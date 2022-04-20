@@ -1,0 +1,28 @@
+syntax = "proto3";
+package dev.f110.kubeproto;
+
+import "google/protobuf/descriptor.proto";
+
+message Kind {}
+
+message Field {
+  string go_name = 1;
+  bool   inline  = 2;
+}
+
+message Kubernetes {
+  string group = 1;
+  string version = 2;
+}
+
+extend google.protobuf.MessageOptions {
+  Kind kind = 60010;
+}
+
+extend google.protobuf.FieldOptions {
+  Field field = 60010;
+}
+
+extend google.protobuf.FileOptions {
+  Kubernetes k8s = 60010;
+}

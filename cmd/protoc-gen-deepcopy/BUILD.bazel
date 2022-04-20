@@ -1,0 +1,20 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "protoc-gen-deepcopy_lib",
+    srcs = ["main.go"],
+    importpath = "go.f110.dev/kubeproto/cmd/protoc-gen-deepcopy",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//internal/object",
+        "@org_golang_google_protobuf//proto:go_default_library",
+        "@org_golang_google_protobuf//types/descriptorpb:go_default_library",
+        "@org_golang_google_protobuf//types/pluginpb:go_default_library",
+    ],
+)
+
+go_binary(
+    name = "protoc-gen-deepcopy",
+    embed = [":protoc-gen-deepcopy_lib"],
+    visibility = ["//visibility:public"],
+)
