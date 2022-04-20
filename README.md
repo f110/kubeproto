@@ -45,11 +45,25 @@ go_proto_library(
     compiler = "//bazel/go:deepcopy",
     importpath = "go.f110.dev/kubeproto/example/pkg/apis",
     proto = ":github_proto",
-    deps = [
-        # This line is required
+    deps = [ # deps is required
         "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
     ],
     visibility = ["//visibility:public"],
+)
+
+go_proto_library(
+    name = "github_proto_register",
+    compiler = "//bazel/go:register",
+    importpath = "go.f110.dev/kubeproto/example/pkg/apis",
+    proto = ":github_proto",
+    visibility = ["//visibility:public"],
+    embed = [":github_proto_deepcopy"],
+    deps = [
+        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
+    ],
 )
 ```
 

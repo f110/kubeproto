@@ -1,4 +1,4 @@
-package object
+package definition
 
 import (
 	"fmt"
@@ -60,12 +60,19 @@ func isKind(desc *descriptorpb.DescriptorProto) bool {
 }
 
 type Message struct {
-	Dep       bool
-	Name      string
+	// Dep indicates that this message is dependent
+	Dep bool
+	// Name is a fully qualified message name that includes a package name. (e,g, .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta)
+	Name string
+	// ShortName is a name of message (e,g, TypeMeta)
 	ShortName string
-	Fields    Fields
-	Virtual   bool
-	Package   ImportPackage
+	// Kind indicates has this message is runtime.Object.
+	Kind bool
+	// Fields has all fields of the message.
+	Fields Fields
+	// Virtual indicates that the message is not defined protobuf.
+	Virtual bool
+	Package ImportPackage
 
 	descriptor *descriptorpb.DescriptorProto
 }
@@ -115,19 +122,23 @@ func NewMessage(f *descriptorpb.FileDescriptorProto, desc *descriptorpb.Descript
 		})
 	}
 
+	var kind bool
 	if isKind(desc) {
+		kind = true
 		fields = append([]*Field{
 			{
 				Name:        "TypeMeta",
 				MessageName: ".k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta",
 				Type:        descriptorpb.FieldDescriptorProto_TYPE_MESSAGE,
 				Inline:      true,
+				Embed:       true,
 			},
 			{
 				Name:        "ObjectMeta",
 				FieldName:   "metadata",
 				MessageName: ".k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta",
 				Type:        descriptorpb.FieldDescriptorProto_TYPE_MESSAGE,
+				Embed:       true,
 			},
 		}, fields...)
 	}
@@ -135,6 +146,7 @@ func NewMessage(f *descriptorpb.FileDescriptorProto, desc *descriptorpb.Descript
 	return &Message{
 		Name:       fmt.Sprintf(".%s.%s", f.GetPackage(), desc.GetName()),
 		ShortName:  desc.GetName(),
+		Kind:       kind,
 		Fields:     fields,
 		descriptor: desc,
 	}
@@ -153,6 +165,7 @@ type Field struct {
 	// Inline indicates the embed field
 	Inline   bool
 	Optional bool
+	Embed    bool
 
 	typeName string
 }

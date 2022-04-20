@@ -20,6 +20,21 @@ go_proto_library(
     visibility = ["//visibility:public"],
     deps = [
         "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
+    ],
+)
+
+go_proto_library(
+    name = "github_proto_register",
+    compiler = "//bazel/go:register",
+    embed = [":github_proto_deepcopy"],
+    importpath = "go.f110.dev/kubeproto/example/pkg/apis",
+    proto = ":github_proto",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
     ],
 )
 
@@ -27,11 +42,16 @@ go_library(
     name = "apis",
     srcs = [
         "github.generated.deepcopy.go",
+        "github.generated.register.go",
         "import.go",
     ],
     importpath = "go.f110.dev/kubeproto/example/pkg/apis",
     visibility = ["//visibility:public"],
-    deps = ["//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta"],
+    deps = [
+        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
+    ],
 )
 
 go_test(

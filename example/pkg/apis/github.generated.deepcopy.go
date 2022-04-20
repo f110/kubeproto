@@ -2,13 +2,14 @@ package apis
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
 type Grafana struct {
-	TypeMeta   metav1.TypeMeta   `json:",inline"`
-	ObjectMeta metav1.ObjectMeta `json:"metadata"`
-	Spec       GrafanaSpec       `json:"spec"`
-	Status     GrafanaStatus     `json:"status"`
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata"`
+	Spec              GrafanaSpec   `json:"spec"`
+	Status            GrafanaStatus `json:"status"`
 }
 
 func (in *Grafana) DeepCopyInto(out *Grafana) {
@@ -28,11 +29,18 @@ func (in *Grafana) DeepCopy() *Grafana {
 	return out
 }
 
+func (in *Grafana) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	}
+	return nil
+}
+
 type GrafanaUser struct {
-	TypeMeta   metav1.TypeMeta   `json:",inline"`
-	ObjectMeta metav1.ObjectMeta `json:"metadata"`
-	Spec       GrafanaUserSpec   `json:"spec"`
-	Status     GrafanaUserStatus `json:"status"`
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata"`
+	Spec              GrafanaUserSpec   `json:"spec"`
+	Status            GrafanaUserStatus `json:"status"`
 }
 
 func (in *GrafanaUser) DeepCopyInto(out *GrafanaUser) {
@@ -50,6 +58,13 @@ func (in *GrafanaUser) DeepCopy() *GrafanaUser {
 	out := new(GrafanaUser)
 	in.DeepCopyInto(out)
 	return out
+}
+
+func (in *GrafanaUser) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	}
+	return nil
 }
 
 type GrafanaSpec struct {

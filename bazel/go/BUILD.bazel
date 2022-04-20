@@ -8,3 +8,12 @@ go_proto_compiler(
     visibility = ["//visibility:public"],
     deps = [],
 )
+
+go_proto_compiler(
+    name = "register",
+    options = ["plugins=register"],
+    plugin = "//cmd/protoc-gen-register",
+    suffix = ".generated.register.go",
+    visibility = ["//visibility:public"],
+    deps = [],
+)

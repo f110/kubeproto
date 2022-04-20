@@ -1,0 +1,8 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "codegeneration",
+    srcs = ["writer.go"],
+    importpath = "go.f110.dev/kubeproto/internal/codegeneration",
+    visibility = ["//:__subpackages__"],
+)

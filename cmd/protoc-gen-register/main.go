@@ -15,7 +15,7 @@ import (
 	"go.f110.dev/kubeproto/internal/k8s"
 )
 
-func genDeepCopy() error {
+func genRegister() error {
 	buf, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		return err
@@ -40,12 +40,12 @@ func genDeepCopy() error {
 	res.SupportedFeatures = &supportedFeatures
 	for name, desc := range files {
 		out := new(bytes.Buffer)
-		g := k8s.NewDeepCopyGenerator(desc, input.ProtoFile)
+		g := k8s.NewRegisterGenerator(desc, input.ProtoFile)
 		if err := g.Generate(out); err != nil {
 			return err
 		}
 		res.File = append(res.File, &pluginpb.CodeGeneratorResponse_File{
-			Name:    proto.String(fmt.Sprintf("%s.generated.deepcopy.go", strings.TrimSuffix(name, filepath.Ext(name)))),
+			Name:    proto.String(fmt.Sprintf("%s.generated.register.go", strings.TrimSuffix(name, filepath.Ext(name)))),
 			Content: proto.String(out.String()),
 		})
 	}
@@ -62,7 +62,7 @@ func genDeepCopy() error {
 }
 
 func main() {
-	if err := genDeepCopy(); err != nil {
+	if err := genRegister(); err != nil {
 		fmt.Fprintf(os.Stderr, "%+v\n", err)
 		os.Exit(1)
 	}

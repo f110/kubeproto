@@ -1,13 +1,12 @@
 load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
-    name = "object",
+    name = "definition",
     srcs = [
-        "deepcopy.go",
+        "lister.go",
         "message.go",
-        "writer.go",
     ],
-    importpath = "go.f110.dev/kubeproto/internal/object",
+    importpath = "go.f110.dev/kubeproto/internal/definition",
     visibility = ["//:__subpackages__"],
     deps = [
         "//:kubeproto_go_proto",

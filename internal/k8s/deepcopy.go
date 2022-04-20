@@ -1,19 +1,14 @@
-package object
+package k8s
 
 import (
-	"bufio"
-	"fmt"
-	"go/format"
 	"io"
 	"log"
-	"os"
 	"path"
-	"strings"
 
-	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
 
-	"go.f110.dev/kubeproto"
+	"go.f110.dev/kubeproto/internal/codegeneration"
+	"go.f110.dev/kubeproto/internal/definition"
 )
 
 type DeepCopyGenerator struct {
@@ -26,15 +21,17 @@ func NewDeepCopyGenerator(file *descriptorpb.FileDescriptorProto, allProtos []*d
 }
 
 func (g *DeepCopyGenerator) Generate(out io.Writer) error {
-	w := newWriter()
+	w := codegeneration.NewWriter()
 	messages := g.getMessages()
 
 	packageName := g.file.GetOptions().GetGoPackage()
 	w.F("package %s", path.Base(packageName))
 
-	importPackages := make(map[string]string)
+	importPackages := map[string]string{
+		"k8s.io/apimachinery/pkg/runtime": "",
+	}
 	mark := make(map[string]struct{})
-	defW := newWriter()
+	defW := codegeneration.NewWriter()
 	objs := messages.FilterKind()
 	for len(objs) > 0 {
 		obj := objs[0]
@@ -57,14 +54,18 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 					objs = append(objs, m)
 				}
 			}
+			var name string
+			if !f.Embed {
+				name = f.Name.CamelCase()
+			}
 			typ := f.TypeName(messages)
 			tag := f.Tag()
-			defW.F("%s %s %s", f.Name.CamelCase(), typ, tag)
+			defW.F("%s %s %s", name, typ, tag)
 		}
 		defW.F("}")
 		defW.F("")
 
-		// DeepCopy functions (DeepCopyInto / DeepCopy)
+		// DeepCopy functions (DeepCopyInto / DeepCopy / DeepCopyObject)
 		defW.F("func (in *%s) DeepCopyInto(out *%s) {", obj.ShortName, obj.ShortName)
 		defW.F("*out = *in")
 		for _, f := range obj.Fields {
@@ -109,6 +110,17 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 		defW.F("in.DeepCopyInto(out)")
 		defW.F("return out")
 		defW.F("}")
+		defW.F("")
+		// DeepCopyObject should generate only top level object.
+		if obj.Kind {
+			defW.F("func (in *%s) DeepCopyObject() runtime.Object {", obj.ShortName)
+			defW.F("if c := in.DeepCopy(); c != nil {")
+			defW.F("return c")
+			defW.F("}")
+			defW.F("return nil")
+			defW.F("}")
+		}
+
 		objs = objs[1:]
 	}
 
@@ -124,31 +136,24 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 	w.F("")
 	defW.WriteTo(w)
 
-	formatted, err := format.Source(w.Bytes())
-	if err != nil {
-		scanner := bufio.NewScanner(strings.NewReader(w.String()))
-		i := 1
-		for scanner.Scan() {
-			fmt.Fprintf(os.Stderr, "%d: %s\n", i, scanner.Text())
-			i++
-		}
+	if err := w.Format(); err != nil {
 		return err
 	}
-	if _, err := out.Write(formatted); err != nil {
+	if _, err := w.WriteTo(out); err != nil {
 		return err
 	}
-	log.Print(string(formatted))
+	log.Print(w.String())
 	return nil
 }
 
-func (g *DeepCopyGenerator) getMessages() Messages {
-	var msgs Messages
+func (g *DeepCopyGenerator) getMessages() definition.Messages {
+	var msgs definition.Messages
 	for _, v := range g.file.GetMessageType() {
-		msgs = append(msgs, NewMessage(g.file, v))
+		msgs = append(msgs, definition.NewMessage(g.file, v))
 	}
 	for _, v := range g.allFiles {
 		for _, mt := range v.GetMessageType() {
-			m := NewMessage(v, mt)
+			m := definition.NewMessage(v, mt)
 			m.Dep = true
 			if exists := msgs.Find(m.Name); exists == nil {
 				msgs = append(msgs, m)
@@ -156,24 +161,7 @@ func (g *DeepCopyGenerator) getMessages() Messages {
 		}
 	}
 
-	msgs = append(msgs, MessageTypeMeta, MessageObjectMeta)
+	msgs = append(msgs, definition.MessageTypeMeta, definition.MessageObjectMeta)
 
 	return msgs
-}
-
-func (g *DeepCopyGenerator) getObjectDescriptors() []*descriptorpb.DescriptorProto {
-	var objects []*descriptorpb.DescriptorProto
-	for _, v := range g.file.GetMessageType() {
-		e := proto.GetExtension(v.GetOptions(), kubeproto.E_Kind)
-		if e == nil {
-			continue
-		}
-		ext := e.(*kubeproto.Kind)
-		if ext == nil {
-			continue
-		}
-		objects = append(objects, v)
-	}
-
-	return objects
 }
