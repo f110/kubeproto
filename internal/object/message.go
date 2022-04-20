@@ -90,8 +90,18 @@ var (
 func NewMessage(f *descriptorpb.FileDescriptorProto, desc *descriptorpb.DescriptorProto) *Message {
 	var fields []*Field
 	for _, v := range desc.Field {
+		var name string
+		e := proto.GetExtension(v.GetOptions(), kubeproto.E_Field)
+		ext := e.(*kubeproto.Field)
+		if ext != nil {
+			name = ext.GetGoName()
+		}
+		if name == "" {
+			name = v.GetName()
+		}
+
 		fields = append(fields, &Field{
-			Name:        Name(v.GetName()),
+			Name:        Name(name),
 			FieldName:   stringsutil.ToLowerCamelCase(v.GetName()),
 			Type:        v.GetType(),
 			MessageName: v.GetTypeName(),
