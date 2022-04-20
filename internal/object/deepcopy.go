@@ -70,6 +70,16 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 		for _, f := range obj.Fields {
 			switch f.Type {
 			case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
+				if f.Repeated {
+					defW.F("if in.%s != nil {", f.Name.CamelCase())
+					defW.F("l := make(%s, len(in.%s))", f.TypeName(messages), f.Name.CamelCase())
+					defW.F("for i := range in.%s {", f.Name.CamelCase())
+					defW.F("in.%s[i].DeepCopyInto(&l[i])", f.Name.CamelCase())
+					defW.F("}")
+					defW.F("out.%s = l", f.Name.CamelCase())
+					defW.F("}")
+					continue
+				}
 				if f.Optional {
 					defW.F("if in.%s != nil {", f.Name.CamelCase())
 					defW.F("in, out := &in.%s, &out.%s", f.Name.CamelCase(), f.Name.CamelCase())
@@ -80,6 +90,14 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 					defW.F("out.%s = in.%s", f.Name.CamelCase(), f.Name.CamelCase())
 				} else {
 					defW.F("in.%s.DeepCopyInto(&out.%s)", f.Name.CamelCase(), f.Name.CamelCase())
+				}
+			default:
+				if f.Repeated {
+					defW.F("if in.%s != nil {", f.Name.CamelCase())
+					defW.F("t := make(%s, len(in.%s))", f.TypeName(messages), f.Name.CamelCase())
+					defW.F("copy(t, in.%s)", f.Name.CamelCase())
+					defW.F("out.%s = t", f.Name.CamelCase())
+					defW.F("}")
 				}
 			}
 		}

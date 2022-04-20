@@ -100,10 +100,16 @@ func NewMessage(f *descriptorpb.FileDescriptorProto, desc *descriptorpb.Descript
 			name = v.GetName()
 		}
 
+		var repeated bool
+		if v.GetLabel() == descriptorpb.FieldDescriptorProto_LABEL_REPEATED {
+			repeated = true
+		}
+
 		fields = append(fields, &Field{
 			Name:        Name(name),
 			FieldName:   stringsutil.ToLowerCamelCase(v.GetName()),
 			Type:        v.GetType(),
+			Repeated:    repeated,
 			MessageName: v.GetTypeName(),
 			Optional:    v.GetProto3Optional(),
 		})
@@ -140,6 +146,8 @@ type Field struct {
 	// FieldName is a json tag name
 	FieldName string
 	Type      descriptorpb.FieldDescriptorProto_Type
+	// Repeated indicates that this field is an array.
+	Repeated bool
 	// MessageName is a name of Message if Type is FieldDescriptorProto_TYPE_MESSAGE
 	MessageName string
 	// Inline indicates the embed field
@@ -175,6 +183,10 @@ func (f *Field) TypeName(messages Messages) string {
 		}
 	default:
 		typ = descriptorTypeMap[f.Type]
+	}
+
+	if f.Repeated {
+		typ = "[]" + typ
 	}
 
 	f.typeName = typ
