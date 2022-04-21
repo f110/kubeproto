@@ -12,17 +12,17 @@ import (
 )
 
 type DeepCopyGenerator struct {
-	file     *descriptorpb.FileDescriptorProto
-	allFiles []*descriptorpb.FileDescriptorProto
+	file   *descriptorpb.FileDescriptorProto
+	lister *definition.Lister
 }
 
 func NewDeepCopyGenerator(file *descriptorpb.FileDescriptorProto, allProtos []*descriptorpb.FileDescriptorProto) *DeepCopyGenerator {
-	return &DeepCopyGenerator{file: file, allFiles: allProtos}
+	return &DeepCopyGenerator{file: file, lister: definition.NewLister(file, allProtos)}
 }
 
 func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 	w := codegeneration.NewWriter()
-	messages := g.getMessages()
+	messages := g.lister.GetMessages()
 
 	packageName := g.file.GetOptions().GetGoPackage()
 	w.F("package %s", path.Base(packageName))
@@ -144,24 +144,4 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 	}
 	log.Print(w.String())
 	return nil
-}
-
-func (g *DeepCopyGenerator) getMessages() definition.Messages {
-	var msgs definition.Messages
-	for _, v := range g.file.GetMessageType() {
-		msgs = append(msgs, definition.NewMessage(g.file, v))
-	}
-	for _, v := range g.allFiles {
-		for _, mt := range v.GetMessageType() {
-			m := definition.NewMessage(v, mt)
-			m.Dep = true
-			if exists := msgs.Find(m.Name); exists == nil {
-				msgs = append(msgs, m)
-			}
-		}
-	}
-
-	msgs = append(msgs, definition.MessageTypeMeta, definition.MessageObjectMeta)
-
-	return msgs
 }
