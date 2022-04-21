@@ -28,6 +28,6 @@ func (l *Lister) GetMessages() Messages {
 		}
 	}
 
-	msgs = append(msgs, MessageTypeMeta, MessageObjectMeta)
+	msgs = append(msgs, MessageTypeMeta, MessageObjectMeta, MessageListMeta)
 	return msgs
 }

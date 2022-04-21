@@ -19,11 +19,36 @@ var descriptorTypeMap = map[descriptorpb.FieldDescriptorProto_Type]string{
 	descriptorpb.FieldDescriptorProto_TYPE_BOOL:   "bool",
 }
 
+var (
+	MessageTypeMeta = &Message{
+		Dep:       true,
+		Virtual:   true,
+		Name:      ".k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta",
+		ShortName: "TypeMeta",
+		Package:   ImportPackage{Path: "k8s.io/apimachinery/pkg/apis/meta/v1", Alias: "metav1"},
+	}
+	MessageObjectMeta = &Message{
+		Dep:       true,
+		Virtual:   true,
+		Name:      ".k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta",
+		ShortName: "ObjectMeta",
+		Package:   ImportPackage{Path: "k8s.io/apimachinery/pkg/apis/meta/v1", Alias: "metav1"},
+	}
+	MessageListMeta = &Message{
+		Dep:       true,
+		Virtual:   true,
+		Name:      ".k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta",
+		ShortName: "ListMeta",
+		Package:   ImportPackage{Path: "k8s.io/apimachinery/pkg/apis/meta/v1", Alias: "metav1"},
+	}
+)
+
 type Messages []*Message
 
-func (m Messages) FilterKind() Messages {
+func (m *Messages) FilterKind() Messages {
+	kindMap := make(map[string]*Message)
 	var kinds []*Message
-	for _, v := range m {
+	for _, v := range *m {
 		if v.Dep {
 			continue
 		}
@@ -31,6 +56,41 @@ func (m Messages) FilterKind() Messages {
 			continue
 		}
 		kinds = append(kinds, v)
+		kindMap[v.ShortName] = v
+	}
+	for name, v := range kindMap {
+		if _, ok := kindMap[name+"List"]; !ok {
+			listMessage := &Message{
+				Name:      fmt.Sprintf("%sList", v.Name),
+				ShortName: fmt.Sprintf("%sList", v.ShortName),
+				Fields: []*Field{
+					{
+						Name:        "TypeMeta",
+						MessageName: ".k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta",
+						Type:        descriptorpb.FieldDescriptorProto_TYPE_MESSAGE,
+						Inline:      true,
+						Embed:       true,
+					},
+					{
+						Name:        "ListMeta",
+						FieldName:   "metadata",
+						MessageName: ".k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta",
+						Type:        descriptorpb.FieldDescriptorProto_TYPE_MESSAGE,
+						Embed:       true,
+					},
+					{
+						Name:        "Items",
+						FieldName:   "items",
+						Type:        descriptorpb.FieldDescriptorProto_TYPE_MESSAGE,
+						Repeated:    true,
+						MessageName: v.Name,
+					},
+				},
+				Kind: true,
+			}
+			*m = append(*m, listMessage)
+			kinds = append(kinds, listMessage)
+		}
 	}
 
 	return kinds
@@ -77,23 +137,6 @@ type Message struct {
 	descriptor *descriptorpb.DescriptorProto
 }
 
-var (
-	MessageTypeMeta = &Message{
-		Dep:       true,
-		Virtual:   true,
-		Name:      ".k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta",
-		ShortName: "TypeMeta",
-		Package:   ImportPackage{Path: "k8s.io/apimachinery/pkg/apis/meta/v1", Alias: "metav1"},
-	}
-	MessageObjectMeta = &Message{
-		Dep:       true,
-		Virtual:   true,
-		Name:      ".k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta",
-		ShortName: "ObjectMeta",
-		Package:   ImportPackage{Path: "k8s.io/apimachinery/pkg/apis/meta/v1", Alias: "metav1"},
-	}
-)
-
 func NewMessage(f *descriptorpb.FileDescriptorProto, desc *descriptorpb.DescriptorProto) *Message {
 	var fields []*Field
 	for _, v := range desc.Field {
@@ -122,10 +165,31 @@ func NewMessage(f *descriptorpb.FileDescriptorProto, desc *descriptorpb.Descript
 		})
 	}
 
-	var kind bool
+	m := &Message{
+		Name:       fmt.Sprintf(".%s.%s", f.GetPackage(), desc.GetName()),
+		ShortName:  desc.GetName(),
+		Fields:     fields,
+		descriptor: desc,
+	}
+
 	if isKind(desc) {
-		kind = true
-		fields = append([]*Field{
+		extendAsKind(m)
+	}
+
+	return m
+}
+
+func extendAsKind(m *Message) {
+	m.Kind = true
+	found := false
+	for _, v := range m.Fields {
+		if v.Name == "TypeMeta" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		m.Fields = append([]*Field{
 			{
 				Name:        "TypeMeta",
 				MessageName: ".k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta",
@@ -140,15 +204,7 @@ func NewMessage(f *descriptorpb.FileDescriptorProto, desc *descriptorpb.Descript
 				Type:        descriptorpb.FieldDescriptorProto_TYPE_MESSAGE,
 				Embed:       true,
 			},
-		}, fields...)
-	}
-
-	return &Message{
-		Name:       fmt.Sprintf(".%s.%s", f.GetPackage(), desc.GetName()),
-		ShortName:  desc.GetName(),
-		Kind:       kind,
-		Fields:     fields,
-		descriptor: desc,
+		}, m.Fields...)
 	}
 }
 
