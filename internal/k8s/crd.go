@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"sort"
 	"strings"
 
 	"google.golang.org/protobuf/types/descriptorpb"
@@ -103,6 +104,10 @@ func (g *CRDGenerator) Generate(out io.Writer) error {
 			}
 			crd.Spec.Versions = append(crd.Spec.Versions, ver)
 		}
+
+		sort.Slice(crd.Spec.Versions, func(i, j int) bool {
+			return crd.Spec.Versions[i].Name < crd.Spec.Versions[j].Name
+		})
 
 		tmp, err := json.Marshal(crd)
 		if err != nil {

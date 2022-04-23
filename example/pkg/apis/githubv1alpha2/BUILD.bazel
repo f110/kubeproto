@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
 
@@ -29,6 +29,21 @@ go_proto_library(
     embed = [":github_proto_deepcopy"],
     importpath = "go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha2",
     proto = ":github_proto",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
+    ],
+)
+
+go_library(
+    name = "githubv1alpha2",
+    srcs = [
+        "github.generated.deepcopy.go",
+        "github.generated.register.go",
+    ],
+    importpath = "go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha2",
     visibility = ["//visibility:public"],
     deps = [
         "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",

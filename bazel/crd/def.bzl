@@ -7,11 +7,11 @@ def _crd_proto_manifest(ctx):
     args = ctx.actions.args()
 
     proto_files = []
-    transitive_protos = depset()
+    transitive_protos = []
     import_path = []
     for src in ctx.attr.srcs:
         proto = src[ProtoInfo]
-        transitive_protos = depset(transitive = [transitive_protos, proto.transitive_sources])
+        transitive_protos.append(proto.transitive_imports)
         import_path.append(proto.transitive_proto_path)
         for s in proto.direct_sources:
             args.add(s.path)
@@ -23,13 +23,12 @@ def _crd_proto_manifest(ctx):
 
     out = ctx.actions.declare_file("%s.crd.yaml" % ctx.label.name)
     args.add("--crd_out=%s:." % out.path)
-    print(args)
     ctx.actions.run(
         executable = ctx.executable.protoc,
         tools = [ctx.executable._compiler],
         inputs = depset(
             direct = proto_files,
-            transitive = [transitive_protos],
+            transitive = transitive_protos,
         ),
         outputs = [out],
         arguments = [args],

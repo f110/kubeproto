@@ -1,5 +1,6 @@
 # gazelle:prefix go.f110.dev/kubeproto
 # gazelle:proto disable_global
+# gazelle:resolve go go.f110.dev/kubeproto //:kubeproto_lib
 
 load("@bazel_gazelle//:def.bzl", "gazelle")
 

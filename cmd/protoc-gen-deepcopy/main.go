@@ -44,6 +44,7 @@ func genDeepCopy() error {
 		if err := g.Generate(out); err != nil {
 			return err
 		}
+
 		res.File = append(res.File, &pluginpb.CodeGeneratorResponse_File{
 			Name:    proto.String(fmt.Sprintf("%s.generated.deepcopy.go", strings.TrimSuffix(name, filepath.Ext(name)))),
 			Content: proto.String(out.String()),
