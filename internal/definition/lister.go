@@ -5,18 +5,20 @@ import (
 )
 
 type Lister struct {
-	file     *descriptorpb.FileDescriptorProto
+	files    []*descriptorpb.FileDescriptorProto
 	allFiles []*descriptorpb.FileDescriptorProto
 }
 
-func NewLister(file *descriptorpb.FileDescriptorProto, allProtos []*descriptorpb.FileDescriptorProto) *Lister {
-	return &Lister{file: file, allFiles: allProtos}
+func NewLister(files []*descriptorpb.FileDescriptorProto, allProtos []*descriptorpb.FileDescriptorProto) *Lister {
+	return &Lister{files: files, allFiles: allProtos}
 }
 
 func (l *Lister) GetMessages() Messages {
 	var msgs Messages
-	for _, v := range l.file.GetMessageType() {
-		msgs = append(msgs, NewMessage(l.file, v))
+	for _, f := range l.files {
+		for _, v := range f.GetMessageType() {
+			msgs = append(msgs, NewMessage(f, v))
+		}
 	}
 	for _, v := range l.allFiles {
 		for _, mt := range v.GetMessageType() {

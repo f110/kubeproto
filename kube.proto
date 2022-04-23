@@ -3,16 +3,31 @@ package dev.f110.kubeproto;
 
 import "google/protobuf/descriptor.proto";
 
-message Kind {}
+message Kind {
+  repeated PrinterColumn additional_printer_columns = 1;
+}
 
 message Field {
-  string go_name = 1;
-  bool   inline  = 2;
+  string go_name      = 1;
+  bool   inline       = 2;
+  bool   sub_resource = 3;
 }
 
 message Kubernetes {
-  string group = 1;
+  string group   = 1;
   string version = 2;
+  bool   served  = 3;
+  bool   storage = 4;
+}
+
+message PrinterColumn {
+  string description = 1;
+  string name        = 2;
+  string json_path   = 3;
+  int32  priority    = 4;
+  // In future, type and format field will remove.
+  string type        = 5;
+  string format      = 6;
 }
 
 extend google.protobuf.MessageOptions {

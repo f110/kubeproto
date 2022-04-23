@@ -1,0 +1,60 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
+
+proto_library(
+    name = "github_proto",
+    srcs = ["github.proto"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:kubeproto",
+    ],
+)
+
+go_proto_library(
+    name = "github_proto_deepcopy",
+    compiler = "//bazel:deepcopy",
+    importpath = "go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha1",
+    proto = ":github_proto",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
+    ],
+)
+
+go_proto_library(
+    name = "github_proto_register",
+    compiler = "//bazel:register",
+    embed = [":github_proto_deepcopy"],
+    importpath = "go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha1",
+    proto = ":github_proto",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
+    ],
+)
+
+go_test(
+    name = "githubv1alpha1_test",
+    srcs = ["test_test.go"],
+    embed = [":githubv1alpha1"],
+    deps = ["//example/pkg/apis"],
+)
+
+go_library(
+    name = "githubv1alpha1",
+    srcs = [
+        "github.generated.deepcopy.go",
+        "github.generated.register.go",
+    ],
+    importpath = "go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha1",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
+    ],
+)

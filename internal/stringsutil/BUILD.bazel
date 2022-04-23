@@ -5,4 +5,5 @@ go_library(
     srcs = ["strings.go"],
     importpath = "go.f110.dev/kubeproto/internal/stringsutil",
     visibility = ["//:__subpackages__"],
+    deps = ["//vendor/github.com/gertd/go-pluralize"],
 )

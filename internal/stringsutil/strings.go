@@ -3,6 +3,8 @@ package stringsutil
 import (
 	"strings"
 	"unicode"
+
+	"github.com/gertd/go-pluralize"
 )
 
 func ToUpperCamelCase(in string) string {
@@ -19,4 +21,14 @@ func ToLowerCamelCase(in string) string {
 	s := ToUpperCamelCase(in)
 
 	return string(unicode.ToLower(rune(s[0]))) + s[1:]
+}
+
+var pluralizeClient = pluralize.NewClient()
+
+func Plural(word string) string {
+	return pluralizeClient.Plural(word)
+}
+
+func Singular(word string) string {
+	return pluralizeClient.Singular(word)
 }

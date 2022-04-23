@@ -9,9 +9,9 @@ go_library(
     importpath = "go.f110.dev/kubeproto/internal/definition",
     visibility = ["//:__subpackages__"],
     deps = [
-        "//:kubeproto_go_proto",
+        "//:kubeproto_lib",
         "//internal/stringsutil",
-        "@org_golang_google_protobuf//proto:go_default_library",
-        "@org_golang_google_protobuf//types/descriptorpb:go_default_library",
+        "//vendor/google.golang.org/protobuf/proto",
+        "//vendor/google.golang.org/protobuf/types/descriptorpb",
     ],
 )

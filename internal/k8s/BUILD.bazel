@@ -3,16 +3,20 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 go_library(
     name = "k8s",
     srcs = [
+        "crd.go",
         "deepcopy.go",
         "register.go",
     ],
     importpath = "go.f110.dev/kubeproto/internal/k8s",
     visibility = ["//:__subpackages__"],
     deps = [
-        "//:kubeproto_go_proto",
+        "//:kubeproto_lib",
         "//internal/codegeneration",
         "//internal/definition",
-        "@org_golang_google_protobuf//proto:go_default_library",
-        "@org_golang_google_protobuf//types/descriptorpb:go_default_library",
+        "//internal/stringsutil",
+        "//vendor/google.golang.org/protobuf/proto",
+        "//vendor/google.golang.org/protobuf/types/descriptorpb",
+        "//vendor/gopkg.in/yaml.v2:yaml_v2",
+        "//vendor/k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1:apiextensions",
     ],
 )

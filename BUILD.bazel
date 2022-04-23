@@ -29,3 +29,17 @@ go_proto_library(
     protos = [":kubeproto"],
     visibility = ["//visibility:public"],
 )
+
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "kubeproto_lib",
+    srcs = ["kube.pb.go"],
+    importpath = "go.f110.dev/kubeproto",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vendor/google.golang.org/protobuf/reflect/protoreflect",
+        "//vendor/google.golang.org/protobuf/runtime/protoimpl",
+        "//vendor/google.golang.org/protobuf/types/descriptorpb",
+    ],
+)

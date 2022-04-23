@@ -19,7 +19,7 @@ type RegisterGenerator struct {
 }
 
 func NewRegisterGenerator(file *descriptorpb.FileDescriptorProto, allProtos []*descriptorpb.FileDescriptorProto) *RegisterGenerator {
-	return &RegisterGenerator{file: file, lister: definition.NewLister(file, allProtos)}
+	return &RegisterGenerator{file: file, lister: definition.NewLister([]*descriptorpb.FileDescriptorProto{file}, allProtos)}
 }
 
 func (g *RegisterGenerator) Generate(out io.Writer) error {

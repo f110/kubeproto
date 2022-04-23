@@ -1,0 +1,10 @@
+load("//bazel/crd:def.bzl", "crd_proto_manifest")
+
+crd_proto_manifest(
+    name = "github",
+    srcs = [
+        "//example/pkg/apis/githubv1alpha1:github_proto",
+        "//example/pkg/apis/githubv1alpha2:github_proto",
+    ],
+    visibility = ["//visibility:public"],
+)

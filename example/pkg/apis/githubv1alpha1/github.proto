@@ -1,6 +1,6 @@
 syntax = "proto3";
-package example.apis;
-option go_package = "go.f110.dev/kubeproto/example/pkg/apis";
+package example.apis.githubv1alpha1;
+option go_package = "go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha1";
 option (dev.f110.kubeproto.k8s) = {group: "grafana.f110.dev", version: "v1alpha1"};
 
 import "kube.proto";

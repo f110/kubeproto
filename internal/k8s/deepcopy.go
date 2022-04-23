@@ -17,7 +17,7 @@ type DeepCopyGenerator struct {
 }
 
 func NewDeepCopyGenerator(file *descriptorpb.FileDescriptorProto, allProtos []*descriptorpb.FileDescriptorProto) *DeepCopyGenerator {
-	return &DeepCopyGenerator{file: file, lister: definition.NewLister(file, allProtos)}
+	return &DeepCopyGenerator{file: file, lister: definition.NewLister([]*descriptorpb.FileDescriptorProto{file}, allProtos)}
 }
 
 func (g *DeepCopyGenerator) Generate(out io.Writer) error {

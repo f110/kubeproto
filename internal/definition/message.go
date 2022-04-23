@@ -25,7 +25,21 @@ var (
 		Virtual:   true,
 		Name:      ".k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta",
 		ShortName: "TypeMeta",
-		Package:   ImportPackage{Path: "k8s.io/apimachinery/pkg/apis/meta/v1", Alias: "metav1"},
+		Fields: []*Field{
+			{
+				Name:      "Kind",
+				FieldName: "kind",
+				Optional:  true,
+				Type:      descriptorpb.FieldDescriptorProto_TYPE_STRING,
+			},
+			{
+				Name:      "APIVersion",
+				FieldName: "apiVersion",
+				Optional:  true,
+				Type:      descriptorpb.FieldDescriptorProto_TYPE_STRING,
+			},
+		},
+		Package: ImportPackage{Path: "k8s.io/apimachinery/pkg/apis/meta/v1", Alias: "metav1"},
 	}
 	MessageObjectMeta = &Message{
 		Dep:       true,
@@ -86,7 +100,8 @@ func (m *Messages) FilterKind() Messages {
 						MessageName: v.Name,
 					},
 				},
-				Kind: true,
+				Kind:    true,
+				Virtual: true,
 			}
 			*m = append(*m, listMessage)
 			kinds = append(kinds, listMessage)
@@ -131,20 +146,24 @@ type Message struct {
 	// Fields has all fields of the message.
 	Fields Fields
 	// Virtual indicates that the message is not defined protobuf.
-	Virtual bool
-	Package ImportPackage
+	Virtual                  bool
+	AdditionalPrinterColumns []*kubeproto.PrinterColumn
+	Package                  ImportPackage
 
-	descriptor *descriptorpb.DescriptorProto
+	descriptor     *descriptorpb.DescriptorProto
+	fileDescriptor *descriptorpb.FileDescriptorProto
 }
 
 func NewMessage(f *descriptorpb.FileDescriptorProto, desc *descriptorpb.DescriptorProto) *Message {
 	var fields []*Field
 	for _, v := range desc.Field {
 		var name string
+		var subResource bool
 		e := proto.GetExtension(v.GetOptions(), kubeproto.E_Field)
 		ext := e.(*kubeproto.Field)
 		if ext != nil {
 			name = ext.GetGoName()
+			subResource = ext.SubResource
 		}
 		if name == "" {
 			name = v.GetName()
@@ -162,14 +181,24 @@ func NewMessage(f *descriptorpb.FileDescriptorProto, desc *descriptorpb.Descript
 			Repeated:    repeated,
 			MessageName: v.GetTypeName(),
 			Optional:    v.GetProto3Optional(),
+			SubResource: subResource,
 		})
 	}
 
+	var printerColumns []*kubeproto.PrinterColumn
+	e := proto.GetExtension(desc.GetOptions(), kubeproto.E_Kind)
+	ext := e.(*kubeproto.Kind)
+	if ext != nil {
+		printerColumns = ext.AdditionalPrinterColumns
+	}
+
 	m := &Message{
-		Name:       fmt.Sprintf(".%s.%s", f.GetPackage(), desc.GetName()),
-		ShortName:  desc.GetName(),
-		Fields:     fields,
-		descriptor: desc,
+		Name:                     fmt.Sprintf(".%s.%s", f.GetPackage(), desc.GetName()),
+		ShortName:                desc.GetName(),
+		Fields:                   fields,
+		AdditionalPrinterColumns: printerColumns,
+		descriptor:               desc,
+		fileDescriptor:           f,
 	}
 
 	if isKind(desc) {
@@ -177,6 +206,16 @@ func NewMessage(f *descriptorpb.FileDescriptorProto, desc *descriptorpb.Descript
 	}
 
 	return m
+}
+
+func (m *Message) Kubernetes() (*kubeproto.Kubernetes, error) {
+	e := proto.GetExtension(m.fileDescriptor.GetOptions(), kubeproto.E_K8S)
+	ext := e.(*kubeproto.Kubernetes)
+	if ext == nil {
+		return nil, fmt.Errorf("%s is not extended by kubeproto.Kubernetes", m.ShortName)
+	}
+
+	return ext, nil
 }
 
 func extendAsKind(m *Message) {
@@ -219,9 +258,11 @@ type Field struct {
 	// MessageName is a name of Message if Type is FieldDescriptorProto_TYPE_MESSAGE
 	MessageName string
 	// Inline indicates the embed field
-	Inline   bool
-	Optional bool
-	Embed    bool
+	Inline bool
+	// Optional indicates that this field is an optional field.
+	Optional    bool
+	Embed       bool
+	SubResource bool
 
 	typeName string
 }
