@@ -1,4 +1,4 @@
-load("//bazel/crd:def.bzl", "crd_proto_manifest")
+load("//bazel:def.bzl", "crd_proto_manifest")
 
 crd_proto_manifest(
     name = "github",

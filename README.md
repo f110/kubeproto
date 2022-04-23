@@ -27,7 +27,7 @@ message Grafana {
 }
 ```
 
-BUILD
+BUILD at pkg/apis/GROUP_AND_VERSION
 
 ```
 load("@rules_proto//proto:defs.bzl", "proto_library")
@@ -44,28 +44,18 @@ proto_library(
 
 go_proto_library(
     name = "github_proto_deepcopy",
-    compiler = "//bazel/go:deepcopy",
+    compilers = [
+        "//bazel:deepcopy",
+        "//bazel:register",
+    ],
     importpath = "go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha1",
     proto = ":github_proto",
     deps = [ # deps is required
         "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
         "//example/vendor/k8s.io/apimachinery/pkg/runtime",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-go_proto_library(
-    name = "github_proto_register",
-    compiler = "//bazel/go:register",
-    importpath = "go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha1",
-    proto = ":github_proto",
-    visibility = ["//visibility:public"],
-    embed = [":github_proto_deepcopy"],
-    deps = [
-        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
-        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
         "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
     ],
+    visibility = ["//visibility:public"],
 )
 ```
 

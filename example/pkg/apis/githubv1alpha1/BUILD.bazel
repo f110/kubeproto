@@ -12,14 +12,18 @@ proto_library(
 )
 
 go_proto_library(
-    name = "github_proto_deepcopy",
-    compiler = "//bazel:deepcopy",
+    name = "github_proto_k8s",
+    compilers = [
+        "//bazel:deepcopy",
+        "//bazel:register",
+    ],
     importpath = "go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha1",
     proto = ":github_proto",
     visibility = ["//visibility:public"],
     deps = [
         "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
         "//example/vendor/k8s.io/apimachinery/pkg/runtime",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
     ],
 )
 

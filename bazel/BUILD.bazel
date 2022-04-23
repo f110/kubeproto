@@ -19,9 +19,10 @@ go_proto_compiler(
 )
 
 go_proto_compiler(
-    name = "crd",
-    options = ["plugins=crd"],
-    plugin = "//cmd/protoc-gen-crd",
-    suffix = ".crd.yaml",
+    name = "clientset",
+    plugin = "//cmd/protoc-gen-clientset",
+    suffix = ".generated.clientset.go",
+    import_path_option = True,
     visibility = ["//visibility:public"],
+    deps = [],
 )

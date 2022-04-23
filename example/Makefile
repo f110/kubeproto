@@ -1,33 +1,21 @@
 .PHONY: build
-build: pkg/apis/githubv1alpha1/github.generated.deepcopy.go \
-		pkg/apis/githubv1alpha1/github.generated.register.go \
-		pkg/apis/githubv1alpha2/github.generated.deepcopy.go \
-		pkg/apis/githubv1alpha2/github.generated.register.go \
+build: githubv1alpha1 githubv1alpha2 \
 		crd/github.crd.yaml
 
-pkg/apis/githubv1alpha1/github.generated.deepcopy.go: pkg/apis/githubv1alpha1/github.proto
-	bazel build //example/pkg/apis/githubv1alpha1:github_proto_deepcopy
-	@rm -f $@
-	cp ../bazel-bin/example/pkg/apis/githubv1alpha1/github_proto_deepcopy_/go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha1/github.generated.deepcopy.go $(@D)
-	@chmod 644 $@
+.PHONY: githubv1alpha1
+githubv1alpha1: pkg/apis/githubv1alpha1/github.proto
+	bazel build //example/pkg/apis/githubv1alpha1:github_proto_k8s
+	@rm -f pkg/apis/$@/github.generated.deepcopy.go pkg/apis/$@/github.generated.register.go
+	cp ../bazel-bin/example/pkg/apis/$@/github_proto_k8s_/go.f110.dev/kubeproto/example/pkg/apis/$@/github.generated.deepcopy.go pkg/apis/$@
+	cp ../bazel-bin/example/pkg/apis/$@/github_proto_k8s_/go.f110.dev/kubeproto/example/pkg/apis/$@/github.generated.register.go pkg/apis/$@
 
-pkg/apis/githubv1alpha1/github.generated.register.go: pkg/apis/githubv1alpha1/github.proto
-	bazel build //example/pkg/apis/githubv1alpha1:github_proto_register
-	@rm -f $@
-	cp ../bazel-bin/example/pkg/apis/githubv1alpha1/github_proto_register_/go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha1/github.generated.register.go $(@D)
-	@chmod 644 $@
+.PHONY: githubv1alpha2
+githubv1alpha2: pkg/apis/githubv1alpha2/github.proto
+	bazel build //example/pkg/apis/githubv1alpha2:github_proto_k8s
+	@rm -f pkg/apis/$@/github.generated.deepcopy.go pkg/apis/$@/github.generated.register.go
+	cp ../bazel-bin/example/pkg/apis/$@/github_proto_k8s_/go.f110.dev/kubeproto/example/pkg/apis/$@/github.generated.deepcopy.go pkg/apis/$@
+	cp ../bazel-bin/example/pkg/apis/$@/github_proto_k8s_/go.f110.dev/kubeproto/example/pkg/apis/$@/github.generated.register.go pkg/apis/$@
 
-pkg/apis/githubv1alpha2/github.generated.deepcopy.go: pkg/apis/githubv1alpha2/github.proto
-	bazel build //example/pkg/apis/githubv1alpha2:github_proto_deepcopy
-	@rm -f $@
-	cp ../bazel-bin/example/pkg/apis/githubv1alpha2/github_proto_deepcopy_/go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha2/github.generated.deepcopy.go $(@D)
-	@chmod 644 $@
-
-pkg/apis/githubv1alpha2/github.generated.register.go: pkg/apis/githubv1alpha2/github.proto
-	bazel build //example/pkg/apis/githubv1alpha2:github_proto_register
-	@rm -f $@
-	cp ../bazel-bin/example/pkg/apis/githubv1alpha2/github_proto_register_/go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha2/github.generated.register.go $(@D)
-	@chmod 644 $@
 
 crd/github.crd.yaml: pkg/apis/githubv1alpha1/github.proto pkg/apis/githubv1alpha2/github.proto
 	bazel build //example/crd:github
