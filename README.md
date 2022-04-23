@@ -13,8 +13,8 @@ github.proto
 
 ```protobuf
 syntax = "proto3";
-package example.apis;
-option go_package = "go.f110.dev/kubeproto/example/pkg/apis";
+package example.apis.githubv1alpha1;
+option go_package = "go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha1";
 option (dev.f110.kubeproto.k8s) = {group: "grafana.f110.dev", version: "v1alpha1"};
 
 import "kube.proto";
@@ -45,7 +45,7 @@ proto_library(
 go_proto_library(
     name = "github_proto_deepcopy",
     compiler = "//bazel/go:deepcopy",
-    importpath = "go.f110.dev/kubeproto/example/pkg/apis",
+    importpath = "go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha1",
     proto = ":github_proto",
     deps = [ # deps is required
         "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
@@ -57,7 +57,7 @@ go_proto_library(
 go_proto_library(
     name = "github_proto_register",
     compiler = "//bazel/go:register",
-    importpath = "go.f110.dev/kubeproto/example/pkg/apis",
+    importpath = "go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha1",
     proto = ":github_proto",
     visibility = ["//visibility:public"],
     embed = [":github_proto_deepcopy"],
@@ -66,6 +66,21 @@ go_proto_library(
         "//example/vendor/k8s.io/apimachinery/pkg/runtime",
         "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
     ],
+)
+```
+
+BUILD file for CustomResourceDefinition
+
+```
+load("//bazel/crd:def.bzl", "crd_proto_manifest")
+
+crd_proto_manifest(
+    name = "github",
+    srcs = [
+        "//example/pkg/apis/githubv1alpha1:github_proto",
+        "//example/pkg/apis/githubv1alpha2:github_proto",
+    ],
+    visibility = ["//visibility:public"],
 )
 ```
 
