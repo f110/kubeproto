@@ -1,0 +1,9 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "transform",
+    srcs = ["transform.go"],
+    importmap = "go.f110.dev/kubeproto/vendor/golang.org/x/text/transform",
+    importpath = "golang.org/x/text/transform",
+    visibility = ["//visibility:public"],
+)
