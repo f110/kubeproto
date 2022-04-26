@@ -46,9 +46,10 @@ func (g *CRDGenerator) Generate(out io.Writer) error {
 		crd := customResourceDefinition{
 			APIVersion: "apiextensions.k8s.io/v1",
 			Kind:       "CustomResourceDefinition",
-			Metadata:   metadata{Name: fmt.Sprintf("%s.%s", strings.ToLower(stringsutil.Plural(name)), ext.Group)},
+			Metadata: metadata{
+				Name: fmt.Sprintf("%s.%s.%s", strings.ToLower(stringsutil.Plural(name)), ext.SubGroup, ext.Domain)},
 			Spec: apiextensionsv1.CustomResourceDefinitionSpec{
-				Group: ext.Group,
+				Group: fmt.Sprintf("%s.%s", ext.SubGroup, ext.Domain),
 				Names: apiextensionsv1.CustomResourceDefinitionNames{
 					Kind:     name,
 					ListKind: fmt.Sprintf("%sList", name),

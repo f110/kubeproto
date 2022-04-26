@@ -1,0 +1,16 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "strs",
+    srcs = [
+        "strings.go",
+        "strings_unsafe.go",
+    ],
+    importmap = "go.f110.dev/kubeproto/example/vendor/google.golang.org/protobuf/internal/strs",
+    importpath = "google.golang.org/protobuf/internal/strs",
+    visibility = ["//example/vendor/google.golang.org/protobuf:__subpackages__"],
+    deps = [
+        "//example/vendor/google.golang.org/protobuf/internal/flags",
+        "//example/vendor/google.golang.org/protobuf/reflect/protoreflect",
+    ],
+)

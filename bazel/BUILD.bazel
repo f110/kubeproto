@@ -20,9 +20,9 @@ go_proto_compiler(
 
 go_proto_compiler(
     name = "clientset",
+    import_path_option = True,
     plugin = "//cmd/protoc-gen-clientset",
     suffix = ".generated.clientset.go",
-    import_path_option = True,
     visibility = ["//visibility:public"],
     deps = [],
 )

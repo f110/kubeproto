@@ -1,0 +1,31 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "exec",
+    srcs = [
+        "exec.go",
+        "metrics.go",
+    ],
+    importmap = "go.f110.dev/kubeproto/example/vendor/k8s.io/client-go/plugin/pkg/client/auth/exec",
+    importpath = "k8s.io/client-go/plugin/pkg/client/auth/exec",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/github.com/davecgh/go-spew/spew",
+        "//example/vendor/golang.org/x/term",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime/serializer",
+        "//example/vendor/k8s.io/apimachinery/pkg/util/net",
+        "//example/vendor/k8s.io/client-go/pkg/apis/clientauthentication",
+        "//example/vendor/k8s.io/client-go/pkg/apis/clientauthentication/install",
+        "//example/vendor/k8s.io/client-go/pkg/apis/clientauthentication/v1:clientauthentication",
+        "//example/vendor/k8s.io/client-go/pkg/apis/clientauthentication/v1alpha1",
+        "//example/vendor/k8s.io/client-go/pkg/apis/clientauthentication/v1beta1",
+        "//example/vendor/k8s.io/client-go/tools/clientcmd/api",
+        "//example/vendor/k8s.io/client-go/tools/metrics",
+        "//example/vendor/k8s.io/client-go/transport",
+        "//example/vendor/k8s.io/client-go/util/connrotation",
+        "//example/vendor/k8s.io/klog/v2:klog",
+        "//example/vendor/k8s.io/utils/clock",
+    ],
+)

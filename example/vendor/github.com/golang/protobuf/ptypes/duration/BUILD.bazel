@@ -1,0 +1,14 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "duration",
+    srcs = ["duration.pb.go"],
+    importmap = "go.f110.dev/kubeproto/example/vendor/github.com/golang/protobuf/ptypes/duration",
+    importpath = "github.com/golang/protobuf/ptypes/duration",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/google.golang.org/protobuf/reflect/protoreflect",
+        "//example/vendor/google.golang.org/protobuf/runtime/protoimpl",
+        "//example/vendor/google.golang.org/protobuf/types/known/durationpb",
+    ],
+)

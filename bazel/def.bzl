@@ -53,3 +53,52 @@ crd_proto_manifest = rule(
         "_compiler_name": attr.string(default = "crd"),
     },
 )
+
+def _go_client(ctx):
+    args = ctx.actions.args()
+    args.add("--plugin", ("protoc-gen-%s=%s" % (ctx.attr._compiler_name, ctx.executable._compiler.path)))
+
+    proto_files = []
+    transitive_protos = []
+    for src in ctx.attr.srcs:
+        proto = src[ProtoInfo]
+        transitive_protos.append(proto.transitive_imports)
+        args.add_all(proto.transitive_proto_path, format_each = "--proto_path=%s")
+
+        for s in proto.direct_sources:
+            args.add(s.path)
+            proto_files.append(s)
+
+    out = ctx.actions.declare_file("%s.generated.client.go" % ctx.label.name)
+    args.add("--client_out=%s:." % out.path)
+
+    ctx.actions.run(
+        executable = ctx.executable.protoc,
+        tools = [ctx.executable._compiler],
+        inputs = depset(
+            direct = proto_files,
+            transitive = transitive_protos,
+        ),
+        outputs = [out],
+        arguments = [args],
+    )
+
+    return [DefaultInfo(files = depset([out]))]
+
+go_client = rule(
+    implementation = _go_client,
+    attrs = {
+        "srcs": attr.label_list(providers = [ProtoInfo]),
+        "protoc": attr.label(
+            executable = True,
+            cfg = "host",
+            default = "@com_google_protobuf//:protoc",
+        ),
+        "_compiler": attr.label(
+            executable = True,
+            cfg = "host",
+            default = "//cmd/protoc-gen-client",
+        ),
+        "_compiler_name": attr.string(default = "client"),
+    },
+)

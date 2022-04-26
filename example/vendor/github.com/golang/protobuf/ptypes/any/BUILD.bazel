@@ -1,0 +1,14 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "any",
+    srcs = ["any.pb.go"],
+    importmap = "go.f110.dev/kubeproto/example/vendor/github.com/golang/protobuf/ptypes/any",
+    importpath = "github.com/golang/protobuf/ptypes/any",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/google.golang.org/protobuf/reflect/protoreflect",
+        "//example/vendor/google.golang.org/protobuf/runtime/protoimpl",
+        "//example/vendor/google.golang.org/protobuf/types/known/anypb",
+    ],
+)

@@ -14,10 +14,14 @@ message Field {
 }
 
 message Kubernetes {
-  string group   = 1;
-  string version = 2;
-  bool   served  = 3;
-  bool   storage = 4;
+  // domain and sub_group are combined to the group
+  // and combined the group and version are "apiVersion".
+  // apiVersion is "${domain}.${sub_group}/${version}"
+  string domain    = 1;
+  string sub_group = 2;
+  string version   = 3;
+  bool   served    = 4;
+  bool   storage   = 5;
 }
 
 message PrinterColumn {

@@ -149,6 +149,11 @@ type Message struct {
 	Virtual                  bool
 	AdditionalPrinterColumns []*kubeproto.PrinterColumn
 	Package                  ImportPackage
+	// Group is the api group (e,g, authorization.k8s.io)
+	Group    string
+	SubGroup string
+	// Version is the api version (e,g, v1alpha1)
+	Version string
 
 	descriptor     *descriptorpb.DescriptorProto
 	fileDescriptor *descriptorpb.FileDescriptorProto
@@ -192,13 +197,28 @@ func NewMessage(f *descriptorpb.FileDescriptorProto, desc *descriptorpb.Descript
 		printerColumns = ext.AdditionalPrinterColumns
 	}
 
+	var group, subGroup, version string
+	e = proto.GetExtension(f.GetOptions(), kubeproto.E_K8S)
+	k8sExt := e.(*kubeproto.Kubernetes)
+	if k8sExt != nil {
+		group = fmt.Sprintf("%s.%s", k8sExt.SubGroup, k8sExt.Domain)
+		subGroup = k8sExt.SubGroup
+		version = k8sExt.Version
+	}
+
 	m := &Message{
 		Name:                     fmt.Sprintf(".%s.%s", f.GetPackage(), desc.GetName()),
 		ShortName:                desc.GetName(),
 		Fields:                   fields,
 		AdditionalPrinterColumns: printerColumns,
-		descriptor:               desc,
-		fileDescriptor:           f,
+		Group:                    group,
+		SubGroup:                 subGroup,
+		Version:                  version,
+		Package: ImportPackage{
+			Path: f.GetOptions().GetGoPackage(),
+		},
+		descriptor:     desc,
+		fileDescriptor: f,
 	}
 
 	if isKind(desc) {

@@ -1,7 +1,11 @@
 syntax = "proto3";
 package example.apis.githubv1alpha2;
 option go_package = "go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha2";
-option (dev.f110.kubeproto.k8s) = {group: "grafana.f110.dev", version: "v1alpha2"};
+option (dev.f110.kubeproto.k8s) = {
+    domain: "f110.dev",
+    sub_group: "grafana",
+    version: "v1alpha2",
+};
 
 import "kube.proto";
 

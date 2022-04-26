@@ -1,0 +1,34 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "core",
+    srcs = [
+        "annotation_key_constants.go",
+        "doc.go",
+        "generated.pb.go",
+        "lifecycle.go",
+        "objectreference.go",
+        "register.go",
+        "resource.go",
+        "taint.go",
+        "toleration.go",
+        "types.go",
+        "types_swagger_doc_generated.go",
+        "well_known_labels.go",
+        "well_known_taints.go",
+        "zz_generated.deepcopy.go",
+    ],
+    importmap = "go.f110.dev/kubeproto/example/vendor/k8s.io/api/core/v1",
+    importpath = "k8s.io/api/core/v1",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/github.com/gogo/protobuf/proto",
+        "//example/vendor/github.com/gogo/protobuf/sortkeys",
+        "//example/vendor/k8s.io/apimachinery/pkg/api/resource",
+        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
+        "//example/vendor/k8s.io/apimachinery/pkg/types",
+        "//example/vendor/k8s.io/apimachinery/pkg/util/intstr",
+    ],
+)

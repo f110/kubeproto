@@ -1,0 +1,24 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("//bazel:def.bzl", "go_client")
+
+go_client(
+    name = "github",
+    srcs = [
+        "//example/pkg/apis/githubv1alpha1:github_proto",
+        "//example/pkg/apis/githubv1alpha2:github_proto",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+go_library(
+    name = "client",
+    srcs = ["github.generated.client.go"],
+    importpath = "go.f110.dev/kubeproto/example/pkg/client",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
+        "//example/vendor/k8s.io/apimachinery/pkg/watch",
+        "//example/vendor/k8s.io/client-go/rest",
+    ],
+)
