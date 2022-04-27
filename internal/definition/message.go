@@ -2,6 +2,7 @@ package definition
 
 import (
 	"fmt"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -215,6 +216,7 @@ func NewMessage(f *descriptorpb.FileDescriptorProto, desc *descriptorpb.Descript
 		SubGroup:                 subGroup,
 		Version:                  version,
 		Package: ImportPackage{
+			Name: path.Base(f.GetOptions().GetGoPackage()),
 			Path: f.GetOptions().GetGoPackage(),
 		},
 		descriptor:     desc,
@@ -348,6 +350,7 @@ func (f *Field) Tag() string {
 type Fields []*Field
 
 type ImportPackage struct {
+	Name  string
 	Path  string
 	Alias string
 }

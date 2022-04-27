@@ -2,15 +2,18 @@ package client
 
 import (
 	"context"
+	"reflect"
+	"sync"
 	"time"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/watch"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/cache"
 
 	"go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha1"
 	"go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha2"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/watch"
-	"k8s.io/client-go/rest"
 )
 
 var (
@@ -411,4 +414,135 @@ func (c *GrafanaV1alpha2) WatchGrafanaUser(ctx context.Context, namespace string
 		VersionedParams(&opts, ParameterCodec).
 		Timeout(timeout).
 		Watch(ctx)
+}
+
+var Factory = NewInformerFactory()
+
+type InformerFactory struct {
+	mu        sync.Mutex
+	informers map[reflect.Type]cache.SharedIndexInformer
+	once      sync.Once
+	ctx       context.Context
+}
+
+func NewInformerFactory() *InformerFactory {
+	return &InformerFactory{informers: make(map[reflect.Type]cache.SharedIndexInformer)}
+}
+
+func (f *InformerFactory) InformerFor(obj runtime.Object, newFunc func() cache.SharedIndexInformer) cache.SharedIndexInformer {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+
+	typ := reflect.TypeOf(obj)
+	if v, ok := f.informers[typ]; ok {
+		return v
+	}
+	informer := newFunc()
+	f.informers[typ] = informer
+	if f.ctx != nil {
+		go informer.Run(f.ctx.Done())
+	}
+	return informer
+}
+func (f *InformerFactory) Run(ctx context.Context) {
+	f.mu.Lock()
+	f.once.Do(func() {
+		for _, v := range f.informers {
+			go v.Run(ctx.Done())
+		}
+		f.ctx = ctx
+	})
+	f.mu.Unlock()
+}
+
+type GrafanaV1alpha1Informer struct {
+	factory *InformerFactory
+	client  *GrafanaV1alpha1
+}
+
+func NewGrafanaV1alpha1Informer(f *InformerFactory, client *GrafanaV1alpha1) *GrafanaV1alpha1Informer {
+	return &GrafanaV1alpha1Informer{factory: f, client: client}
+}
+
+func (f *GrafanaV1alpha1Informer) GrafanaInformer(namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return f.factory.InformerFor(&githubv1alpha1.Grafana{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListGrafana(context.TODO(), namespace, metav1.ListOptions{})
+				},
+				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchGrafana(context.TODO(), namespace, metav1.ListOptions{})
+				},
+			},
+			&githubv1alpha1.Grafana{},
+			resyncPeriod,
+			indexers,
+		)
+	},
+	)
+}
+func (f *GrafanaV1alpha1Informer) GrafanaUserInformer(namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return f.factory.InformerFor(&githubv1alpha1.GrafanaUser{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListGrafanaUser(context.TODO(), namespace, metav1.ListOptions{})
+				},
+				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchGrafanaUser(context.TODO(), namespace, metav1.ListOptions{})
+				},
+			},
+			&githubv1alpha1.GrafanaUser{},
+			resyncPeriod,
+			indexers,
+		)
+	},
+	)
+}
+
+type GrafanaV1alpha2Informer struct {
+	factory *InformerFactory
+	client  *GrafanaV1alpha2
+}
+
+func NewGrafanaV1alpha2Informer(f *InformerFactory, client *GrafanaV1alpha2) *GrafanaV1alpha2Informer {
+	return &GrafanaV1alpha2Informer{factory: f, client: client}
+}
+
+func (f *GrafanaV1alpha2Informer) GrafanaInformer(namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return f.factory.InformerFor(&githubv1alpha2.Grafana{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListGrafana(context.TODO(), namespace, metav1.ListOptions{})
+				},
+				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchGrafana(context.TODO(), namespace, metav1.ListOptions{})
+				},
+			},
+			&githubv1alpha2.Grafana{},
+			resyncPeriod,
+			indexers,
+		)
+	},
+	)
+}
+func (f *GrafanaV1alpha2Informer) GrafanaUserInformer(namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return f.factory.InformerFor(&githubv1alpha2.GrafanaUser{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListGrafanaUser(context.TODO(), namespace, metav1.ListOptions{})
+				},
+				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchGrafanaUser(context.TODO(), namespace, metav1.ListOptions{})
+				},
+			},
+			&githubv1alpha2.GrafanaUser{},
+			resyncPeriod,
+			indexers,
+		)
+	},
+	)
 }

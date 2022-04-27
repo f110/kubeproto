@@ -3,7 +3,6 @@ package k8s
 import (
 	"fmt"
 	"io"
-	"log"
 	"path"
 	"strings"
 
@@ -20,19 +19,19 @@ type ClientGenerator struct {
 }
 
 func NewClientGenerator(files []*descriptorpb.FileDescriptorProto, allProtos []*descriptorpb.FileDescriptorProto) *ClientGenerator {
-	log.Print(files[0].GetOptions().GetGoPackage())
 	return &ClientGenerator{files: files, lister: definition.NewLister(files, allProtos)}
 }
 
-func (g *ClientGenerator) Generate(out io.Writer, packageName string) error {
+func (g *ClientGenerator) Generate(out io.Writer, packageName, importPath string) error {
 	w := codegeneration.NewWriter()
 	w.F("package %s", path.Base(packageName))
 
 	// The key is a package path. The value is an alias.
 	importPackages := map[string]string{
+		"context":                         "",
+		"time":                            "",
 		"k8s.io/apimachinery/pkg/runtime": "",
 	}
-	importProjectPackages := make(map[string]string)
 
 	messages := g.lister.GetMessages()
 	kinds := make(map[string][]*definition.Message)
@@ -70,27 +69,27 @@ func (g *ClientGenerator) Generate(out io.Writer, packageName string) error {
 		return err
 	}
 	for p, a := range restClient.Import() {
-		importProjectPackages[p] = a
+		importPackages[p] = a
+	}
+	informer := newInformerGenerator(groupVersions)
+	if err := informer.WriteTo(writer); err != nil {
+		return err
+	}
+	for p, a := range informer.Import() {
+		importPackages[p] = a
 	}
 
 	w.F("import (")
-	w.F("\"context\"")
-	w.F("\"time\"")
-	w.F("")
-	for p, a := range importPackages {
-		if a != "" {
-			w.F("%s %q", a, p)
-		} else {
-			w.F("%q", p)
+	core, libs, proj := sortImports(importPackages, importPath)
+	for _, v := range []map[string]string{core, libs, proj} {
+		for p, a := range v {
+			if a != "" {
+				w.F("%s %q", a, p)
+			} else {
+				w.F("%q", p)
+			}
 		}
-	}
-	w.F("")
-	for p, a := range importProjectPackages {
-		if a != "" {
-			w.F("%s %q", a, p)
-		} else {
-			w.F("%q", p)
-		}
+		w.F("")
 	}
 	w.F(")")
 	writer.WriteTo(w)
@@ -102,6 +101,43 @@ func (g *ClientGenerator) Generate(out io.Writer, packageName string) error {
 		return err
 	}
 	return nil
+}
+
+func sortImports(v map[string]string, projectPackageName string) (core map[string]string, libs map[string]string, proj map[string]string) {
+	core = make(map[string]string)
+	libs = make(map[string]string)
+	proj = make(map[string]string)
+
+	s := strings.Split(projectPackageName, "/")
+	projPkg := fmt.Sprintf("%s/%s", s[0], s[1])
+
+	for p, a := range v {
+		if isCorePackage(p) {
+			core[p] = a
+			continue
+		}
+		if isProjectPackage(p, projPkg) {
+			proj[p] = a
+			continue
+		}
+		libs[p] = a
+	}
+
+	return
+}
+
+func isCorePackage(v string) bool {
+	if strings.Contains(v, ".") {
+		return false
+	}
+	return true
+}
+
+func isProjectPackage(v, projPkg string) bool {
+	if strings.HasPrefix(v, projPkg) {
+		return true
+	}
+	return false
 }
 
 type restClientGenerator struct {
@@ -148,8 +184,7 @@ func (g *restClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 		writer.F("")
 
 		for _, m := range v {
-			pkgName := path.Base(m.Package.Path)
-			structNameWithPkg := fmt.Sprintf("%s.%s", pkgName, m.ShortName)
+			structNameWithPkg := fmt.Sprintf("%s.%s", m.Package.Name, m.ShortName)
 			// GetXXX
 			writer.F("func(c *%s) Get%s(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg)
 			writer.F("result := &%s{}", structNameWithPkg)
@@ -209,12 +244,12 @@ func (g *restClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 			writer.F("")
 
 			// ListXXX
-			writer.F("func (c *%s) List%s(ctx context.Context, namespace string, opts metav1.ListOptions) (*%s.%sList, error) {", clientName, m.ShortName, pkgName, m.ShortName)
+			writer.F("func (c *%s) List%s(ctx context.Context, namespace string, opts metav1.ListOptions) (*%s.%sList, error) {", clientName, m.ShortName, m.Package.Name, m.ShortName)
 			writer.F("var timeout time.Duration")
 			writer.F("if opts.TimeoutSeconds != nil {")
 			writer.F("timeout = time.Duration(*opts.TimeoutSeconds) * time.Second")
 			writer.F("}")
-			writer.F("result := &%s.%sList{}", pkgName, m.ShortName)
+			writer.F("result := &%s.%sList{}", m.Package.Name, m.ShortName)
 			writer.F("err := c.client.Get().")
 			writer.F("Namespace(namespace).")
 			writer.F("Resource(%q).", strings.ToLower(stringsutil.Plural(m.ShortName)))
@@ -242,6 +277,118 @@ func (g *restClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 			writer.F("Watch(ctx)")
 			writer.F("}") // end of WatchXXX
 			writer.F("")
+		}
+	}
+
+	return nil
+}
+
+type informerGenerator struct {
+	groupVersions map[string][]*definition.Message
+}
+
+func (g *informerGenerator) Import() map[string]string {
+	importPackages := map[string]string{
+		"reflect":                              "",
+		"sync":                                 "",
+		"context":                              "",
+		"time":                                 "",
+		"k8s.io/client-go/rest":                "",
+		"k8s.io/apimachinery/pkg/apis/meta/v1": "metav1",
+		"k8s.io/apimachinery/pkg/watch":        "",
+		"k8s.io/apimachinery/pkg/runtime":      "",
+		"k8s.io/client-go/tools/cache":         "",
+	}
+	for _, v := range g.groupVersions {
+		for _, m := range v {
+			importPackages[m.Package.Path] = m.Package.Alias
+		}
+	}
+
+	return importPackages
+}
+
+func newInformerGenerator(groupVersions map[string][]*definition.Message) *informerGenerator {
+	return &informerGenerator{groupVersions: groupVersions}
+}
+
+func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
+	writer.F("var Factory = NewInformerFactory()")
+	writer.F("")
+	writer.F("type InformerFactory struct {")
+	writer.F("mu        sync.Mutex")
+	writer.F("informers map[reflect.Type]cache.SharedIndexInformer")
+	writer.F("once sync.Once")
+	writer.F("ctx  context.Context")
+	writer.F("}")
+	writer.F("")
+	writer.F("func NewInformerFactory() *InformerFactory {")
+	writer.F("return &InformerFactory{informers: make(map[reflect.Type]cache.SharedIndexInformer)}")
+	writer.F("}")
+	writer.F("")
+	writer.F("func (f *InformerFactory) InformerFor(obj runtime.Object, newFunc func() cache.SharedIndexInformer) cache.SharedIndexInformer {")
+	writer.F("f.mu.Lock()")
+	writer.F("defer f.mu.Unlock()")
+	writer.F("")
+	writer.F("typ := reflect.TypeOf(obj)")
+	writer.F("if v, ok := f.informers[typ]; ok {")
+	writer.F("return v")
+	writer.F("}")
+	writer.F("informer := newFunc()")
+	writer.F("f.informers[typ] = informer")
+	writer.F("if f.ctx != nil {")
+	writer.F("go informer.Run(f.ctx.Done())")
+	writer.F("}")
+	writer.F("return informer")
+	writer.F("}")
+	writer.F("func (f *InformerFactory) Run(ctx context.Context) {")
+	writer.F("f.mu.Lock()")
+	writer.F("f.once.Do(func() {")
+	writer.F("for _, v := range f.informers {")
+	writer.F("go v.Run(ctx.Done())")
+	writer.F("}")
+	writer.F("f.ctx = ctx")
+	writer.F("})")
+	writer.F("f.mu.Unlock()")
+	writer.F("}")
+
+	for _, v := range g.groupVersions {
+		m := v[0]
+		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
+
+		writer.F("type %sInformer struct {", clientName)
+		writer.F("factory *InformerFactory")
+		writer.F("client  *%s", clientName)
+		writer.F("}")
+		writer.F("")
+		writer.F("func New%sInformer(f *InformerFactory, client *%s) *%sInformer {", clientName, clientName, clientName)
+		writer.F("return &%sInformer{factory: f, client: client}", clientName)
+		writer.F("}")
+		writer.F("")
+
+		for _, m := range v {
+			writer.F(
+				"func(f *%sInformer) %sInformer(namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer{",
+				clientName,
+				m.ShortName,
+			)
+			writer.F("return f.factory.InformerFor(&%s.%s{}, func () cache.SharedIndexInformer{", m.Package.Name, m.ShortName)
+			writer.F("return cache.NewSharedIndexInformer(")
+			writer.F("&cache.ListWatch{")
+			writer.F("ListFunc: func (options metav1.ListOptions) (runtime.Object, error){")
+			writer.F("return f.client.List%s(context.TODO(), namespace, metav1.ListOptions{})", m.ShortName)
+			writer.F("},") // end of ListFunc
+			writer.F("WatchFunc: func (options metav1.ListOptions) (watch.Interface, error){")
+			writer.F("return f.client.Watch%s(context.TODO(), namespace, metav1.ListOptions{})", m.ShortName)
+			writer.F("},") // end of WatchFunc
+			writer.F("},")
+			writer.F("&%s.%s{},", m.Package.Name, m.ShortName)
+			writer.F("resyncPeriod,")
+			writer.F("indexers,")
+			writer.F(")")
+			writer.F("},")
+			writer.F(")")
+			writer.F("}") // end of XXXInformer
 		}
 	}
 

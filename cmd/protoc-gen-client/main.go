@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
@@ -35,7 +36,15 @@ func genClient() error {
 		}
 	}
 
-	outFile := input.GetParameter()
+	var outFile, importPath string
+	opt := input.GetParameter()
+	if strings.Contains(opt, ",") {
+		s := strings.Split(opt, ",")
+		outFile = s[0]
+		importPath = s[1]
+	} else {
+		outFile = opt
+	}
 	var inputFiles []*descriptorpb.FileDescriptorProto
 	for _, v := range files {
 		inputFiles = append(inputFiles, v)
@@ -47,7 +56,7 @@ func genClient() error {
 	out := new(bytes.Buffer)
 	g := k8s.NewClientGenerator(inputFiles, input.ProtoFile)
 	packageName := path.Base(filepath.Dir(outFile))
-	if err := g.Generate(out, packageName); err != nil {
+	if err := g.Generate(out, packageName, importPath); err != nil {
 		return err
 	}
 	res.File = append(res.File, &pluginpb.CodeGeneratorResponse_File{

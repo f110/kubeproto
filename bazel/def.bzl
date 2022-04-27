@@ -71,6 +71,7 @@ def _go_client(ctx):
 
     out = ctx.actions.declare_file("%s.generated.client.go" % ctx.label.name)
     args.add("--client_out=%s:." % out.path)
+    args.add("--client_opt=%s" % ctx.attr.importpath)
 
     ctx.actions.run(
         executable = ctx.executable.protoc,
@@ -89,6 +90,7 @@ go_client = rule(
     implementation = _go_client,
     attrs = {
         "srcs": attr.label_list(providers = [ProtoInfo]),
+        "importpath": attr.string(mandatory = True),
         "protoc": attr.label(
             executable = True,
             cfg = "host",
