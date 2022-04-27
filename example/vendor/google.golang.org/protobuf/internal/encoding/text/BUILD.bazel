@@ -1,0 +1,22 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "text",
+    srcs = [
+        "decode.go",
+        "decode_number.go",
+        "decode_string.go",
+        "decode_token.go",
+        "doc.go",
+        "encode.go",
+    ],
+    importmap = "go.f110.dev/kubeproto/example/vendor/google.golang.org/protobuf/internal/encoding/text",
+    importpath = "google.golang.org/protobuf/internal/encoding/text",
+    visibility = ["//example/vendor/google.golang.org/protobuf:__subpackages__"],
+    deps = [
+        "//example/vendor/google.golang.org/protobuf/internal/detrand",
+        "//example/vendor/google.golang.org/protobuf/internal/errors",
+        "//example/vendor/google.golang.org/protobuf/internal/flags",
+        "//example/vendor/google.golang.org/protobuf/internal/strs",
+    ],
+)

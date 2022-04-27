@@ -1,0 +1,18 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "flowcontrol",
+    srcs = [
+        "backoff.go",
+        "throttle.go",
+    ],
+    importmap = "go.f110.dev/kubeproto/example/vendor/k8s.io/client-go/util/flowcontrol",
+    importpath = "k8s.io/client-go/util/flowcontrol",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/golang.org/x/time/rate",
+        "//example/vendor/k8s.io/utils/clock",
+        "//example/vendor/k8s.io/utils/clock/testing",
+        "//example/vendor/k8s.io/utils/integer",
+    ],
+)

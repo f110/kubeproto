@@ -1,0 +1,32 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "proto",
+    srcs = [
+        "buffer.go",
+        "defaults.go",
+        "deprecated.go",
+        "discard.go",
+        "extensions.go",
+        "properties.go",
+        "proto.go",
+        "registry.go",
+        "text_decode.go",
+        "text_encode.go",
+        "wire.go",
+        "wrappers.go",
+    ],
+    importmap = "go.f110.dev/kubeproto/example/vendor/github.com/golang/protobuf/proto",
+    importpath = "github.com/golang/protobuf/proto",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/google.golang.org/protobuf/encoding/prototext",
+        "//example/vendor/google.golang.org/protobuf/encoding/protowire",
+        "//example/vendor/google.golang.org/protobuf/proto",
+        "//example/vendor/google.golang.org/protobuf/reflect/protodesc",
+        "//example/vendor/google.golang.org/protobuf/reflect/protoreflect",
+        "//example/vendor/google.golang.org/protobuf/reflect/protoregistry",
+        "//example/vendor/google.golang.org/protobuf/runtime/protoiface",
+        "//example/vendor/google.golang.org/protobuf/runtime/protoimpl",
+    ],
+)

@@ -1,0 +1,19 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "clientauthentication",
+    srcs = [
+        "doc.go",
+        "register.go",
+        "types.go",
+        "zz_generated.deepcopy.go",
+    ],
+    importmap = "go.f110.dev/kubeproto/example/vendor/k8s.io/client-go/pkg/apis/clientauthentication",
+    importpath = "k8s.io/client-go/pkg/apis/clientauthentication",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
+    ],
+)

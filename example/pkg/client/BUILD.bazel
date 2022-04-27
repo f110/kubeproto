@@ -21,5 +21,6 @@ go_library(
         "//example/vendor/k8s.io/apimachinery/pkg/runtime",
         "//example/vendor/k8s.io/apimachinery/pkg/watch",
         "//example/vendor/k8s.io/client-go/rest",
+        "//example/vendor/k8s.io/client-go/tools/cache",
     ],
 )

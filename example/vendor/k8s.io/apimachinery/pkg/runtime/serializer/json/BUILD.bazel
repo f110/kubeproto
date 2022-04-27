@@ -1,0 +1,22 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "json",
+    srcs = [
+        "json.go",
+        "meta.go",
+    ],
+    importmap = "go.f110.dev/kubeproto/example/vendor/k8s.io/apimachinery/pkg/runtime/serializer/json",
+    importpath = "k8s.io/apimachinery/pkg/runtime/serializer/json",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime/serializer/recognizer",
+        "//example/vendor/k8s.io/apimachinery/pkg/util/framer",
+        "//example/vendor/k8s.io/apimachinery/pkg/util/yaml",
+        "//example/vendor/k8s.io/klog/v2:klog",
+        "//example/vendor/sigs.k8s.io/json",
+        "//example/vendor/sigs.k8s.io/yaml",
+    ],
+)

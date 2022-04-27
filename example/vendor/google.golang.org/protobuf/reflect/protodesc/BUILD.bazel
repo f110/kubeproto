@@ -1,0 +1,29 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "protodesc",
+    srcs = [
+        "desc.go",
+        "desc_init.go",
+        "desc_resolve.go",
+        "desc_validate.go",
+        "proto.go",
+    ],
+    importmap = "go.f110.dev/kubeproto/example/vendor/google.golang.org/protobuf/reflect/protodesc",
+    importpath = "google.golang.org/protobuf/reflect/protodesc",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/google.golang.org/protobuf/encoding/protowire",
+        "//example/vendor/google.golang.org/protobuf/internal/encoding/defval",
+        "//example/vendor/google.golang.org/protobuf/internal/errors",
+        "//example/vendor/google.golang.org/protobuf/internal/filedesc",
+        "//example/vendor/google.golang.org/protobuf/internal/flags",
+        "//example/vendor/google.golang.org/protobuf/internal/genid",
+        "//example/vendor/google.golang.org/protobuf/internal/pragma",
+        "//example/vendor/google.golang.org/protobuf/internal/strs",
+        "//example/vendor/google.golang.org/protobuf/proto",
+        "//example/vendor/google.golang.org/protobuf/reflect/protoreflect",
+        "//example/vendor/google.golang.org/protobuf/reflect/protoregistry",
+        "//example/vendor/google.golang.org/protobuf/types/descriptorpb",
+    ],
+)
