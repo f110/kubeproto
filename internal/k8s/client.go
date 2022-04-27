@@ -78,6 +78,13 @@ func (g *ClientGenerator) Generate(out io.Writer, packageName, importPath string
 	for p, a := range informer.Import() {
 		importPackages[p] = a
 	}
+	lister := newListerGenerator(groupVersions)
+	if err := lister.WriteTo(writer); err != nil {
+		return err
+	}
+	for p, a := range lister.Import() {
+		importPackages[p] = a
+	}
 
 	w.F("import (")
 	core, libs, proj := sortImports(importPackages, importPath)
@@ -392,5 +399,70 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 		}
 	}
 
+	return nil
+}
+
+type listerGenerator struct {
+	groupVersions map[string][]*definition.Message
+}
+
+func newListerGenerator(groupVersions map[string][]*definition.Message) *listerGenerator {
+	return &listerGenerator{groupVersions: groupVersions}
+}
+
+func (g *listerGenerator) Import() map[string]string {
+	importPackages := map[string]string{
+		"k8s.io/client-go/tools/cache":       "",
+		"k8s.io/apimachinery/pkg/labels":     "",
+		"k8s.io/apimachinery/pkg/api/errors": "k8serrors",
+	}
+	for _, v := range g.groupVersions {
+		for _, m := range v {
+			importPackages[m.Package.Path] = m.Package.Alias
+		}
+	}
+
+	return importPackages
+}
+
+func (g *listerGenerator) WriteTo(writer *codegeneration.Writer) error {
+	for _, v := range g.groupVersions {
+		m := v[0]
+		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
+
+		writer.F("type %sLister struct {", clientName)
+		writer.F("indexer cache.Indexer")
+		writer.F("}")
+		writer.F("")
+		writer.F("func New%sLister(indexer cache.Indexer) *%sLister {", clientName, clientName)
+		writer.F("return &%sLister{indexer: indexer}", clientName)
+		writer.F("}")
+		writer.F("")
+
+		for _, m := range v {
+			// ListXXX
+			writer.F("func (x *%sLister) List%s(namespace string, selector labels.Selector) ([]*%s.%s, error) {", clientName, m.ShortName, m.Package.Name, m.ShortName)
+			writer.F("var ret []*%s.%s", m.Package.Name, m.ShortName)
+			writer.F("err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {")
+			writer.F("ret = append(ret, m.(*%s.%s))", m.Package.Name, m.ShortName)
+			writer.F("})")
+			writer.F("return ret, err")
+			writer.F("}") // end of ListXXX
+			writer.F("")
+
+			// GetXXX
+			writer.F("func (x *%sLister) Get%s(namespace, name string) (*%s.%s, error) {", clientName, m.ShortName, m.Package.Name, m.ShortName)
+			writer.F("obj, exists, err := x.indexer.GetByKey(namespace + \"/\" + name)")
+			writer.F("if err != nil {")
+			writer.F("return nil, err")
+			writer.F("}")
+			writer.F("if !exists {")
+			writer.F("return nil, k8serrors.NewNotFound(%s.SchemaGroupVersion.WithResource(%q).GroupResource(), name)", m.Package.Name, strings.ToLower(m.ShortName))
+			writer.F("}")
+			writer.F("return obj.(*%s.%s), nil", m.Package.Name, m.ShortName)
+			writer.F("}")
+			writer.F("")
+		}
+	}
 	return nil
 }

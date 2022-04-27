@@ -44,17 +44,17 @@ func (g *RegisterGenerator) Generate(out io.Writer) error {
 	w.F("GroupVersion = metav1.GroupVersion{Group: GroupName, Version: %q}", ext.Version)
 	w.F("SchemeBuilder = runtime.NewSchemeBuilder(addKnownTypes)")
 	w.F("AddToScheme = SchemeBuilder.AddToScheme")
-	w.F("schemaGroupVersion = schema.GroupVersion{Group: \"%s.%s\", Version: %q}", ext.SubGroup, ext.Domain, ext.Version)
+	w.F("SchemaGroupVersion = schema.GroupVersion{Group: \"%s.%s\", Version: %q}", ext.SubGroup, ext.Domain, ext.Version)
 	w.F(")")
 
 	w.F("func addKnownTypes(scheme *runtime.Scheme) error {")
-	w.F("scheme.AddKnownTypes(schemaGroupVersion,")
+	w.F("scheme.AddKnownTypes(SchemaGroupVersion,")
 	messages := g.lister.GetMessages()
 	for _, m := range messages.FilterKind() {
 		w.F("&%s{},", m.ShortName)
 	}
 	w.F(")")
-	w.F("metav1.AddToGroupVersion(scheme, schemaGroupVersion)")
+	w.F("metav1.AddToGroupVersion(scheme, SchemaGroupVersion)")
 	w.F("return nil")
 	w.F("}")
 

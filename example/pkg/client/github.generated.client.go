@@ -6,7 +6,9 @@ import (
 	"sync"
 	"time"
 
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/rest"
@@ -545,4 +547,96 @@ func (f *GrafanaV1alpha2Informer) GrafanaUserInformer(namespace string, resyncPe
 		)
 	},
 	)
+}
+
+type GrafanaV1alpha2Lister struct {
+	indexer cache.Indexer
+}
+
+func NewGrafanaV1alpha2Lister(indexer cache.Indexer) *GrafanaV1alpha2Lister {
+	return &GrafanaV1alpha2Lister{indexer: indexer}
+}
+
+func (x *GrafanaV1alpha2Lister) ListGrafana(namespace string, selector labels.Selector) ([]*githubv1alpha2.Grafana, error) {
+	var ret []*githubv1alpha2.Grafana
+	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
+		ret = append(ret, m.(*githubv1alpha2.Grafana))
+	})
+	return ret, err
+}
+
+func (x *GrafanaV1alpha2Lister) GetGrafana(namespace, name string) (*githubv1alpha2.Grafana, error) {
+	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(githubv1alpha2.SchemaGroupVersion.WithResource("grafana").GroupResource(), name)
+	}
+	return obj.(*githubv1alpha2.Grafana), nil
+}
+
+func (x *GrafanaV1alpha2Lister) ListGrafanaUser(namespace string, selector labels.Selector) ([]*githubv1alpha2.GrafanaUser, error) {
+	var ret []*githubv1alpha2.GrafanaUser
+	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
+		ret = append(ret, m.(*githubv1alpha2.GrafanaUser))
+	})
+	return ret, err
+}
+
+func (x *GrafanaV1alpha2Lister) GetGrafanaUser(namespace, name string) (*githubv1alpha2.GrafanaUser, error) {
+	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(githubv1alpha2.SchemaGroupVersion.WithResource("grafanauser").GroupResource(), name)
+	}
+	return obj.(*githubv1alpha2.GrafanaUser), nil
+}
+
+type GrafanaV1alpha1Lister struct {
+	indexer cache.Indexer
+}
+
+func NewGrafanaV1alpha1Lister(indexer cache.Indexer) *GrafanaV1alpha1Lister {
+	return &GrafanaV1alpha1Lister{indexer: indexer}
+}
+
+func (x *GrafanaV1alpha1Lister) ListGrafana(namespace string, selector labels.Selector) ([]*githubv1alpha1.Grafana, error) {
+	var ret []*githubv1alpha1.Grafana
+	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
+		ret = append(ret, m.(*githubv1alpha1.Grafana))
+	})
+	return ret, err
+}
+
+func (x *GrafanaV1alpha1Lister) GetGrafana(namespace, name string) (*githubv1alpha1.Grafana, error) {
+	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(githubv1alpha1.SchemaGroupVersion.WithResource("grafana").GroupResource(), name)
+	}
+	return obj.(*githubv1alpha1.Grafana), nil
+}
+
+func (x *GrafanaV1alpha1Lister) ListGrafanaUser(namespace string, selector labels.Selector) ([]*githubv1alpha1.GrafanaUser, error) {
+	var ret []*githubv1alpha1.GrafanaUser
+	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
+		ret = append(ret, m.(*githubv1alpha1.GrafanaUser))
+	})
+	return ret, err
+}
+
+func (x *GrafanaV1alpha1Lister) GetGrafanaUser(namespace, name string) (*githubv1alpha1.GrafanaUser, error) {
+	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(githubv1alpha1.SchemaGroupVersion.WithResource("grafanauser").GroupResource(), name)
+	}
+	return obj.(*githubv1alpha1.GrafanaUser), nil
 }

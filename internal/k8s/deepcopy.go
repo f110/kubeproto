@@ -2,7 +2,6 @@ package k8s
 
 import (
 	"io"
-	"log"
 	"path"
 
 	"google.golang.org/protobuf/types/descriptorpb"
@@ -46,7 +45,7 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 				if m == nil {
 					continue
 				}
-				if m.Package.Path != "" {
+				if m.Package.Path != "" && m.Package.Path != packageName {
 					importPackages[m.Package.Path] = m.Package.Alias
 				}
 
@@ -58,7 +57,7 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 			if !f.Embed {
 				name = f.Name.CamelCase()
 			}
-			typ := f.TypeName(messages)
+			typ := f.TypeName(packageName, messages)
 			tag := f.Tag()
 			defW.F("%s %s %s", name, typ, tag)
 		}
@@ -73,7 +72,7 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 			case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
 				if f.Repeated {
 					defW.F("if in.%s != nil {", f.Name.CamelCase())
-					defW.F("l := make(%s, len(in.%s))", f.TypeName(messages), f.Name.CamelCase())
+					defW.F("l := make(%s, len(in.%s))", f.TypeName(packageName, messages), f.Name.CamelCase())
 					defW.F("for i := range in.%s {", f.Name.CamelCase())
 					defW.F("in.%s[i].DeepCopyInto(&l[i])", f.Name.CamelCase())
 					defW.F("}")
@@ -95,7 +94,7 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 			default:
 				if f.Repeated {
 					defW.F("if in.%s != nil {", f.Name.CamelCase())
-					defW.F("t := make(%s, len(in.%s))", f.TypeName(messages), f.Name.CamelCase())
+					defW.F("t := make(%s, len(in.%s))", f.TypeName(packageName, messages), f.Name.CamelCase())
 					defW.F("copy(t, in.%s)", f.Name.CamelCase())
 					defW.F("out.%s = t", f.Name.CamelCase())
 					defW.F("}")
@@ -142,6 +141,5 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 	if _, err := w.WriteTo(out); err != nil {
 		return err
 	}
-	log.Print(w.String())
 	return nil
 }

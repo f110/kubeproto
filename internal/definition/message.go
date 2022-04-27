@@ -289,7 +289,7 @@ type Field struct {
 	typeName string
 }
 
-func (f *Field) TypeName(messages Messages) string {
+func (f *Field) TypeName(packageName string, messages Messages) string {
 	if f.typeName != "" {
 		return f.typeName
 	}
@@ -301,12 +301,12 @@ func (f *Field) TypeName(messages Messages) string {
 		if m == nil {
 			return ""
 		}
-		if m.Package.Path != "" {
+		if m.Package.Path != "" && m.Package.Path != packageName {
 			alias := m.Package.Alias
 			if alias == "" {
 				alias = filepath.Base(m.Package.Path)
 			}
-			typ = fmt.Sprintf("%s.%s", m.Package.Alias, m.ShortName)
+			typ = fmt.Sprintf("%s.%s", alias, m.ShortName)
 		} else {
 			typ = m.ShortName
 		}
