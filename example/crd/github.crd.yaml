@@ -113,8 +113,8 @@ spec:
           spec:
             properties:
               admin:
-                description: |2
-                   admin indicates that the user has the privilege
+                description: |
+                  admin indicates that the user has the privilege
                 type: boolean
               email:
                 type: string

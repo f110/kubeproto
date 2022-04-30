@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"path"
 	"path/filepath"
-	"reflect"
+	"sort"
 	"strings"
 
 	"google.golang.org/protobuf/proto"
@@ -112,6 +112,9 @@ func (m *Messages) FilterKind() Messages {
 		}
 	}
 
+	sort.Slice(kinds, func(i, j int) bool {
+		return kinds[i].ShortName < kinds[j].ShortName
+	})
 	return kinds
 }
 
@@ -137,6 +140,13 @@ func isKind(desc *descriptorpb.DescriptorProto) bool {
 
 	return true
 }
+
+const (
+	// messageTypeIndex is an index of MessageType in descriptorpb.FileDescriptorProto.
+	messageTypeIndex = 4
+	// fieldIndex is an index of Field in descriptorpb.DescriptorProto
+	fieldIndex = 2
+)
 
 type Message struct {
 	// Dep indicates that this message is dependent
@@ -192,10 +202,10 @@ func NewMessage(f *descriptorpb.FileDescriptorProto, desc *descriptorpb.Descript
 		}
 
 		var description string
-		fieldPath := []int32{4, int32(messageIndex), 2, int32(i)}
+		fieldPath := []int32{messageTypeIndex, int32(messageIndex), fieldIndex, int32(i)}
 		for _, s := range f.SourceCodeInfo.GetLocation() {
-			if reflect.DeepEqual(s.Path, fieldPath) {
-				description = s.GetLeadingComments()
+			if isEqualProtoPath(s.Path, fieldPath) {
+				description = strings.TrimPrefix(s.GetLeadingComments(), " ")
 				break
 			}
 		}
@@ -259,6 +269,18 @@ func (m *Message) Kubernetes() (*kubeproto.Kubernetes, error) {
 	}
 
 	return ext, nil
+}
+
+func isEqualProtoPath(a, b []int32) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := 0; i < len(a); i++ {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
 }
 
 func extendAsKind(m *Message) {

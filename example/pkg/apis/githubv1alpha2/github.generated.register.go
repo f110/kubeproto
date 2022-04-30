@@ -18,8 +18,8 @@ var (
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemaGroupVersion,
 		&Grafana{},
-		&GrafanaUser{},
 		&GrafanaList{},
+		&GrafanaUser{},
 		&GrafanaUserList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemaGroupVersion)

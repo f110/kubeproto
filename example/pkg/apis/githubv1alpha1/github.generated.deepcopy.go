@@ -36,37 +36,6 @@ func (in *Grafana) DeepCopyObject() runtime.Object {
 	return nil
 }
 
-type GrafanaUser struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata"`
-	Spec              GrafanaUserSpec   `json:"spec"`
-	Status            GrafanaUserStatus `json:"status"`
-}
-
-func (in *GrafanaUser) DeepCopyInto(out *GrafanaUser) {
-	*out = *in
-	out.TypeMeta = in.TypeMeta
-	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
-	in.Spec.DeepCopyInto(&out.Spec)
-	in.Status.DeepCopyInto(&out.Status)
-}
-
-func (in *GrafanaUser) DeepCopy() *GrafanaUser {
-	if in == nil {
-		return nil
-	}
-	out := new(GrafanaUser)
-	in.DeepCopyInto(out)
-	return out
-}
-
-func (in *GrafanaUser) DeepCopyObject() runtime.Object {
-	if c := in.DeepCopy(); c != nil {
-		return c
-	}
-	return nil
-}
-
 type GrafanaList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -96,6 +65,37 @@ func (in *GrafanaList) DeepCopy() *GrafanaList {
 }
 
 func (in *GrafanaList) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	}
+	return nil
+}
+
+type GrafanaUser struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata"`
+	Spec              GrafanaUserSpec   `json:"spec"`
+	Status            GrafanaUserStatus `json:"status"`
+}
+
+func (in *GrafanaUser) DeepCopyInto(out *GrafanaUser) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
+	in.Spec.DeepCopyInto(&out.Spec)
+	in.Status.DeepCopyInto(&out.Status)
+}
+
+func (in *GrafanaUser) DeepCopy() *GrafanaUser {
+	if in == nil {
+		return nil
+	}
+	out := new(GrafanaUser)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *GrafanaUser) DeepCopyObject() runtime.Object {
 	if c := in.DeepCopy(); c != nil {
 		return c
 	}
