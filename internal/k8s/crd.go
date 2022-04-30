@@ -159,7 +159,9 @@ func (g *CRDGenerator) ToOpenAPISchema(m *definition.Message) *apiextensionsv1.J
 }
 
 func (g *CRDGenerator) fieldToJSONSchemaProps(f *definition.Field) apiextensionsv1.JSONSchemaProps {
-	props := apiextensionsv1.JSONSchemaProps{}
+	props := apiextensionsv1.JSONSchemaProps{
+		Description: f.Description,
+	}
 
 	switch f.Type {
 	case descriptorpb.FieldDescriptorProto_TYPE_BOOL:

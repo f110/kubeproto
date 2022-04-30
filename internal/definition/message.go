@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path"
 	"path/filepath"
+	"reflect"
 	"strings"
 
 	"google.golang.org/protobuf/proto"
@@ -28,16 +29,18 @@ var (
 		ShortName: "TypeMeta",
 		Fields: []*Field{
 			{
-				Name:      "Kind",
-				FieldName: "kind",
-				Optional:  true,
-				Type:      descriptorpb.FieldDescriptorProto_TYPE_STRING,
+				Name:        "Kind",
+				FieldName:   "kind",
+				Optional:    true,
+				Type:        descriptorpb.FieldDescriptorProto_TYPE_STRING,
+				Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated.",
 			},
 			{
-				Name:      "APIVersion",
-				FieldName: "apiVersion",
-				Optional:  true,
-				Type:      descriptorpb.FieldDescriptorProto_TYPE_STRING,
+				Name:        "APIVersion",
+				FieldName:   "apiVersion",
+				Optional:    true,
+				Type:        descriptorpb.FieldDescriptorProto_TYPE_STRING,
+				Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values.",
 			},
 		},
 		Package: ImportPackage{Path: "k8s.io/apimachinery/pkg/apis/meta/v1", Alias: "metav1"},
@@ -161,8 +164,16 @@ type Message struct {
 }
 
 func NewMessage(f *descriptorpb.FileDescriptorProto, desc *descriptorpb.DescriptorProto) *Message {
+	var messageIndex int
+	for i, v := range f.MessageType {
+		if v == desc {
+			messageIndex = i
+			break
+		}
+	}
+
 	var fields []*Field
-	for _, v := range desc.Field {
+	for i, v := range desc.Field {
 		var name string
 		var subResource bool
 		e := proto.GetExtension(v.GetOptions(), kubeproto.E_Field)
@@ -180,12 +191,22 @@ func NewMessage(f *descriptorpb.FileDescriptorProto, desc *descriptorpb.Descript
 			repeated = true
 		}
 
+		var description string
+		fieldPath := []int32{4, int32(messageIndex), 2, int32(i)}
+		for _, s := range f.SourceCodeInfo.GetLocation() {
+			if reflect.DeepEqual(s.Path, fieldPath) {
+				description = s.GetLeadingComments()
+				break
+			}
+		}
+
 		fields = append(fields, &Field{
 			Name:        Name(name),
 			FieldName:   stringsutil.ToLowerCamelCase(v.GetName()),
 			Type:        v.GetType(),
 			Repeated:    repeated,
 			MessageName: v.GetTypeName(),
+			Description: description,
 			Optional:    v.GetProto3Optional(),
 			SubResource: subResource,
 		})
@@ -279,6 +300,8 @@ type Field struct {
 	Repeated bool
 	// MessageName is a name of Message if Type is FieldDescriptorProto_TYPE_MESSAGE
 	MessageName string
+	// Description is a string of an account of this field
+	Description string
 	// Inline indicates the embed field
 	Inline bool
 	// Optional indicates that this field is an optional field.
