@@ -1,7 +1,6 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@io_bazel_rules_go//go:def.bzl", "go_context")
 load("@rules_proto//proto:defs.bzl", "ProtoInfo")
-load("@io_bazel_rules_go//proto:compiler.bzl", "GoProtoCompiler")
 
 def _crd_proto_manifest(ctx):
     args = ctx.actions.args()
@@ -103,4 +102,78 @@ go_client = rule(
         ),
         "_compiler_name": attr.string(default = "client"),
     },
+)
+
+def _execute_protoc(ctx, compiler, compiler_name, suffix, srcs):
+    args = ctx.actions.args()
+    args.add("--plugin", ("protoc-gen-%s=%s" % (compiler_name, compiler.path)))
+
+    proto_files = []
+    transitive_protos = []
+    for src in srcs:
+        proto = src[ProtoInfo]
+        transitive_protos.append(proto.transitive_imports)
+        args.add_all(proto.transitive_proto_path, format_each = "--proto_path=%s")
+
+        for s in proto.direct_sources:
+            args.add(s.path)
+            proto_files.append(s)
+
+    out = ctx.actions.declare_file("%s.%s" % (ctx.label.name, suffix))
+    args.add("--%s_out=%s:." % (compiler_name, out.path))
+
+    ctx.actions.run(
+        executable = ctx.executable.protoc,
+        tools = [compiler],
+        inputs = depset(
+            direct = proto_files,
+            transitive = transitive_protos,
+        ),
+        outputs = [out],
+        arguments = [args],
+    )
+
+    return out
+
+def _kubeproto_go_api(ctx):
+    deepcopyOut = _execute_protoc(
+        ctx,
+        ctx.executable._deepcopy_compiler,
+        ctx.attr._deepcopy_compiler_name,
+        "generated.deepcopy.go",
+        ctx.attr.srcs,
+    )
+    registerOut = _execute_protoc(
+        ctx,
+        ctx.executable._register_compiler,
+        ctx.attr._register_compiler_name,
+        "generated.register.go",
+        ctx.attr.srcs,
+    )
+
+    return [DefaultInfo(files = depset([deepcopyOut, registerOut]))]
+
+kubeproto_go_api = rule(
+    implementation = _kubeproto_go_api,
+    attrs = {
+        "srcs": attr.label_list(providers = [ProtoInfo]),
+        "importpath": attr.string(mandatory = True),
+        "protoc": attr.label(
+            executable = True,
+            cfg = "host",
+            default = "@com_google_protobuf//:protoc",
+        ),
+        "_deepcopy_compiler": attr.label(
+            executable = True,
+            cfg = "host",
+            default = "//cmd/protoc-gen-deepcopy",
+        ),
+        "_deepcopy_compiler_name": attr.string(default = "deepcopy"),
+        "_register_compiler": attr.label(
+            executable = True,
+            cfg = "host",
+            default = "//cmd/protoc-gen-register",
+        ),
+        "_register_compiler_name": attr.string(default = "register"),
+    }
 )

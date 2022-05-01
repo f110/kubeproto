@@ -195,7 +195,8 @@ func (in *GrafanaStatus) DeepCopy() *GrafanaStatus {
 
 type GrafanaUserSpec struct {
 	Email string `json:"email"`
-	Admin bool   `json:"admin"`
+	// Admin indicates that the user has the privilege
+	Admin bool `json:"admin"`
 }
 
 func (in *GrafanaUserSpec) DeepCopyInto(out *GrafanaUserSpec) {

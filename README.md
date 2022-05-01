@@ -31,7 +31,7 @@ BUILD at pkg/apis/GROUP_AND_VERSION
 
 ```
 load("@rules_proto//proto:defs.bzl", "proto_library")
-load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
+load("//bazel:def.bzl", "kubeproto_go_api")
 
 proto_library(
     name = "github_proto",
@@ -42,20 +42,10 @@ proto_library(
     visibility = ["//visibility:public"],
 )
 
-go_proto_library(
-    name = "github_proto_deepcopy",
-    compilers = [
-        "//bazel:deepcopy",
-        "//bazel:register",
-    ],
+kubeproto_go_api(
+    name = "github_proto_kubeproto",
+    srcs = [":github_proto"],
     importpath = "go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha1",
-    proto = ":github_proto",
-    deps = [ # deps is required
-        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
-        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
-        "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
-    ],
-    visibility = ["//visibility:public"],
 )
 ```
 

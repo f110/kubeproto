@@ -3,6 +3,7 @@ package k8s
 import (
 	"io"
 	"path"
+	"strings"
 
 	"google.golang.org/protobuf/types/descriptorpb"
 
@@ -71,6 +72,10 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 			}
 			typ := g.lister.ResolveGoType(packageName, f)
 			tag := f.Tag()
+			if f.Description != "" {
+				d := strings.Replace(f.Description, string(f.Name), f.Name.CamelCase(), 1)
+				defW.F("// %s", d)
+			}
 			defW.F("%s %s %s", name, typ, tag)
 		}
 		defW.F("}")

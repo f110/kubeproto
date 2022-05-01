@@ -204,7 +204,7 @@ func NewMessage(f *descriptorpb.FileDescriptorProto, desc *descriptorpb.Descript
 		fieldPath := []int32{messageTypeIndex, int32(messageIndex), fieldIndex, int32(i)}
 		for _, s := range f.SourceCodeInfo.GetLocation() {
 			if isEqualProtoPath(s.Path, fieldPath) {
-				description = strings.TrimPrefix(s.GetLeadingComments(), " ")
+				description = strings.TrimSuffix(strings.TrimPrefix(s.GetLeadingComments(), " "), "\n")
 				break
 			}
 		}

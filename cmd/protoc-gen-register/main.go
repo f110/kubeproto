@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
-	"strings"
 
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
@@ -35,17 +33,18 @@ func genRegister() error {
 		}
 	}
 
+	outFile := input.GetParameter()
 	var res pluginpb.CodeGeneratorResponse
 	supportedFeatures := uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)
 	res.SupportedFeatures = &supportedFeatures
-	for name, desc := range files {
+	for _, desc := range files {
 		out := new(bytes.Buffer)
 		g := k8s.NewRegisterGenerator(desc, input.ProtoFile)
 		if err := g.Generate(out); err != nil {
 			return err
 		}
 		res.File = append(res.File, &pluginpb.CodeGeneratorResponse_File{
-			Name:    proto.String(fmt.Sprintf("%s.generated.register.go", strings.TrimSuffix(name, filepath.Ext(name)))),
+			Name:    proto.String(outFile),
 			Content: proto.String(out.String()),
 		})
 	}

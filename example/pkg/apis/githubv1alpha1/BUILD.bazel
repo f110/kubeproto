@@ -62,3 +62,11 @@ go_library(
         "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
     ],
 )
+
+load("//bazel:def.bzl", "kubeproto_go_api")
+
+kubeproto_go_api(
+    name = "github_proto_kubeproto",
+    srcs = [":github_proto"],
+    importpath = "go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha1",
+)
