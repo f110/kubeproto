@@ -34,6 +34,10 @@ message PrinterColumn {
   string format      = 6;
 }
 
+message EnumValue {
+  string value = 1;
+}
+
 extend google.protobuf.MessageOptions {
   Kind kind = 60010;
 }
@@ -44,4 +48,8 @@ extend google.protobuf.FieldOptions {
 
 extend google.protobuf.FileOptions {
   Kubernetes k8s = 60010;
+}
+
+extend google.protobuf.EnumValueOptions {
+  EnumValue value = 60010;
 }

@@ -26,6 +26,7 @@ func NewCRDGenerator(files []*descriptorpb.FileDescriptorProto, allProtos []*des
 
 func (g *CRDGenerator) Generate(out io.Writer) error {
 	messages := g.lister.GetMessages()
+	var keys []string
 	kinds := make(map[string][]*definition.Message)
 	for _, m := range messages.FilterKind() {
 		// If the message is virtual, it is a List object.
@@ -33,11 +34,16 @@ func (g *CRDGenerator) Generate(out io.Writer) error {
 		if m.Virtual {
 			continue
 		}
+		if _, ok := kinds[m.ShortName]; !ok {
+			keys = append(keys, m.ShortName)
+		}
 		kinds[m.ShortName] = append(kinds[m.ShortName], m)
 	}
+	sort.Strings(keys)
 
 	i := 0
-	for name, msgs := range kinds {
+	for _, name := range keys {
+		msgs := kinds[name]
 		ext, err := msgs[0].Kubernetes()
 		if err != nil {
 			return err

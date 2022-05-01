@@ -27,8 +27,13 @@ message Volume {
   string name = 1;
 }
 
+enum GrafanaPhase {
+  GRAFANA_PHASE_CREATED = 0 [(dev.f110.kubeproto.value) = {value: "Created"}];
+}
+
 message GrafanaStatus {
   int64 observed_generation = 1;
+  GrafanaPhase phase = 2;
 }
 
 message GrafanaUser {

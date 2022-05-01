@@ -62,3 +62,10 @@ func (w *Writer) Format() error {
 
 	return nil
 }
+
+func (w *Writer) DebugOut() {
+	scanner := bufio.NewScanner(strings.NewReader(w.w.String()))
+	for i := 1; scanner.Scan(); i++ {
+		fmt.Fprintf(os.Stderr, "%d: %s\n", i, scanner.Text())
+	}
+}

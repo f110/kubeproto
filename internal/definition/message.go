@@ -3,7 +3,6 @@ package definition
 import (
 	"fmt"
 	"path"
-	"path/filepath"
 	"sort"
 	"strings"
 
@@ -332,42 +331,6 @@ type Field struct {
 	SubResource bool
 
 	typeName string
-}
-
-func (f *Field) TypeName(packageName string, messages Messages) string {
-	if f.typeName != "" {
-		return f.typeName
-	}
-
-	var typ string
-	switch f.Type {
-	case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
-		m := messages.Find(f.MessageName)
-		if m == nil {
-			return ""
-		}
-		if m.Package.Path != "" && m.Package.Path != packageName {
-			alias := m.Package.Alias
-			if alias == "" {
-				alias = filepath.Base(m.Package.Path)
-			}
-			typ = fmt.Sprintf("%s.%s", alias, m.ShortName)
-		} else {
-			typ = m.ShortName
-		}
-		if f.Optional {
-			typ = "*" + typ
-		}
-	default:
-		typ = descriptorTypeMap[f.Type]
-	}
-
-	if f.Repeated {
-		typ = "[]" + typ
-	}
-
-	f.typeName = typ
-	return typ
 }
 
 func (f *Field) Tag() string {

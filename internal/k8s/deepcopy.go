@@ -29,8 +29,20 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 	importPackages := map[string]string{
 		"k8s.io/apimachinery/pkg/runtime": "",
 	}
-	mark := make(map[string]struct{})
 	defW := codegeneration.NewWriter()
+
+	enums := g.lister.GetEnums()
+	for _, enum := range enums.Own() {
+		// Enum definition
+		defW.F("type %s string", enum.ShortName)
+		defW.F("const (")
+		for _, v := range enum.Values {
+			defW.F("%s%s %s = %q", enum.ShortName, v, enum.ShortName, v)
+		}
+		defW.F(")")
+	}
+
+	mark := make(map[string]struct{})
 	objs := messages.FilterKind()
 	for len(objs) > 0 {
 		obj := objs[0]
@@ -57,7 +69,7 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 			if !f.Embed {
 				name = f.Name.CamelCase()
 			}
-			typ := f.TypeName(packageName, messages)
+			typ := g.lister.ResolveGoType(packageName, f)
 			tag := f.Tag()
 			defW.F("%s %s %s", name, typ, tag)
 		}
@@ -72,7 +84,7 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 			case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
 				if f.Repeated {
 					defW.F("if in.%s != nil {", f.Name.CamelCase())
-					defW.F("l := make(%s, len(in.%s))", f.TypeName(packageName, messages), f.Name.CamelCase())
+					defW.F("l := make(%s, len(in.%s))", g.lister.ResolveGoType(packageName, f), f.Name.CamelCase())
 					defW.F("for i := range in.%s {", f.Name.CamelCase())
 					defW.F("in.%s[i].DeepCopyInto(&l[i])", f.Name.CamelCase())
 					defW.F("}")
@@ -94,7 +106,7 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 			default:
 				if f.Repeated {
 					defW.F("if in.%s != nil {", f.Name.CamelCase())
-					defW.F("t := make(%s, len(in.%s))", f.TypeName(packageName, messages), f.Name.CamelCase())
+					defW.F("t := make(%s, len(in.%s))", g.lister.ResolveGoType(packageName, f), f.Name.CamelCase())
 					defW.F("copy(t, in.%s)", f.Name.CamelCase())
 					defW.F("out.%s = t", f.Name.CamelCase())
 					defW.F("}")

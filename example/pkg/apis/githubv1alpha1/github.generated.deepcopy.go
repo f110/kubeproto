@@ -5,6 +5,12 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
+type GrafanaPhase string
+
+const (
+	GrafanaPhaseCreated GrafanaPhase = "Created"
+)
+
 type Grafana struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
@@ -170,7 +176,8 @@ func (in *GrafanaSpec) DeepCopy() *GrafanaSpec {
 }
 
 type GrafanaStatus struct {
-	ObservedGeneration int64 `json:"observedGeneration"`
+	ObservedGeneration int64        `json:"observedGeneration"`
+	Phase              GrafanaPhase `json:"phase"`
 }
 
 func (in *GrafanaStatus) DeepCopyInto(out *GrafanaStatus) {

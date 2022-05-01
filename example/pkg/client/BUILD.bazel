@@ -17,7 +17,9 @@ go_library(
     importpath = "go.f110.dev/kubeproto/example/pkg/client",
     visibility = ["//visibility:public"],
     deps = [
+        "//example/vendor/k8s.io/apimachinery/pkg/api/errors",
         "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/labels",
         "//example/vendor/k8s.io/apimachinery/pkg/runtime",
         "//example/vendor/k8s.io/apimachinery/pkg/watch",
         "//example/vendor/k8s.io/client-go/rest",
