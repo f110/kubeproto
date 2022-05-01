@@ -35,6 +35,10 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 
 	enums := g.lister.GetEnums()
 	for _, enum := range enums.Own() {
+		if len(enum.Values) == 0 {
+			continue
+		}
+
 		// Enum definition
 		defW.F("type %s string", enum.ShortName)
 		defW.F("const (")

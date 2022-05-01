@@ -8,7 +8,8 @@ import (
 type GrafanaPhase string
 
 const (
-	GrafanaPhaseCreated GrafanaPhase = "Created"
+	GrafanaPhaseCreated  GrafanaPhase = "Created"
+	GrafanaPhaseCreating GrafanaPhase = "Creating"
 )
 
 type Grafana struct {
@@ -195,7 +196,8 @@ func (in *GrafanaStatus) DeepCopy() *GrafanaStatus {
 
 type GrafanaUserSpec struct {
 	Email string `json:"email"`
-	// Admin indicates that the user has the privilege
+	// Admin indicates that the user has the privilege.
+	//  If admin is true, the user is an administrator.
 	Admin bool `json:"admin"`
 }
 
