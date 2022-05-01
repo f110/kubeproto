@@ -8,11 +8,14 @@ import (
 )
 
 func ToUpperCamelCase(in string) string {
+	if !strings.Contains(in, "_") {
+		return in
+	}
 	s := strings.Split(in, "_")
 	var buf strings.Builder
 	for _, v := range s {
 		buf.WriteRune(unicode.ToUpper(rune(v[0])))
-		buf.WriteString(v[1:])
+		buf.WriteString(strings.ToLower(v[1:]))
 	}
 	return buf.String()
 }
@@ -21,6 +24,28 @@ func ToLowerCamelCase(in string) string {
 	s := ToUpperCamelCase(in)
 
 	return string(unicode.ToLower(rune(s[0]))) + s[1:]
+}
+
+func ToUpperSnakeCase(in string) string {
+	var buf strings.Builder
+	for i, v := range in {
+		if i != 0 && unicode.IsUpper(v) {
+			buf.WriteRune('_')
+		}
+		buf.WriteRune(unicode.ToUpper(v))
+	}
+	return buf.String()
+}
+
+func ToLowerSnakeCase(in string) string {
+	var buf strings.Builder
+	for i, v := range in {
+		if i != 0 && unicode.IsUpper(v) {
+			buf.WriteRune('_')
+		}
+		buf.WriteRune(unicode.ToLower(v))
+	}
+	return buf.String()
 }
 
 var pluralizeClient = pluralize.NewClient()
