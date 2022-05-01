@@ -1,6 +1,7 @@
 package k8s
 
 import (
+	"bufio"
 	"io"
 	"path"
 	"strings"
@@ -74,7 +75,10 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 			tag := f.Tag()
 			if f.Description != "" {
 				d := strings.Replace(f.Description, string(f.Name), f.Name.CamelCase(), 1)
-				defW.F("// %s", d)
+				scanner := bufio.NewScanner(strings.NewReader(d))
+				for scanner.Scan() {
+					defW.F("// %s", scanner.Text())
+				}
 			}
 			defW.F("%s %s %s", name, typ, tag)
 		}

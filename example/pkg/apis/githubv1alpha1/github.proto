@@ -52,7 +52,8 @@ message GrafanaUser {
 
 message GrafanaUserSpec {
   string email = 1;
-  // admin indicates that the user has the privilege
+  // admin indicates that the user has the privilege.
+  // If admin is true, the user is an administrator.
   bool admin = 2;
 }
 
