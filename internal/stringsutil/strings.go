@@ -8,9 +8,6 @@ import (
 )
 
 func ToUpperCamelCase(in string) string {
-	if !strings.Contains(in, "_") {
-		return in
-	}
 	s := strings.Split(in, "_")
 	var buf strings.Builder
 	for _, v := range s {

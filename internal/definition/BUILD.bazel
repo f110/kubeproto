@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "definition",
@@ -12,6 +12,17 @@ go_library(
     deps = [
         "//:kubeproto_lib",
         "//internal/stringsutil",
+        "//vendor/google.golang.org/protobuf/proto",
+        "//vendor/google.golang.org/protobuf/types/descriptorpb",
+    ],
+)
+
+go_test(
+    name = "definition_test",
+    srcs = ["enum_test.go"],
+    embed = [":definition"],
+    deps = [
+        "//vendor/github.com/stretchr/testify/assert",
         "//vendor/google.golang.org/protobuf/proto",
         "//vendor/google.golang.org/protobuf/types/descriptorpb",
     ],

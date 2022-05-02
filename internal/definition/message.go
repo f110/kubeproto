@@ -28,14 +28,14 @@ var (
 		ShortName: "TypeMeta",
 		Fields: []*Field{
 			{
-				Name:        "Kind",
+				Name:        "kind",
 				FieldName:   "kind",
 				Optional:    true,
 				Type:        descriptorpb.FieldDescriptorProto_TYPE_STRING,
 				Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated.",
 			},
 			{
-				Name:        "APIVersion",
+				Name:        "api_version",
 				FieldName:   "apiVersion",
 				Optional:    true,
 				Type:        descriptorpb.FieldDescriptorProto_TYPE_STRING,
@@ -82,21 +82,21 @@ func (m *Messages) FilterKind() Messages {
 				ShortName: fmt.Sprintf("%sList", v.ShortName),
 				Fields: []*Field{
 					{
-						Name:        "TypeMeta",
+						Name:        "type_meta",
 						MessageName: ".k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta",
 						Type:        descriptorpb.FieldDescriptorProto_TYPE_MESSAGE,
 						Inline:      true,
 						Embed:       true,
 					},
 					{
-						Name:        "ListMeta",
+						Name:        "list_meta",
 						FieldName:   "metadata",
 						MessageName: ".k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta",
 						Type:        descriptorpb.FieldDescriptorProto_TYPE_MESSAGE,
 						Embed:       true,
 					},
 					{
-						Name:        "Items",
+						Name:        "items",
 						FieldName:   "items",
 						Type:        descriptorpb.FieldDescriptorProto_TYPE_MESSAGE,
 						Repeated:    true,
@@ -294,14 +294,14 @@ func extendAsKind(m *Message) {
 	if !found {
 		m.Fields = append([]*Field{
 			{
-				Name:        "TypeMeta",
+				Name:        "type_meta",
 				MessageName: ".k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta",
 				Type:        descriptorpb.FieldDescriptorProto_TYPE_MESSAGE,
 				Inline:      true,
 				Embed:       true,
 			},
 			{
-				Name:        "ObjectMeta",
+				Name:        "object_meta",
 				FieldName:   "metadata",
 				MessageName: ".k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta",
 				Type:        descriptorpb.FieldDescriptorProto_TYPE_MESSAGE,

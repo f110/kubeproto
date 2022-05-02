@@ -29,8 +29,8 @@ message Volume {
 }
 
 enum GrafanaPhase {
-  GRAFANA_PHASE_CREATED  = 0 [(dev.f110.kubeproto.value) = { value: "Created" }];
-  GRAFANA_PHASE_CREATING = 1 [(dev.f110.kubeproto.value) = { value: "Creating" }];
+  GRAFANA_PHASE_CREATED  = 0;
+  GRAFANA_PHASE_CREATING = 1;
 }
 
 enum GrafanaUserPhase {

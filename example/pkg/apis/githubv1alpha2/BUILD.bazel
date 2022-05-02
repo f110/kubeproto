@@ -30,8 +30,8 @@ go_proto_library(
 go_library(
     name = "githubv1alpha2",
     srcs = [
-        "github.generated.deepcopy.go",
-        "github.generated.register.go",
+        "github_proto_kubeproto.generated.deepcopy.go",
+        "github_proto_kubeproto.generated.register.go",
     ],
     importpath = "go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha2",
     visibility = ["//visibility:public"],

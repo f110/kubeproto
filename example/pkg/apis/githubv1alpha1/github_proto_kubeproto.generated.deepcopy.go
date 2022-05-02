@@ -12,6 +12,12 @@ const (
 	GrafanaPhaseCreating GrafanaPhase = "Creating"
 )
 
+type GrafanaUserPhase string
+
+const (
+	GrafanaUserPhaseCreated GrafanaUserPhase = "Created"
+)
+
 type Grafana struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
@@ -146,7 +152,7 @@ func (in *GrafanaUserList) DeepCopyObject() runtime.Object {
 
 type GrafanaSpec struct {
 	AdminUser    string   `json:"adminUser,omitempty"`
-	APIVersion   string   `json:"apiVersion"`
+	Apiversion   string   `json:"apiVersion"`
 	FeatureGates []string `json:"featureGates"`
 	Volumes      []Volume `json:"volumes"`
 }

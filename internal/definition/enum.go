@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"path"
 	"sort"
+	"strings"
 
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
 
 	"go.f110.dev/kubeproto"
+	"go.f110.dev/kubeproto/internal/stringsutil"
 )
 
 type Enum struct {
@@ -22,10 +24,13 @@ type Enum struct {
 
 func NewEnum(f *descriptorpb.FileDescriptorProto, enum *descriptorpb.EnumDescriptorProto) *Enum {
 	var values []string
+	prefix := stringsutil.ToUpperSnakeCase(enum.GetName()) + "_"
 	for _, v := range enum.Value {
 		e := proto.GetExtension(v.GetOptions(), kubeproto.E_Value)
 		if ext := e.(*kubeproto.EnumValue); ext != nil {
 			values = append(values, ext.Value)
+		} else {
+			values = append(values, stringsutil.ToUpperCamelCase(strings.TrimPrefix(v.GetName(), prefix)))
 		}
 	}
 
