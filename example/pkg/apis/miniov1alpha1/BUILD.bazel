@@ -1,0 +1,52 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
+
+proto_library(
+    name = "minio_proto",
+    srcs = ["minio.proto"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:k8s_proto",
+        "//:kubeproto",
+    ],
+)
+
+go_proto_library(
+    name = "minio_proto_k8s",
+    compilers = [
+        "//bazel:deepcopy",
+        "//bazel:register",
+    ],
+    importpath = "go.f110.dev/kubeproto/example/pkg/apis/miniov1alpha1",
+    proto = ":minio_proto",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
+    ],
+)
+
+load("//bazel:def.bzl", "kubeproto_go_api")
+
+kubeproto_go_api(
+    name = "minio_proto_kubeproto",
+    srcs = [":minio_proto"],
+    importpath = "go.f110.dev/kubeproto/example/pkg/apis/miniov1alpha1",
+)
+
+go_library(
+    name = "miniov1alpha1",
+    srcs = [
+        "minio_proto_kubeproto.generated.deepcopy.go",
+        "minio_proto_kubeproto.generated.register.go",
+    ],
+    importpath = "go.f110.dev/kubeproto/example/pkg/apis/miniov1alpha1",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
+    ],
+)

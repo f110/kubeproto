@@ -68,6 +68,7 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 				}
 
 				if _, ok := mark[m.Name]; !ok && !m.Dep {
+					mark[m.Name] = struct{}{}
 					objs = append(objs, m)
 				}
 			}
