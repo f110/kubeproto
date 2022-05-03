@@ -152,7 +152,7 @@ func (in *GrafanaUserList) DeepCopyObject() runtime.Object {
 
 type GrafanaSpec struct {
 	AdminUser    string   `json:"adminUser,omitempty"`
-	Apiversion   string   `json:"apiVersion"`
+	APIVersion   string   `json:"apiVersion"`
 	FeatureGates []string `json:"featureGates"`
 	Volumes      []Volume `json:"volumes"`
 }
@@ -202,7 +202,7 @@ func (in *GrafanaStatus) DeepCopy() *GrafanaStatus {
 
 type GrafanaUserSpec struct {
 	Email string `json:"email"`
-	// Admin indicates that the user has the privilege.
+	// admin indicates that the user has the privilege.
 	//  If admin is true, the user is an administrator.
 	Admin bool `json:"admin"`
 }

@@ -90,21 +90,21 @@ func (m *Messages) FilterKind() Messages {
 				ShortName: fmt.Sprintf("%sList", v.ShortName),
 				Fields: []*Field{
 					{
-						Name:        "type_meta",
+						Name:        "TypeMeta",
 						MessageName: ".k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta",
 						Kind:        protoreflect.MessageKind,
 						Inline:      true,
 						Embed:       true,
 					},
 					{
-						Name:        "list_meta",
+						Name:        "ListMeta",
 						FieldName:   "metadata",
 						MessageName: ".k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta",
 						Kind:        protoreflect.MessageKind,
 						Embed:       true,
 					},
 					{
-						Name:        "items",
+						Name:        "Items",
 						FieldName:   "items",
 						Kind:        protoreflect.MessageKind,
 						Repeated:    true,
@@ -178,16 +178,22 @@ func NewMessageFromMessageDescriptor(m protoreflect.MessageDescriptor, f protore
 	for i := 0; i < m.Fields().Len(); i++ {
 		v := m.Fields().Get(i)
 
-		var name string
+		var name, fieldName string
 		var subResource bool
 		e := proto.GetExtension(v.Options(), kubeproto.E_Field)
 		ext := e.(*kubeproto.Field)
 		if ext != nil {
 			name = ext.GetGoName()
 			subResource = ext.SubResource
+			if ext.ApiFieldName != "" {
+				fieldName = ext.ApiFieldName
+			}
 		}
 		if name == "" {
-			name = string(v.Name())
+			name = stringsutil.ToUpperCamelCase(string(v.Name()))
+		}
+		if fieldName == "" {
+			fieldName = stringsutil.ToLowerCamelCase(string(v.Name()))
 		}
 
 		repeated := v.IsList()
@@ -205,7 +211,7 @@ func NewMessageFromMessageDescriptor(m protoreflect.MessageDescriptor, f protore
 		}
 		fields = append(fields, &Field{
 			Name:        Name(name),
-			FieldName:   stringsutil.ToLowerCamelCase(string(v.Name())),
+			FieldName:   fieldName,
 			Kind:        v.Kind(),
 			Repeated:    repeated,
 			MessageName: messageName,
@@ -273,18 +279,6 @@ func (m *Message) Kubernetes() (*kubeproto.Kubernetes, error) {
 	return ext, nil
 }
 
-func isEqualProtoPath(a, b []int32) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := 0; i < len(a); i++ {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-	return true
-}
-
 func extendAsKind(m *Message) {
 	m.Kind = true
 	found := false
@@ -297,14 +291,14 @@ func extendAsKind(m *Message) {
 	if !found {
 		m.Fields = append([]*Field{
 			{
-				Name:        "type_meta",
+				Name:        "TypeMeta",
 				MessageName: ".k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta",
 				Kind:        protoreflect.MessageKind,
 				Inline:      true,
 				Embed:       true,
 			},
 			{
-				Name:        "object_meta",
+				Name:        "ObjectMeta",
 				FieldName:   "metadata",
 				MessageName: ".k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta",
 				Kind:        protoreflect.MessageKind,
@@ -319,11 +313,10 @@ type Field struct {
 	Name Name
 	// FieldName is a json tag name
 	FieldName string
-	Type      descriptorpb.FieldDescriptorProto_Type
 	Kind      protoreflect.Kind
 	// Repeated indicates that this field is an array.
 	Repeated bool
-	// MessageName is a name of Message if Type is FieldDescriptorProto_TYPE_MESSAGE
+	// MessageName is a name of Message if Kind is MessageKind
 	MessageName string
 	// Description is a string of an account of this field
 	Description string

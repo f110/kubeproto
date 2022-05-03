@@ -8,9 +8,10 @@ message Kind {
 }
 
 message Field {
-  string go_name    = 1;
-  bool inline       = 2;
-  bool sub_resource = 3;
+  string go_name        = 1;
+  bool inline           = 2;
+  bool   sub_resource   = 3;
+  string api_field_name = 4;
 }
 
 message Kubernetes {

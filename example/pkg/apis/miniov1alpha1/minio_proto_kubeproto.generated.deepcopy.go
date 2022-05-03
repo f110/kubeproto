@@ -154,24 +154,30 @@ func (in *MinIOUserList) DeepCopyObject() runtime.Object {
 }
 
 type MinIOBucketSpec struct {
-	// Selector is a selector of MinIOInstance.
+	// selector is a selector of MinIOInstance.
 	Selector metav1.LabelSelector `json:"selector"`
-	// BucketFinalizePolicy is a policy when deleted CR Object.
+	// bucket_finalize_policy is a policy when deleted CR Object.
 	//  If bucket_finalize_policy is an empty string, then it is the same as "keep".
 	BucketFinalizePolicy BucketFinalizePolicy `json:"bucketFinalizePolicy"`
-	// Policy is the policy of the bucket. One of public, readOnly, private.
+	// policy is the policy of the bucket. One of public, readOnly, private.
 	//  If you don't want to give public access, set private or an empty value.
 	//  If it is an empty value, The bucket will not have any policy.
 	//  Currently, MinIOBucket can't use prefix based policy.
 	Policy BucketPolicy `json:"policy"`
-	// CreateIndexFile is a flag that creates index.html on top of bucket.
-	CreateIndexFile bool `json:"createIndexFile"`
-	MaxBackups      int  `json:"maxBackups"`
+	// create_index_file is a flag that creates index.html on top of bucket.
+	CreateIndexFile    bool                      `json:"createIndexFile"`
+	MaxBackups         int                       `json:"maxBackups"`
+	ServiceAccountJSON *corev1.SecretKeySelector `json:"serviceAccountJSON,omitempty"`
 }
 
 func (in *MinIOBucketSpec) DeepCopyInto(out *MinIOBucketSpec) {
 	*out = *in
 	in.Selector.DeepCopyInto(&out.Selector)
+	if in.ServiceAccountJSON != nil {
+		in, out := &in.ServiceAccountJSON, &out.ServiceAccountJSON
+		*out = new(corev1.SecretKeySelector)
+		(*in).DeepCopyInto(*out)
+	}
 }
 
 func (in *MinIOBucketSpec) DeepCopy() *MinIOBucketSpec {
@@ -201,11 +207,11 @@ func (in *MinIOBucketStatus) DeepCopy() *MinIOBucketStatus {
 }
 
 type MinIOUserSpec struct {
-	// Selector is a selector of MinIOInstance
+	// selector is a selector of MinIOInstance
 	Selector metav1.LabelSelector `json:"selector"`
-	// Path is a path in vault
+	// path is a path in vault
 	Path string `json:"path"`
-	// MountPath is a mount path of KV secrets engine.
+	// mount_path is a mount path of KV secrets engine.
 	MountPath           string                       `json:"mountPath"`
 	AdminPasswordSecret *corev1.SecretKeySelector    `json:"adminPasswordSecret,omitempty"`
 	Service             *corev1.LocalObjectReference `json:"service,omitempty"`

@@ -84,7 +84,7 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 			}
 			var name string
 			if !f.Embed {
-				name = f.Name.CamelCase()
+				name = string(f.Name)
 			}
 			typ := g.lister.ResolveGoType(packageName, f)
 			tag := f.Tag()
@@ -107,34 +107,34 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 			switch f.Kind {
 			case protoreflect.MessageKind:
 				if f.Repeated {
-					defW.F("if in.%s != nil {", f.Name.CamelCase())
-					defW.F("l := make(%s, len(in.%s))", g.lister.ResolveGoType(packageName, f), f.Name.CamelCase())
-					defW.F("for i := range in.%s {", f.Name.CamelCase())
-					defW.F("in.%s[i].DeepCopyInto(&l[i])", f.Name.CamelCase())
+					defW.F("if in.%s != nil {", f.Name)
+					defW.F("l := make(%s, len(in.%s))", g.lister.ResolveGoType(packageName, f), f.Name)
+					defW.F("for i := range in.%s {", f.Name)
+					defW.F("in.%s[i].DeepCopyInto(&l[i])", f.Name)
 					defW.F("}")
-					defW.F("out.%s = l", f.Name.CamelCase())
+					defW.F("out.%s = l", f.Name)
 					defW.F("}")
 					continue
 				}
 				if f.Optional {
-					defW.F("if in.%s != nil {", f.Name.CamelCase())
-					defW.F("in, out := &in.%s, &out.%s", f.Name.CamelCase(), f.Name.CamelCase())
+					defW.F("if in.%s != nil {", f.Name)
+					defW.F("in, out := &in.%s, &out.%s", f.Name, f.Name)
 					defW.F("*out = new(%s)", g.lister.ResolveGoType(packageName, f)[1:])
 					defW.F("(*in).DeepCopyInto(*out)")
 					defW.F("}")
 					continue
 				}
 				if f.Inline {
-					defW.F("out.%s = in.%s", f.Name.CamelCase(), f.Name.CamelCase())
+					defW.F("out.%s = in.%s", f.Name, f.Name)
 				} else {
-					defW.F("in.%s.DeepCopyInto(&out.%s)", f.Name.CamelCase(), f.Name.CamelCase())
+					defW.F("in.%s.DeepCopyInto(&out.%s)", f.Name, f.Name)
 				}
 			default:
 				if f.Repeated {
-					defW.F("if in.%s != nil {", f.Name.CamelCase())
-					defW.F("t := make(%s, len(in.%s))", g.lister.ResolveGoType(packageName, f), f.Name.CamelCase())
-					defW.F("copy(t, in.%s)", f.Name.CamelCase())
-					defW.F("out.%s = t", f.Name.CamelCase())
+					defW.F("if in.%s != nil {", f.Name)
+					defW.F("t := make(%s, len(in.%s))", g.lister.ResolveGoType(packageName, f), f.Name)
+					defW.F("copy(t, in.%s)", f.Name)
+					defW.F("out.%s = t", f.Name)
 					defW.F("}")
 				}
 			}
