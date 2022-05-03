@@ -152,7 +152,7 @@ func (g *CRDGenerator) ToOpenAPISchema(m *definition.Message) *apiextensionsv1.J
 	properties := make(map[string]apiextensionsv1.JSONSchemaProps)
 	for _, f := range m.Fields {
 		switch f.Kind {
-		case protoreflect.BoolKind, protoreflect.StringKind, protoreflect.Int64Kind:
+		case protoreflect.BoolKind, protoreflect.StringKind, protoreflect.Int64Kind, protoreflect.Int32Kind:
 			properties[f.FieldName] = g.fieldToJSONSchemaProps(f)
 		case protoreflect.MessageKind:
 			child := g.lister.GetMessages().Find(f.MessageName)
@@ -175,15 +175,7 @@ func (g *CRDGenerator) fieldToJSONSchemaProps(f *definition.Field) apiextensions
 	props := apiextensionsv1.JSONSchemaProps{
 		Description: f.Description,
 	}
-
-	switch f.Kind {
-	case protoreflect.BoolKind:
-		props.Type = "boolean"
-	case protoreflect.StringKind:
-		props.Type = "string"
-	case protoreflect.Int64Kind:
-		props.Type = "integer"
-	}
+	props.Type = definition.ProtoreflectKindToJSONSchemaType[f.Kind]
 
 	if f.Repeated {
 		return apiextensionsv1.JSONSchemaProps{

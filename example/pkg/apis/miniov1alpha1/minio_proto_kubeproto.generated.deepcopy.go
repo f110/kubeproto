@@ -166,6 +166,7 @@ type MinIOBucketSpec struct {
 	Policy BucketPolicy `json:"policy"`
 	// CreateIndexFile is a flag that creates index.html on top of bucket.
 	CreateIndexFile bool `json:"createIndexFile"`
+	MaxBackups      int  `json:"maxBackups"`
 }
 
 func (in *MinIOBucketSpec) DeepCopyInto(out *MinIOBucketSpec) {

@@ -112,7 +112,7 @@ func (l *Lister) ResolveGoType(packageName string, f *Field) string {
 		e := l.GetEnums().Find(f.MessageName)
 		typ = e.ShortName
 	default:
-		typ = descriptorTypeMap[f.Kind]
+		typ = protoreflectKindMap[f.Kind]
 	}
 
 	if f.Repeated {

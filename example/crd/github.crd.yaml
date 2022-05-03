@@ -206,6 +206,8 @@ spec:
                 description: create_index_file is a flag that creates index.html on
                   top of bucket.
                 type: boolean
+              maxBackups:
+                type: integer
               selector:
                 properties:
                   matchexpressions:

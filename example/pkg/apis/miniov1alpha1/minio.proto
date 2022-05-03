@@ -44,7 +44,8 @@ message MinIOBucketSpec {
   // Currently, MinIOBucket can't use prefix based policy.
   BucketPolicy policy = 3;
   // create_index_file is a flag that creates index.html on top of bucket.
-  bool create_index_file = 4;
+  bool  create_index_file = 4;
+  int32 max_backups       = 5;
 }
 
 message MinIOBucketStatus {

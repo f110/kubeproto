@@ -14,11 +14,18 @@ import (
 	"go.f110.dev/kubeproto/internal/stringsutil"
 )
 
-var descriptorTypeMap = map[protoreflect.Kind]string{
+var protoreflectKindMap = map[protoreflect.Kind]string{
 	protoreflect.StringKind: "string",
 	protoreflect.Int64Kind:  "int64",
 	protoreflect.Int32Kind:  "int",
 	protoreflect.BoolKind:   "bool",
+}
+
+var ProtoreflectKindToJSONSchemaType = map[protoreflect.Kind]string{
+	protoreflect.StringKind: "string",
+	protoreflect.Int64Kind:  "integer",
+	protoreflect.Int32Kind:  "integer",
+	protoreflect.BoolKind:   "boolean",
 }
 
 var (
