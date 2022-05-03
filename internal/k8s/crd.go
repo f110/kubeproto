@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"sort"
 	"strings"
 
@@ -157,7 +156,6 @@ func (g *CRDGenerator) ToOpenAPISchema(m *definition.Message) *apiextensionsv1.J
 			properties[f.FieldName] = g.fieldToJSONSchemaProps(f)
 		case protoreflect.MessageKind:
 			child := g.lister.GetMessages().Find(f.MessageName)
-			log.Print(f.MessageName)
 			props := g.ToOpenAPISchema(child)
 			if f.Inline {
 				for k, v := range props.Properties {
