@@ -6,6 +6,7 @@ go_client(
     srcs = [
         "//example/pkg/apis/githubv1alpha1:github_proto",
         "//example/pkg/apis/githubv1alpha2:github_proto",
+        "//example/pkg/apis/miniov1alpha1:minio_proto",
     ],
     importpath = "go.f110.dev/kubeproto/example/pkg/client",
     visibility = ["//visibility:public"],

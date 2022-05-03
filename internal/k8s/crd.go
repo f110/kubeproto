@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"sort"
 	"strings"
 
-	"google.golang.org/protobuf/types/descriptorpb"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/reflect/protoregistry"
 	"gopkg.in/yaml.v2"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 
@@ -16,12 +18,20 @@ import (
 )
 
 type CRDGenerator struct {
-	files  []*descriptorpb.FileDescriptorProto
+	files  protoreflect.FileDescriptor
 	lister *definition.Lister
 }
 
-func NewCRDGenerator(files []*descriptorpb.FileDescriptorProto, allProtos []*descriptorpb.FileDescriptorProto) *CRDGenerator {
-	return &CRDGenerator{files: files, lister: definition.NewLister(files, allProtos)}
+func NewCRDGenerator(fileToGenerate []string, files *protoregistry.Files) (*CRDGenerator, error) {
+	desc, err := files.FindFileByPath(fileToGenerate[0])
+	if err != nil {
+		return nil, err
+	}
+
+	return &CRDGenerator{
+		files:  desc,
+		lister: definition.NewLister(fileToGenerate, files),
+	}, nil
 }
 
 func (g *CRDGenerator) Generate(out io.Writer) error {
@@ -142,13 +152,12 @@ func (g *CRDGenerator) ToOpenAPISchema(m *definition.Message) *apiextensionsv1.J
 	}
 	properties := make(map[string]apiextensionsv1.JSONSchemaProps)
 	for _, f := range m.Fields {
-		switch f.Type {
-		case descriptorpb.FieldDescriptorProto_TYPE_BOOL,
-			descriptorpb.FieldDescriptorProto_TYPE_STRING,
-			descriptorpb.FieldDescriptorProto_TYPE_INT64:
+		switch f.Kind {
+		case protoreflect.BoolKind, protoreflect.StringKind, protoreflect.Int64Kind:
 			properties[f.FieldName] = g.fieldToJSONSchemaProps(f)
-		case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
+		case protoreflect.MessageKind:
 			child := g.lister.GetMessages().Find(f.MessageName)
+			log.Print(f.MessageName)
 			props := g.ToOpenAPISchema(child)
 			if f.Inline {
 				for k, v := range props.Properties {
@@ -169,12 +178,12 @@ func (g *CRDGenerator) fieldToJSONSchemaProps(f *definition.Field) apiextensions
 		Description: f.Description,
 	}
 
-	switch f.Type {
-	case descriptorpb.FieldDescriptorProto_TYPE_BOOL:
+	switch f.Kind {
+	case protoreflect.BoolKind:
 		props.Type = "boolean"
-	case descriptorpb.FieldDescriptorProto_TYPE_STRING:
+	case protoreflect.StringKind:
 		props.Type = "string"
-	case descriptorpb.FieldDescriptorProto_TYPE_INT64:
+	case protoreflect.Int64Kind:
 		props.Type = "integer"
 	}
 

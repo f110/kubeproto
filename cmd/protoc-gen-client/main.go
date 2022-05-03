@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protodesc"
 	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/pluginpb"
 
@@ -26,14 +27,9 @@ func genClient() error {
 	if err != nil {
 		return err
 	}
-	files := make(map[string]*descriptorpb.FileDescriptorProto)
-	for _, v := range input.FileToGenerate {
-		files[v] = nil
-	}
-	for _, v := range input.ProtoFile {
-		if _, ok := files[v.GetName()]; ok {
-			files[v.GetName()] = v
-		}
+	files, err := protodesc.NewFiles(&descriptorpb.FileDescriptorSet{File: input.ProtoFile})
+	if err != nil {
+		return err
 	}
 
 	var outFile, importPath string
@@ -45,16 +41,12 @@ func genClient() error {
 	} else {
 		outFile = opt
 	}
-	var inputFiles []*descriptorpb.FileDescriptorProto
-	for _, v := range files {
-		inputFiles = append(inputFiles, v)
-	}
 
 	var res pluginpb.CodeGeneratorResponse
 	supportedFeatures := uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)
 	res.SupportedFeatures = &supportedFeatures
 	out := new(bytes.Buffer)
-	g := k8s.NewClientGenerator(inputFiles, input.ProtoFile)
+	g := k8s.NewClientGenerator(input.FileToGenerate, files)
 	packageName := path.Base(filepath.Dir(outFile))
 	if err := g.Generate(out, packageName, importPath); err != nil {
 		return err

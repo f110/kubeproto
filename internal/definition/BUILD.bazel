@@ -13,6 +13,8 @@ go_library(
         "//:kubeproto_lib",
         "//internal/stringsutil",
         "//vendor/google.golang.org/protobuf/proto",
+        "//vendor/google.golang.org/protobuf/reflect/protoreflect",
+        "//vendor/google.golang.org/protobuf/reflect/protoregistry",
         "//vendor/google.golang.org/protobuf/types/descriptorpb",
     ],
 )

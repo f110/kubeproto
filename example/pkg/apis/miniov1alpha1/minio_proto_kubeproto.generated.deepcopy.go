@@ -1,7 +1,7 @@
 package miniov1alpha1
 
 import (
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -21,10 +21,10 @@ const (
 )
 
 type MinIOBucket struct {
-	v1.TypeMeta   `json:",inline"`
-	v1.ObjectMeta `json:"metadata"`
-	Spec          MinIOBucketSpec   `json:"spec"`
-	Status        MinIOBucketStatus `json:"status"`
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata"`
+	Spec              MinIOBucketSpec   `json:"spec"`
+	Status            MinIOBucketStatus `json:"status"`
 }
 
 func (in *MinIOBucket) DeepCopyInto(out *MinIOBucket) {
@@ -52,9 +52,9 @@ func (in *MinIOBucket) DeepCopyObject() runtime.Object {
 }
 
 type MinIOBucketList struct {
-	v1.TypeMeta `json:",inline"`
-	v1.ListMeta `json:"metadata"`
-	Items       []MinIOBucket `json:"items"`
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata"`
+	Items           []MinIOBucket `json:"items"`
 }
 
 func (in *MinIOBucketList) DeepCopyInto(out *MinIOBucketList) {
@@ -87,10 +87,10 @@ func (in *MinIOBucketList) DeepCopyObject() runtime.Object {
 }
 
 type MinIOUser struct {
-	v1.TypeMeta   `json:",inline"`
-	v1.ObjectMeta `json:"metadata"`
-	Spec          MinIOUserSpec     `json:"spec"`
-	Status        MinIOBucketStatus `json:"status"`
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata"`
+	Spec              MinIOUserSpec     `json:"spec"`
+	Status            MinIOBucketStatus `json:"status"`
 }
 
 func (in *MinIOUser) DeepCopyInto(out *MinIOUser) {
@@ -118,9 +118,9 @@ func (in *MinIOUser) DeepCopyObject() runtime.Object {
 }
 
 type MinIOUserList struct {
-	v1.TypeMeta `json:",inline"`
-	v1.ListMeta `json:"metadata"`
-	Items       []MinIOUser `json:"items"`
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata"`
+	Items           []MinIOUser `json:"items"`
 }
 
 func (in *MinIOUserList) DeepCopyInto(out *MinIOUserList) {
@@ -154,8 +154,8 @@ func (in *MinIOUserList) DeepCopyObject() runtime.Object {
 
 type MinIOBucketSpec struct {
 	// Selector is a selector of MinIOInstance.
-	Selector v1.LabelSelector `json:"selector"`
-	// BucketFinalizePolicy is a plicy when deleted CR Object.
+	Selector metav1.LabelSelector `json:"selector"`
+	// BucketFinalizePolicy is a policy when deleted CR Object.
 	//  If bucket_finalize_policy is an empty string, then it is the same as "keep".
 	BucketFinalizePolicy BucketFinalizePolicy `json:"bucketFinalizePolicy"`
 	// Policy is the policy of the bucket. One of public, readOnly, private.
@@ -200,7 +200,7 @@ func (in *MinIOBucketStatus) DeepCopy() *MinIOBucketStatus {
 
 type MinIOUserSpec struct {
 	// Selector is a selector of MinIOInstance
-	Selector v1.LabelSelector `json:"selector"`
+	Selector metav1.LabelSelector `json:"selector"`
 	// Path is a path in vault
 	Path string `json:"path"`
 	// MountPath is a mount path of KV secrets engine.

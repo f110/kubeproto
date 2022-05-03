@@ -6,6 +6,8 @@ import (
 	"path"
 	"strings"
 
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/reflect/protoregistry"
 	"google.golang.org/protobuf/types/descriptorpb"
 
 	"go.f110.dev/kubeproto/internal/codegeneration"
@@ -13,19 +15,27 @@ import (
 )
 
 type DeepCopyGenerator struct {
-	file   *descriptorpb.FileDescriptorProto
+	file   protoreflect.FileDescriptor
 	lister *definition.Lister
 }
 
-func NewDeepCopyGenerator(file *descriptorpb.FileDescriptorProto, allProtos []*descriptorpb.FileDescriptorProto) *DeepCopyGenerator {
-	return &DeepCopyGenerator{file: file, lister: definition.NewLister([]*descriptorpb.FileDescriptorProto{file}, allProtos)}
+func NewDeepCopyGenerator(fileToGenerate []string, files *protoregistry.Files) (*DeepCopyGenerator, error) {
+	desc, err := files.FindFileByPath(fileToGenerate[0])
+	if err != nil {
+		return nil, err
+	}
+	return &DeepCopyGenerator{
+		file:   desc.(protoreflect.FileDescriptor),
+		lister: definition.NewLister(fileToGenerate, files),
+	}, nil
 }
 
 func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 	w := codegeneration.NewWriter()
 	messages := g.lister.GetMessages()
 
-	packageName := g.file.GetOptions().GetGoPackage()
+	fileOpt := g.file.Options().(*descriptorpb.FileOptions)
+	packageName := fileOpt.GetGoPackage()
 	w.F("package %s", path.Base(packageName))
 
 	importPackages := map[string]string{
@@ -57,8 +67,8 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 		// Struct definition
 		defW.F("type %s struct {", obj.ShortName)
 		for _, f := range obj.Fields {
-			switch f.Type {
-			case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
+			switch f.Kind {
+			case protoreflect.MessageKind:
 				m := messages.Find(f.MessageName)
 				if m == nil {
 					continue
@@ -94,8 +104,8 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 		defW.F("func (in *%s) DeepCopyInto(out *%s) {", obj.ShortName, obj.ShortName)
 		defW.F("*out = *in")
 		for _, f := range obj.Fields {
-			switch f.Type {
-			case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
+			switch f.Kind {
+			case protoreflect.MessageKind:
 				if f.Repeated {
 					defW.F("if in.%s != nil {", f.Name.CamelCase())
 					defW.F("l := make(%s, len(in.%s))", g.lister.ResolveGoType(packageName, f), f.Name.CamelCase())

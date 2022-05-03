@@ -6,6 +6,8 @@ import (
 	"path"
 
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/reflect/protoregistry"
 	"google.golang.org/protobuf/types/descriptorpb"
 
 	"go.f110.dev/kubeproto"
@@ -14,24 +16,32 @@ import (
 )
 
 type RegisterGenerator struct {
-	file   *descriptorpb.FileDescriptorProto
+	file   protoreflect.FileDescriptor
 	lister *definition.Lister
 }
 
-func NewRegisterGenerator(file *descriptorpb.FileDescriptorProto, allProtos []*descriptorpb.FileDescriptorProto) *RegisterGenerator {
-	return &RegisterGenerator{file: file, lister: definition.NewLister([]*descriptorpb.FileDescriptorProto{file}, allProtos)}
+func NewRegisterGenerator(fileToGenerate []string, files *protoregistry.Files) (*RegisterGenerator, error) {
+	desc, err := files.FindFileByPath(fileToGenerate[0])
+	if err != nil {
+		return nil, err
+	}
+	return &RegisterGenerator{
+		file:   desc.(protoreflect.FileDescriptor),
+		lister: definition.NewLister(fileToGenerate, files),
+	}, err
 }
 
 func (g *RegisterGenerator) Generate(out io.Writer) error {
 	w := codegeneration.NewWriter()
 
-	e := proto.GetExtension(g.file.GetOptions(), kubeproto.E_K8S)
+	e := proto.GetExtension(g.file.Options(), kubeproto.E_K8S)
 	ext := e.(*kubeproto.Kubernetes)
 	if ext == nil {
-		return fmt.Errorf("%s is not extended by kubeproto.Kubernetes", g.file.GetName())
+		return fmt.Errorf("%s is not extended by kubeproto.Kubernetes", g.file.Name())
 	}
 
-	packageName := g.file.GetOptions().GetGoPackage()
+	fileOpt := g.file.Options().(*descriptorpb.FileOptions)
+	packageName := fileOpt.GetGoPackage()
 	w.F("package %s", path.Base(packageName))
 	w.F("import (")
 	w.F("metav1 \"k8s.io/apimachinery/pkg/apis/meta/v1\"")

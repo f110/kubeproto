@@ -5,6 +5,7 @@ crd_proto_manifest(
     srcs = [
         "//example/pkg/apis/githubv1alpha1:github_proto",
         "//example/pkg/apis/githubv1alpha2:github_proto",
+        "//example/pkg/apis/miniov1alpha1:minio_proto",
     ],
     visibility = ["//visibility:public"],
 )

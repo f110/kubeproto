@@ -16,6 +16,8 @@ go_library(
         "//internal/definition",
         "//internal/stringsutil",
         "//vendor/google.golang.org/protobuf/proto",
+        "//vendor/google.golang.org/protobuf/reflect/protoreflect",
+        "//vendor/google.golang.org/protobuf/reflect/protoregistry",
         "//vendor/google.golang.org/protobuf/types/descriptorpb",
         "//vendor/gopkg.in/yaml.v2:yaml_v2",
         "//vendor/k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1:apiextensions",

@@ -4,19 +4,24 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"google.golang.org/protobuf/types/descriptorpb"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/reflect/protoregistry"
 )
 
 type Lister struct {
-	files    []*descriptorpb.FileDescriptorProto
-	allFiles []*descriptorpb.FileDescriptorProto
+	files    map[string]struct{}
+	allFiles *protoregistry.Files
 
 	messages Messages
 	enums    Enums
 }
 
-func NewLister(files []*descriptorpb.FileDescriptorProto, allProtos []*descriptorpb.FileDescriptorProto) *Lister {
-	return &Lister{files: files, allFiles: allProtos}
+func NewLister(files []string, all *protoregistry.Files) *Lister {
+	m := make(map[string]struct{})
+	for _, v := range files {
+		m[v] = struct{}{}
+	}
+	return &Lister{files: m, allFiles: all}
 }
 
 func (l *Lister) GetMessages() Messages {
@@ -25,20 +30,35 @@ func (l *Lister) GetMessages() Messages {
 	}
 
 	var msgs Messages
-	for _, f := range l.files {
-		for _, v := range f.GetMessageType() {
-			msgs = append(msgs, NewMessage(f, v))
+	addMessage := func(m protoreflect.MessageDescriptor, desc protoreflect.FileDescriptor) bool {
+		msg, err := NewMessageFromMessageDescriptor(m, desc)
+		if err != nil {
+			return false
 		}
+		if _, ok := l.files[desc.Path()]; !ok {
+			msg.Dep = true
+		}
+		if exists := msgs.Find(msg.Name); exists == nil {
+			msgs = append(msgs, msg)
+		}
+
+		return true
 	}
-	for _, v := range l.allFiles {
-		for _, mt := range v.GetMessageType() {
-			m := NewMessage(v, mt)
-			m.Dep = true
-			if exists := msgs.Find(m.Name); exists == nil {
-				msgs = append(msgs, m)
+	l.allFiles.RangeFiles(func(desc protoreflect.FileDescriptor) bool {
+		for i := 0; i < desc.Messages().Len(); i++ {
+			m := desc.Messages().Get(i)
+			if !addMessage(m, desc) {
+				return false
+			}
+			for i := 0; i < m.Messages().Len(); i++ {
+				if !addMessage(m.Messages().Get(i), desc) {
+					return false
+				}
 			}
 		}
-	}
+
+		return true
+	})
 
 	msgs = append(msgs, MessageTypeMeta, MessageObjectMeta, MessageListMeta)
 	l.messages = msgs
@@ -51,16 +71,14 @@ func (l *Lister) GetEnums() Enums {
 	}
 
 	var enums []*Enum
-	for _, f := range l.files {
-		for _, v := range f.GetEnumType() {
-			enums = append(enums, NewEnum(f, v))
+	l.allFiles.RangeFiles(func(desc protoreflect.FileDescriptor) bool {
+		for i := 0; i < desc.Enums().Len(); i++ {
+			e := desc.Enums().Get(i)
+			enums = append(enums, NewEnumFromEnumDescriptor(e, desc))
 		}
-	}
-	for _, f := range l.allFiles {
-		for _, v := range f.GetEnumType() {
-			enums = append(enums, NewEnum(f, v))
-		}
-	}
+
+		return true
+	})
 
 	l.enums = enums
 	return enums
@@ -72,8 +90,8 @@ func (l *Lister) ResolveGoType(packageName string, f *Field) string {
 	}
 
 	var typ string
-	switch f.Type {
-	case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
+	switch f.Kind {
+	case protoreflect.MessageKind:
 		m := l.GetMessages().Find(f.MessageName)
 		if m == nil {
 			return ""
@@ -90,11 +108,11 @@ func (l *Lister) ResolveGoType(packageName string, f *Field) string {
 		if f.Optional {
 			typ = "*" + typ
 		}
-	case descriptorpb.FieldDescriptorProto_TYPE_ENUM:
+	case protoreflect.EnumKind:
 		e := l.GetEnums().Find(f.MessageName)
 		typ = e.ShortName
 	default:
-		typ = descriptorTypeMap[f.Type]
+		typ = descriptorTypeMap[f.Kind]
 	}
 
 	if f.Repeated {

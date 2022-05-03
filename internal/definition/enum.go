@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/descriptorpb"
 
 	"go.f110.dev/kubeproto"
@@ -41,6 +42,35 @@ func NewEnum(f *descriptorpb.FileDescriptorProto, enum *descriptorpb.EnumDescrip
 		Package: ImportPackage{
 			Name: path.Base(f.GetOptions().GetGoPackage()),
 			Path: f.GetOptions().GetGoPackage(),
+		},
+	}
+}
+
+func NewEnumFromEnumDescriptor(e protoreflect.EnumDescriptor, f protoreflect.FileDescriptor) *Enum {
+	var values []string
+	prefix := stringsutil.ToUpperSnakeCase(string(e.Name())) + "_"
+	for i := 0; i < e.Values().Len(); i++ {
+		v := e.Values().Get(i)
+		e := proto.GetExtension(v.Options(), kubeproto.E_Value)
+		if ext := e.(*kubeproto.EnumValue); ext != nil {
+			values = append(values, ext.Value)
+		} else {
+			values = append(values, stringsutil.ToUpperCamelCase(strings.TrimPrefix(string(v.Name()), prefix)))
+		}
+	}
+
+	fileOpt := f.Options()
+	var goPackage string
+	if v, ok := fileOpt.(*descriptorpb.FileOptions); ok {
+		goPackage = v.GetGoPackage()
+	}
+	return &Enum{
+		Name:      string(e.FullName()),
+		ShortName: string(e.Name()),
+		Values:    values,
+		Package: ImportPackage{
+			Name: path.Base(goPackage),
+			Path: goPackage,
 		},
 	}
 }

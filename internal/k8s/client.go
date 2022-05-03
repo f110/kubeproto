@@ -6,6 +6,7 @@ import (
 	"path"
 	"strings"
 
+	"google.golang.org/protobuf/reflect/protoregistry"
 	"google.golang.org/protobuf/types/descriptorpb"
 
 	"go.f110.dev/kubeproto/internal/codegeneration"
@@ -18,8 +19,11 @@ type ClientGenerator struct {
 	lister *definition.Lister
 }
 
-func NewClientGenerator(files []*descriptorpb.FileDescriptorProto, allProtos []*descriptorpb.FileDescriptorProto) *ClientGenerator {
-	return &ClientGenerator{files: files, lister: definition.NewLister(files, allProtos)}
+func NewClientGenerator(fileToGenerate []string, files *protoregistry.Files) *ClientGenerator {
+	return &ClientGenerator{
+		files:  nil,
+		lister: definition.NewLister(fileToGenerate, files),
+	}
 }
 
 func (g *ClientGenerator) Generate(out io.Writer, packageName, importPath string) error {

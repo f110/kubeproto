@@ -7,17 +7,18 @@ import (
 	"strings"
 
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/descriptorpb"
 
 	"go.f110.dev/kubeproto"
 	"go.f110.dev/kubeproto/internal/stringsutil"
 )
 
-var descriptorTypeMap = map[descriptorpb.FieldDescriptorProto_Type]string{
-	descriptorpb.FieldDescriptorProto_TYPE_STRING: "string",
-	descriptorpb.FieldDescriptorProto_TYPE_INT64:  "int64",
-	descriptorpb.FieldDescriptorProto_TYPE_INT32:  "int",
-	descriptorpb.FieldDescriptorProto_TYPE_BOOL:   "bool",
+var descriptorTypeMap = map[protoreflect.Kind]string{
+	protoreflect.StringKind: "string",
+	protoreflect.Int64Kind:  "int64",
+	protoreflect.Int32Kind:  "int",
+	protoreflect.BoolKind:   "bool",
 }
 
 var (
@@ -31,14 +32,14 @@ var (
 				Name:        "kind",
 				FieldName:   "kind",
 				Optional:    true,
-				Type:        descriptorpb.FieldDescriptorProto_TYPE_STRING,
+				Kind:        protoreflect.StringKind,
 				Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated.",
 			},
 			{
 				Name:        "api_version",
 				FieldName:   "apiVersion",
 				Optional:    true,
-				Type:        descriptorpb.FieldDescriptorProto_TYPE_STRING,
+				Kind:        protoreflect.StringKind,
 				Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values.",
 			},
 		},
@@ -69,7 +70,7 @@ func (m *Messages) FilterKind() Messages {
 		if v.Dep {
 			continue
 		}
-		if !isKind(v.descriptor) {
+		if !isKind(v.messageDescriptor) {
 			continue
 		}
 		kinds = append(kinds, v)
@@ -84,7 +85,7 @@ func (m *Messages) FilterKind() Messages {
 					{
 						Name:        "type_meta",
 						MessageName: ".k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta",
-						Type:        descriptorpb.FieldDescriptorProto_TYPE_MESSAGE,
+						Kind:        protoreflect.MessageKind,
 						Inline:      true,
 						Embed:       true,
 					},
@@ -92,13 +93,13 @@ func (m *Messages) FilterKind() Messages {
 						Name:        "list_meta",
 						FieldName:   "metadata",
 						MessageName: ".k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta",
-						Type:        descriptorpb.FieldDescriptorProto_TYPE_MESSAGE,
+						Kind:        protoreflect.MessageKind,
 						Embed:       true,
 					},
 					{
 						Name:        "items",
 						FieldName:   "items",
-						Type:        descriptorpb.FieldDescriptorProto_TYPE_MESSAGE,
+						Kind:        protoreflect.MessageKind,
 						Repeated:    true,
 						MessageName: v.Name,
 					},
@@ -127,8 +128,8 @@ func (m Messages) Find(name string) *Message {
 	return nil
 }
 
-func isKind(desc *descriptorpb.DescriptorProto) bool {
-	e := proto.GetExtension(desc.GetOptions(), kubeproto.E_Kind)
+func isKind(desc protoreflect.MessageDescriptor) bool {
+	e := proto.GetExtension(desc.Options(), kubeproto.E_Kind)
 	if e == nil {
 		return false
 	}
@@ -139,13 +140,6 @@ func isKind(desc *descriptorpb.DescriptorProto) bool {
 
 	return true
 }
-
-const (
-	// messageTypeIndex is an index of MessageType in descriptorpb.FileDescriptorProto.
-	messageTypeIndex = 4
-	// fieldIndex is an index of Field in descriptorpb.DescriptorProto
-	fieldIndex = 2
-)
 
 type Message struct {
 	// Dep indicates that this message is dependent
@@ -168,68 +162,61 @@ type Message struct {
 	// Version is the api version (e,g, v1alpha1)
 	Version string
 
-	descriptor     *descriptorpb.DescriptorProto
-	fileDescriptor *descriptorpb.FileDescriptorProto
+	fileDescriptor    protoreflect.FileDescriptor
+	messageDescriptor protoreflect.MessageDescriptor
 }
 
-func NewMessage(f *descriptorpb.FileDescriptorProto, desc *descriptorpb.DescriptorProto) *Message {
-	var messageIndex int
-	for i, v := range f.MessageType {
-		if v == desc {
-			messageIndex = i
-			break
-		}
-	}
-
+func NewMessageFromMessageDescriptor(m protoreflect.MessageDescriptor, f protoreflect.FileDescriptor) (*Message, error) {
 	var fields []*Field
-	for i, v := range desc.Field {
+	for i := 0; i < m.Fields().Len(); i++ {
+		v := m.Fields().Get(i)
+
 		var name string
 		var subResource bool
-		e := proto.GetExtension(v.GetOptions(), kubeproto.E_Field)
+		e := proto.GetExtension(v.Options(), kubeproto.E_Field)
 		ext := e.(*kubeproto.Field)
 		if ext != nil {
 			name = ext.GetGoName()
 			subResource = ext.SubResource
 		}
 		if name == "" {
-			name = v.GetName()
+			name = string(v.Name())
 		}
 
-		var repeated bool
-		if v.GetLabel() == descriptorpb.FieldDescriptorProto_LABEL_REPEATED {
-			repeated = true
-		}
-
+		repeated := v.IsList()
 		var description string
-		fieldPath := []int32{messageTypeIndex, int32(messageIndex), fieldIndex, int32(i)}
-		for _, s := range f.SourceCodeInfo.GetLocation() {
-			if isEqualProtoPath(s.Path, fieldPath) {
-				description = strings.TrimSuffix(strings.TrimPrefix(s.GetLeadingComments(), " "), "\n")
-				break
-			}
+		if location := f.SourceLocations().ByDescriptor(v); location.LeadingComments != "" {
+			description = strings.TrimSuffix(strings.TrimPrefix(location.LeadingComments, " "), "\n")
 		}
 
+		var messageName string
+		switch v.Kind() {
+		case protoreflect.MessageKind:
+			messageName = string(v.Message().FullName())
+		case protoreflect.EnumKind:
+			messageName = string(v.Enum().FullName())
+		}
 		fields = append(fields, &Field{
 			Name:        Name(name),
-			FieldName:   stringsutil.ToLowerCamelCase(v.GetName()),
-			Type:        v.GetType(),
+			FieldName:   stringsutil.ToLowerCamelCase(string(v.Name())),
+			Kind:        v.Kind(),
 			Repeated:    repeated,
-			MessageName: v.GetTypeName(),
+			MessageName: messageName,
 			Description: description,
-			Optional:    v.GetProto3Optional(),
+			Optional:    v.HasOptionalKeyword(),
 			SubResource: subResource,
 		})
 	}
 
 	var printerColumns []*kubeproto.PrinterColumn
-	e := proto.GetExtension(desc.GetOptions(), kubeproto.E_Kind)
+	e := proto.GetExtension(m.Options(), kubeproto.E_Kind)
 	ext := e.(*kubeproto.Kind)
 	if ext != nil {
 		printerColumns = ext.AdditionalPrinterColumns
 	}
 
 	var group, subGroup, version string
-	e = proto.GetExtension(f.GetOptions(), kubeproto.E_K8S)
+	e = proto.GetExtension(f.Options(), kubeproto.E_K8S)
 	k8sExt := e.(*kubeproto.Kubernetes)
 	if k8sExt != nil {
 		group = fmt.Sprintf("%s.%s", k8sExt.SubGroup, k8sExt.Domain)
@@ -237,31 +224,40 @@ func NewMessage(f *descriptorpb.FileDescriptorProto, desc *descriptorpb.Descript
 		version = k8sExt.Version
 	}
 
-	m := &Message{
-		Name:                     fmt.Sprintf(".%s.%s", f.GetPackage(), desc.GetName()),
-		ShortName:                desc.GetName(),
+	fileOpt := f.Options()
+	var goPackage, goPackageAlias string
+	if v, ok := fileOpt.(*descriptorpb.FileOptions); ok {
+		goPackage = v.GetGoPackage()
+	}
+	if strings.HasPrefix(goPackage, "k8s.io/apimachinery") || strings.HasPrefix(goPackage, "k8s.io/api") {
+		s := strings.Split(goPackage, "/")
+		goPackageAlias = fmt.Sprintf("%s%s", s[len(s)-2], s[len(s)-1])
+	}
+	msg := &Message{
+		Name:                     string(m.FullName()),
+		ShortName:                string(m.Name()),
 		Fields:                   fields,
 		AdditionalPrinterColumns: printerColumns,
 		Group:                    group,
 		SubGroup:                 subGroup,
 		Version:                  version,
 		Package: ImportPackage{
-			Name: path.Base(f.GetOptions().GetGoPackage()),
-			Path: f.GetOptions().GetGoPackage(),
+			Name:  path.Base(goPackage),
+			Path:  goPackage,
+			Alias: goPackageAlias,
 		},
-		descriptor:     desc,
-		fileDescriptor: f,
+		fileDescriptor:    f,
+		messageDescriptor: m,
 	}
 
-	if isKind(desc) {
-		extendAsKind(m)
+	if isKind(m) {
+		extendAsKind(msg)
 	}
-
-	return m
+	return msg, nil
 }
 
 func (m *Message) Kubernetes() (*kubeproto.Kubernetes, error) {
-	e := proto.GetExtension(m.fileDescriptor.GetOptions(), kubeproto.E_K8S)
+	e := proto.GetExtension(m.fileDescriptor.Options(), kubeproto.E_K8S)
 	ext := e.(*kubeproto.Kubernetes)
 	if ext == nil {
 		return nil, fmt.Errorf("%s is not extended by kubeproto.Kubernetes", m.ShortName)
@@ -296,7 +292,7 @@ func extendAsKind(m *Message) {
 			{
 				Name:        "type_meta",
 				MessageName: ".k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta",
-				Type:        descriptorpb.FieldDescriptorProto_TYPE_MESSAGE,
+				Kind:        protoreflect.MessageKind,
 				Inline:      true,
 				Embed:       true,
 			},
@@ -304,7 +300,7 @@ func extendAsKind(m *Message) {
 				Name:        "object_meta",
 				FieldName:   "metadata",
 				MessageName: ".k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta",
-				Type:        descriptorpb.FieldDescriptorProto_TYPE_MESSAGE,
+				Kind:        protoreflect.MessageKind,
 				Embed:       true,
 			},
 		}, m.Fields...)
@@ -317,6 +313,7 @@ type Field struct {
 	// FieldName is a json tag name
 	FieldName string
 	Type      descriptorpb.FieldDescriptorProto_Type
+	Kind      protoreflect.Kind
 	// Repeated indicates that this field is an array.
 	Repeated bool
 	// MessageName is a name of Message if Type is FieldDescriptorProto_TYPE_MESSAGE
