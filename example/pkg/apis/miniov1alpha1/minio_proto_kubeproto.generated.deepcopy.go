@@ -1,6 +1,7 @@
 package miniov1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
@@ -204,12 +205,24 @@ type MinIOUserSpec struct {
 	// Path is a path in vault
 	Path string `json:"path"`
 	// MountPath is a mount path of KV secrets engine.
-	MountPath string `json:"mountPath"`
+	MountPath           string                       `json:"mountPath"`
+	AdminPasswordSecret *corev1.SecretKeySelector    `json:"adminPasswordSecret,omitempty"`
+	Service             *corev1.LocalObjectReference `json:"service,omitempty"`
 }
 
 func (in *MinIOUserSpec) DeepCopyInto(out *MinIOUserSpec) {
 	*out = *in
 	in.Selector.DeepCopyInto(&out.Selector)
+	if in.AdminPasswordSecret != nil {
+		in, out := &in.AdminPasswordSecret, &out.AdminPasswordSecret
+		*out = new(corev1.SecretKeySelector)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.Service != nil {
+		in, out := &in.Service, &out.Service
+		*out = new(corev1.LocalObjectReference)
+		(*in).DeepCopyInto(*out)
+	}
 }
 
 func (in *MinIOUserSpec) DeepCopy() *MinIOUserSpec {

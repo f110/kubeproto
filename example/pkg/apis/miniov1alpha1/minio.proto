@@ -8,6 +8,7 @@ option (dev.f110.kubeproto.k8s) = {
 };
 
 import "kube.proto";
+import "k8s.io/api/core/v1/generated.proto";
 import "k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto";
 
 enum BucketFinalizePolicy {
@@ -65,7 +66,9 @@ message MinIOUserSpec {
   // path is a path in vault
   string path = 2;
   // mount_path is a mount path of KV secrets engine.
-  string mount_path = 3;
+  string   mount_path                                                 = 3;
+  optional k8s.io.api.core.v1.SecretKeySelector admin_password_secret = 4;
+  optional k8s.io.api.core.v1.LocalObjectReference service            = 5;
 }
 
 message MInIOUserStatus {

@@ -119,8 +119,10 @@ func (g *DeepCopyGenerator) Generate(out io.Writer) error {
 				if f.Optional {
 					defW.F("if in.%s != nil {", f.Name.CamelCase())
 					defW.F("in, out := &in.%s, &out.%s", f.Name.CamelCase(), f.Name.CamelCase())
-					defW.F("*out = new(%s)", f.Name.CamelCase())
+					defW.F("*out = new(%s)", g.lister.ResolveGoType(packageName, f)[1:])
+					defW.F("(*in).DeepCopyInto(*out)")
 					defW.F("}")
+					continue
 				}
 				if f.Inline {
 					defW.F("out.%s = in.%s", f.Name.CamelCase(), f.Name.CamelCase())

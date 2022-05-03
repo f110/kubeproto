@@ -289,6 +289,28 @@ spec:
             type: object
           spec:
             properties:
+              adminPasswordSecret:
+                properties:
+                  key:
+                    description: The key of the secret to select from.  Must be a
+                      valid secret key.
+                    type: string
+                  localobjectreference:
+                    properties:
+                      name:
+                        description: |-
+                          Name of the referent.
+                           More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                           TODO: Add other useful fields. apiVersion, kind, uid?
+                           +optional
+                        type: string
+                    type: object
+                  optional:
+                    description: |-
+                      Specify whether the Secret or its key must be defined
+                       +optional
+                    type: boolean
+                type: object
               mountPath:
                 description: mount_path is a mount path of KV secrets engine.
                 type: string
@@ -328,6 +350,16 @@ spec:
                       value:
                         type: string
                     type: object
+                type: object
+              service:
+                properties:
+                  name:
+                    description: |-
+                      Name of the referent.
+                       More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                       TODO: Add other useful fields. apiVersion, kind, uid?
+                       +optional
+                    type: string
                 type: object
             type: object
           status:
