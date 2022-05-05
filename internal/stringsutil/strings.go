@@ -7,7 +7,8 @@ import (
 	"github.com/gertd/go-pluralize"
 )
 
-var word = []string{"UID", "API", "CIDRs"}
+var word = []string{"UID", "API", "CIDRs", "DNS", "IP", "QOS", "OS", "FS", "TCP", "UDP", "SCTP",
+	"URI", "URL", "HTTPS", "HTTP"}
 
 var wordDic map[string]struct{}
 
@@ -57,7 +58,7 @@ Loop:
 	for i < len(s) {
 		str := s[i]
 
-		for v := range wordDic {
+		for _, v := range word {
 			if v == str {
 				i++
 				continue Loop
