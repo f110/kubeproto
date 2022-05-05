@@ -1,0 +1,18 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "gen-go-to-protobuf_lib",
+    srcs = ["main.go"],
+    importpath = "go.f110.dev/kubeproto/cmd/gen-go-to-protobuf",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//internal/goparser",
+        "//vendor/github.com/spf13/pflag",
+    ],
+)
+
+go_binary(
+    name = "gen-go-to-protobuf",
+    embed = [":gen-go-to-protobuf_lib"],
+    visibility = ["//visibility:public"],
+)

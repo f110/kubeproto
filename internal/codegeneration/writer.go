@@ -30,6 +30,10 @@ func (w *Writer) F(format string, a ...interface{}) {
 	_, _ = fmt.Fprintf(w.w, format, a...)
 }
 
+func (w *Writer) Fn(format string, a ...interface{}) {
+	_, _ = fmt.Fprintf(w.w, format, a...)
+}
+
 func (w *Writer) Write(p []byte) (int, error) {
 	return w.w.Write(p)
 }
