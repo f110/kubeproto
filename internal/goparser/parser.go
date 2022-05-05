@@ -444,6 +444,20 @@ func (g *Generator) protobufDefinableToMessage(v *ast.GenDecl) *ProtobufMessage 
 		}
 	}
 
+	if !g.allStructs {
+		var toGenerate bool
+		if v.Doc != nil {
+			for _, line := range v.Doc.List {
+				if strings.Contains(line.Text, "+protobuf=true") {
+					toGenerate = true
+				}
+			}
+		}
+		if !toGenerate {
+			return nil
+		}
+	}
+
 	typeSpec := v.Specs[0].(*ast.TypeSpec)
 	m := &ProtobufMessage{
 		Name: typeSpec.Name.String(),

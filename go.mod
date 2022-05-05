@@ -8,6 +8,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	google.golang.org/protobuf v1.28.0
 	gopkg.in/yaml.v2 v2.4.0
+	k8s.io/api v0.23.6
 	k8s.io/apiextensions-apiserver v0.23.6
 )
 
