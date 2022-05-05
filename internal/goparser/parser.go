@@ -421,7 +421,7 @@ func (g *Generator) goTypeToProtobufKind(in ast.Expr) string {
 	switch v := in.(type) {
 	case *ast.Ident:
 		switch v.Name {
-		case "string", "int64", "int32", "bool", "byte":
+		case "string", "int64", "int32", "bool":
 			return v.Name
 		case "int":
 			return "int32"
@@ -442,6 +442,14 @@ func (g *Generator) goTypeToProtobufKind(in ast.Expr) string {
 		}
 		if protobufPackage != "" {
 			return protobufPackage + "." + v.Sel.Name
+		}
+		return ""
+	case *ast.ArrayType:
+		ident, ok := v.Elt.(*ast.Ident)
+		if ok {
+			if ident.Name == "byte" {
+				return "bytes"
+			}
 		}
 		return ""
 	default:

@@ -5,16 +5,16 @@ option  go_package = "k8s.io/apimachinery/pkg/runtime";
 import "kube.proto";
 
 enum Identifier {
-  NOOP = 0;
+  IDENTIFIER_NOOP = 0 [(dev.f110.kubeproto.value) = { value: "noop" }];
+}
+
+message RawExtension {
+  optional bytes raw = 1 [(dev.f110.kubeproto.field) = { go_name: "Raw", api_field_name: "-", inline: false }];
 }
 
 message TypeMeta {
   string api_version = 1 [(dev.f110.kubeproto.field) = { go_name: "APIVersion", api_field_name: "apiVersion", inline: false }];
   string kind        = 2 [(dev.f110.kubeproto.field) = { go_name: "Kind", api_field_name: "kind", inline: false }];
-}
-
-message RawExtension {
-  optional bytes raw = 1 [(dev.f110.kubeproto.field) = { go_name: "Raw", api_field_name: "-", inline: false }];
 }
 
 message Unknown {
