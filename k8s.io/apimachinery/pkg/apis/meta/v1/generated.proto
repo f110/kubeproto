@@ -77,28 +77,136 @@ enum StatusReason {
   STATUS_REASON_SERVICE_UNAVAILABLE      = 18;
 }
 
-message WatchEvent {
-  string                                       type   = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
-  k8s.io.apimachinery.pkg.runtime.RawExtension object = 2 [(dev.f110.kubeproto.field) = { go_name: "Object", api_field_name: "object", inline: false }];
+message APIGroup {
+  TypeMeta                           type_meta                      = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  string                             name                           = 2 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  repeated GroupVersionForDiscovery  versions                       = 3 [(dev.f110.kubeproto.field) = { go_name: "Versions", api_field_name: "versions", inline: false }];
+  GroupVersionForDiscovery           preferred_version              = 4 [(dev.f110.kubeproto.field) = { go_name: "PreferredVersion", api_field_name: "preferredVersion", inline: false }];
+  repeated ServerAddressByClientCIDR server_address_by_client_cidrs = 5 [(dev.f110.kubeproto.field) = { go_name: "ServerAddressByClientCIDRs", api_field_name: "serverAddressByClientCIDRs", inline: false }];
+}
+
+message APIGroupList {
+  TypeMeta          type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  repeated APIGroup groups    = 2 [(dev.f110.kubeproto.field) = { go_name: "Groups", api_field_name: "groups", inline: false }];
+}
+
+message APIResource {
+  string          name                 = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  string          singular_name        = 2 [(dev.f110.kubeproto.field) = { go_name: "SingularName", api_field_name: "singularName", inline: false }];
+  bool            namespaced           = 3 [(dev.f110.kubeproto.field) = { go_name: "Namespaced", api_field_name: "namespaced", inline: false }];
+  string          group                = 4 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
+  string          version              = 5 [(dev.f110.kubeproto.field) = { go_name: "Version", api_field_name: "version", inline: false }];
+  string          kind                 = 6 [(dev.f110.kubeproto.field) = { go_name: "Kind", api_field_name: "kind", inline: false }];
+  Verbs           verbs                = 7 [(dev.f110.kubeproto.field) = { go_name: "Verbs", api_field_name: "verbs", inline: false }];
+  repeated string short_names          = 8 [(dev.f110.kubeproto.field) = { go_name: "ShortNames", api_field_name: "shortNames", inline: false }];
+  repeated string categories           = 9 [(dev.f110.kubeproto.field) = { go_name: "Categories", api_field_name: "categories", inline: false }];
+  string          storage_version_hash = 10 [(dev.f110.kubeproto.field) = { go_name: "StorageVersionHash", api_field_name: "storageVersionHash", inline: false }];
+}
+
+message APIResourceList {
+  TypeMeta             type_meta     = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  string               group_version = 2 [(dev.f110.kubeproto.field) = { go_name: "GroupVersion", api_field_name: "groupVersion", inline: false }];
+  repeated APIResource api_resources = 3 [(dev.f110.kubeproto.field) = { go_name: "APIResources", api_field_name: "resources", inline: false }];
+}
+
+message APIVersions {
+  TypeMeta                           type_meta                      = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  repeated string                    versions                       = 2 [(dev.f110.kubeproto.field) = { go_name: "Versions", api_field_name: "versions", inline: false }];
+  repeated ServerAddressByClientCIDR server_address_by_client_cidrs = 3 [(dev.f110.kubeproto.field) = { go_name: "ServerAddressByClientCIDRs", api_field_name: "serverAddressByClientCIDRs", inline: false }];
+}
+
+message ApplyOptions {
+  TypeMeta        type_meta     = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  repeated string dry_run       = 2 [(dev.f110.kubeproto.field) = { go_name: "DryRun", api_field_name: "dryRun", inline: false }];
+  bool            force         = 3 [(dev.f110.kubeproto.field) = { go_name: "Force", api_field_name: "force", inline: false }];
+  string          field_manager = 4 [(dev.f110.kubeproto.field) = { go_name: "FieldManager", api_field_name: "fieldManager", inline: false }];
+}
+
+message Condition {
+  string          type                 = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
+  ConditionStatus status               = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  int64           observed_generation  = 3 [(dev.f110.kubeproto.field) = { go_name: "ObservedGeneration", api_field_name: "observedGeneration", inline: false }];
+  Time            last_transition_time = 4 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
+  string          reason               = 5 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
+  string          message              = 6 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
+}
+
+message CreateOptions {
+  TypeMeta        type_meta        = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  repeated string dry_run          = 2 [(dev.f110.kubeproto.field) = { go_name: "DryRun", api_field_name: "dryRun", inline: false }];
+  string          field_manager    = 3 [(dev.f110.kubeproto.field) = { go_name: "FieldManager", api_field_name: "fieldManager", inline: false }];
+  string          field_validation = 4 [(dev.f110.kubeproto.field) = { go_name: "FieldValidation", api_field_name: "fieldValidation", inline: false }];
+}
+
+message DeleteOptions {
+  TypeMeta                     type_meta            = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  optional int64               grace_period_seconds = 2 [(dev.f110.kubeproto.field) = { go_name: "GracePeriodSeconds", api_field_name: "gracePeriodSeconds", inline: false }];
+  optional Preconditions       preconditions        = 3 [(dev.f110.kubeproto.field) = { go_name: "Preconditions", api_field_name: "preconditions", inline: false }];
+  optional bool                orphan_dependents    = 4 [(dev.f110.kubeproto.field) = { go_name: "OrphanDependents", api_field_name: "orphanDependents", inline: false }];
+  optional DeletionPropagation propagation_policy   = 5 [(dev.f110.kubeproto.field) = { go_name: "PropagationPolicy", api_field_name: "propagationPolicy", inline: false }];
+  repeated string              dry_run              = 6 [(dev.f110.kubeproto.field) = { go_name: "DryRun", api_field_name: "dryRun", inline: false }];
 }
 
 message Duration {
   int64 duration = 1 [(dev.f110.kubeproto.field) = { go_name: "Duration", api_field_name: "", inline: false }];
 }
 
-message Time {
-  int64 seconds = 1 [(dev.f110.kubeproto.field) = { go_name: "Seconds", api_field_name: "seconds", inline: false }];
-  int32 nanos   = 2 [(dev.f110.kubeproto.field) = { go_name: "Nanos", api_field_name: "nanos", inline: false }];
+message FieldsV1 {
+  optional bytes raw = 1 [(dev.f110.kubeproto.field) = { go_name: "Raw", api_field_name: "-", inline: false }];
 }
 
-message Timestamp {
-  int64 seconds = 1 [(dev.f110.kubeproto.field) = { go_name: "Seconds", api_field_name: "seconds", inline: false }];
-  int32 nanos   = 2 [(dev.f110.kubeproto.field) = { go_name: "Nanos", api_field_name: "nanos", inline: false }];
+message GetOptions {
+  TypeMeta type_meta        = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  string   resource_version = 2 [(dev.f110.kubeproto.field) = { go_name: "ResourceVersion", api_field_name: "resourceVersion", inline: false }];
 }
 
-message TypeMeta {
-  string kind        = 1 [(dev.f110.kubeproto.field) = { go_name: "Kind", api_field_name: "kind", inline: false }];
-  string api_version = 2 [(dev.f110.kubeproto.field) = { go_name: "APIVersion", api_field_name: "apiVersion", inline: false }];
+message GroupKind {
+  string group = 1 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
+  string kind  = 2 [(dev.f110.kubeproto.field) = { go_name: "Kind", api_field_name: "kind", inline: false }];
+}
+
+message GroupResource {
+  string group    = 1 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
+  string resource = 2 [(dev.f110.kubeproto.field) = { go_name: "Resource", api_field_name: "resource", inline: false }];
+}
+
+message GroupVersion {
+  string group   = 1 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
+  string version = 2 [(dev.f110.kubeproto.field) = { go_name: "Version", api_field_name: "version", inline: false }];
+}
+
+message GroupVersionForDiscovery {
+  string group_version = 1 [(dev.f110.kubeproto.field) = { go_name: "GroupVersion", api_field_name: "groupVersion", inline: false }];
+  string version       = 2 [(dev.f110.kubeproto.field) = { go_name: "Version", api_field_name: "version", inline: false }];
+}
+
+message GroupVersionKind {
+  string group   = 1 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
+  string version = 2 [(dev.f110.kubeproto.field) = { go_name: "Version", api_field_name: "version", inline: false }];
+  string kind    = 3 [(dev.f110.kubeproto.field) = { go_name: "Kind", api_field_name: "kind", inline: false }];
+}
+
+message GroupVersionResource {
+  string group    = 1 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
+  string version  = 2 [(dev.f110.kubeproto.field) = { go_name: "Version", api_field_name: "version", inline: false }];
+  string resource = 3 [(dev.f110.kubeproto.field) = { go_name: "Resource", api_field_name: "resource", inline: false }];
+}
+
+message LabelSelector {
+  map<string, string>               match_labels      = 1 [(dev.f110.kubeproto.field) = { go_name: "MatchLabels", api_field_name: "matchLabels", inline: false }];
+  repeated LabelSelectorRequirement match_expressions = 2 [(dev.f110.kubeproto.field) = { go_name: "MatchExpressions", api_field_name: "matchExpressions", inline: false }];
+}
+
+message LabelSelectorRequirement {
+  string                key = 1 [(dev.f110.kubeproto.field) = { go_name: "Key", api_field_name: "key", inline: false }];
+  LabelSelectorOperator operator = 2 [(dev.f110.kubeproto.field) = { go_name: "Operator", api_field_name: "operator", inline: false }];
+  repeated string       values = 3 [(dev.f110.kubeproto.field) = { go_name: "Values", api_field_name: "values", inline: false }];
+}
+
+message List {
+  TypeMeta type_meta                                          = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  ListMeta list_meta                                          = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated k8s.io.apimachinery.pkg.runtime.RawExtension items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
 
 message ListMeta {
@@ -106,6 +214,34 @@ message ListMeta {
   string resource_version             = 2 [(dev.f110.kubeproto.field) = { go_name: "ResourceVersion", api_field_name: "resourceVersion", inline: false }];
   string continue                     = 3 [(dev.f110.kubeproto.field) = { go_name: "Continue", api_field_name: "continue", inline: false }];
   optional int64 remaining_item_count = 4 [(dev.f110.kubeproto.field) = { go_name: "RemainingItemCount", api_field_name: "remainingItemCount", inline: false }];
+}
+
+message ListOptions {
+  TypeMeta             type_meta              = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  string               label_selector         = 2 [(dev.f110.kubeproto.field) = { go_name: "LabelSelector", api_field_name: "labelSelector", inline: false }];
+  string               field_selector         = 3 [(dev.f110.kubeproto.field) = { go_name: "FieldSelector", api_field_name: "fieldSelector", inline: false }];
+  bool                 watch                  = 4 [(dev.f110.kubeproto.field) = { go_name: "Watch", api_field_name: "watch", inline: false }];
+  bool                 allow_watch_bookmarks  = 5 [(dev.f110.kubeproto.field) = { go_name: "AllowWatchBookmarks", api_field_name: "allowWatchBookmarks", inline: false }];
+  string               resource_version       = 6 [(dev.f110.kubeproto.field) = { go_name: "ResourceVersion", api_field_name: "resourceVersion", inline: false }];
+  ResourceVersionMatch resource_version_match = 7 [(dev.f110.kubeproto.field) = { go_name: "ResourceVersionMatch", api_field_name: "resourceVersionMatch", inline: false }];
+  optional int64       timeout_seconds        = 8 [(dev.f110.kubeproto.field) = { go_name: "TimeoutSeconds", api_field_name: "timeoutSeconds", inline: false }];
+  int64                limit                  = 9 [(dev.f110.kubeproto.field) = { go_name: "Limit", api_field_name: "limit", inline: false }];
+  string continue                             = 10 [(dev.f110.kubeproto.field) = { go_name: "Continue", api_field_name: "continue", inline: false }];
+}
+
+message ManagedFieldsEntry {
+  string                     manager     = 1 [(dev.f110.kubeproto.field) = { go_name: "Manager", api_field_name: "manager", inline: false }];
+  ManagedFieldsOperationType operation   = 2 [(dev.f110.kubeproto.field) = { go_name: "Operation", api_field_name: "operation", inline: false }];
+  string                     api_version = 3 [(dev.f110.kubeproto.field) = { go_name: "APIVersion", api_field_name: "apiVersion", inline: false }];
+  optional Time              time        = 4 [(dev.f110.kubeproto.field) = { go_name: "Time", api_field_name: "time", inline: false }];
+  string                     fields_type = 5 [(dev.f110.kubeproto.field) = { go_name: "FieldsType", api_field_name: "fieldsType", inline: false }];
+  optional FieldsV1          fields_v1   = 6 [(dev.f110.kubeproto.field) = { go_name: "FieldsV1", api_field_name: "fieldsV1", inline: false }];
+  string                     subresource = 7 [(dev.f110.kubeproto.field) = { go_name: "Subresource", api_field_name: "subresource", inline: false }];
+}
+
+message MicroTime {
+  int64 seconds = 1 [(dev.f110.kubeproto.field) = { go_name: "Seconds", api_field_name: "seconds", inline: false }];
+  int32 nanos   = 2 [(dev.f110.kubeproto.field) = { go_name: "Nanos", api_field_name: "nanos", inline: false }];
 }
 
 message ObjectMeta {
@@ -136,38 +272,18 @@ message OwnerReference {
   optional bool block_owner_deletion = 6 [(dev.f110.kubeproto.field) = { go_name: "BlockOwnerDeletion", api_field_name: "blockOwnerDeletion", inline: false }];
 }
 
-message ListOptions {
-  TypeMeta             type_meta              = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
-  string               label_selector         = 2 [(dev.f110.kubeproto.field) = { go_name: "LabelSelector", api_field_name: "labelSelector", inline: false }];
-  string               field_selector         = 3 [(dev.f110.kubeproto.field) = { go_name: "FieldSelector", api_field_name: "fieldSelector", inline: false }];
-  bool                 watch                  = 4 [(dev.f110.kubeproto.field) = { go_name: "Watch", api_field_name: "watch", inline: false }];
-  bool                 allow_watch_bookmarks  = 5 [(dev.f110.kubeproto.field) = { go_name: "AllowWatchBookmarks", api_field_name: "allowWatchBookmarks", inline: false }];
-  string               resource_version       = 6 [(dev.f110.kubeproto.field) = { go_name: "ResourceVersion", api_field_name: "resourceVersion", inline: false }];
-  ResourceVersionMatch resource_version_match = 7 [(dev.f110.kubeproto.field) = { go_name: "ResourceVersionMatch", api_field_name: "resourceVersionMatch", inline: false }];
-  optional int64       timeout_seconds        = 8 [(dev.f110.kubeproto.field) = { go_name: "TimeoutSeconds", api_field_name: "timeoutSeconds", inline: false }];
-  int64                limit                  = 9 [(dev.f110.kubeproto.field) = { go_name: "Limit", api_field_name: "limit", inline: false }];
-  string continue                             = 10 [(dev.f110.kubeproto.field) = { go_name: "Continue", api_field_name: "continue", inline: false }];
+message PartialObjectMetadata {
+  TypeMeta   type_meta   = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  ObjectMeta object_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
 }
 
-message GetOptions {
-  TypeMeta type_meta        = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
-  string   resource_version = 2 [(dev.f110.kubeproto.field) = { go_name: "ResourceVersion", api_field_name: "resourceVersion", inline: false }];
+message PartialObjectMetadataList {
+  TypeMeta                       type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  ListMeta                       list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated PartialObjectMetadata items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
 
-message DeleteOptions {
-  TypeMeta                     type_meta            = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
-  optional int64               grace_period_seconds = 2 [(dev.f110.kubeproto.field) = { go_name: "GracePeriodSeconds", api_field_name: "gracePeriodSeconds", inline: false }];
-  optional Preconditions       preconditions        = 3 [(dev.f110.kubeproto.field) = { go_name: "Preconditions", api_field_name: "preconditions", inline: false }];
-  optional bool                orphan_dependents    = 4 [(dev.f110.kubeproto.field) = { go_name: "OrphanDependents", api_field_name: "orphanDependents", inline: false }];
-  optional DeletionPropagation propagation_policy   = 5 [(dev.f110.kubeproto.field) = { go_name: "PropagationPolicy", api_field_name: "propagationPolicy", inline: false }];
-  repeated string              dry_run              = 6 [(dev.f110.kubeproto.field) = { go_name: "DryRun", api_field_name: "dryRun", inline: false }];
-}
-
-message CreateOptions {
-  TypeMeta        type_meta        = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
-  repeated string dry_run          = 2 [(dev.f110.kubeproto.field) = { go_name: "DryRun", api_field_name: "dryRun", inline: false }];
-  string          field_manager    = 3 [(dev.f110.kubeproto.field) = { go_name: "FieldManager", api_field_name: "fieldManager", inline: false }];
-  string          field_validation = 4 [(dev.f110.kubeproto.field) = { go_name: "FieldValidation", api_field_name: "fieldValidation", inline: false }];
+message Patch {
 }
 
 message PatchOptions {
@@ -178,23 +294,18 @@ message PatchOptions {
   string          field_validation = 5 [(dev.f110.kubeproto.field) = { go_name: "FieldValidation", api_field_name: "fieldValidation", inline: false }];
 }
 
-message ApplyOptions {
-  TypeMeta        type_meta     = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
-  repeated string dry_run       = 2 [(dev.f110.kubeproto.field) = { go_name: "DryRun", api_field_name: "dryRun", inline: false }];
-  bool            force         = 3 [(dev.f110.kubeproto.field) = { go_name: "Force", api_field_name: "force", inline: false }];
-  string          field_manager = 4 [(dev.f110.kubeproto.field) = { go_name: "FieldManager", api_field_name: "fieldManager", inline: false }];
-}
-
-message UpdateOptions {
-  TypeMeta        type_meta        = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
-  repeated string dry_run          = 2 [(dev.f110.kubeproto.field) = { go_name: "DryRun", api_field_name: "dryRun", inline: false }];
-  string          field_manager    = 3 [(dev.f110.kubeproto.field) = { go_name: "FieldManager", api_field_name: "fieldManager", inline: false }];
-  string          field_validation = 4 [(dev.f110.kubeproto.field) = { go_name: "FieldValidation", api_field_name: "fieldValidation", inline: false }];
-}
-
 message Preconditions {
   optional string uid              = 1 [(dev.f110.kubeproto.field) = { go_name: "UID", api_field_name: "uid", inline: false }];
   optional string resource_version = 2 [(dev.f110.kubeproto.field) = { go_name: "ResourceVersion", api_field_name: "resourceVersion", inline: false }];
+}
+
+message RootPaths {
+  repeated string paths = 1 [(dev.f110.kubeproto.field) = { go_name: "Paths", api_field_name: "paths", inline: false }];
+}
+
+message ServerAddressByClientCIDR {
+  string client_c_i_d_r = 1 [(dev.f110.kubeproto.field) = { go_name: "ClientCIDR", api_field_name: "clientCIDR", inline: false }];
+  string server_address = 2 [(dev.f110.kubeproto.field) = { go_name: "ServerAddress", api_field_name: "serverAddress", inline: false }];
 }
 
 message Status {
@@ -207,6 +318,12 @@ message Status {
   int32                  code      = 7 [(dev.f110.kubeproto.field) = { go_name: "Code", api_field_name: "code", inline: false }];
 }
 
+message StatusCause {
+  CauseType type    = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "reason", inline: false }];
+  string    message = 2 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
+  string    field   = 3 [(dev.f110.kubeproto.field) = { go_name: "Field", api_field_name: "field", inline: false }];
+}
+
 message StatusDetails {
   string               name                = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
   string               group               = 2 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
@@ -216,155 +333,38 @@ message StatusDetails {
   int32                retry_after_seconds = 6 [(dev.f110.kubeproto.field) = { go_name: "RetryAfterSeconds", api_field_name: "retryAfterSeconds", inline: false }];
 }
 
-message StatusCause {
-  CauseType type    = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "reason", inline: false }];
-  string    message = 2 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
-  string    field   = 3 [(dev.f110.kubeproto.field) = { go_name: "Field", api_field_name: "field", inline: false }];
+message TableOptions {
+  TypeMeta            type_meta      = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  IncludeObjectPolicy include_object = 2 [(dev.f110.kubeproto.field) = { go_name: "IncludeObject", api_field_name: "includeObject", inline: false }];
 }
 
-message List {
-  TypeMeta type_meta                                          = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
-  ListMeta list_meta                                          = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
-  repeated k8s.io.apimachinery.pkg.runtime.RawExtension items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+message Time {
+  int64 seconds = 1 [(dev.f110.kubeproto.field) = { go_name: "Seconds", api_field_name: "seconds", inline: false }];
+  int32 nanos   = 2 [(dev.f110.kubeproto.field) = { go_name: "Nanos", api_field_name: "nanos", inline: false }];
 }
 
-message APIVersions {
-  TypeMeta                           type_meta                      = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
-  repeated string                    versions                       = 2 [(dev.f110.kubeproto.field) = { go_name: "Versions", api_field_name: "versions", inline: false }];
-  repeated ServerAddressByClientCIDR server_address_by_client_cidrs = 3 [(dev.f110.kubeproto.field) = { go_name: "ServerAddressByClientCIDRs", api_field_name: "serverAddressByClientCIDRs", inline: false }];
+message Timestamp {
+  int64 seconds = 1 [(dev.f110.kubeproto.field) = { go_name: "Seconds", api_field_name: "seconds", inline: false }];
+  int32 nanos   = 2 [(dev.f110.kubeproto.field) = { go_name: "Nanos", api_field_name: "nanos", inline: false }];
 }
 
-message APIGroupList {
-  TypeMeta          type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
-  repeated APIGroup groups    = 2 [(dev.f110.kubeproto.field) = { go_name: "Groups", api_field_name: "groups", inline: false }];
+message TypeMeta {
+  string kind        = 1 [(dev.f110.kubeproto.field) = { go_name: "Kind", api_field_name: "kind", inline: false }];
+  string api_version = 2 [(dev.f110.kubeproto.field) = { go_name: "APIVersion", api_field_name: "apiVersion", inline: false }];
 }
 
-message APIGroup {
-  TypeMeta                           type_meta                      = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
-  string                             name                           = 2 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
-  repeated GroupVersionForDiscovery  versions                       = 3 [(dev.f110.kubeproto.field) = { go_name: "Versions", api_field_name: "versions", inline: false }];
-  GroupVersionForDiscovery           preferred_version              = 4 [(dev.f110.kubeproto.field) = { go_name: "PreferredVersion", api_field_name: "preferredVersion", inline: false }];
-  repeated ServerAddressByClientCIDR server_address_by_client_cidrs = 5 [(dev.f110.kubeproto.field) = { go_name: "ServerAddressByClientCIDRs", api_field_name: "serverAddressByClientCIDRs", inline: false }];
-}
-
-message ServerAddressByClientCIDR {
-  string client_c_i_d_r = 1 [(dev.f110.kubeproto.field) = { go_name: "ClientCIDR", api_field_name: "clientCIDR", inline: false }];
-  string server_address = 2 [(dev.f110.kubeproto.field) = { go_name: "ServerAddress", api_field_name: "serverAddress", inline: false }];
-}
-
-message GroupVersionForDiscovery {
-  string group_version = 1 [(dev.f110.kubeproto.field) = { go_name: "GroupVersion", api_field_name: "groupVersion", inline: false }];
-  string version       = 2 [(dev.f110.kubeproto.field) = { go_name: "Version", api_field_name: "version", inline: false }];
-}
-
-message APIResource {
-  string          name                 = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
-  string          singular_name        = 2 [(dev.f110.kubeproto.field) = { go_name: "SingularName", api_field_name: "singularName", inline: false }];
-  bool            namespaced           = 3 [(dev.f110.kubeproto.field) = { go_name: "Namespaced", api_field_name: "namespaced", inline: false }];
-  string          group                = 4 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
-  string          version              = 5 [(dev.f110.kubeproto.field) = { go_name: "Version", api_field_name: "version", inline: false }];
-  string          kind                 = 6 [(dev.f110.kubeproto.field) = { go_name: "Kind", api_field_name: "kind", inline: false }];
-  Verbs           verbs                = 7 [(dev.f110.kubeproto.field) = { go_name: "Verbs", api_field_name: "verbs", inline: false }];
-  repeated string short_names          = 8 [(dev.f110.kubeproto.field) = { go_name: "ShortNames", api_field_name: "shortNames", inline: false }];
-  repeated string categories           = 9 [(dev.f110.kubeproto.field) = { go_name: "Categories", api_field_name: "categories", inline: false }];
-  string          storage_version_hash = 10 [(dev.f110.kubeproto.field) = { go_name: "StorageVersionHash", api_field_name: "storageVersionHash", inline: false }];
+message UpdateOptions {
+  TypeMeta        type_meta        = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  repeated string dry_run          = 2 [(dev.f110.kubeproto.field) = { go_name: "DryRun", api_field_name: "dryRun", inline: false }];
+  string          field_manager    = 3 [(dev.f110.kubeproto.field) = { go_name: "FieldManager", api_field_name: "fieldManager", inline: false }];
+  string          field_validation = 4 [(dev.f110.kubeproto.field) = { go_name: "FieldValidation", api_field_name: "fieldValidation", inline: false }];
 }
 
 message Verbs {
   repeated string items = 1 [(dev.f110.kubeproto.field) = { go_name: "", api_field_name: "", inline: false }];
 }
 
-message APIResourceList {
-  TypeMeta             type_meta     = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
-  string               group_version = 2 [(dev.f110.kubeproto.field) = { go_name: "GroupVersion", api_field_name: "groupVersion", inline: false }];
-  repeated APIResource api_resources = 3 [(dev.f110.kubeproto.field) = { go_name: "APIResources", api_field_name: "resources", inline: false }];
-}
-
-message RootPaths {
-  repeated string paths = 1 [(dev.f110.kubeproto.field) = { go_name: "Paths", api_field_name: "paths", inline: false }];
-}
-
-message Patch {
-}
-
-message LabelSelector {
-  map<string, string>               match_labels      = 1 [(dev.f110.kubeproto.field) = { go_name: "MatchLabels", api_field_name: "matchLabels", inline: false }];
-  repeated LabelSelectorRequirement match_expressions = 2 [(dev.f110.kubeproto.field) = { go_name: "MatchExpressions", api_field_name: "matchExpressions", inline: false }];
-}
-
-message LabelSelectorRequirement {
-  string                key = 1 [(dev.f110.kubeproto.field) = { go_name: "Key", api_field_name: "key", inline: false }];
-  LabelSelectorOperator operator = 2 [(dev.f110.kubeproto.field) = { go_name: "Operator", api_field_name: "operator", inline: false }];
-  repeated string       values = 3 [(dev.f110.kubeproto.field) = { go_name: "Values", api_field_name: "values", inline: false }];
-}
-
-message ManagedFieldsEntry {
-  string                     manager     = 1 [(dev.f110.kubeproto.field) = { go_name: "Manager", api_field_name: "manager", inline: false }];
-  ManagedFieldsOperationType operation   = 2 [(dev.f110.kubeproto.field) = { go_name: "Operation", api_field_name: "operation", inline: false }];
-  string                     api_version = 3 [(dev.f110.kubeproto.field) = { go_name: "APIVersion", api_field_name: "apiVersion", inline: false }];
-  optional Time              time        = 4 [(dev.f110.kubeproto.field) = { go_name: "Time", api_field_name: "time", inline: false }];
-  string                     fields_type = 5 [(dev.f110.kubeproto.field) = { go_name: "FieldsType", api_field_name: "fieldsType", inline: false }];
-  optional FieldsV1          fields_v1   = 6 [(dev.f110.kubeproto.field) = { go_name: "FieldsV1", api_field_name: "fieldsV1", inline: false }];
-  string                     subresource = 7 [(dev.f110.kubeproto.field) = { go_name: "Subresource", api_field_name: "subresource", inline: false }];
-}
-
-message FieldsV1 {
-  optional bytes raw = 1 [(dev.f110.kubeproto.field) = { go_name: "Raw", api_field_name: "-", inline: false }];
-}
-
-message TableOptions {
-  TypeMeta            type_meta      = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
-  IncludeObjectPolicy include_object = 2 [(dev.f110.kubeproto.field) = { go_name: "IncludeObject", api_field_name: "includeObject", inline: false }];
-}
-
-message PartialObjectMetadata {
-  TypeMeta   type_meta   = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
-  ObjectMeta object_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
-}
-
-message PartialObjectMetadataList {
-  TypeMeta                       type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
-  ListMeta                       list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
-  repeated PartialObjectMetadata items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
-}
-
-message Condition {
-  string          type                 = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
-  ConditionStatus status               = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
-  int64           observed_generation  = 3 [(dev.f110.kubeproto.field) = { go_name: "ObservedGeneration", api_field_name: "observedGeneration", inline: false }];
-  Time            last_transition_time = 4 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
-  string          reason               = 5 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
-  string          message              = 6 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
-}
-
-message GroupResource {
-  string group    = 1 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
-  string resource = 2 [(dev.f110.kubeproto.field) = { go_name: "Resource", api_field_name: "resource", inline: false }];
-}
-
-message GroupVersionResource {
-  string group    = 1 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
-  string version  = 2 [(dev.f110.kubeproto.field) = { go_name: "Version", api_field_name: "version", inline: false }];
-  string resource = 3 [(dev.f110.kubeproto.field) = { go_name: "Resource", api_field_name: "resource", inline: false }];
-}
-
-message GroupKind {
-  string group = 1 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
-  string kind  = 2 [(dev.f110.kubeproto.field) = { go_name: "Kind", api_field_name: "kind", inline: false }];
-}
-
-message GroupVersionKind {
-  string group   = 1 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
-  string version = 2 [(dev.f110.kubeproto.field) = { go_name: "Version", api_field_name: "version", inline: false }];
-  string kind    = 3 [(dev.f110.kubeproto.field) = { go_name: "Kind", api_field_name: "kind", inline: false }];
-}
-
-message GroupVersion {
-  string group   = 1 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
-  string version = 2 [(dev.f110.kubeproto.field) = { go_name: "Version", api_field_name: "version", inline: false }];
-}
-
-message MicroTime {
-  int64 seconds = 1 [(dev.f110.kubeproto.field) = { go_name: "Seconds", api_field_name: "seconds", inline: false }];
-  int32 nanos   = 2 [(dev.f110.kubeproto.field) = { go_name: "Nanos", api_field_name: "nanos", inline: false }];
+message WatchEvent {
+  string                                       type   = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
+  k8s.io.apimachinery.pkg.runtime.RawExtension object = 2 [(dev.f110.kubeproto.field) = { go_name: "Object", api_field_name: "object", inline: false }];
 }

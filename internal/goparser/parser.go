@@ -136,6 +136,10 @@ func (g *Generator) WriteFile(path string) error {
 	}
 	g.protobufFile.Package = g.protoPackage
 
+	sort.Slice(g.protobufFile.Messages, func(i, j int) bool {
+		return g.protobufFile.Messages[i].Name < g.protobufFile.Messages[j].Name
+	})
+
 	imports := make(map[string]struct{})
 	for _, m := range g.protobufFile.Messages {
 		for _, f := range m.Fields {
