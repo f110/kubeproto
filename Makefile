@@ -22,4 +22,4 @@ k8s.io/apimachinery/pkg/runtime/generated.proto:
 .PHONY: k8s.io/api/core/v1/generated.proto
 k8s.io/api/core/v1/generated.proto:
 	mkdir -p $(@D)
-	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.core.v1 --go-package $(@D) $(CURDIR)/vendor/$(@D)
+	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.core.v1 --go-package $(@D) --all $(CURDIR)/vendor/$(@D)

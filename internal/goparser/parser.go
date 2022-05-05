@@ -22,8 +22,9 @@ import (
 
 var packageMap = map[string]string{
 	// Go package to protobuf package
-	"k8s.io/apimachinery/pkg/runtime": "k8s.io.apimachinery.pkg.runtime",
-	"k8s.io/apimachinery/pkg/types":   "k8s.io.apimachinery.pkg.types",
+	"k8s.io/apimachinery/pkg/runtime":      "k8s.io.apimachinery.pkg.runtime",
+	"k8s.io/apimachinery/pkg/types":        "k8s.io.apimachinery.pkg.types",
+	"k8s.io/apimachinery/pkg/apis/meta/v1": "k8s.io.apimachinery.pkg.apis.meta.v1",
 }
 
 type Generator struct {
@@ -179,13 +180,17 @@ func (g *Generator) WriteFile(path string) error {
 			if enumName == "" {
 				enumName = strings.TrimPrefix(values[i].Name, name)
 			}
-			if enumName == values[i].Value {
-				w.F("%s_%s = %d;", stringsutil.ToUpperSnakeCase(name), stringsutil.ToUpperSnakeCase(enumName), i)
+			enumName = stringsutil.ToUpperSnakeCase(enumName)
+			if stringsutil.ToUpperCamelCase(enumName) == values[i].Value {
+				w.F("%s_%s = %d;", stringsutil.ToUpperSnakeCase(name), enumName, i)
 			} else {
+				for _, v := range []string{"-", ".", "/"} {
+					enumName = strings.Replace(enumName, v, "_", -1)
+				}
 				w.F(
 					"%s_%s = %d [(dev.f110.kubeproto.value) = {value: %q}];",
 					stringsutil.ToUpperSnakeCase(name),
-					stringsutil.ToUpperSnakeCase(enumName),
+					enumName,
 					i,
 					values[i].Value,
 				)
@@ -274,6 +279,9 @@ func (g *Generator) constToEnumValue(v *ast.GenDecl) map[string][]*enumValue {
 			}
 			lit, ok := valueSpec.Values[0].(*ast.BasicLit)
 			if !ok || lit.Kind != token.STRING {
+				continue
+			}
+			if strings.HasSuffix(value, "Prefix") {
 				continue
 			}
 			strValue := lit.Value[1 : len(lit.Value)-1]
