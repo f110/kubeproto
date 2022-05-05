@@ -5,85 +5,76 @@ option  go_package = "k8s.io/apimachinery/pkg/apis/meta/v1";
 import "kube.proto";
 import "k8s.io/apimachinery/pkg/runtime/generated.proto";
 
-enum StatusReason {
-  UNKNOWN                  = 0 [(dev.f110.kubeproto.value) = { value: "" }];
-  UNAUTHORIZED             = 1;
-  FORBIDDEN                = 2;
-  NOT_FOUND                = 3;
-  ALREADY_EXISTS           = 4;
-  CONFLICT                 = 5;
-  GONE                     = 6;
-  INVALID                  = 7;
-  SERVER_TIMEOUT           = 8;
-  TIMEOUT                  = 9;
-  TOO_MANY_REQUESTS        = 10;
-  BAD_REQUEST              = 11;
-  METHOD_NOT_ALLOWED       = 12;
-  NOT_ACCEPTABLE           = 13;
-  REQUEST_ENTITY_TOO_LARGE = 14;
-  UNSUPPORTED_MEDIA_TYPE   = 15;
-  INTERNAL_ERROR           = 16;
-  EXPIRED                  = 17;
-  SERVICE_UNAVAILABLE      = 18;
-}
-
-enum LabelSelectorOperator {
-  IN             = 0;
-  NOT_IN         = 1;
-  EXISTS         = 2;
-  DOES_NOT_EXIST = 3;
-}
-
-enum IncludeObjectPolicy {
-  NONE     = 0;
-  METADATA = 1;
-  OBJECT   = 2;
-}
-
-enum ResourceVersionMatch {
-  NOT_OLDER_THAN = 0;
-  EXACT          = 1;
-}
-
-enum DeletionPropagation {
-  ORPHAN     = 0;
-  BACKGROUND = 1;
-  FOREGROUND = 2;
-}
-
 enum CauseType {
-  FIELD_VALUE_NOT_FOUND      = 0;
-  FIELD_VALUE_REQUIRED       = 1;
-  FIELD_VALUE_DUPLICATE      = 2;
-  FIELD_VALUE_INVALID        = 3;
-  FIELD_VALUE_NOT_SUPPORTED  = 4;
-  UNEXPECTED_SERVER_RESPONSE = 5;
-  FIELD_MANAGER_CONFLICT     = 6;
-  RESOURCE_VERSION_TOO_LARGE = 7;
-}
-
-enum ManagedFieldsOperationType {
-  APPLY  = 0;
-  UPDATE = 1;
-}
-
-enum RowConditionType {
-  COMPLETED = 0;
+  CAUSE_TYPE_FIELD_VALUE_NOT_FOUND      = 0;
+  CAUSE_TYPE_FIELD_VALUE_REQUIRED       = 1;
+  CAUSE_TYPE_FIELD_VALUE_DUPLICATE      = 2;
+  CAUSE_TYPE_FIELD_VALUE_INVALID        = 3;
+  CAUSE_TYPE_FIELD_VALUE_NOT_SUPPORTED  = 4;
+  CAUSE_TYPE_UNEXPECTED_SERVER_RESPONSE = 5;
+  CAUSE_TYPE_FIELD_MANAGER_CONFLICT     = 6;
+  CAUSE_TYPE_RESOURCE_VERSION_TOO_LARGE = 7;
 }
 
 enum ConditionStatus {
-  TRUE    = 0;
-  FALSE   = 1;
-  UNKNOWN = 2;
+  CONDITION_STATUS_TRUE    = 0;
+  CONDITION_STATUS_FALSE   = 1;
+  CONDITION_STATUS_UNKNOWN = 2;
 }
 
-message Duration {
-  int64 duration = 1 [(dev.f110.kubeproto.field) = { go_name: "Duration", api_field_name: "", inline: false }];
+enum DeletionPropagation {
+  DELETION_PROPAGATION_ORPHAN     = 0;
+  DELETION_PROPAGATION_BACKGROUND = 1;
+  DELETION_PROPAGATION_FOREGROUND = 2;
 }
 
-message Timestamp {
-  int64 seconds = 1 [(dev.f110.kubeproto.field) = { go_name: "Seconds", api_field_name: "seconds", inline: false }];
-  int32 nanos   = 2 [(dev.f110.kubeproto.field) = { go_name: "Nanos", api_field_name: "nanos", inline: false }];
+enum IncludeObjectPolicy {
+  INCLUDE_OBJECT_POLICY_NONE     = 0;
+  INCLUDE_OBJECT_POLICY_METADATA = 1;
+  INCLUDE_OBJECT_POLICY_OBJECT   = 2;
+}
+
+enum LabelSelectorOperator {
+  LABEL_SELECTOR_OPERATOR_IN             = 0;
+  LABEL_SELECTOR_OPERATOR_NOT_IN         = 1;
+  LABEL_SELECTOR_OPERATOR_EXISTS         = 2;
+  LABEL_SELECTOR_OPERATOR_DOES_NOT_EXIST = 3;
+}
+
+enum ManagedFieldsOperationType {
+  MANAGED_FIELDS_OPERATION_TYPE_APPLY  = 0;
+  MANAGED_FIELDS_OPERATION_TYPE_UPDATE = 1;
+}
+
+enum ResourceVersionMatch {
+  RESOURCE_VERSION_MATCH_NOT_OLDER_THAN = 0;
+  RESOURCE_VERSION_MATCH_EXACT          = 1;
+}
+
+enum RowConditionType {
+  ROW_CONDITION_TYPE_COMPLETED = 0;
+}
+
+enum StatusReason {
+  STATUS_REASON_UNKNOWN                  = 0 [(dev.f110.kubeproto.value) = { value: "" }];
+  STATUS_REASON_UNAUTHORIZED             = 1;
+  STATUS_REASON_FORBIDDEN                = 2;
+  STATUS_REASON_NOT_FOUND                = 3;
+  STATUS_REASON_ALREADY_EXISTS           = 4;
+  STATUS_REASON_CONFLICT                 = 5;
+  STATUS_REASON_GONE                     = 6;
+  STATUS_REASON_INVALID                  = 7;
+  STATUS_REASON_SERVER_TIMEOUT           = 8;
+  STATUS_REASON_TIMEOUT                  = 9;
+  STATUS_REASON_TOO_MANY_REQUESTS        = 10;
+  STATUS_REASON_BAD_REQUEST              = 11;
+  STATUS_REASON_METHOD_NOT_ALLOWED       = 12;
+  STATUS_REASON_NOT_ACCEPTABLE           = 13;
+  STATUS_REASON_REQUEST_ENTITY_TOO_LARGE = 14;
+  STATUS_REASON_UNSUPPORTED_MEDIA_TYPE   = 15;
+  STATUS_REASON_INTERNAL_ERROR           = 16;
+  STATUS_REASON_EXPIRED                  = 17;
+  STATUS_REASON_SERVICE_UNAVAILABLE      = 18;
 }
 
 message WatchEvent {
@@ -91,39 +82,16 @@ message WatchEvent {
   k8s.io.apimachinery.pkg.runtime.RawExtension object = 2 [(dev.f110.kubeproto.field) = { go_name: "Object", api_field_name: "object", inline: false }];
 }
 
-message GroupResource {
-  string group    = 1 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
-  string resource = 2 [(dev.f110.kubeproto.field) = { go_name: "Resource", api_field_name: "resource", inline: false }];
+message Duration {
+  int64 duration = 1 [(dev.f110.kubeproto.field) = { go_name: "Duration", api_field_name: "", inline: false }];
 }
 
-message GroupVersionResource {
-  string group    = 1 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
-  string version  = 2 [(dev.f110.kubeproto.field) = { go_name: "Version", api_field_name: "version", inline: false }];
-  string resource = 3 [(dev.f110.kubeproto.field) = { go_name: "Resource", api_field_name: "resource", inline: false }];
-}
-
-message GroupKind {
-  string group = 1 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
-  string kind  = 2 [(dev.f110.kubeproto.field) = { go_name: "Kind", api_field_name: "kind", inline: false }];
-}
-
-message GroupVersionKind {
-  string group   = 1 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
-  string version = 2 [(dev.f110.kubeproto.field) = { go_name: "Version", api_field_name: "version", inline: false }];
-  string kind    = 3 [(dev.f110.kubeproto.field) = { go_name: "Kind", api_field_name: "kind", inline: false }];
-}
-
-message GroupVersion {
-  string group   = 1 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
-  string version = 2 [(dev.f110.kubeproto.field) = { go_name: "Version", api_field_name: "version", inline: false }];
-}
-
-message MicroTime {
+message Time {
   int64 seconds = 1 [(dev.f110.kubeproto.field) = { go_name: "Seconds", api_field_name: "seconds", inline: false }];
   int32 nanos   = 2 [(dev.f110.kubeproto.field) = { go_name: "Nanos", api_field_name: "nanos", inline: false }];
 }
 
-message Time {
+message Timestamp {
   int64 seconds = 1 [(dev.f110.kubeproto.field) = { go_name: "Seconds", api_field_name: "seconds", inline: false }];
   int32 nanos   = 2 [(dev.f110.kubeproto.field) = { go_name: "Nanos", api_field_name: "nanos", inline: false }];
 }
@@ -367,4 +335,36 @@ message Condition {
   Time            last_transition_time = 4 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
   string          reason               = 5 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
   string          message              = 6 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
+}
+
+message GroupResource {
+  string group    = 1 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
+  string resource = 2 [(dev.f110.kubeproto.field) = { go_name: "Resource", api_field_name: "resource", inline: false }];
+}
+
+message GroupVersionResource {
+  string group    = 1 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
+  string version  = 2 [(dev.f110.kubeproto.field) = { go_name: "Version", api_field_name: "version", inline: false }];
+  string resource = 3 [(dev.f110.kubeproto.field) = { go_name: "Resource", api_field_name: "resource", inline: false }];
+}
+
+message GroupKind {
+  string group = 1 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
+  string kind  = 2 [(dev.f110.kubeproto.field) = { go_name: "Kind", api_field_name: "kind", inline: false }];
+}
+
+message GroupVersionKind {
+  string group   = 1 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
+  string version = 2 [(dev.f110.kubeproto.field) = { go_name: "Version", api_field_name: "version", inline: false }];
+  string kind    = 3 [(dev.f110.kubeproto.field) = { go_name: "Kind", api_field_name: "kind", inline: false }];
+}
+
+message GroupVersion {
+  string group   = 1 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
+  string version = 2 [(dev.f110.kubeproto.field) = { go_name: "Version", api_field_name: "version", inline: false }];
+}
+
+message MicroTime {
+  int64 seconds = 1 [(dev.f110.kubeproto.field) = { go_name: "Seconds", api_field_name: "seconds", inline: false }];
+  int32 nanos   = 2 [(dev.f110.kubeproto.field) = { go_name: "Nanos", api_field_name: "nanos", inline: false }];
 }

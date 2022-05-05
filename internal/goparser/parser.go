@@ -12,6 +12,7 @@ import (
 	"os/exec"
 	"path"
 	"reflect"
+	"sort"
 	"strings"
 	"unicode"
 
@@ -163,7 +164,14 @@ func (g *Generator) WriteFile(path string) error {
 	}
 	w.F("")
 
-	for name, values := range g.enumValueCandidates {
+	var enums []string
+	for name := range g.enumValueCandidates {
+		enums = append(enums, name)
+	}
+	sort.Strings(enums)
+	for _, name := range enums {
+		values := g.enumValueCandidates[name]
+
 		w.F("enum %s {", name)
 		for i := 0; i < len(values); i++ {
 			//log.Printf("%s: %s", values[i].Value, stringsutil.ToUpperSnakeCase(values[i].Value))
@@ -172,9 +180,15 @@ func (g *Generator) WriteFile(path string) error {
 				enumName = strings.TrimPrefix(values[i].Name, name)
 			}
 			if enumName == values[i].Value {
-				w.F("%s = %d;", stringsutil.ToUpperSnakeCase(enumName), i)
+				w.F("%s_%s = %d;", stringsutil.ToUpperSnakeCase(name), stringsutil.ToUpperSnakeCase(enumName), i)
 			} else {
-				w.F("%s = %d [(dev.f110.kubeproto.value) = {value: %q}];", stringsutil.ToUpperSnakeCase(enumName), i, values[i].Value)
+				w.F(
+					"%s_%s = %d [(dev.f110.kubeproto.value) = {value: %q}];",
+					stringsutil.ToUpperSnakeCase(name),
+					stringsutil.ToUpperSnakeCase(enumName),
+					i,
+					values[i].Value,
+				)
 			}
 		}
 		w.F("}")
