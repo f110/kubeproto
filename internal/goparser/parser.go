@@ -135,7 +135,7 @@ func (g *Generator) AddDir(dir string, allStructs bool) error {
 	for _, v := range typeMap {
 		if v.ProtobufMapKeyKind != "" {
 			switch v.ProtobufMapKeyKind {
-			case "string", "int32":
+			case "string", "int32", "int64":
 			default:
 				if t, ok := typeMap[v.ProtobufMapKeyKind]; ok {
 					v.ProtobufMapKeyKind = t.ProtobufKind
@@ -668,6 +668,9 @@ func isTypeDeclaration(v ast.Decl) bool {
 	}
 	typeSpec := gen.Specs[0].(*ast.TypeSpec)
 	if _, ok := typeSpec.Type.(*ast.MapType); ok {
+		return true
+	}
+	if _, ok := typeSpec.Type.(*ast.Ident); ok {
 		return true
 	}
 	return false
