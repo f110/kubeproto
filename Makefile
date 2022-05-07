@@ -14,6 +14,11 @@ k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto:
 	mkdir -p $(@D)
 	bazel run //cmd/gen-go-to-protobuf -- --out $(shell pwd)/$@ --proto-package k8s.io.apimachinery.pkg.apis.meta.v1 --go-package $(@D) --all $(CURDIR)/vendor/$(@D)
 
+.PHONY: k8s.io/apimachinery/pkg/api/resource/generated.proto
+k8s.io/apimachinery/pkg/api/resource/generated.proto:
+	mkdir -p $(@D)
+	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.apimachinery.pkg.api.resource --go-package $(@D) --all $(CURDIR)/vendor/$(@D)
+
 .PHONY: k8s.io/apimachinery/pkg/runtime/generated.proto
 k8s.io/apimachinery/pkg/runtime/generated.proto:
 	mkdir -p $(@D)

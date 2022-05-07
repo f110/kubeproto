@@ -398,6 +398,10 @@ func (g *Generator) structToProtobufMessage(v *ast.GenDecl) *ProtobufMessage {
 				// TODO: handle package
 			}
 		}
+		if unicode.IsLower(rune(name[0])) {
+			// Private field is ignored
+			continue
+		}
 
 		var inline bool
 		var apiFieldName string
