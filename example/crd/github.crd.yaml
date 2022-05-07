@@ -210,31 +210,16 @@ spec:
                 type: integer
               selector:
                 properties:
-                  matchexpressions:
+                  matchExpressions:
                     properties:
                       key:
-                        description: |-
-                          key is the label key that the selector applies to.
-                           +patchMergeKey=key
-                           +patchStrategy=merge
-                        type: string
-                      operator:
-                        description: |-
-                          operator represents a key's relationship to a set of values.
-                           Valid operators are In, NotIn, Exists and DoesNotExist.
                         type: string
                       values:
                         items:
-                          description: |-
-                            values is an array of string values. If the operator is In or NotIn,
-                             the values array must be non-empty. If the operator is Exists or DoesNotExist,
-                             the values array must be empty. This array is replaced during a strategic
-                             merge patch.
-                             +optional
                           type: string
                         type: array
                     type: object
-                  matchlabels:
+                  matchLabels:
                     properties:
                       key:
                         type: string
@@ -245,23 +230,13 @@ spec:
               serviceAccountJSON:
                 properties:
                   key:
-                    description: The key of the secret to select from.  Must be a
-                      valid secret key.
                     type: string
-                  localobjectreference:
+                  localObjectReference:
                     properties:
                       name:
-                        description: |-
-                          Name of the referent.
-                           More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                           TODO: Add other useful fields. apiVersion, kind, uid?
-                           +optional
                         type: string
                     type: object
                   optional:
-                    description: |-
-                      Specify whether the Secret or its key must be defined
-                       +optional
                     type: boolean
                 type: object
             type: object
@@ -315,23 +290,13 @@ spec:
               adminPasswordSecret:
                 properties:
                   key:
-                    description: The key of the secret to select from.  Must be a
-                      valid secret key.
                     type: string
-                  localobjectreference:
+                  localObjectReference:
                     properties:
                       name:
-                        description: |-
-                          Name of the referent.
-                           More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                           TODO: Add other useful fields. apiVersion, kind, uid?
-                           +optional
                         type: string
                     type: object
                   optional:
-                    description: |-
-                      Specify whether the Secret or its key must be defined
-                       +optional
                     type: boolean
                 type: object
               mountPath:
@@ -342,31 +307,16 @@ spec:
                 type: string
               selector:
                 properties:
-                  matchexpressions:
+                  matchExpressions:
                     properties:
                       key:
-                        description: |-
-                          key is the label key that the selector applies to.
-                           +patchMergeKey=key
-                           +patchStrategy=merge
-                        type: string
-                      operator:
-                        description: |-
-                          operator represents a key's relationship to a set of values.
-                           Valid operators are In, NotIn, Exists and DoesNotExist.
                         type: string
                       values:
                         items:
-                          description: |-
-                            values is an array of string values. If the operator is In or NotIn,
-                             the values array must be non-empty. If the operator is Exists or DoesNotExist,
-                             the values array must be empty. This array is replaced during a strategic
-                             merge patch.
-                             +optional
                           type: string
                         type: array
                     type: object
-                  matchlabels:
+                  matchLabels:
                     properties:
                       key:
                         type: string
@@ -377,11 +327,6 @@ spec:
               service:
                 properties:
                   name:
-                    description: |-
-                      Name of the referent.
-                       More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                       TODO: Add other useful fields. apiVersion, kind, uid?
-                       +optional
                     type: string
                 type: object
             type: object

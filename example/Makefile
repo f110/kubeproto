@@ -1,5 +1,6 @@
 .PHONY: build
 build: githubv1alpha1 githubv1alpha2 miniov1alpha1 \
+		pkg/client/github.generated.client.go \
 		crd/github.crd.yaml
 
 .PHONY: githubv1alpha1

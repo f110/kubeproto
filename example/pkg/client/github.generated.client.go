@@ -16,6 +16,7 @@ import (
 
 	"go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha1"
 	"go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha2"
+	"go.f110.dev/kubeproto/example/pkg/apis/miniov1alpha1"
 )
 
 var (
@@ -27,6 +28,7 @@ func init() {
 	for _, v := range []func(*runtime.Scheme) error{
 		githubv1alpha1.AddToScheme,
 		githubv1alpha2.AddToScheme,
+		miniov1alpha1.AddToScheme,
 	} {
 		if err := v(Scheme); err != nil {
 			panic(err)
@@ -418,6 +420,198 @@ func (c *GrafanaV1alpha2) WatchGrafanaUser(ctx context.Context, namespace string
 		Watch(ctx)
 }
 
+type MinioV1alpha1 struct {
+	client *rest.RESTClient
+}
+
+func NewMinioV1alpha1Client(c *rest.Config) (*MinioV1alpha1, error) {
+	client, err := rest.RESTClientFor(c)
+	if err != nil {
+		return nil, err
+	}
+	return &MinioV1alpha1{
+		client: client,
+	}, nil
+}
+
+func (c *MinioV1alpha1) GetMinIOBucket(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*miniov1alpha1.MinIOBucket, error) {
+	result := &miniov1alpha1.MinIOBucket{}
+	err := c.client.Get().
+		Namespace(namespace).
+		Resource("miniobuckets").
+		Name(name).
+		VersionedParams(&opts, ParameterCodec).
+		Do(ctx).
+		Into(result)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (c *MinioV1alpha1) CreateMinIOBucket(ctx context.Context, v *miniov1alpha1.MinIOBucket, opts metav1.CreateOptions) (*miniov1alpha1.MinIOBucket, error) {
+	result := &miniov1alpha1.MinIOBucket{}
+	err := c.client.Post().
+		Namespace(v.Namespace).
+		Resource("miniobuckets").
+		VersionedParams(&opts, ParameterCodec).
+		Body(v).
+		Do(ctx).
+		Into(result)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (c *MinioV1alpha1) UpdateMinIOBucket(ctx context.Context, v *miniov1alpha1.MinIOBucket, opts metav1.UpdateOptions) (*miniov1alpha1.MinIOBucket, error) {
+	result := &miniov1alpha1.MinIOBucket{}
+	err := c.client.Put().
+		Namespace(v.Namespace).
+		Resource("miniobuckets").
+		Name(v.Name).
+		VersionedParams(&opts, ParameterCodec).
+		Body(v).
+		Do(ctx).
+		Into(result)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (c *MinioV1alpha1) DeleteMinIOBucket(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
+	return c.client.Delete().
+		Namespace(namespace).
+		Resource("miniobuckets").
+		Name(name).
+		Body(&opts).
+		Do(ctx).
+		Error()
+}
+
+func (c *MinioV1alpha1) ListMinIOBucket(ctx context.Context, namespace string, opts metav1.ListOptions) (*miniov1alpha1.MinIOBucketList, error) {
+	var timeout time.Duration
+	if opts.TimeoutSeconds != nil {
+		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	}
+	result := &miniov1alpha1.MinIOBucketList{}
+	err := c.client.Get().
+		Namespace(namespace).
+		Resource("miniobuckets").
+		VersionedParams(&opts, ParameterCodec).
+		Timeout(timeout).
+		Do(ctx).
+		Into(result)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (c *MinioV1alpha1) WatchMinIOBucket(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
+	var timeout time.Duration
+	if opts.TimeoutSeconds != nil {
+		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	}
+	opts.Watch = true
+	return c.client.Get().
+		Namespace(namespace).
+		Resource("miniobuckets").
+		VersionedParams(&opts, ParameterCodec).
+		Timeout(timeout).
+		Watch(ctx)
+}
+
+func (c *MinioV1alpha1) GetMinIOUser(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*miniov1alpha1.MinIOUser, error) {
+	result := &miniov1alpha1.MinIOUser{}
+	err := c.client.Get().
+		Namespace(namespace).
+		Resource("miniousers").
+		Name(name).
+		VersionedParams(&opts, ParameterCodec).
+		Do(ctx).
+		Into(result)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (c *MinioV1alpha1) CreateMinIOUser(ctx context.Context, v *miniov1alpha1.MinIOUser, opts metav1.CreateOptions) (*miniov1alpha1.MinIOUser, error) {
+	result := &miniov1alpha1.MinIOUser{}
+	err := c.client.Post().
+		Namespace(v.Namespace).
+		Resource("miniousers").
+		VersionedParams(&opts, ParameterCodec).
+		Body(v).
+		Do(ctx).
+		Into(result)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (c *MinioV1alpha1) UpdateMinIOUser(ctx context.Context, v *miniov1alpha1.MinIOUser, opts metav1.UpdateOptions) (*miniov1alpha1.MinIOUser, error) {
+	result := &miniov1alpha1.MinIOUser{}
+	err := c.client.Put().
+		Namespace(v.Namespace).
+		Resource("miniousers").
+		Name(v.Name).
+		VersionedParams(&opts, ParameterCodec).
+		Body(v).
+		Do(ctx).
+		Into(result)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (c *MinioV1alpha1) DeleteMinIOUser(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
+	return c.client.Delete().
+		Namespace(namespace).
+		Resource("miniousers").
+		Name(name).
+		Body(&opts).
+		Do(ctx).
+		Error()
+}
+
+func (c *MinioV1alpha1) ListMinIOUser(ctx context.Context, namespace string, opts metav1.ListOptions) (*miniov1alpha1.MinIOUserList, error) {
+	var timeout time.Duration
+	if opts.TimeoutSeconds != nil {
+		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	}
+	result := &miniov1alpha1.MinIOUserList{}
+	err := c.client.Get().
+		Namespace(namespace).
+		Resource("miniousers").
+		VersionedParams(&opts, ParameterCodec).
+		Timeout(timeout).
+		Do(ctx).
+		Into(result)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (c *MinioV1alpha1) WatchMinIOUser(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
+	var timeout time.Duration
+	if opts.TimeoutSeconds != nil {
+		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	}
+	opts.Watch = true
+	return c.client.Get().
+		Namespace(namespace).
+		Resource("miniousers").
+		VersionedParams(&opts, ParameterCodec).
+		Timeout(timeout).
+		Watch(ctx)
+}
+
 var Factory = NewInformerFactory()
 
 type InformerFactory struct {
@@ -549,6 +743,52 @@ func (f *GrafanaV1alpha2Informer) GrafanaUserInformer(namespace string, resyncPe
 	)
 }
 
+type MinioV1alpha1Informer struct {
+	factory *InformerFactory
+	client  *MinioV1alpha1
+}
+
+func NewMinioV1alpha1Informer(f *InformerFactory, client *MinioV1alpha1) *MinioV1alpha1Informer {
+	return &MinioV1alpha1Informer{factory: f, client: client}
+}
+
+func (f *MinioV1alpha1Informer) MinIOBucketInformer(namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return f.factory.InformerFor(&miniov1alpha1.MinIOBucket{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListMinIOBucket(context.TODO(), namespace, metav1.ListOptions{})
+				},
+				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchMinIOBucket(context.TODO(), namespace, metav1.ListOptions{})
+				},
+			},
+			&miniov1alpha1.MinIOBucket{},
+			resyncPeriod,
+			indexers,
+		)
+	},
+	)
+}
+func (f *MinioV1alpha1Informer) MinIOUserInformer(namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return f.factory.InformerFor(&miniov1alpha1.MinIOUser{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListMinIOUser(context.TODO(), namespace, metav1.ListOptions{})
+				},
+				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchMinIOUser(context.TODO(), namespace, metav1.ListOptions{})
+				},
+			},
+			&miniov1alpha1.MinIOUser{},
+			resyncPeriod,
+			indexers,
+		)
+	},
+	)
+}
+
 type GrafanaV1alpha2Lister struct {
 	indexer cache.Indexer
 }
@@ -593,6 +833,52 @@ func (x *GrafanaV1alpha2Lister) GetGrafanaUser(namespace, name string) (*githubv
 		return nil, k8serrors.NewNotFound(githubv1alpha2.SchemaGroupVersion.WithResource("grafanauser").GroupResource(), name)
 	}
 	return obj.(*githubv1alpha2.GrafanaUser), nil
+}
+
+type MinioV1alpha1Lister struct {
+	indexer cache.Indexer
+}
+
+func NewMinioV1alpha1Lister(indexer cache.Indexer) *MinioV1alpha1Lister {
+	return &MinioV1alpha1Lister{indexer: indexer}
+}
+
+func (x *MinioV1alpha1Lister) ListMinIOBucket(namespace string, selector labels.Selector) ([]*miniov1alpha1.MinIOBucket, error) {
+	var ret []*miniov1alpha1.MinIOBucket
+	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
+		ret = append(ret, m.(*miniov1alpha1.MinIOBucket))
+	})
+	return ret, err
+}
+
+func (x *MinioV1alpha1Lister) GetMinIOBucket(namespace, name string) (*miniov1alpha1.MinIOBucket, error) {
+	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(miniov1alpha1.SchemaGroupVersion.WithResource("miniobucket").GroupResource(), name)
+	}
+	return obj.(*miniov1alpha1.MinIOBucket), nil
+}
+
+func (x *MinioV1alpha1Lister) ListMinIOUser(namespace string, selector labels.Selector) ([]*miniov1alpha1.MinIOUser, error) {
+	var ret []*miniov1alpha1.MinIOUser
+	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
+		ret = append(ret, m.(*miniov1alpha1.MinIOUser))
+	})
+	return ret, err
+}
+
+func (x *MinioV1alpha1Lister) GetMinIOUser(namespace, name string) (*miniov1alpha1.MinIOUser, error) {
+	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(miniov1alpha1.SchemaGroupVersion.WithResource("miniouser").GroupResource(), name)
+	}
+	return obj.(*miniov1alpha1.MinIOUser), nil
 }
 
 type GrafanaV1alpha1Lister struct {

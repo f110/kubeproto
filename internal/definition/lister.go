@@ -72,6 +72,10 @@ func (l *Lister) GetEnums() Enums {
 
 	var enums []*Enum
 	l.allFiles.RangeFiles(func(desc protoreflect.FileDescriptor) bool {
+		if _, ok := l.files[desc.Path()]; !ok {
+			return true
+		}
+
 		for i := 0; i < desc.Enums().Len(); i++ {
 			e := desc.Enums().Get(i)
 			enums = append(enums, NewEnumFromEnumDescriptor(e, desc))
