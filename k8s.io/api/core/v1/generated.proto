@@ -1,0 +1,1874 @@
+syntax = "proto3";
+package k8s.io.api.core.v1;
+option  go_package = "k8s.io/api/core/v1";
+
+import "kube.proto";
+import "k8s.io/apimachinery/pkg/util/intstr/generated.proto";
+import "k8s.io/apimachinery/pkg/api/resource/generated.proto";
+import "k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto";
+
+enum AzureDataDiskCachingMode {
+  AZURE_DATA_DISK_CACHING_MODE_NONE       = 0;
+  AZURE_DATA_DISK_CACHING_MODE_READ_ONLY  = 1;
+  AZURE_DATA_DISK_CACHING_MODE_READ_WRITE = 2;
+}
+
+enum AzureDataDiskKind {
+  AZURE_DATA_DISK_KIND_SHARED    = 0;
+  AZURE_DATA_DISK_KIND_DEDICATED = 1;
+  AZURE_DATA_DISK_KIND_MANAGED   = 2;
+}
+
+enum ComponentConditionType {
+  COMPONENT_CONDITION_TYPE_HEALTHY = 0;
+}
+
+enum ConditionStatus {
+  CONDITION_STATUS_TRUE    = 0;
+  CONDITION_STATUS_FALSE   = 1;
+  CONDITION_STATUS_UNKNOWN = 2;
+}
+
+enum DNSPolicy {
+  DNS_POLICY_CLUSTER_FIRST_WITH_HOST_NET = 0;
+  DNS_POLICY_CLUSTER_FIRST               = 1;
+  DNS_POLICY_DEFAULT                     = 2;
+  DNS_POLICY_NONE                        = 3;
+}
+
+enum FinalizerName {
+  FINALIZER_NAME_KUBERNETES = 0 [(dev.f110.kubeproto.value) = { value: "kubernetes" }];
+}
+
+enum HostPathType {
+  HOST_PATH_TYPE_HOST_PATH_UNSET     = 0 [(dev.f110.kubeproto.value) = { value: "" }];
+  HOST_PATH_TYPE_DIRECTORY_OR_CREATE = 1;
+  HOST_PATH_TYPE_DIRECTORY           = 2;
+  HOST_PATH_TYPE_FILE_OR_CREATE      = 3;
+  HOST_PATH_TYPE_FILE                = 4;
+  HOST_PATH_TYPE_SOCKET              = 5;
+  HOST_PATH_TYPE_CHAR_DEVICE         = 6;
+  HOST_PATH_TYPE_BLOCK_DEVICE        = 7;
+}
+
+enum IPFamily {
+  IP_FAMILY_IP_V4 = 0 [(dev.f110.kubeproto.value) = { value: "IPv4" }];
+  IP_FAMILY_IP_V6 = 1 [(dev.f110.kubeproto.value) = { value: "IPv6" }];
+}
+
+enum IPFamilyPolicyType {
+  IP_FAMILY_POLICY_TYPE_SINGLE_STACK       = 0;
+  IP_FAMILY_POLICY_TYPE_PREFER_DUAL_STACK  = 1;
+  IP_FAMILY_POLICY_TYPE_REQUIRE_DUAL_STACK = 2;
+}
+
+enum LimitType {
+  LIMIT_TYPE_POD                     = 0;
+  LIMIT_TYPE_CONTAINER               = 1;
+  LIMIT_TYPE_PERSISTENT_VOLUME_CLAIM = 2;
+}
+
+enum MountPropagationMode {
+  MOUNT_PROPAGATION_MODE_NONE              = 0;
+  MOUNT_PROPAGATION_MODE_HOST_TO_CONTAINER = 1;
+  MOUNT_PROPAGATION_MODE_BIDIRECTIONAL     = 2;
+}
+
+enum NamespaceConditionType {
+  NAMESPACE_CONDITION_TYPE_NAMESPACE_DELETION_DISCOVERY_FAILURE             = 0;
+  NAMESPACE_CONDITION_TYPE_NAMESPACE_DELETION_CONTENT_FAILURE               = 1;
+  NAMESPACE_CONDITION_TYPE_NAMESPACE_DELETION_GROUP_VERSION_PARSING_FAILURE = 2;
+  NAMESPACE_CONDITION_TYPE_NAMESPACE_CONTENT_REMAINING                      = 3;
+  NAMESPACE_CONDITION_TYPE_NAMESPACE_FINALIZERS_REMAINING                   = 4;
+}
+
+enum NamespacePhase {
+  NAMESPACE_PHASE_ACTIVE      = 0;
+  NAMESPACE_PHASE_TERMINATING = 1;
+}
+
+enum NodeAddressType {
+  NODE_ADDRESS_TYPE_HOSTNAME     = 0;
+  NODE_ADDRESS_TYPE_INTERNAL_IP  = 1 [(dev.f110.kubeproto.value) = { value: "InternalIP" }];
+  NODE_ADDRESS_TYPE_EXTERNAL_IP  = 2 [(dev.f110.kubeproto.value) = { value: "ExternalIP" }];
+  NODE_ADDRESS_TYPE_INTERNAL_DNS = 3 [(dev.f110.kubeproto.value) = { value: "InternalDNS" }];
+  NODE_ADDRESS_TYPE_EXTERNAL_DNS = 4 [(dev.f110.kubeproto.value) = { value: "ExternalDNS" }];
+}
+
+enum NodeConditionType {
+  NODE_CONDITION_TYPE_READY               = 0;
+  NODE_CONDITION_TYPE_MEMORY_PRESSURE     = 1;
+  NODE_CONDITION_TYPE_DISK_PRESSURE       = 2;
+  NODE_CONDITION_TYPE_PID_PRESSURE        = 3 [(dev.f110.kubeproto.value) = { value: "PIDPressure" }];
+  NODE_CONDITION_TYPE_NETWORK_UNAVAILABLE = 4;
+}
+
+enum NodePhase {
+  NODE_PHASE_PENDING    = 0;
+  NODE_PHASE_RUNNING    = 1;
+  NODE_PHASE_TERMINATED = 2;
+}
+
+enum NodeSelectorOperator {
+  NODE_SELECTOR_OPERATOR_IN             = 0;
+  NODE_SELECTOR_OPERATOR_NOT_IN         = 1;
+  NODE_SELECTOR_OPERATOR_EXISTS         = 2;
+  NODE_SELECTOR_OPERATOR_DOES_NOT_EXIST = 3;
+  NODE_SELECTOR_OPERATOR_GT             = 4;
+  NODE_SELECTOR_OPERATOR_LT             = 5;
+}
+
+enum OSName {
+  OS_NAME_LINUX   = 0 [(dev.f110.kubeproto.value) = { value: "linux" }];
+  OS_NAME_WINDOWS = 1 [(dev.f110.kubeproto.value) = { value: "windows" }];
+}
+
+enum PersistentVolumeAccessMode {
+  PERSISTENT_VOLUME_ACCESS_MODE_READ_WRITE_ONCE     = 0;
+  PERSISTENT_VOLUME_ACCESS_MODE_READ_ONLY_MANY      = 1;
+  PERSISTENT_VOLUME_ACCESS_MODE_READ_WRITE_MANY     = 2;
+  PERSISTENT_VOLUME_ACCESS_MODE_READ_WRITE_ONCE_POD = 3;
+}
+
+enum PersistentVolumeClaimConditionType {
+  PERSISTENT_VOLUME_CLAIM_CONDITION_TYPE_RESIZING                   = 0;
+  PERSISTENT_VOLUME_CLAIM_CONDITION_TYPE_FILE_SYSTEM_RESIZE_PENDING = 1;
+}
+
+enum PersistentVolumeClaimPhase {
+  PERSISTENT_VOLUME_CLAIM_PHASE_PENDING = 0;
+  PERSISTENT_VOLUME_CLAIM_PHASE_BOUND   = 1;
+  PERSISTENT_VOLUME_CLAIM_PHASE_LOST    = 2;
+}
+
+enum PersistentVolumeClaimResizeStatus {
+  PERSISTENT_VOLUME_CLAIM_RESIZE_STATUS_PERSISTENT_VOLUME_CLAIM_NO_EXPANSION_IN_PROGRESS = 0 [(dev.f110.kubeproto.value) = { value: "" }];
+  PERSISTENT_VOLUME_CLAIM_RESIZE_STATUS_CONTROLLER_EXPANSION_IN_PROGRESS                 = 1;
+  PERSISTENT_VOLUME_CLAIM_RESIZE_STATUS_CONTROLLER_EXPANSION_FAILED                      = 2;
+  PERSISTENT_VOLUME_CLAIM_RESIZE_STATUS_NODE_EXPANSION_PENDING                           = 3;
+  PERSISTENT_VOLUME_CLAIM_RESIZE_STATUS_NODE_EXPANSION_IN_PROGRESS                       = 4;
+  PERSISTENT_VOLUME_CLAIM_RESIZE_STATUS_NODE_EXPANSION_FAILED                            = 5;
+}
+
+enum PersistentVolumeMode {
+  PERSISTENT_VOLUME_MODE_BLOCK      = 0;
+  PERSISTENT_VOLUME_MODE_FILESYSTEM = 1;
+}
+
+enum PersistentVolumePhase {
+  PERSISTENT_VOLUME_PHASE_PENDING   = 0;
+  PERSISTENT_VOLUME_PHASE_AVAILABLE = 1;
+  PERSISTENT_VOLUME_PHASE_BOUND     = 2;
+  PERSISTENT_VOLUME_PHASE_RELEASED  = 3;
+  PERSISTENT_VOLUME_PHASE_FAILED    = 4;
+}
+
+enum PersistentVolumeReclaimPolicy {
+  PERSISTENT_VOLUME_RECLAIM_POLICY_RECYCLE = 0;
+  PERSISTENT_VOLUME_RECLAIM_POLICY_DELETE  = 1;
+  PERSISTENT_VOLUME_RECLAIM_POLICY_RETAIN  = 2;
+}
+
+enum PodConditionType {
+  POD_CONDITION_TYPE_CONTAINERS_READY = 0;
+  POD_CONDITION_TYPE_INITIALIZED      = 1;
+  POD_CONDITION_TYPE_READY            = 2;
+  POD_CONDITION_TYPE_POD_SCHEDULED    = 3;
+}
+
+enum PodFSGroupChangePolicy {
+  POD_FS_GROUP_CHANGE_POLICY_ON_ROOT_MISMATCH = 0;
+  POD_FS_GROUP_CHANGE_POLICY_ALWAYS           = 1;
+}
+
+enum PodPhase {
+  POD_PHASE_PENDING   = 0;
+  POD_PHASE_RUNNING   = 1;
+  POD_PHASE_SUCCEEDED = 2;
+  POD_PHASE_FAILED    = 3;
+  POD_PHASE_UNKNOWN   = 4;
+}
+
+enum PodQOSClass {
+  POD_QOS_CLASS_GUARANTEED  = 0;
+  POD_QOS_CLASS_BURSTABLE   = 1;
+  POD_QOS_CLASS_BEST_EFFORT = 2;
+}
+
+enum PreemptionPolicy {
+  PREEMPTION_POLICY_PREEMPT_LOWER_PRIORITY = 0;
+  PREEMPTION_POLICY_NEVER                  = 1;
+}
+
+enum ProcMountType {
+  PROC_MOUNT_TYPE_DEFAULT  = 0;
+  PROC_MOUNT_TYPE_UNMASKED = 1;
+}
+
+enum Protocol {
+  PROTOCOL_TCP  = 0 [(dev.f110.kubeproto.value) = { value: "TCP" }];
+  PROTOCOL_UDP  = 1 [(dev.f110.kubeproto.value) = { value: "UDP" }];
+  PROTOCOL_SCTP = 2 [(dev.f110.kubeproto.value) = { value: "SCTP" }];
+}
+
+enum PullPolicy {
+  PULL_POLICY_ALWAYS         = 0;
+  PULL_POLICY_NEVER          = 1;
+  PULL_POLICY_IF_NOT_PRESENT = 2;
+}
+
+enum ReplicationControllerConditionType {
+  REPLICATION_CONTROLLER_CONDITION_TYPE_REPLICA_FAILURE = 0;
+}
+
+enum ResourceName {
+  RESOURCE_NAME_CPU                        = 0 [(dev.f110.kubeproto.value) = { value: "cpu" }];
+  RESOURCE_NAME_MEMORY                     = 1 [(dev.f110.kubeproto.value) = { value: "memory" }];
+  RESOURCE_NAME_STORAGE                    = 2 [(dev.f110.kubeproto.value) = { value: "storage" }];
+  RESOURCE_NAME_EPHEMERAL_STORAGE          = 3 [(dev.f110.kubeproto.value) = { value: "ephemeral-storage" }];
+  RESOURCE_NAME_PODS                       = 4 [(dev.f110.kubeproto.value) = { value: "pods" }];
+  RESOURCE_NAME_SERVICES                   = 5 [(dev.f110.kubeproto.value) = { value: "services" }];
+  RESOURCE_NAME_REPLICATIONCONTROLLERS     = 6 [(dev.f110.kubeproto.value) = { value: "replicationcontrollers" }];
+  RESOURCE_NAME_RESOURCEQUOTAS             = 7 [(dev.f110.kubeproto.value) = { value: "resourcequotas" }];
+  RESOURCE_NAME_SECRETS                    = 8 [(dev.f110.kubeproto.value) = { value: "secrets" }];
+  RESOURCE_NAME_CONFIGMAPS                 = 9 [(dev.f110.kubeproto.value) = { value: "configmaps" }];
+  RESOURCE_NAME_PERSISTENTVOLUMECLAIMS     = 10 [(dev.f110.kubeproto.value) = { value: "persistentvolumeclaims" }];
+  RESOURCE_NAME_SERVICES_NODEPORTS         = 11 [(dev.f110.kubeproto.value) = { value: "services.nodeports" }];
+  RESOURCE_NAME_SERVICES_LOADBALANCERS     = 12 [(dev.f110.kubeproto.value) = { value: "services.loadbalancers" }];
+  RESOURCE_NAME_REQUESTS_CPU               = 13 [(dev.f110.kubeproto.value) = { value: "requests.cpu" }];
+  RESOURCE_NAME_REQUESTS_MEMORY            = 14 [(dev.f110.kubeproto.value) = { value: "requests.memory" }];
+  RESOURCE_NAME_REQUESTS_STORAGE           = 15 [(dev.f110.kubeproto.value) = { value: "requests.storage" }];
+  RESOURCE_NAME_REQUESTS_EPHEMERAL_STORAGE = 16 [(dev.f110.kubeproto.value) = { value: "requests.ephemeral-storage" }];
+  RESOURCE_NAME_LIMITS_CPU                 = 17 [(dev.f110.kubeproto.value) = { value: "limits.cpu" }];
+  RESOURCE_NAME_LIMITS_MEMORY              = 18 [(dev.f110.kubeproto.value) = { value: "limits.memory" }];
+  RESOURCE_NAME_LIMITS_EPHEMERAL_STORAGE   = 19 [(dev.f110.kubeproto.value) = { value: "limits.ephemeral-storage" }];
+}
+
+enum ResourceQuotaScope {
+  RESOURCE_QUOTA_SCOPE_TERMINATING                  = 0;
+  RESOURCE_QUOTA_SCOPE_NOT_TERMINATING              = 1;
+  RESOURCE_QUOTA_SCOPE_BEST_EFFORT                  = 2;
+  RESOURCE_QUOTA_SCOPE_NOT_BEST_EFFORT              = 3;
+  RESOURCE_QUOTA_SCOPE_PRIORITY_CLASS               = 4;
+  RESOURCE_QUOTA_SCOPE_CROSS_NAMESPACE_POD_AFFINITY = 5;
+}
+
+enum RestartPolicy {
+  RESTART_POLICY_ALWAYS     = 0;
+  RESTART_POLICY_ON_FAILURE = 1;
+  RESTART_POLICY_NEVER      = 2;
+}
+
+enum ScopeSelectorOperator {
+  SCOPE_SELECTOR_OPERATOR_IN             = 0;
+  SCOPE_SELECTOR_OPERATOR_NOT_IN         = 1;
+  SCOPE_SELECTOR_OPERATOR_EXISTS         = 2;
+  SCOPE_SELECTOR_OPERATOR_DOES_NOT_EXIST = 3;
+}
+
+enum SeccompProfileType {
+  SECCOMP_PROFILE_TYPE_UNCONFINED      = 0;
+  SECCOMP_PROFILE_TYPE_RUNTIME_DEFAULT = 1;
+  SECCOMP_PROFILE_TYPE_LOCALHOST       = 2;
+}
+
+enum SecretType {
+  SECRET_TYPE_OPAQUE                              = 0;
+  SECRET_TYPE_KUBERNETES_IO_SERVICE_ACCOUNT_TOKEN = 1 [(dev.f110.kubeproto.value) = { value: "kubernetes.io/service-account-token" }];
+  SECRET_TYPE_KUBERNETES_IO_DOCKERCFG             = 2 [(dev.f110.kubeproto.value) = { value: "kubernetes.io/dockercfg" }];
+  SECRET_TYPE_KUBERNETES_IO_DOCKERCONFIGJSON      = 3 [(dev.f110.kubeproto.value) = { value: "kubernetes.io/dockerconfigjson" }];
+  SECRET_TYPE_KUBERNETES_IO_BASIC_AUTH            = 4 [(dev.f110.kubeproto.value) = { value: "kubernetes.io/basic-auth" }];
+  SECRET_TYPE_KUBERNETES_IO_SSH_AUTH              = 5 [(dev.f110.kubeproto.value) = { value: "kubernetes.io/ssh-auth" }];
+  SECRET_TYPE_KUBERNETES_IO_TLS                   = 6 [(dev.f110.kubeproto.value) = { value: "kubernetes.io/tls" }];
+  SECRET_TYPE_BOOTSTRAP_KUBERNETES_IO_TOKEN       = 7 [(dev.f110.kubeproto.value) = { value: "bootstrap.kubernetes.io/token" }];
+}
+
+enum ServiceAffinity {
+  SERVICE_AFFINITY_CLIENT_IP = 0 [(dev.f110.kubeproto.value) = { value: "ClientIP" }];
+  SERVICE_AFFINITY_NONE      = 1;
+}
+
+enum ServiceExternalTrafficPolicyType {
+  SERVICE_EXTERNAL_TRAFFIC_POLICY_TYPE_LOCAL   = 0;
+  SERVICE_EXTERNAL_TRAFFIC_POLICY_TYPE_CLUSTER = 1;
+}
+
+enum ServiceInternalTrafficPolicyType {
+  SERVICE_INTERNAL_TRAFFIC_POLICY_TYPE_CLUSTER = 0;
+  SERVICE_INTERNAL_TRAFFIC_POLICY_TYPE_LOCAL   = 1;
+}
+
+enum ServiceType {
+  SERVICE_TYPE_CLUSTER_IP    = 0 [(dev.f110.kubeproto.value) = { value: "ClusterIP" }];
+  SERVICE_TYPE_NODE_PORT     = 1;
+  SERVICE_TYPE_LOAD_BALANCER = 2;
+  SERVICE_TYPE_EXTERNAL_NAME = 3;
+}
+
+enum StorageMedium {
+  STORAGE_MEDIUM_DEFAULT    = 0 [(dev.f110.kubeproto.value) = { value: "" }];
+  STORAGE_MEDIUM_MEMORY     = 1;
+  STORAGE_MEDIUM_HUGE_PAGES = 2;
+}
+
+enum TaintEffect {
+  TAINT_EFFECT_NO_SCHEDULE        = 0;
+  TAINT_EFFECT_PREFER_NO_SCHEDULE = 1;
+  TAINT_EFFECT_NO_EXECUTE         = 2;
+}
+
+enum TerminationMessagePolicy {
+  TERMINATION_MESSAGE_POLICY_FILE                      = 0;
+  TERMINATION_MESSAGE_POLICY_FALLBACK_TO_LOGS_ON_ERROR = 1;
+}
+
+enum TolerationOperator {
+  TOLERATION_OPERATOR_EXISTS = 0;
+  TOLERATION_OPERATOR_EQUAL  = 1;
+}
+
+enum URIScheme {
+  URI_SCHEME_HTTP  = 0 [(dev.f110.kubeproto.value) = { value: "HTTP" }];
+  URI_SCHEME_HTTPS = 1 [(dev.f110.kubeproto.value) = { value: "HTTPS" }];
+}
+
+enum UnsatisfiableConstraintAction {
+  UNSATISFIABLE_CONSTRAINT_ACTION_DO_NOT_SCHEDULE = 0;
+  UNSATISFIABLE_CONSTRAINT_ACTION_SCHEDULE_ANYWAY = 1;
+}
+
+message AWSElasticBlockStoreVolumeSource {
+  string volume_id = 1 [(dev.f110.kubeproto.field) = { go_name: "VolumeID", api_field_name: "volumeID", inline: false }];
+  string fs_type   = 2 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
+  int32  partition = 3 [(dev.f110.kubeproto.field) = { go_name: "Partition", api_field_name: "partition", inline: false }];
+  bool   read_only = 4 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+}
+
+message Affinity {
+  optional NodeAffinity    node_affinity     = 1 [(dev.f110.kubeproto.field) = { go_name: "NodeAffinity", api_field_name: "nodeAffinity", inline: false }];
+  optional PodAffinity     pod_affinity      = 2 [(dev.f110.kubeproto.field) = { go_name: "PodAffinity", api_field_name: "podAffinity", inline: false }];
+  optional PodAntiAffinity pod_anti_affinity = 3 [(dev.f110.kubeproto.field) = { go_name: "PodAntiAffinity", api_field_name: "podAntiAffinity", inline: false }];
+}
+
+message AttachedVolume {
+  string name        = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  string device_path = 2 [(dev.f110.kubeproto.field) = { go_name: "DevicePath", api_field_name: "devicePath", inline: false }];
+}
+
+message AvoidPods {
+  repeated PreferAvoidPodsEntry prefer_avoid_pods = 1 [(dev.f110.kubeproto.field) = { go_name: "PreferAvoidPods", api_field_name: "preferAvoidPods", inline: false }];
+}
+
+message AzureDiskVolumeSource {
+  string          disk_name     = 1 [(dev.f110.kubeproto.field) = { go_name: "DiskName", api_field_name: "diskName", inline: false }];
+  string          data_disk_uri = 2 [(dev.f110.kubeproto.field) = { go_name: "DataDiskURI", api_field_name: "diskURI", inline: false }];
+  optional string caching_mode  = 3 [(dev.f110.kubeproto.field) = { go_name: "CachingMode", api_field_name: "cachingMode", inline: false }];
+  optional string fs_type       = 4 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
+  optional bool   read_only     = 5 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+  optional string kind          = 6 [(dev.f110.kubeproto.field) = { go_name: "Kind", api_field_name: "kind", inline: false }];
+}
+
+message AzureFilePersistentVolumeSource {
+  string          secret_name      = 1 [(dev.f110.kubeproto.field) = { go_name: "SecretName", api_field_name: "secretName", inline: false }];
+  string          share_name       = 2 [(dev.f110.kubeproto.field) = { go_name: "ShareName", api_field_name: "shareName", inline: false }];
+  bool            read_only        = 3 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+  optional string secret_namespace = 4 [(dev.f110.kubeproto.field) = { go_name: "SecretNamespace", api_field_name: "secretNamespace", inline: false }];
+}
+
+message AzureFileVolumeSource {
+  string secret_name = 1 [(dev.f110.kubeproto.field) = { go_name: "SecretName", api_field_name: "secretName", inline: false }];
+  string share_name  = 2 [(dev.f110.kubeproto.field) = { go_name: "ShareName", api_field_name: "shareName", inline: false }];
+  bool   read_only   = 3 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+}
+
+message Binding {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta   type_meta   = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  ObjectReference                                 target      = 3 [(dev.f110.kubeproto.field) = { go_name: "Target", api_field_name: "target", inline: false }];
+}
+
+message CSIPersistentVolumeSource {
+  string                   driver                        = 1 [(dev.f110.kubeproto.field) = { go_name: "Driver", api_field_name: "driver", inline: false }];
+  string                   volume_handle                 = 2 [(dev.f110.kubeproto.field) = { go_name: "VolumeHandle", api_field_name: "volumeHandle", inline: false }];
+  bool                     read_only                     = 3 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+  string                   fs_type                       = 4 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
+  map<string, string>      volume_attributes             = 5 [(dev.f110.kubeproto.field) = { go_name: "VolumeAttributes", api_field_name: "volumeAttributes", inline: false }];
+  optional SecretReference controller_publish_secret_ref = 6 [(dev.f110.kubeproto.field) = { go_name: "ControllerPublishSecretRef", api_field_name: "controllerPublishSecretRef", inline: false }];
+  optional SecretReference node_stage_secret_ref         = 7 [(dev.f110.kubeproto.field) = { go_name: "NodeStageSecretRef", api_field_name: "nodeStageSecretRef", inline: false }];
+  optional SecretReference node_publish_secret_ref       = 8 [(dev.f110.kubeproto.field) = { go_name: "NodePublishSecretRef", api_field_name: "nodePublishSecretRef", inline: false }];
+  optional SecretReference controller_expand_secret_ref  = 9 [(dev.f110.kubeproto.field) = { go_name: "ControllerExpandSecretRef", api_field_name: "controllerExpandSecretRef", inline: false }];
+}
+
+message CSIVolumeSource {
+  string                        driver                  = 1 [(dev.f110.kubeproto.field) = { go_name: "Driver", api_field_name: "driver", inline: false }];
+  optional bool                 read_only               = 2 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+  optional string               fs_type                 = 3 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
+  map<string, string>           volume_attributes       = 4 [(dev.f110.kubeproto.field) = { go_name: "VolumeAttributes", api_field_name: "volumeAttributes", inline: false }];
+  optional LocalObjectReference node_publish_secret_ref = 5 [(dev.f110.kubeproto.field) = { go_name: "NodePublishSecretRef", api_field_name: "nodePublishSecretRef", inline: false }];
+}
+
+message Capabilities {
+  repeated string add  = 1 [(dev.f110.kubeproto.field) = { go_name: "Add", api_field_name: "add", inline: false }];
+  repeated string drop = 2 [(dev.f110.kubeproto.field) = { go_name: "Drop", api_field_name: "drop", inline: false }];
+}
+
+message CephFSPersistentVolumeSource {
+  repeated string          monitors    = 1 [(dev.f110.kubeproto.field) = { go_name: "Monitors", api_field_name: "monitors", inline: false }];
+  string                   path        = 2 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
+  string                   user        = 3 [(dev.f110.kubeproto.field) = { go_name: "User", api_field_name: "user", inline: false }];
+  string                   secret_file = 4 [(dev.f110.kubeproto.field) = { go_name: "SecretFile", api_field_name: "secretFile", inline: false }];
+  optional SecretReference secret_ref  = 5 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
+  bool                     read_only   = 6 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+}
+
+message CephFSVolumeSource {
+  repeated string               monitors    = 1 [(dev.f110.kubeproto.field) = { go_name: "Monitors", api_field_name: "monitors", inline: false }];
+  string                        path        = 2 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
+  string                        user        = 3 [(dev.f110.kubeproto.field) = { go_name: "User", api_field_name: "user", inline: false }];
+  string                        secret_file = 4 [(dev.f110.kubeproto.field) = { go_name: "SecretFile", api_field_name: "secretFile", inline: false }];
+  optional LocalObjectReference secret_ref  = 5 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
+  bool                          read_only   = 6 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+}
+
+message CinderPersistentVolumeSource {
+  string                   volume_id  = 1 [(dev.f110.kubeproto.field) = { go_name: "VolumeID", api_field_name: "volumeID", inline: false }];
+  string                   fs_type    = 2 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
+  bool                     read_only  = 3 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+  optional SecretReference secret_ref = 4 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
+}
+
+message CinderVolumeSource {
+  string                        volume_id  = 1 [(dev.f110.kubeproto.field) = { go_name: "VolumeID", api_field_name: "volumeID", inline: false }];
+  string                        fs_type    = 2 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
+  bool                          read_only  = 3 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+  optional LocalObjectReference secret_ref = 4 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
+}
+
+message ClientIPConfig {
+  optional int32 timeout_seconds = 1 [(dev.f110.kubeproto.field) = { go_name: "TimeoutSeconds", api_field_name: "timeoutSeconds", inline: false }];
+}
+
+message ComponentCondition {
+  string type    = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
+  string status  = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  string message = 3 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
+  string error   = 4 [(dev.f110.kubeproto.field) = { go_name: "Error", api_field_name: "error", inline: false }];
+}
+
+message ComponentStatus {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta   type_meta   = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  repeated ComponentCondition                     conditions  = 3 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+}
+
+message ComponentStatusList {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated ComponentStatus                      items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+}
+
+message ConfigMap {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta   type_meta   = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  optional bool                                   immutable   = 3 [(dev.f110.kubeproto.field) = { go_name: "Immutable", api_field_name: "immutable", inline: false }];
+  map<string, string>                             data        = 4 [(dev.f110.kubeproto.field) = { go_name: "Data", api_field_name: "data", inline: false }];
+  map<string, bytes>                              binary_data = 5 [(dev.f110.kubeproto.field) = { go_name: "BinaryData", api_field_name: "binaryData", inline: false }];
+}
+
+message ConfigMapEnvSource {
+  LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", api_field_name: "", inline: true }];
+  optional bool        optional               = 2 [(dev.f110.kubeproto.field) = { go_name: "Optional", api_field_name: "optional", inline: false }];
+}
+
+message ConfigMapKeySelector {
+  LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", api_field_name: "", inline: true }];
+  string               key                    = 2 [(dev.f110.kubeproto.field) = { go_name: "Key", api_field_name: "key", inline: false }];
+  optional bool        optional               = 3 [(dev.f110.kubeproto.field) = { go_name: "Optional", api_field_name: "optional", inline: false }];
+}
+
+message ConfigMapList {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated ConfigMap                            items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+}
+
+message ConfigMapNodeConfigSource {
+  string namespace          = 1 [(dev.f110.kubeproto.field) = { go_name: "Namespace", api_field_name: "namespace", inline: false }];
+  string name               = 2 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  string uid                = 3 [(dev.f110.kubeproto.field) = { go_name: "UID", api_field_name: "uid", inline: false }];
+  string resource_version   = 4 [(dev.f110.kubeproto.field) = { go_name: "ResourceVersion", api_field_name: "resourceVersion", inline: false }];
+  string kubelet_config_key = 5 [(dev.f110.kubeproto.field) = { go_name: "KubeletConfigKey", api_field_name: "kubeletConfigKey", inline: false }];
+}
+
+message ConfigMapProjection {
+  LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", api_field_name: "", inline: true }];
+  repeated KeyToPath   items                  = 2 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+  optional bool        optional               = 3 [(dev.f110.kubeproto.field) = { go_name: "Optional", api_field_name: "optional", inline: false }];
+}
+
+message ConfigMapVolumeSource {
+  LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", api_field_name: "", inline: true }];
+  repeated KeyToPath   items                  = 2 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+  optional int32       default_mode           = 3 [(dev.f110.kubeproto.field) = { go_name: "DefaultMode", api_field_name: "defaultMode", inline: false }];
+  optional bool        optional               = 4 [(dev.f110.kubeproto.field) = { go_name: "Optional", api_field_name: "optional", inline: false }];
+}
+
+message Container {
+  string                   name                       = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  string                   image                      = 2 [(dev.f110.kubeproto.field) = { go_name: "Image", api_field_name: "image", inline: false }];
+  repeated string          command                    = 3 [(dev.f110.kubeproto.field) = { go_name: "Command", api_field_name: "command", inline: false }];
+  repeated string          args                       = 4 [(dev.f110.kubeproto.field) = { go_name: "Args", api_field_name: "args", inline: false }];
+  string                   working_dir                = 5 [(dev.f110.kubeproto.field) = { go_name: "WorkingDir", api_field_name: "workingDir", inline: false }];
+  repeated ContainerPort   ports                      = 6 [(dev.f110.kubeproto.field) = { go_name: "Ports", api_field_name: "ports", inline: false }];
+  repeated EnvFromSource   env_from                   = 7 [(dev.f110.kubeproto.field) = { go_name: "EnvFrom", api_field_name: "envFrom", inline: false }];
+  repeated EnvVar          env                        = 8 [(dev.f110.kubeproto.field) = { go_name: "Env", api_field_name: "env", inline: false }];
+  ResourceRequirements     resources                  = 9 [(dev.f110.kubeproto.field) = { go_name: "Resources", api_field_name: "resources", inline: false }];
+  repeated VolumeMount     volume_mounts              = 10 [(dev.f110.kubeproto.field) = { go_name: "VolumeMounts", api_field_name: "volumeMounts", inline: false }];
+  repeated VolumeDevice    volume_devices             = 11 [(dev.f110.kubeproto.field) = { go_name: "VolumeDevices", api_field_name: "volumeDevices", inline: false }];
+  optional Probe           liveness_probe             = 12 [(dev.f110.kubeproto.field) = { go_name: "LivenessProbe", api_field_name: "livenessProbe", inline: false }];
+  optional Probe           readiness_probe            = 13 [(dev.f110.kubeproto.field) = { go_name: "ReadinessProbe", api_field_name: "readinessProbe", inline: false }];
+  optional Probe           startup_probe              = 14 [(dev.f110.kubeproto.field) = { go_name: "StartupProbe", api_field_name: "startupProbe", inline: false }];
+  optional Lifecycle       lifecycle                  = 15 [(dev.f110.kubeproto.field) = { go_name: "Lifecycle", api_field_name: "lifecycle", inline: false }];
+  string                   termination_message_path   = 16 [(dev.f110.kubeproto.field) = { go_name: "TerminationMessagePath", api_field_name: "terminationMessagePath", inline: false }];
+  string                   termination_message_policy = 17 [(dev.f110.kubeproto.field) = { go_name: "TerminationMessagePolicy", api_field_name: "terminationMessagePolicy", inline: false }];
+  string                   image_pull_policy          = 18 [(dev.f110.kubeproto.field) = { go_name: "ImagePullPolicy", api_field_name: "imagePullPolicy", inline: false }];
+  optional SecurityContext security_context           = 19 [(dev.f110.kubeproto.field) = { go_name: "SecurityContext", api_field_name: "securityContext", inline: false }];
+  bool                     stdin                      = 20 [(dev.f110.kubeproto.field) = { go_name: "Stdin", api_field_name: "stdin", inline: false }];
+  bool                     stdin_once                 = 21 [(dev.f110.kubeproto.field) = { go_name: "StdinOnce", api_field_name: "stdinOnce", inline: false }];
+  bool                     tty                        = 22 [(dev.f110.kubeproto.field) = { go_name: "TTY", api_field_name: "tty", inline: false }];
+}
+
+message ContainerImage {
+  repeated string names      = 1 [(dev.f110.kubeproto.field) = { go_name: "Names", api_field_name: "names", inline: false }];
+  int64           size_bytes = 2 [(dev.f110.kubeproto.field) = { go_name: "SizeBytes", api_field_name: "sizeBytes", inline: false }];
+}
+
+message ContainerPort {
+  string name           = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  int32  host_port      = 2 [(dev.f110.kubeproto.field) = { go_name: "HostPort", api_field_name: "hostPort", inline: false }];
+  int32  container_port = 3 [(dev.f110.kubeproto.field) = { go_name: "ContainerPort", api_field_name: "containerPort", inline: false }];
+  string protocol       = 4 [(dev.f110.kubeproto.field) = { go_name: "Protocol", api_field_name: "protocol", inline: false }];
+  string host_ip        = 5 [(dev.f110.kubeproto.field) = { go_name: "HostIP", api_field_name: "hostIP", inline: false }];
+}
+
+message ContainerState {
+  optional ContainerStateWaiting    waiting    = 1 [(dev.f110.kubeproto.field) = { go_name: "Waiting", api_field_name: "waiting", inline: false }];
+  optional ContainerStateRunning    running    = 2 [(dev.f110.kubeproto.field) = { go_name: "Running", api_field_name: "running", inline: false }];
+  optional ContainerStateTerminated terminated = 3 [(dev.f110.kubeproto.field) = { go_name: "Terminated", api_field_name: "terminated", inline: false }];
+}
+
+message ContainerStateRunning {
+  k8s.io.apimachinery.pkg.apis.meta.v1.Time started_at = 1 [(dev.f110.kubeproto.field) = { go_name: "StartedAt", api_field_name: "startedAt", inline: false }];
+}
+
+message ContainerStateTerminated {
+  int32                                     exit_code    = 1 [(dev.f110.kubeproto.field) = { go_name: "ExitCode", api_field_name: "exitCode", inline: false }];
+  int32                                     signal       = 2 [(dev.f110.kubeproto.field) = { go_name: "Signal", api_field_name: "signal", inline: false }];
+  string                                    reason       = 3 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
+  string                                    message      = 4 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.Time started_at   = 5 [(dev.f110.kubeproto.field) = { go_name: "StartedAt", api_field_name: "startedAt", inline: false }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.Time finished_at  = 6 [(dev.f110.kubeproto.field) = { go_name: "FinishedAt", api_field_name: "finishedAt", inline: false }];
+  string                                    container_id = 7 [(dev.f110.kubeproto.field) = { go_name: "ContainerID", api_field_name: "containerID", inline: false }];
+}
+
+message ContainerStateWaiting {
+  string reason  = 1 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
+  string message = 2 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
+}
+
+message ContainerStatus {
+  string         name                   = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  ContainerState state                  = 2 [(dev.f110.kubeproto.field) = { go_name: "State", api_field_name: "state", inline: false }];
+  ContainerState last_termination_state = 3 [(dev.f110.kubeproto.field) = { go_name: "LastTerminationState", api_field_name: "lastState", inline: false }];
+  bool           ready                  = 4 [(dev.f110.kubeproto.field) = { go_name: "Ready", api_field_name: "ready", inline: false }];
+  int32          restart_count          = 5 [(dev.f110.kubeproto.field) = { go_name: "RestartCount", api_field_name: "restartCount", inline: false }];
+  string         image                  = 6 [(dev.f110.kubeproto.field) = { go_name: "Image", api_field_name: "image", inline: false }];
+  string         image_id               = 7 [(dev.f110.kubeproto.field) = { go_name: "ImageID", api_field_name: "imageID", inline: false }];
+  string         container_id           = 8 [(dev.f110.kubeproto.field) = { go_name: "ContainerID", api_field_name: "containerID", inline: false }];
+  optional bool  started                = 9 [(dev.f110.kubeproto.field) = { go_name: "Started", api_field_name: "started", inline: false }];
+}
+
+message DaemonEndpoint {
+  int32 port = 1 [(dev.f110.kubeproto.field) = { go_name: "Port", api_field_name: "Port", inline: false }];
+}
+
+message DownwardAPIProjection {
+  repeated DownwardAPIVolumeFile items = 1 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+}
+
+message DownwardAPIVolumeFile {
+  string                         path               = 1 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
+  optional ObjectFieldSelector   field_ref          = 2 [(dev.f110.kubeproto.field) = { go_name: "FieldRef", api_field_name: "fieldRef", inline: false }];
+  optional ResourceFieldSelector resource_field_ref = 3 [(dev.f110.kubeproto.field) = { go_name: "ResourceFieldRef", api_field_name: "resourceFieldRef", inline: false }];
+  optional int32                 mode               = 4 [(dev.f110.kubeproto.field) = { go_name: "Mode", api_field_name: "mode", inline: false }];
+}
+
+message DownwardAPIVolumeSource {
+  repeated DownwardAPIVolumeFile items        = 1 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+  optional int32                 default_mode = 2 [(dev.f110.kubeproto.field) = { go_name: "DefaultMode", api_field_name: "defaultMode", inline: false }];
+}
+
+message EmptyDirVolumeSource {
+  string   medium                                                   = 1 [(dev.f110.kubeproto.field) = { go_name: "Medium", api_field_name: "medium", inline: false }];
+  optional k8s.io.apimachinery.pkg.api.resource.Quantity size_limit = 2 [(dev.f110.kubeproto.field) = { go_name: "SizeLimit", api_field_name: "sizeLimit", inline: false }];
+}
+
+message EndpointAddress {
+  string                   ip         = 1 [(dev.f110.kubeproto.field) = { go_name: "IP", api_field_name: "ip", inline: false }];
+  string                   hostname   = 2 [(dev.f110.kubeproto.field) = { go_name: "Hostname", api_field_name: "hostname", inline: false }];
+  optional string          node_name  = 3 [(dev.f110.kubeproto.field) = { go_name: "NodeName", api_field_name: "nodeName", inline: false }];
+  optional ObjectReference target_ref = 4 [(dev.f110.kubeproto.field) = { go_name: "TargetRef", api_field_name: "targetRef", inline: false }];
+}
+
+message EndpointPort {
+  string          name         = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  int32           port         = 2 [(dev.f110.kubeproto.field) = { go_name: "Port", api_field_name: "port", inline: false }];
+  string          protocol     = 3 [(dev.f110.kubeproto.field) = { go_name: "Protocol", api_field_name: "protocol", inline: false }];
+  optional string app_protocol = 4 [(dev.f110.kubeproto.field) = { go_name: "AppProtocol", api_field_name: "appProtocol", inline: false }];
+}
+
+message EndpointSubset {
+  repeated EndpointAddress addresses           = 1 [(dev.f110.kubeproto.field) = { go_name: "Addresses", api_field_name: "addresses", inline: false }];
+  repeated EndpointAddress not_ready_addresses = 2 [(dev.f110.kubeproto.field) = { go_name: "NotReadyAddresses", api_field_name: "notReadyAddresses", inline: false }];
+  repeated EndpointPort    ports               = 3 [(dev.f110.kubeproto.field) = { go_name: "Ports", api_field_name: "ports", inline: false }];
+}
+
+message Endpoints {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta   type_meta   = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  repeated EndpointSubset                         subsets     = 3 [(dev.f110.kubeproto.field) = { go_name: "Subsets", api_field_name: "subsets", inline: false }];
+}
+
+message EndpointsList {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated Endpoints                            items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+}
+
+message EnvFromSource {
+  string                      prefix         = 1 [(dev.f110.kubeproto.field) = { go_name: "Prefix", api_field_name: "prefix", inline: false }];
+  optional ConfigMapEnvSource config_map_ref = 2 [(dev.f110.kubeproto.field) = { go_name: "ConfigMapRef", api_field_name: "configMapRef", inline: false }];
+  optional SecretEnvSource    secret_ref     = 3 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
+}
+
+message EnvVar {
+  string                name       = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  string                value      = 2 [(dev.f110.kubeproto.field) = { go_name: "Value", api_field_name: "value", inline: false }];
+  optional EnvVarSource value_from = 3 [(dev.f110.kubeproto.field) = { go_name: "ValueFrom", api_field_name: "valueFrom", inline: false }];
+}
+
+message EnvVarSource {
+  optional ObjectFieldSelector   field_ref          = 1 [(dev.f110.kubeproto.field) = { go_name: "FieldRef", api_field_name: "fieldRef", inline: false }];
+  optional ResourceFieldSelector resource_field_ref = 2 [(dev.f110.kubeproto.field) = { go_name: "ResourceFieldRef", api_field_name: "resourceFieldRef", inline: false }];
+  optional ConfigMapKeySelector  config_map_key_ref = 3 [(dev.f110.kubeproto.field) = { go_name: "ConfigMapKeyRef", api_field_name: "configMapKeyRef", inline: false }];
+  optional SecretKeySelector     secret_key_ref     = 4 [(dev.f110.kubeproto.field) = { go_name: "SecretKeyRef", api_field_name: "secretKeyRef", inline: false }];
+}
+
+message EphemeralContainer {
+  EphemeralContainerCommon ephemeral_container_common = 1 [(dev.f110.kubeproto.field) = { go_name: "EphemeralContainerCommon", api_field_name: "", inline: true }];
+  string                   target_container_name      = 2 [(dev.f110.kubeproto.field) = { go_name: "TargetContainerName", api_field_name: "targetContainerName", inline: false }];
+}
+
+message EphemeralContainerCommon {
+  string                   name                       = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  string                   image                      = 2 [(dev.f110.kubeproto.field) = { go_name: "Image", api_field_name: "image", inline: false }];
+  repeated string          command                    = 3 [(dev.f110.kubeproto.field) = { go_name: "Command", api_field_name: "command", inline: false }];
+  repeated string          args                       = 4 [(dev.f110.kubeproto.field) = { go_name: "Args", api_field_name: "args", inline: false }];
+  string                   working_dir                = 5 [(dev.f110.kubeproto.field) = { go_name: "WorkingDir", api_field_name: "workingDir", inline: false }];
+  repeated ContainerPort   ports                      = 6 [(dev.f110.kubeproto.field) = { go_name: "Ports", api_field_name: "ports", inline: false }];
+  repeated EnvFromSource   env_from                   = 7 [(dev.f110.kubeproto.field) = { go_name: "EnvFrom", api_field_name: "envFrom", inline: false }];
+  repeated EnvVar          env                        = 8 [(dev.f110.kubeproto.field) = { go_name: "Env", api_field_name: "env", inline: false }];
+  ResourceRequirements     resources                  = 9 [(dev.f110.kubeproto.field) = { go_name: "Resources", api_field_name: "resources", inline: false }];
+  repeated VolumeMount     volume_mounts              = 10 [(dev.f110.kubeproto.field) = { go_name: "VolumeMounts", api_field_name: "volumeMounts", inline: false }];
+  repeated VolumeDevice    volume_devices             = 11 [(dev.f110.kubeproto.field) = { go_name: "VolumeDevices", api_field_name: "volumeDevices", inline: false }];
+  optional Probe           liveness_probe             = 12 [(dev.f110.kubeproto.field) = { go_name: "LivenessProbe", api_field_name: "livenessProbe", inline: false }];
+  optional Probe           readiness_probe            = 13 [(dev.f110.kubeproto.field) = { go_name: "ReadinessProbe", api_field_name: "readinessProbe", inline: false }];
+  optional Probe           startup_probe              = 14 [(dev.f110.kubeproto.field) = { go_name: "StartupProbe", api_field_name: "startupProbe", inline: false }];
+  optional Lifecycle       lifecycle                  = 15 [(dev.f110.kubeproto.field) = { go_name: "Lifecycle", api_field_name: "lifecycle", inline: false }];
+  string                   termination_message_path   = 16 [(dev.f110.kubeproto.field) = { go_name: "TerminationMessagePath", api_field_name: "terminationMessagePath", inline: false }];
+  string                   termination_message_policy = 17 [(dev.f110.kubeproto.field) = { go_name: "TerminationMessagePolicy", api_field_name: "terminationMessagePolicy", inline: false }];
+  string                   image_pull_policy          = 18 [(dev.f110.kubeproto.field) = { go_name: "ImagePullPolicy", api_field_name: "imagePullPolicy", inline: false }];
+  optional SecurityContext security_context           = 19 [(dev.f110.kubeproto.field) = { go_name: "SecurityContext", api_field_name: "securityContext", inline: false }];
+  bool                     stdin                      = 20 [(dev.f110.kubeproto.field) = { go_name: "Stdin", api_field_name: "stdin", inline: false }];
+  bool                     stdin_once                 = 21 [(dev.f110.kubeproto.field) = { go_name: "StdinOnce", api_field_name: "stdinOnce", inline: false }];
+  bool                     tty                        = 22 [(dev.f110.kubeproto.field) = { go_name: "TTY", api_field_name: "tty", inline: false }];
+}
+
+message EphemeralVolumeSource {
+  optional PersistentVolumeClaimTemplate volume_claim_template = 1 [(dev.f110.kubeproto.field) = { go_name: "VolumeClaimTemplate", api_field_name: "volumeClaimTemplate", inline: false }];
+}
+
+message Event {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta   type_meta            = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta          = 2 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  ObjectReference                                 involved_object      = 3 [(dev.f110.kubeproto.field) = { go_name: "InvolvedObject", api_field_name: "involvedObject", inline: false }];
+  string                                          reason               = 4 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
+  string                                          message              = 5 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
+  EventSource                                     source               = 6 [(dev.f110.kubeproto.field) = { go_name: "Source", api_field_name: "source", inline: false }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.Time       first_timestamp      = 7 [(dev.f110.kubeproto.field) = { go_name: "FirstTimestamp", api_field_name: "firstTimestamp", inline: false }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.Time       last_timestamp       = 8 [(dev.f110.kubeproto.field) = { go_name: "LastTimestamp", api_field_name: "lastTimestamp", inline: false }];
+  int32                                           count                = 9 [(dev.f110.kubeproto.field) = { go_name: "Count", api_field_name: "count", inline: false }];
+  string                                          type                 = 10 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.MicroTime  event_time           = 11 [(dev.f110.kubeproto.field) = { go_name: "EventTime", api_field_name: "eventTime", inline: false }];
+  optional EventSeries                            series               = 12 [(dev.f110.kubeproto.field) = { go_name: "Series", api_field_name: "series", inline: false }];
+  string                                          action               = 13 [(dev.f110.kubeproto.field) = { go_name: "Action", api_field_name: "action", inline: false }];
+  optional ObjectReference                        related              = 14 [(dev.f110.kubeproto.field) = { go_name: "Related", api_field_name: "related", inline: false }];
+  string                                          reporting_controller = 15 [(dev.f110.kubeproto.field) = { go_name: "ReportingController", api_field_name: "reportingComponent", inline: false }];
+  string                                          reporting_instance   = 16 [(dev.f110.kubeproto.field) = { go_name: "ReportingInstance", api_field_name: "reportingInstance", inline: false }];
+}
+
+message EventList {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated Event                                items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+}
+
+message EventSeries {
+  int32                                          count              = 1 [(dev.f110.kubeproto.field) = { go_name: "Count", api_field_name: "count", inline: false }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.MicroTime last_observed_time = 2 [(dev.f110.kubeproto.field) = { go_name: "LastObservedTime", api_field_name: "lastObservedTime", inline: false }];
+}
+
+message EventSource {
+  string component = 1 [(dev.f110.kubeproto.field) = { go_name: "Component", api_field_name: "component", inline: false }];
+  string host      = 2 [(dev.f110.kubeproto.field) = { go_name: "Host", api_field_name: "host", inline: false }];
+}
+
+message ExecAction {
+  repeated string command = 1 [(dev.f110.kubeproto.field) = { go_name: "Command", api_field_name: "command", inline: false }];
+}
+
+message FCVolumeSource {
+  repeated string target_wwns = 1 [(dev.f110.kubeproto.field) = { go_name: "TargetWWNs", api_field_name: "targetWWNs", inline: false }];
+  optional int32  lun         = 2 [(dev.f110.kubeproto.field) = { go_name: "Lun", api_field_name: "lun", inline: false }];
+  string          fs_type     = 3 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
+  bool            read_only   = 4 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+  repeated string wwids       = 5 [(dev.f110.kubeproto.field) = { go_name: "WWIDs", api_field_name: "wwids", inline: false }];
+}
+
+message FlexPersistentVolumeSource {
+  string                   driver     = 1 [(dev.f110.kubeproto.field) = { go_name: "Driver", api_field_name: "driver", inline: false }];
+  string                   fs_type    = 2 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
+  optional SecretReference secret_ref = 3 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
+  bool                     read_only  = 4 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+  map<string, string>      options    = 5 [(dev.f110.kubeproto.field) = { go_name: "Options", api_field_name: "options", inline: false }];
+}
+
+message FlexVolumeSource {
+  string                        driver     = 1 [(dev.f110.kubeproto.field) = { go_name: "Driver", api_field_name: "driver", inline: false }];
+  string                        fs_type    = 2 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
+  optional LocalObjectReference secret_ref = 3 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
+  bool                          read_only  = 4 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+  map<string, string>           options    = 5 [(dev.f110.kubeproto.field) = { go_name: "Options", api_field_name: "options", inline: false }];
+}
+
+message FlockerVolumeSource {
+  string dataset_name = 1 [(dev.f110.kubeproto.field) = { go_name: "DatasetName", api_field_name: "datasetName", inline: false }];
+  string dataset_uuid = 2 [(dev.f110.kubeproto.field) = { go_name: "DatasetUUID", api_field_name: "datasetUUID", inline: false }];
+}
+
+message GCEPersistentDiskVolumeSource {
+  string p_d_name  = 1 [(dev.f110.kubeproto.field) = { go_name: "PDName", api_field_name: "pdName", inline: false }];
+  string fs_type   = 2 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
+  int32  partition = 3 [(dev.f110.kubeproto.field) = { go_name: "Partition", api_field_name: "partition", inline: false }];
+  bool   read_only = 4 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+}
+
+message GRPCAction {
+  int32           port    = 1 [(dev.f110.kubeproto.field) = { go_name: "Port", api_field_name: "port", inline: false }];
+  optional string service = 2 [(dev.f110.kubeproto.field) = { go_name: "Service", api_field_name: "service", inline: false }];
+}
+
+message GitRepoVolumeSource {
+  string repository = 1 [(dev.f110.kubeproto.field) = { go_name: "Repository", api_field_name: "repository", inline: false }];
+  string revision   = 2 [(dev.f110.kubeproto.field) = { go_name: "Revision", api_field_name: "revision", inline: false }];
+  string directory  = 3 [(dev.f110.kubeproto.field) = { go_name: "Directory", api_field_name: "directory", inline: false }];
+}
+
+message GlusterfsPersistentVolumeSource {
+  string          endpoints_name      = 1 [(dev.f110.kubeproto.field) = { go_name: "EndpointsName", api_field_name: "endpoints", inline: false }];
+  string          path                = 2 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
+  bool            read_only           = 3 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+  optional string endpoints_namespace = 4 [(dev.f110.kubeproto.field) = { go_name: "EndpointsNamespace", api_field_name: "endpointsNamespace", inline: false }];
+}
+
+message GlusterfsVolumeSource {
+  string endpoints_name = 1 [(dev.f110.kubeproto.field) = { go_name: "EndpointsName", api_field_name: "endpoints", inline: false }];
+  string path           = 2 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
+  bool   read_only      = 3 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+}
+
+message HTTPGetAction {
+  string                                          path         = 1 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
+  k8s.io.apimachinery.pkg.util.intstr.IntOrString port         = 2 [(dev.f110.kubeproto.field) = { go_name: "Port", api_field_name: "port", inline: false }];
+  string                                          host         = 3 [(dev.f110.kubeproto.field) = { go_name: "Host", api_field_name: "host", inline: false }];
+  string                                          scheme       = 4 [(dev.f110.kubeproto.field) = { go_name: "Scheme", api_field_name: "scheme", inline: false }];
+  repeated HTTPHeader                             http_headers = 5 [(dev.f110.kubeproto.field) = { go_name: "HTTPHeaders", api_field_name: "httpHeaders", inline: false }];
+}
+
+message HTTPHeader {
+  string name  = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  string value = 2 [(dev.f110.kubeproto.field) = { go_name: "Value", api_field_name: "value", inline: false }];
+}
+
+message HostAlias {
+  string          ip        = 1 [(dev.f110.kubeproto.field) = { go_name: "IP", api_field_name: "ip", inline: false }];
+  repeated string hostnames = 2 [(dev.f110.kubeproto.field) = { go_name: "Hostnames", api_field_name: "hostnames", inline: false }];
+}
+
+message HostPathVolumeSource {
+  string          path = 1 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
+  optional string type = 2 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
+}
+
+message ISCSIPersistentVolumeSource {
+  string                   target_portal       = 1 [(dev.f110.kubeproto.field) = { go_name: "TargetPortal", api_field_name: "targetPortal", inline: false }];
+  string                   iqn                 = 2 [(dev.f110.kubeproto.field) = { go_name: "IQN", api_field_name: "iqn", inline: false }];
+  int32                    lun                 = 3 [(dev.f110.kubeproto.field) = { go_name: "Lun", api_field_name: "lun", inline: false }];
+  string                   iscsi_interface     = 4 [(dev.f110.kubeproto.field) = { go_name: "ISCSIInterface", api_field_name: "iscsiInterface", inline: false }];
+  string                   fs_type             = 5 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
+  bool                     read_only           = 6 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+  repeated string          portals             = 7 [(dev.f110.kubeproto.field) = { go_name: "Portals", api_field_name: "portals", inline: false }];
+  bool                     discovery_chap_auth = 8 [(dev.f110.kubeproto.field) = { go_name: "DiscoveryCHAPAuth", api_field_name: "chapAuthDiscovery", inline: false }];
+  bool                     session_chap_auth   = 9 [(dev.f110.kubeproto.field) = { go_name: "SessionCHAPAuth", api_field_name: "chapAuthSession", inline: false }];
+  optional SecretReference secret_ref          = 10 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
+  optional string          initiator_name      = 11 [(dev.f110.kubeproto.field) = { go_name: "InitiatorName", api_field_name: "initiatorName", inline: false }];
+}
+
+message ISCSIVolumeSource {
+  string                        target_portal       = 1 [(dev.f110.kubeproto.field) = { go_name: "TargetPortal", api_field_name: "targetPortal", inline: false }];
+  string                        iqn                 = 2 [(dev.f110.kubeproto.field) = { go_name: "IQN", api_field_name: "iqn", inline: false }];
+  int32                         lun                 = 3 [(dev.f110.kubeproto.field) = { go_name: "Lun", api_field_name: "lun", inline: false }];
+  string                        iscsi_interface     = 4 [(dev.f110.kubeproto.field) = { go_name: "ISCSIInterface", api_field_name: "iscsiInterface", inline: false }];
+  string                        fs_type             = 5 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
+  bool                          read_only           = 6 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+  repeated string               portals             = 7 [(dev.f110.kubeproto.field) = { go_name: "Portals", api_field_name: "portals", inline: false }];
+  bool                          discovery_chap_auth = 8 [(dev.f110.kubeproto.field) = { go_name: "DiscoveryCHAPAuth", api_field_name: "chapAuthDiscovery", inline: false }];
+  bool                          session_chap_auth   = 9 [(dev.f110.kubeproto.field) = { go_name: "SessionCHAPAuth", api_field_name: "chapAuthSession", inline: false }];
+  optional LocalObjectReference secret_ref          = 10 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
+  optional string               initiator_name      = 11 [(dev.f110.kubeproto.field) = { go_name: "InitiatorName", api_field_name: "initiatorName", inline: false }];
+}
+
+message KeyToPath {
+  string         key  = 1 [(dev.f110.kubeproto.field) = { go_name: "Key", api_field_name: "key", inline: false }];
+  string         path = 2 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
+  optional int32 mode = 3 [(dev.f110.kubeproto.field) = { go_name: "Mode", api_field_name: "mode", inline: false }];
+}
+
+message Lifecycle {
+  optional LifecycleHandler post_start = 1 [(dev.f110.kubeproto.field) = { go_name: "PostStart", api_field_name: "postStart", inline: false }];
+  optional LifecycleHandler pre_stop   = 2 [(dev.f110.kubeproto.field) = { go_name: "PreStop", api_field_name: "preStop", inline: false }];
+}
+
+message LifecycleHandler {
+  optional ExecAction      exec       = 1 [(dev.f110.kubeproto.field) = { go_name: "Exec", api_field_name: "exec", inline: false }];
+  optional HTTPGetAction   http_get   = 2 [(dev.f110.kubeproto.field) = { go_name: "HTTPGet", api_field_name: "httpGet", inline: false }];
+  optional TCPSocketAction tcp_socket = 3 [(dev.f110.kubeproto.field) = { go_name: "TCPSocket", api_field_name: "tcpSocket", inline: false }];
+}
+
+message LimitRange {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta   type_meta   = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  LimitRangeSpec                                  spec        = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
+}
+
+message LimitRangeItem {
+  string                                                     type                    = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
+  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> max                     = 2 [(dev.f110.kubeproto.field) = { go_name: "Max", api_field_name: "max", inline: false }];
+  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> min                     = 3 [(dev.f110.kubeproto.field) = { go_name: "Min", api_field_name: "min", inline: false }];
+  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> default                 = 4 [(dev.f110.kubeproto.field) = { go_name: "Default", api_field_name: "default", inline: false }];
+  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> default_request         = 5 [(dev.f110.kubeproto.field) = { go_name: "DefaultRequest", api_field_name: "defaultRequest", inline: false }];
+  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> max_limit_request_ratio = 6 [(dev.f110.kubeproto.field) = { go_name: "MaxLimitRequestRatio", api_field_name: "maxLimitRequestRatio", inline: false }];
+}
+
+message LimitRangeList {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated LimitRange                           items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+}
+
+message LimitRangeSpec {
+  repeated LimitRangeItem limits = 1 [(dev.f110.kubeproto.field) = { go_name: "Limits", api_field_name: "limits", inline: false }];
+}
+
+message LoadBalancerIngress {
+  string              ip       = 1 [(dev.f110.kubeproto.field) = { go_name: "IP", api_field_name: "ip", inline: false }];
+  string              hostname = 2 [(dev.f110.kubeproto.field) = { go_name: "Hostname", api_field_name: "hostname", inline: false }];
+  repeated PortStatus ports    = 3 [(dev.f110.kubeproto.field) = { go_name: "Ports", api_field_name: "ports", inline: false }];
+}
+
+message LoadBalancerStatus {
+  repeated LoadBalancerIngress ingress = 1 [(dev.f110.kubeproto.field) = { go_name: "Ingress", api_field_name: "ingress", inline: false }];
+}
+
+message LocalObjectReference {
+  string name = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+}
+
+message LocalVolumeSource {
+  string          path    = 1 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
+  optional string fs_type = 2 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
+}
+
+message NFSVolumeSource {
+  string server    = 1 [(dev.f110.kubeproto.field) = { go_name: "Server", api_field_name: "server", inline: false }];
+  string path      = 2 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
+  bool   read_only = 3 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+}
+
+message Namespace {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta   type_meta   = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  NamespaceSpec                                   spec        = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
+  NamespaceStatus                                 status      = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+}
+
+message NamespaceCondition {
+  string                                    type                 = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
+  string                                    status               = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
+  string                                    reason               = 4 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
+  string                                    message              = 5 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
+}
+
+message NamespaceList {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated Namespace                            items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+}
+
+message NamespaceSpec {
+  repeated string finalizers = 1 [(dev.f110.kubeproto.field) = { go_name: "Finalizers", api_field_name: "finalizers", inline: false }];
+}
+
+message NamespaceStatus {
+  string                      phase      = 1 [(dev.f110.kubeproto.field) = { go_name: "Phase", api_field_name: "phase", inline: false }];
+  repeated NamespaceCondition conditions = 2 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+}
+
+message Node {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta   type_meta   = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  NodeSpec                                        spec        = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
+  NodeStatus                                      status      = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+}
+
+message NodeAddress {
+  string type    = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
+  string address = 2 [(dev.f110.kubeproto.field) = { go_name: "Address", api_field_name: "address", inline: false }];
+}
+
+message NodeAffinity {
+  optional NodeSelector            required_during_scheduling_ignored_during_execution  = 1 [(dev.f110.kubeproto.field) = { go_name: "RequiredDuringSchedulingIgnoredDuringExecution", api_field_name: "requiredDuringSchedulingIgnoredDuringExecution", inline: false }];
+  repeated PreferredSchedulingTerm preferred_during_scheduling_ignored_during_execution = 2 [(dev.f110.kubeproto.field) = { go_name: "PreferredDuringSchedulingIgnoredDuringExecution", api_field_name: "preferredDuringSchedulingIgnoredDuringExecution", inline: false }];
+}
+
+message NodeCondition {
+  string                                    type                 = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
+  string                                    status               = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.Time last_heartbeat_time  = 3 [(dev.f110.kubeproto.field) = { go_name: "LastHeartbeatTime", api_field_name: "lastHeartbeatTime", inline: false }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 4 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
+  string                                    reason               = 5 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
+  string                                    message              = 6 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
+}
+
+message NodeConfigSource {
+  optional ConfigMapNodeConfigSource config_map = 1 [(dev.f110.kubeproto.field) = { go_name: "ConfigMap", api_field_name: "configMap", inline: false }];
+}
+
+message NodeConfigStatus {
+  optional NodeConfigSource assigned        = 1 [(dev.f110.kubeproto.field) = { go_name: "Assigned", api_field_name: "assigned", inline: false }];
+  optional NodeConfigSource active          = 2 [(dev.f110.kubeproto.field) = { go_name: "Active", api_field_name: "active", inline: false }];
+  optional NodeConfigSource last_known_good = 3 [(dev.f110.kubeproto.field) = { go_name: "LastKnownGood", api_field_name: "lastKnownGood", inline: false }];
+  string                    error           = 4 [(dev.f110.kubeproto.field) = { go_name: "Error", api_field_name: "error", inline: false }];
+}
+
+message NodeDaemonEndpoints {
+  DaemonEndpoint kubelet_endpoint = 1 [(dev.f110.kubeproto.field) = { go_name: "KubeletEndpoint", api_field_name: "kubeletEndpoint", inline: false }];
+}
+
+message NodeList {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated Node                                 items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+}
+
+message NodeProxyOptions {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  string                                        path      = 2 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
+}
+
+message NodeResources {
+  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> capacity = 1 [(dev.f110.kubeproto.field) = { go_name: "Capacity", api_field_name: "", inline: false }];
+}
+
+message NodeSelector {
+  repeated NodeSelectorTerm node_selector_terms = 1 [(dev.f110.kubeproto.field) = { go_name: "NodeSelectorTerms", api_field_name: "nodeSelectorTerms", inline: false }];
+}
+
+message NodeSelectorRequirement {
+  string          key = 1 [(dev.f110.kubeproto.field) = { go_name: "Key", api_field_name: "key", inline: false }];
+  string          operator = 2 [(dev.f110.kubeproto.field) = { go_name: "Operator", api_field_name: "operator", inline: false }];
+  repeated string values = 3 [(dev.f110.kubeproto.field) = { go_name: "Values", api_field_name: "values", inline: false }];
+}
+
+message NodeSelectorTerm {
+  repeated NodeSelectorRequirement match_expressions = 1 [(dev.f110.kubeproto.field) = { go_name: "MatchExpressions", api_field_name: "matchExpressions", inline: false }];
+  repeated NodeSelectorRequirement match_fields      = 2 [(dev.f110.kubeproto.field) = { go_name: "MatchFields", api_field_name: "matchFields", inline: false }];
+}
+
+message NodeSpec {
+  string                    pod_cidr               = 1 [(dev.f110.kubeproto.field) = { go_name: "PodCIDR", api_field_name: "podCIDR", inline: false }];
+  repeated string           pod_cidrs              = 2 [(dev.f110.kubeproto.field) = { go_name: "PodCIDRs", api_field_name: "podCIDRs", inline: false }];
+  string                    provider_id            = 3 [(dev.f110.kubeproto.field) = { go_name: "ProviderID", api_field_name: "providerID", inline: false }];
+  bool                      unschedulable          = 4 [(dev.f110.kubeproto.field) = { go_name: "Unschedulable", api_field_name: "unschedulable", inline: false }];
+  repeated Taint            taints                 = 5 [(dev.f110.kubeproto.field) = { go_name: "Taints", api_field_name: "taints", inline: false }];
+  optional NodeConfigSource config_source          = 6 [(dev.f110.kubeproto.field) = { go_name: "ConfigSource", api_field_name: "configSource", inline: false }];
+  string                    do_not_use_external_id = 7 [(dev.f110.kubeproto.field) = { go_name: "DoNotUseExternalID", api_field_name: "externalID", inline: false }];
+}
+
+message NodeStatus {
+  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> capacity         = 1 [(dev.f110.kubeproto.field) = { go_name: "Capacity", api_field_name: "capacity", inline: false }];
+  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> allocatable      = 2 [(dev.f110.kubeproto.field) = { go_name: "Allocatable", api_field_name: "allocatable", inline: false }];
+  string                                                     phase            = 3 [(dev.f110.kubeproto.field) = { go_name: "Phase", api_field_name: "phase", inline: false }];
+  repeated NodeCondition                                     conditions       = 4 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated NodeAddress                                       addresses        = 5 [(dev.f110.kubeproto.field) = { go_name: "Addresses", api_field_name: "addresses", inline: false }];
+  NodeDaemonEndpoints                                        daemon_endpoints = 6 [(dev.f110.kubeproto.field) = { go_name: "DaemonEndpoints", api_field_name: "daemonEndpoints", inline: false }];
+  NodeSystemInfo                                             node_info        = 7 [(dev.f110.kubeproto.field) = { go_name: "NodeInfo", api_field_name: "nodeInfo", inline: false }];
+  repeated ContainerImage                                    images           = 8 [(dev.f110.kubeproto.field) = { go_name: "Images", api_field_name: "images", inline: false }];
+  repeated string                                            volumes_in_use   = 9 [(dev.f110.kubeproto.field) = { go_name: "VolumesInUse", api_field_name: "volumesInUse", inline: false }];
+  repeated AttachedVolume                                    volumes_attached = 10 [(dev.f110.kubeproto.field) = { go_name: "VolumesAttached", api_field_name: "volumesAttached", inline: false }];
+  optional NodeConfigStatus                                  config           = 11 [(dev.f110.kubeproto.field) = { go_name: "Config", api_field_name: "config", inline: false }];
+}
+
+message NodeSystemInfo {
+  string machine_id                = 1 [(dev.f110.kubeproto.field) = { go_name: "MachineID", api_field_name: "machineID", inline: false }];
+  string system_uuid               = 2 [(dev.f110.kubeproto.field) = { go_name: "SystemUUID", api_field_name: "systemUUID", inline: false }];
+  string boot_id                   = 3 [(dev.f110.kubeproto.field) = { go_name: "BootID", api_field_name: "bootID", inline: false }];
+  string kernel_version            = 4 [(dev.f110.kubeproto.field) = { go_name: "KernelVersion", api_field_name: "kernelVersion", inline: false }];
+  string os_image                  = 5 [(dev.f110.kubeproto.field) = { go_name: "OSImage", api_field_name: "osImage", inline: false }];
+  string container_runtime_version = 6 [(dev.f110.kubeproto.field) = { go_name: "ContainerRuntimeVersion", api_field_name: "containerRuntimeVersion", inline: false }];
+  string kubelet_version           = 7 [(dev.f110.kubeproto.field) = { go_name: "KubeletVersion", api_field_name: "kubeletVersion", inline: false }];
+  string kube_proxy_version        = 8 [(dev.f110.kubeproto.field) = { go_name: "KubeProxyVersion", api_field_name: "kubeProxyVersion", inline: false }];
+  string operating_system          = 9 [(dev.f110.kubeproto.field) = { go_name: "OperatingSystem", api_field_name: "operatingSystem", inline: false }];
+  string architecture              = 10 [(dev.f110.kubeproto.field) = { go_name: "Architecture", api_field_name: "architecture", inline: false }];
+}
+
+message ObjectFieldSelector {
+  string api_version = 1 [(dev.f110.kubeproto.field) = { go_name: "APIVersion", api_field_name: "apiVersion", inline: false }];
+  string field_path  = 2 [(dev.f110.kubeproto.field) = { go_name: "FieldPath", api_field_name: "fieldPath", inline: false }];
+}
+
+message ObjectReference {
+  string kind             = 1 [(dev.f110.kubeproto.field) = { go_name: "Kind", api_field_name: "kind", inline: false }];
+  string namespace        = 2 [(dev.f110.kubeproto.field) = { go_name: "Namespace", api_field_name: "namespace", inline: false }];
+  string name             = 3 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  string uid              = 4 [(dev.f110.kubeproto.field) = { go_name: "UID", api_field_name: "uid", inline: false }];
+  string api_version      = 5 [(dev.f110.kubeproto.field) = { go_name: "APIVersion", api_field_name: "apiVersion", inline: false }];
+  string resource_version = 6 [(dev.f110.kubeproto.field) = { go_name: "ResourceVersion", api_field_name: "resourceVersion", inline: false }];
+  string field_path       = 7 [(dev.f110.kubeproto.field) = { go_name: "FieldPath", api_field_name: "fieldPath", inline: false }];
+}
+
+message PersistentVolume {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta   type_meta   = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  PersistentVolumeSpec                            spec        = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
+  PersistentVolumeStatus                          status      = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+}
+
+message PersistentVolumeClaim {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta   type_meta   = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  PersistentVolumeClaimSpec                       spec        = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
+  PersistentVolumeClaimStatus                     status      = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+}
+
+message PersistentVolumeClaimCondition {
+  string                                    type                 = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
+  string                                    status               = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.Time last_probe_time      = 3 [(dev.f110.kubeproto.field) = { go_name: "LastProbeTime", api_field_name: "lastProbeTime", inline: false }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 4 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
+  string                                    reason               = 5 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
+  string                                    message              = 6 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
+}
+
+message PersistentVolumeClaimList {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated PersistentVolumeClaim                items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+}
+
+message PersistentVolumeClaimSpec {
+  repeated string access_modes                                                   = 1 [(dev.f110.kubeproto.field) = { go_name: "AccessModes", api_field_name: "accessModes", inline: false }];
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector selector           = 2 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", inline: false }];
+  ResourceRequirements                                        resources          = 3 [(dev.f110.kubeproto.field) = { go_name: "Resources", api_field_name: "resources", inline: false }];
+  string                                                      volume_name        = 4 [(dev.f110.kubeproto.field) = { go_name: "VolumeName", api_field_name: "volumeName", inline: false }];
+  optional string                                             storage_class_name = 5 [(dev.f110.kubeproto.field) = { go_name: "StorageClassName", api_field_name: "storageClassName", inline: false }];
+  optional string                                             volume_mode        = 6 [(dev.f110.kubeproto.field) = { go_name: "VolumeMode", api_field_name: "volumeMode", inline: false }];
+  optional TypedLocalObjectReference                          data_source        = 7 [(dev.f110.kubeproto.field) = { go_name: "DataSource", api_field_name: "dataSource", inline: false }];
+  optional TypedLocalObjectReference                          data_source_ref    = 8 [(dev.f110.kubeproto.field) = { go_name: "DataSourceRef", api_field_name: "dataSourceRef", inline: false }];
+}
+
+message PersistentVolumeClaimStatus {
+  string                                                     phase               = 1 [(dev.f110.kubeproto.field) = { go_name: "Phase", api_field_name: "phase", inline: false }];
+  repeated string                                            access_modes        = 2 [(dev.f110.kubeproto.field) = { go_name: "AccessModes", api_field_name: "accessModes", inline: false }];
+  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> capacity            = 3 [(dev.f110.kubeproto.field) = { go_name: "Capacity", api_field_name: "capacity", inline: false }];
+  repeated PersistentVolumeClaimCondition                    conditions          = 4 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> allocated_resources = 5 [(dev.f110.kubeproto.field) = { go_name: "AllocatedResources", api_field_name: "allocatedResources", inline: false }];
+  optional string                                            resize_status       = 6 [(dev.f110.kubeproto.field) = { go_name: "ResizeStatus", api_field_name: "resizeStatus", inline: false }];
+}
+
+message PersistentVolumeClaimTemplate {
+  k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  PersistentVolumeClaimSpec                       spec        = 2 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
+}
+
+message PersistentVolumeClaimVolumeSource {
+  string claim_name = 1 [(dev.f110.kubeproto.field) = { go_name: "ClaimName", api_field_name: "claimName", inline: false }];
+  bool   read_only  = 2 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+}
+
+message PersistentVolumeList {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated PersistentVolume                     items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+}
+
+message PersistentVolumeSource {
+  optional GCEPersistentDiskVolumeSource    gce_persistent_disk     = 1 [(dev.f110.kubeproto.field) = { go_name: "GCEPersistentDisk", api_field_name: "gcePersistentDisk", inline: false }];
+  optional AWSElasticBlockStoreVolumeSource aws_elastic_block_store = 2 [(dev.f110.kubeproto.field) = { go_name: "AWSElasticBlockStore", api_field_name: "awsElasticBlockStore", inline: false }];
+  optional HostPathVolumeSource             host_path               = 3 [(dev.f110.kubeproto.field) = { go_name: "HostPath", api_field_name: "hostPath", inline: false }];
+  optional GlusterfsPersistentVolumeSource  glusterfs               = 4 [(dev.f110.kubeproto.field) = { go_name: "Glusterfs", api_field_name: "glusterfs", inline: false }];
+  optional NFSVolumeSource                  nfs                     = 5 [(dev.f110.kubeproto.field) = { go_name: "NFS", api_field_name: "nfs", inline: false }];
+  optional RBDPersistentVolumeSource        rbd                     = 6 [(dev.f110.kubeproto.field) = { go_name: "RBD", api_field_name: "rbd", inline: false }];
+  optional ISCSIPersistentVolumeSource      iscsi                   = 7 [(dev.f110.kubeproto.field) = { go_name: "ISCSI", api_field_name: "iscsi", inline: false }];
+  optional CinderPersistentVolumeSource     cinder                  = 8 [(dev.f110.kubeproto.field) = { go_name: "Cinder", api_field_name: "cinder", inline: false }];
+  optional CephFSPersistentVolumeSource     ceph_fs                 = 9 [(dev.f110.kubeproto.field) = { go_name: "CephFS", api_field_name: "cephfs", inline: false }];
+  optional FCVolumeSource                   fc                      = 10 [(dev.f110.kubeproto.field) = { go_name: "FC", api_field_name: "fc", inline: false }];
+  optional FlockerVolumeSource              flocker                 = 11 [(dev.f110.kubeproto.field) = { go_name: "Flocker", api_field_name: "flocker", inline: false }];
+  optional FlexPersistentVolumeSource       flex_volume             = 12 [(dev.f110.kubeproto.field) = { go_name: "FlexVolume", api_field_name: "flexVolume", inline: false }];
+  optional AzureFilePersistentVolumeSource  azure_file              = 13 [(dev.f110.kubeproto.field) = { go_name: "AzureFile", api_field_name: "azureFile", inline: false }];
+  optional VsphereVirtualDiskVolumeSource   vsphere_volume          = 14 [(dev.f110.kubeproto.field) = { go_name: "VsphereVolume", api_field_name: "vsphereVolume", inline: false }];
+  optional QuobyteVolumeSource              quobyte                 = 15 [(dev.f110.kubeproto.field) = { go_name: "Quobyte", api_field_name: "quobyte", inline: false }];
+  optional AzureDiskVolumeSource            azure_disk              = 16 [(dev.f110.kubeproto.field) = { go_name: "AzureDisk", api_field_name: "azureDisk", inline: false }];
+  optional PhotonPersistentDiskVolumeSource photon_persistent_disk  = 17 [(dev.f110.kubeproto.field) = { go_name: "PhotonPersistentDisk", api_field_name: "photonPersistentDisk", inline: false }];
+  optional PortworxVolumeSource             portworx_volume         = 18 [(dev.f110.kubeproto.field) = { go_name: "PortworxVolume", api_field_name: "portworxVolume", inline: false }];
+  optional ScaleIOPersistentVolumeSource    scale_io                = 19 [(dev.f110.kubeproto.field) = { go_name: "ScaleIO", api_field_name: "scaleIO", inline: false }];
+  optional LocalVolumeSource                local                   = 20 [(dev.f110.kubeproto.field) = { go_name: "Local", api_field_name: "local", inline: false }];
+  optional StorageOSPersistentVolumeSource  storage_os              = 21 [(dev.f110.kubeproto.field) = { go_name: "StorageOS", api_field_name: "storageos", inline: false }];
+  optional CSIPersistentVolumeSource        csi                     = 22 [(dev.f110.kubeproto.field) = { go_name: "CSI", api_field_name: "csi", inline: false }];
+}
+
+message PersistentVolumeSpec {
+  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> capacity                         = 1 [(dev.f110.kubeproto.field) = { go_name: "Capacity", api_field_name: "capacity", inline: false }];
+  PersistentVolumeSource                                     persistent_volume_source         = 2 [(dev.f110.kubeproto.field) = { go_name: "PersistentVolumeSource", api_field_name: "", inline: true }];
+  repeated string                                            access_modes                     = 3 [(dev.f110.kubeproto.field) = { go_name: "AccessModes", api_field_name: "accessModes", inline: false }];
+  optional ObjectReference                                   claim_ref                        = 4 [(dev.f110.kubeproto.field) = { go_name: "ClaimRef", api_field_name: "claimRef", inline: false }];
+  string                                                     persistent_volume_reclaim_policy = 5 [(dev.f110.kubeproto.field) = { go_name: "PersistentVolumeReclaimPolicy", api_field_name: "persistentVolumeReclaimPolicy", inline: false }];
+  string                                                     storage_class_name               = 6 [(dev.f110.kubeproto.field) = { go_name: "StorageClassName", api_field_name: "storageClassName", inline: false }];
+  repeated string                                            mount_options                    = 7 [(dev.f110.kubeproto.field) = { go_name: "MountOptions", api_field_name: "mountOptions", inline: false }];
+  optional string                                            volume_mode                      = 8 [(dev.f110.kubeproto.field) = { go_name: "VolumeMode", api_field_name: "volumeMode", inline: false }];
+  optional VolumeNodeAffinity                                node_affinity                    = 9 [(dev.f110.kubeproto.field) = { go_name: "NodeAffinity", api_field_name: "nodeAffinity", inline: false }];
+}
+
+message PersistentVolumeStatus {
+  string phase   = 1 [(dev.f110.kubeproto.field) = { go_name: "Phase", api_field_name: "phase", inline: false }];
+  string message = 2 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
+  string reason  = 3 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
+}
+
+message PhotonPersistentDiskVolumeSource {
+  string pd_id   = 1 [(dev.f110.kubeproto.field) = { go_name: "PdID", api_field_name: "pdID", inline: false }];
+  string fs_type = 2 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
+}
+
+message Pod {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta   type_meta   = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  PodSpec                                         spec        = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
+  PodStatus                                       status      = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+}
+
+message PodAffinity {
+  repeated PodAffinityTerm         required_during_scheduling_ignored_during_execution  = 1 [(dev.f110.kubeproto.field) = { go_name: "RequiredDuringSchedulingIgnoredDuringExecution", api_field_name: "requiredDuringSchedulingIgnoredDuringExecution", inline: false }];
+  repeated WeightedPodAffinityTerm preferred_during_scheduling_ignored_during_execution = 2 [(dev.f110.kubeproto.field) = { go_name: "PreferredDuringSchedulingIgnoredDuringExecution", api_field_name: "preferredDuringSchedulingIgnoredDuringExecution", inline: false }];
+}
+
+message PodAffinityTerm {
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector label_selector     = 1 [(dev.f110.kubeproto.field) = { go_name: "LabelSelector", api_field_name: "labelSelector", inline: false }];
+  repeated string                                             namespaces         = 2 [(dev.f110.kubeproto.field) = { go_name: "Namespaces", api_field_name: "namespaces", inline: false }];
+  string                                                      topology_key       = 3 [(dev.f110.kubeproto.field) = { go_name: "TopologyKey", api_field_name: "topologyKey", inline: false }];
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector namespace_selector = 4 [(dev.f110.kubeproto.field) = { go_name: "NamespaceSelector", api_field_name: "namespaceSelector", inline: false }];
+}
+
+message PodAntiAffinity {
+  repeated PodAffinityTerm         required_during_scheduling_ignored_during_execution  = 1 [(dev.f110.kubeproto.field) = { go_name: "RequiredDuringSchedulingIgnoredDuringExecution", api_field_name: "requiredDuringSchedulingIgnoredDuringExecution", inline: false }];
+  repeated WeightedPodAffinityTerm preferred_during_scheduling_ignored_during_execution = 2 [(dev.f110.kubeproto.field) = { go_name: "PreferredDuringSchedulingIgnoredDuringExecution", api_field_name: "preferredDuringSchedulingIgnoredDuringExecution", inline: false }];
+}
+
+message PodAttachOptions {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  bool                                          stdin     = 2 [(dev.f110.kubeproto.field) = { go_name: "Stdin", api_field_name: "stdin", inline: false }];
+  bool                                          stdout    = 3 [(dev.f110.kubeproto.field) = { go_name: "Stdout", api_field_name: "stdout", inline: false }];
+  bool                                          stderr    = 4 [(dev.f110.kubeproto.field) = { go_name: "Stderr", api_field_name: "stderr", inline: false }];
+  bool                                          tty       = 5 [(dev.f110.kubeproto.field) = { go_name: "TTY", api_field_name: "tty", inline: false }];
+  string                                        container = 6 [(dev.f110.kubeproto.field) = { go_name: "Container", api_field_name: "container", inline: false }];
+}
+
+message PodCondition {
+  string                                    type                 = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
+  string                                    status               = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.Time last_probe_time      = 3 [(dev.f110.kubeproto.field) = { go_name: "LastProbeTime", api_field_name: "lastProbeTime", inline: false }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 4 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
+  string                                    reason               = 5 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
+  string                                    message              = 6 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
+}
+
+message PodDNSConfig {
+  repeated string             nameservers = 1 [(dev.f110.kubeproto.field) = { go_name: "Nameservers", api_field_name: "nameservers", inline: false }];
+  repeated string             searches    = 2 [(dev.f110.kubeproto.field) = { go_name: "Searches", api_field_name: "searches", inline: false }];
+  repeated PodDNSConfigOption options     = 3 [(dev.f110.kubeproto.field) = { go_name: "Options", api_field_name: "options", inline: false }];
+}
+
+message PodDNSConfigOption {
+  string          name  = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  optional string value = 2 [(dev.f110.kubeproto.field) = { go_name: "Value", api_field_name: "value", inline: false }];
+}
+
+message PodExecOptions {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  bool                                          stdin     = 2 [(dev.f110.kubeproto.field) = { go_name: "Stdin", api_field_name: "stdin", inline: false }];
+  bool                                          stdout    = 3 [(dev.f110.kubeproto.field) = { go_name: "Stdout", api_field_name: "stdout", inline: false }];
+  bool                                          stderr    = 4 [(dev.f110.kubeproto.field) = { go_name: "Stderr", api_field_name: "stderr", inline: false }];
+  bool                                          tty       = 5 [(dev.f110.kubeproto.field) = { go_name: "TTY", api_field_name: "tty", inline: false }];
+  string                                        container = 6 [(dev.f110.kubeproto.field) = { go_name: "Container", api_field_name: "container", inline: false }];
+  repeated string                               command   = 7 [(dev.f110.kubeproto.field) = { go_name: "Command", api_field_name: "command", inline: false }];
+}
+
+message PodIP {
+  string ip = 1 [(dev.f110.kubeproto.field) = { go_name: "IP", api_field_name: "ip", inline: false }];
+}
+
+message PodList {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated Pod                                  items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+}
+
+message PodLogOptions {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta                             = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  string                                        container                             = 2 [(dev.f110.kubeproto.field) = { go_name: "Container", api_field_name: "container", inline: false }];
+  bool                                          follow                                = 3 [(dev.f110.kubeproto.field) = { go_name: "Follow", api_field_name: "follow", inline: false }];
+  bool                                          previous                              = 4 [(dev.f110.kubeproto.field) = { go_name: "Previous", api_field_name: "previous", inline: false }];
+  optional int64                                since_seconds                         = 5 [(dev.f110.kubeproto.field) = { go_name: "SinceSeconds", api_field_name: "sinceSeconds", inline: false }];
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time since_time                       = 6 [(dev.f110.kubeproto.field) = { go_name: "SinceTime", api_field_name: "sinceTime", inline: false }];
+  bool                                               timestamps                       = 7 [(dev.f110.kubeproto.field) = { go_name: "Timestamps", api_field_name: "timestamps", inline: false }];
+  optional int64                                     tail_lines                       = 8 [(dev.f110.kubeproto.field) = { go_name: "TailLines", api_field_name: "tailLines", inline: false }];
+  optional int64                                     limit_bytes                      = 9 [(dev.f110.kubeproto.field) = { go_name: "LimitBytes", api_field_name: "limitBytes", inline: false }];
+  bool                                               insecure_skip_tls_verify_backend = 10 [(dev.f110.kubeproto.field) = { go_name: "InsecureSkipTLSVerifyBackend", api_field_name: "insecureSkipTLSVerifyBackend", inline: false }];
+}
+
+message PodOS {
+  string name = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+}
+
+message PodPortForwardOptions {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  repeated int32                                ports     = 2 [(dev.f110.kubeproto.field) = { go_name: "Ports", api_field_name: "ports", inline: false }];
+}
+
+message PodProxyOptions {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  string                                        path      = 2 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
+}
+
+message PodReadinessGate {
+  string condition_type = 1 [(dev.f110.kubeproto.field) = { go_name: "ConditionType", api_field_name: "conditionType", inline: false }];
+}
+
+message PodSecurityContext {
+  optional SELinuxOptions                selinux_options        = 1 [(dev.f110.kubeproto.field) = { go_name: "SELinuxOptions", api_field_name: "seLinuxOptions", inline: false }];
+  optional WindowsSecurityContextOptions windows_options        = 2 [(dev.f110.kubeproto.field) = { go_name: "WindowsOptions", api_field_name: "windowsOptions", inline: false }];
+  optional int64                         run_as_user            = 3 [(dev.f110.kubeproto.field) = { go_name: "RunAsUser", api_field_name: "runAsUser", inline: false }];
+  optional int64                         run_as_group           = 4 [(dev.f110.kubeproto.field) = { go_name: "RunAsGroup", api_field_name: "runAsGroup", inline: false }];
+  optional bool                          run_as_non_root        = 5 [(dev.f110.kubeproto.field) = { go_name: "RunAsNonRoot", api_field_name: "runAsNonRoot", inline: false }];
+  repeated int64                         supplemental_groups    = 6 [(dev.f110.kubeproto.field) = { go_name: "SupplementalGroups", api_field_name: "supplementalGroups", inline: false }];
+  optional int64                         fs_group               = 7 [(dev.f110.kubeproto.field) = { go_name: "FSGroup", api_field_name: "fsGroup", inline: false }];
+  repeated Sysctl                        sysctls                = 8 [(dev.f110.kubeproto.field) = { go_name: "Sysctls", api_field_name: "sysctls", inline: false }];
+  optional string                        fs_group_change_policy = 9 [(dev.f110.kubeproto.field) = { go_name: "FSGroupChangePolicy", api_field_name: "fsGroupChangePolicy", inline: false }];
+  optional SeccompProfile                seccomp_profile        = 10 [(dev.f110.kubeproto.field) = { go_name: "SeccompProfile", api_field_name: "seccompProfile", inline: false }];
+}
+
+message PodSignature {
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.OwnerReference pod_controller = 1 [(dev.f110.kubeproto.field) = { go_name: "PodController", api_field_name: "podController", inline: false }];
+}
+
+message PodSpec {
+  repeated Volume                                            volumes                          = 1 [(dev.f110.kubeproto.field) = { go_name: "Volumes", api_field_name: "volumes", inline: false }];
+  repeated Container                                         init_containers                  = 2 [(dev.f110.kubeproto.field) = { go_name: "InitContainers", api_field_name: "initContainers", inline: false }];
+  repeated Container                                         containers                       = 3 [(dev.f110.kubeproto.field) = { go_name: "Containers", api_field_name: "containers", inline: false }];
+  repeated EphemeralContainer                                ephemeral_containers             = 4 [(dev.f110.kubeproto.field) = { go_name: "EphemeralContainers", api_field_name: "ephemeralContainers", inline: false }];
+  string                                                     restart_policy                   = 5 [(dev.f110.kubeproto.field) = { go_name: "RestartPolicy", api_field_name: "restartPolicy", inline: false }];
+  optional int64                                             termination_grace_period_seconds = 6 [(dev.f110.kubeproto.field) = { go_name: "TerminationGracePeriodSeconds", api_field_name: "terminationGracePeriodSeconds", inline: false }];
+  optional int64                                             active_deadline_seconds          = 7 [(dev.f110.kubeproto.field) = { go_name: "ActiveDeadlineSeconds", api_field_name: "activeDeadlineSeconds", inline: false }];
+  string                                                     dns_policy                       = 8 [(dev.f110.kubeproto.field) = { go_name: "DNSPolicy", api_field_name: "dnsPolicy", inline: false }];
+  map<string, string>                                        node_selector                    = 9 [(dev.f110.kubeproto.field) = { go_name: "NodeSelector", api_field_name: "nodeSelector", inline: false }];
+  string                                                     service_account_name             = 10 [(dev.f110.kubeproto.field) = { go_name: "ServiceAccountName", api_field_name: "serviceAccountName", inline: false }];
+  string                                                     deprecated_service_account       = 11 [(dev.f110.kubeproto.field) = { go_name: "DeprecatedServiceAccount", api_field_name: "serviceAccount", inline: false }];
+  optional bool                                              automount_service_account_token  = 12 [(dev.f110.kubeproto.field) = { go_name: "AutomountServiceAccountToken", api_field_name: "automountServiceAccountToken", inline: false }];
+  string                                                     node_name                        = 13 [(dev.f110.kubeproto.field) = { go_name: "NodeName", api_field_name: "nodeName", inline: false }];
+  bool                                                       host_network                     = 14 [(dev.f110.kubeproto.field) = { go_name: "HostNetwork", api_field_name: "hostNetwork", inline: false }];
+  bool                                                       host_pid                         = 15 [(dev.f110.kubeproto.field) = { go_name: "HostPID", api_field_name: "hostPID", inline: false }];
+  bool                                                       host_ipc                         = 16 [(dev.f110.kubeproto.field) = { go_name: "HostIPC", api_field_name: "hostIPC", inline: false }];
+  optional bool                                              share_process_namespace          = 17 [(dev.f110.kubeproto.field) = { go_name: "ShareProcessNamespace", api_field_name: "shareProcessNamespace", inline: false }];
+  optional PodSecurityContext                                security_context                 = 18 [(dev.f110.kubeproto.field) = { go_name: "SecurityContext", api_field_name: "securityContext", inline: false }];
+  repeated LocalObjectReference                              image_pull_secrets               = 19 [(dev.f110.kubeproto.field) = { go_name: "ImagePullSecrets", api_field_name: "imagePullSecrets", inline: false }];
+  string                                                     hostname                         = 20 [(dev.f110.kubeproto.field) = { go_name: "Hostname", api_field_name: "hostname", inline: false }];
+  string                                                     subdomain                        = 21 [(dev.f110.kubeproto.field) = { go_name: "Subdomain", api_field_name: "subdomain", inline: false }];
+  optional Affinity                                          affinity                         = 22 [(dev.f110.kubeproto.field) = { go_name: "Affinity", api_field_name: "affinity", inline: false }];
+  string                                                     scheduler_name                   = 23 [(dev.f110.kubeproto.field) = { go_name: "SchedulerName", api_field_name: "schedulerName", inline: false }];
+  repeated Toleration                                        tolerations                      = 24 [(dev.f110.kubeproto.field) = { go_name: "Tolerations", api_field_name: "tolerations", inline: false }];
+  repeated HostAlias                                         host_aliases                     = 25 [(dev.f110.kubeproto.field) = { go_name: "HostAliases", api_field_name: "hostAliases", inline: false }];
+  string                                                     priority_class_name              = 26 [(dev.f110.kubeproto.field) = { go_name: "PriorityClassName", api_field_name: "priorityClassName", inline: false }];
+  optional int32                                             priority                         = 27 [(dev.f110.kubeproto.field) = { go_name: "Priority", api_field_name: "priority", inline: false }];
+  optional PodDNSConfig                                      dns_config                       = 28 [(dev.f110.kubeproto.field) = { go_name: "DNSConfig", api_field_name: "dnsConfig", inline: false }];
+  repeated PodReadinessGate                                  readiness_gates                  = 29 [(dev.f110.kubeproto.field) = { go_name: "ReadinessGates", api_field_name: "readinessGates", inline: false }];
+  optional string                                            runtime_class_name               = 30 [(dev.f110.kubeproto.field) = { go_name: "RuntimeClassName", api_field_name: "runtimeClassName", inline: false }];
+  optional bool                                              enable_service_links             = 31 [(dev.f110.kubeproto.field) = { go_name: "EnableServiceLinks", api_field_name: "enableServiceLinks", inline: false }];
+  optional string                                            preemption_policy                = 32 [(dev.f110.kubeproto.field) = { go_name: "PreemptionPolicy", api_field_name: "preemptionPolicy", inline: false }];
+  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> overhead                         = 33 [(dev.f110.kubeproto.field) = { go_name: "Overhead", api_field_name: "overhead", inline: false }];
+  repeated TopologySpreadConstraint                          topology_spread_constraints      = 34 [(dev.f110.kubeproto.field) = { go_name: "TopologySpreadConstraints", api_field_name: "topologySpreadConstraints", inline: false }];
+  optional bool                                              set_hostname_as_fqdn             = 35 [(dev.f110.kubeproto.field) = { go_name: "SetHostnameAsFQDN", api_field_name: "setHostnameAsFQDN", inline: false }];
+  optional PodOS                                             os                               = 36 [(dev.f110.kubeproto.field) = { go_name: "OS", api_field_name: "os", inline: false }];
+}
+
+message PodStatus {
+  string                phase                                                     = 1 [(dev.f110.kubeproto.field) = { go_name: "Phase", api_field_name: "phase", inline: false }];
+  repeated PodCondition conditions                                                = 2 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  string                message                                                   = 3 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
+  string                reason                                                    = 4 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
+  string                nominated_node_name                                       = 5 [(dev.f110.kubeproto.field) = { go_name: "NominatedNodeName", api_field_name: "nominatedNodeName", inline: false }];
+  string                host_ip                                                   = 6 [(dev.f110.kubeproto.field) = { go_name: "HostIP", api_field_name: "hostIP", inline: false }];
+  string                pod_ip                                                    = 7 [(dev.f110.kubeproto.field) = { go_name: "PodIP", api_field_name: "podIP", inline: false }];
+  repeated PodIP        pod_ips                                                   = 8 [(dev.f110.kubeproto.field) = { go_name: "PodIPs", api_field_name: "podIPs", inline: false }];
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time start_time                   = 9 [(dev.f110.kubeproto.field) = { go_name: "StartTime", api_field_name: "startTime", inline: false }];
+  repeated ContainerStatus                           init_container_statuses      = 10 [(dev.f110.kubeproto.field) = { go_name: "InitContainerStatuses", api_field_name: "initContainerStatuses", inline: false }];
+  repeated ContainerStatus                           container_statuses           = 11 [(dev.f110.kubeproto.field) = { go_name: "ContainerStatuses", api_field_name: "containerStatuses", inline: false }];
+  string                                             qos_class                    = 12 [(dev.f110.kubeproto.field) = { go_name: "QOSClass", api_field_name: "qosClass", inline: false }];
+  repeated ContainerStatus                           ephemeral_container_statuses = 13 [(dev.f110.kubeproto.field) = { go_name: "EphemeralContainerStatuses", api_field_name: "ephemeralContainerStatuses", inline: false }];
+}
+
+message PodStatusResult {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta   type_meta   = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  PodStatus                                       status      = 3 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+}
+
+message PodTemplate {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta   type_meta   = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  PodTemplateSpec template                                    = 3 [(dev.f110.kubeproto.field) = { go_name: "Template", api_field_name: "template", inline: false }];
+}
+
+message PodTemplateList {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated PodTemplate                          items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+}
+
+message PodTemplateSpec {
+  k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  PodSpec                                         spec        = 2 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
+}
+
+message PortStatus {
+  int32           port     = 1 [(dev.f110.kubeproto.field) = { go_name: "Port", api_field_name: "port", inline: false }];
+  string          protocol = 2 [(dev.f110.kubeproto.field) = { go_name: "Protocol", api_field_name: "protocol", inline: false }];
+  optional string error    = 3 [(dev.f110.kubeproto.field) = { go_name: "Error", api_field_name: "error", inline: false }];
+}
+
+message PortworxVolumeSource {
+  string volume_id = 1 [(dev.f110.kubeproto.field) = { go_name: "VolumeID", api_field_name: "volumeID", inline: false }];
+  string fs_type   = 2 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
+  bool   read_only = 3 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+}
+
+message Preconditions {
+  optional string uid = 1 [(dev.f110.kubeproto.field) = { go_name: "UID", api_field_name: "uid", inline: false }];
+}
+
+message PreferAvoidPodsEntry {
+  PodSignature                              pod_signature = 1 [(dev.f110.kubeproto.field) = { go_name: "PodSignature", api_field_name: "podSignature", inline: false }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.Time eviction_time = 2 [(dev.f110.kubeproto.field) = { go_name: "EvictionTime", api_field_name: "evictionTime", inline: false }];
+  string                                    reason        = 3 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
+  string                                    message       = 4 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
+}
+
+message PreferredSchedulingTerm {
+  int32            weight     = 1 [(dev.f110.kubeproto.field) = { go_name: "Weight", api_field_name: "weight", inline: false }];
+  NodeSelectorTerm preference = 2 [(dev.f110.kubeproto.field) = { go_name: "Preference", api_field_name: "preference", inline: false }];
+}
+
+message Probe {
+  ProbeHandler   probe_handler                    = 1 [(dev.f110.kubeproto.field) = { go_name: "ProbeHandler", api_field_name: "", inline: true }];
+  int32          initial_delay_seconds            = 2 [(dev.f110.kubeproto.field) = { go_name: "InitialDelaySeconds", api_field_name: "initialDelaySeconds", inline: false }];
+  int32          timeout_seconds                  = 3 [(dev.f110.kubeproto.field) = { go_name: "TimeoutSeconds", api_field_name: "timeoutSeconds", inline: false }];
+  int32          period_seconds                   = 4 [(dev.f110.kubeproto.field) = { go_name: "PeriodSeconds", api_field_name: "periodSeconds", inline: false }];
+  int32          success_threshold                = 5 [(dev.f110.kubeproto.field) = { go_name: "SuccessThreshold", api_field_name: "successThreshold", inline: false }];
+  int32          failure_threshold                = 6 [(dev.f110.kubeproto.field) = { go_name: "FailureThreshold", api_field_name: "failureThreshold", inline: false }];
+  optional int64 termination_grace_period_seconds = 7 [(dev.f110.kubeproto.field) = { go_name: "TerminationGracePeriodSeconds", api_field_name: "terminationGracePeriodSeconds", inline: false }];
+}
+
+message ProbeHandler {
+  optional ExecAction      exec       = 1 [(dev.f110.kubeproto.field) = { go_name: "Exec", api_field_name: "exec", inline: false }];
+  optional HTTPGetAction   http_get   = 2 [(dev.f110.kubeproto.field) = { go_name: "HTTPGet", api_field_name: "httpGet", inline: false }];
+  optional TCPSocketAction tcp_socket = 3 [(dev.f110.kubeproto.field) = { go_name: "TCPSocket", api_field_name: "tcpSocket", inline: false }];
+  optional GRPCAction      grpc       = 4 [(dev.f110.kubeproto.field) = { go_name: "GRPC", api_field_name: "grpc", inline: false }];
+}
+
+message ProjectedVolumeSource {
+  repeated VolumeProjection sources      = 1 [(dev.f110.kubeproto.field) = { go_name: "Sources", api_field_name: "sources", inline: false }];
+  optional int32            default_mode = 2 [(dev.f110.kubeproto.field) = { go_name: "DefaultMode", api_field_name: "defaultMode", inline: false }];
+}
+
+message QuobyteVolumeSource {
+  string registry  = 1 [(dev.f110.kubeproto.field) = { go_name: "Registry", api_field_name: "registry", inline: false }];
+  string volume    = 2 [(dev.f110.kubeproto.field) = { go_name: "Volume", api_field_name: "volume", inline: false }];
+  bool   read_only = 3 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+  string user      = 4 [(dev.f110.kubeproto.field) = { go_name: "User", api_field_name: "user", inline: false }];
+  string group     = 5 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
+  string tenant    = 6 [(dev.f110.kubeproto.field) = { go_name: "Tenant", api_field_name: "tenant", inline: false }];
+}
+
+message RBDPersistentVolumeSource {
+  repeated string          ceph_monitors = 1 [(dev.f110.kubeproto.field) = { go_name: "CephMonitors", api_field_name: "monitors", inline: false }];
+  string                   rbd_image     = 2 [(dev.f110.kubeproto.field) = { go_name: "RBDImage", api_field_name: "image", inline: false }];
+  string                   fs_type       = 3 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
+  string                   rbd_pool      = 4 [(dev.f110.kubeproto.field) = { go_name: "RBDPool", api_field_name: "pool", inline: false }];
+  string                   rados_user    = 5 [(dev.f110.kubeproto.field) = { go_name: "RadosUser", api_field_name: "user", inline: false }];
+  string                   keyring       = 6 [(dev.f110.kubeproto.field) = { go_name: "Keyring", api_field_name: "keyring", inline: false }];
+  optional SecretReference secret_ref    = 7 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
+  bool                     read_only     = 8 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+}
+
+message RBDVolumeSource {
+  repeated string               ceph_monitors = 1 [(dev.f110.kubeproto.field) = { go_name: "CephMonitors", api_field_name: "monitors", inline: false }];
+  string                        rbd_image     = 2 [(dev.f110.kubeproto.field) = { go_name: "RBDImage", api_field_name: "image", inline: false }];
+  string                        fs_type       = 3 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
+  string                        rbd_pool      = 4 [(dev.f110.kubeproto.field) = { go_name: "RBDPool", api_field_name: "pool", inline: false }];
+  string                        rados_user    = 5 [(dev.f110.kubeproto.field) = { go_name: "RadosUser", api_field_name: "user", inline: false }];
+  string                        keyring       = 6 [(dev.f110.kubeproto.field) = { go_name: "Keyring", api_field_name: "keyring", inline: false }];
+  optional LocalObjectReference secret_ref    = 7 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
+  bool                          read_only     = 8 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+}
+
+message RangeAllocation {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta   type_meta   = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  string                                          range       = 3 [(dev.f110.kubeproto.field) = { go_name: "Range", api_field_name: "range", inline: false }];
+  optional bytes                                  data        = 4 [(dev.f110.kubeproto.field) = { go_name: "Data", api_field_name: "data", inline: false }];
+}
+
+message ReplicationController {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta   type_meta   = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  ReplicationControllerSpec                       spec        = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
+  ReplicationControllerStatus                     status      = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+}
+
+message ReplicationControllerCondition {
+  string                                    type                 = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
+  string                                    status               = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
+  string                                    reason               = 4 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
+  string                                    message              = 5 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
+}
+
+message ReplicationControllerList {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated ReplicationController                items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+}
+
+message ReplicationControllerSpec {
+  optional int32      replicas                 = 1 [(dev.f110.kubeproto.field) = { go_name: "Replicas", api_field_name: "replicas", inline: false }];
+  int32               min_ready_seconds        = 2 [(dev.f110.kubeproto.field) = { go_name: "MinReadySeconds", api_field_name: "minReadySeconds", inline: false }];
+  map<string, string> selector                 = 3 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", inline: false }];
+  optional            PodTemplateSpec template = 4 [(dev.f110.kubeproto.field) = { go_name: "Template", api_field_name: "template", inline: false }];
+}
+
+message ReplicationControllerStatus {
+  int32                                   replicas               = 1 [(dev.f110.kubeproto.field) = { go_name: "Replicas", api_field_name: "replicas", inline: false }];
+  int32                                   fully_labeled_replicas = 2 [(dev.f110.kubeproto.field) = { go_name: "FullyLabeledReplicas", api_field_name: "fullyLabeledReplicas", inline: false }];
+  int32                                   ready_replicas         = 3 [(dev.f110.kubeproto.field) = { go_name: "ReadyReplicas", api_field_name: "readyReplicas", inline: false }];
+  int32                                   available_replicas     = 4 [(dev.f110.kubeproto.field) = { go_name: "AvailableReplicas", api_field_name: "availableReplicas", inline: false }];
+  int64                                   observed_generation    = 5 [(dev.f110.kubeproto.field) = { go_name: "ObservedGeneration", api_field_name: "observedGeneration", inline: false }];
+  repeated ReplicationControllerCondition conditions             = 6 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+}
+
+message ResourceFieldSelector {
+  string                                        container_name = 1 [(dev.f110.kubeproto.field) = { go_name: "ContainerName", api_field_name: "containerName", inline: false }];
+  string                                        resource       = 2 [(dev.f110.kubeproto.field) = { go_name: "Resource", api_field_name: "resource", inline: false }];
+  k8s.io.apimachinery.pkg.api.resource.Quantity divisor        = 3 [(dev.f110.kubeproto.field) = { go_name: "Divisor", api_field_name: "divisor", inline: false }];
+}
+
+message ResourceQuota {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta   type_meta   = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  ResourceQuotaSpec                               spec        = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
+  ResourceQuotaStatus                             status      = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+}
+
+message ResourceQuotaList {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated ResourceQuota                        items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+}
+
+message ResourceQuotaSpec {
+  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> hard           = 1 [(dev.f110.kubeproto.field) = { go_name: "Hard", api_field_name: "hard", inline: false }];
+  repeated string                                            scopes         = 2 [(dev.f110.kubeproto.field) = { go_name: "Scopes", api_field_name: "scopes", inline: false }];
+  optional ScopeSelector                                     scope_selector = 3 [(dev.f110.kubeproto.field) = { go_name: "ScopeSelector", api_field_name: "scopeSelector", inline: false }];
+}
+
+message ResourceQuotaStatus {
+  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> hard = 1 [(dev.f110.kubeproto.field) = { go_name: "Hard", api_field_name: "hard", inline: false }];
+  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> used = 2 [(dev.f110.kubeproto.field) = { go_name: "Used", api_field_name: "used", inline: false }];
+}
+
+message ResourceRequirements {
+  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> limits   = 1 [(dev.f110.kubeproto.field) = { go_name: "Limits", api_field_name: "limits", inline: false }];
+  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> requests = 2 [(dev.f110.kubeproto.field) = { go_name: "Requests", api_field_name: "requests", inline: false }];
+}
+
+message SELinuxOptions {
+  string user  = 1 [(dev.f110.kubeproto.field) = { go_name: "User", api_field_name: "user", inline: false }];
+  string role  = 2 [(dev.f110.kubeproto.field) = { go_name: "Role", api_field_name: "role", inline: false }];
+  string type  = 3 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
+  string level = 4 [(dev.f110.kubeproto.field) = { go_name: "Level", api_field_name: "level", inline: false }];
+}
+
+message ScaleIOPersistentVolumeSource {
+  string                   gateway           = 1 [(dev.f110.kubeproto.field) = { go_name: "Gateway", api_field_name: "gateway", inline: false }];
+  string                   system            = 2 [(dev.f110.kubeproto.field) = { go_name: "System", api_field_name: "system", inline: false }];
+  optional SecretReference secret_ref        = 3 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
+  bool                     ssl_enabled       = 4 [(dev.f110.kubeproto.field) = { go_name: "SSLEnabled", api_field_name: "sslEnabled", inline: false }];
+  string                   protection_domain = 5 [(dev.f110.kubeproto.field) = { go_name: "ProtectionDomain", api_field_name: "protectionDomain", inline: false }];
+  string                   storage_pool      = 6 [(dev.f110.kubeproto.field) = { go_name: "StoragePool", api_field_name: "storagePool", inline: false }];
+  string                   storage_mode      = 7 [(dev.f110.kubeproto.field) = { go_name: "StorageMode", api_field_name: "storageMode", inline: false }];
+  string                   volume_name       = 8 [(dev.f110.kubeproto.field) = { go_name: "VolumeName", api_field_name: "volumeName", inline: false }];
+  string                   fs_type           = 9 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
+  bool                     read_only         = 10 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+}
+
+message ScaleIOVolumeSource {
+  string                        gateway           = 1 [(dev.f110.kubeproto.field) = { go_name: "Gateway", api_field_name: "gateway", inline: false }];
+  string                        system            = 2 [(dev.f110.kubeproto.field) = { go_name: "System", api_field_name: "system", inline: false }];
+  optional LocalObjectReference secret_ref        = 3 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
+  bool                          ssl_enabled       = 4 [(dev.f110.kubeproto.field) = { go_name: "SSLEnabled", api_field_name: "sslEnabled", inline: false }];
+  string                        protection_domain = 5 [(dev.f110.kubeproto.field) = { go_name: "ProtectionDomain", api_field_name: "protectionDomain", inline: false }];
+  string                        storage_pool      = 6 [(dev.f110.kubeproto.field) = { go_name: "StoragePool", api_field_name: "storagePool", inline: false }];
+  string                        storage_mode      = 7 [(dev.f110.kubeproto.field) = { go_name: "StorageMode", api_field_name: "storageMode", inline: false }];
+  string                        volume_name       = 8 [(dev.f110.kubeproto.field) = { go_name: "VolumeName", api_field_name: "volumeName", inline: false }];
+  string                        fs_type           = 9 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
+  bool                          read_only         = 10 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+}
+
+message ScopeSelector {
+  repeated ScopedResourceSelectorRequirement match_expressions = 1 [(dev.f110.kubeproto.field) = { go_name: "MatchExpressions", api_field_name: "matchExpressions", inline: false }];
+}
+
+message ScopedResourceSelectorRequirement {
+  string          scope_name = 1 [(dev.f110.kubeproto.field) = { go_name: "ScopeName", api_field_name: "scopeName", inline: false }];
+  string          operator = 2 [(dev.f110.kubeproto.field) = { go_name: "Operator", api_field_name: "operator", inline: false }];
+  repeated string values = 3 [(dev.f110.kubeproto.field) = { go_name: "Values", api_field_name: "values", inline: false }];
+}
+
+message SeccompProfile {
+  string          type              = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
+  optional string localhost_profile = 2 [(dev.f110.kubeproto.field) = { go_name: "LocalhostProfile", api_field_name: "localhostProfile", inline: false }];
+}
+
+message Secret {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta   type_meta   = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  optional bool                                   immutable   = 3 [(dev.f110.kubeproto.field) = { go_name: "Immutable", api_field_name: "immutable", inline: false }];
+  map<string, bytes>                              data        = 4 [(dev.f110.kubeproto.field) = { go_name: "Data", api_field_name: "data", inline: false }];
+  map<string, string>                             string_data = 5 [(dev.f110.kubeproto.field) = { go_name: "StringData", api_field_name: "stringData", inline: false }];
+  string                                          type        = 6 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
+}
+
+message SecretEnvSource {
+  LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", api_field_name: "", inline: true }];
+  optional bool        optional               = 2 [(dev.f110.kubeproto.field) = { go_name: "Optional", api_field_name: "optional", inline: false }];
+}
+
+message SecretKeySelector {
+  LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", api_field_name: "", inline: true }];
+  string               key                    = 2 [(dev.f110.kubeproto.field) = { go_name: "Key", api_field_name: "key", inline: false }];
+  optional bool        optional               = 3 [(dev.f110.kubeproto.field) = { go_name: "Optional", api_field_name: "optional", inline: false }];
+}
+
+message SecretList {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated Secret                               items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+}
+
+message SecretProjection {
+  LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", api_field_name: "", inline: true }];
+  repeated KeyToPath   items                  = 2 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+  optional bool        optional               = 3 [(dev.f110.kubeproto.field) = { go_name: "Optional", api_field_name: "optional", inline: false }];
+}
+
+message SecretReference {
+  string name      = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  string namespace = 2 [(dev.f110.kubeproto.field) = { go_name: "Namespace", api_field_name: "namespace", inline: false }];
+}
+
+message SecretVolumeSource {
+  string             secret_name  = 1 [(dev.f110.kubeproto.field) = { go_name: "SecretName", api_field_name: "secretName", inline: false }];
+  repeated KeyToPath items        = 2 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+  optional int32     default_mode = 3 [(dev.f110.kubeproto.field) = { go_name: "DefaultMode", api_field_name: "defaultMode", inline: false }];
+  optional bool      optional     = 4 [(dev.f110.kubeproto.field) = { go_name: "Optional", api_field_name: "optional", inline: false }];
+}
+
+message SecurityContext {
+  optional Capabilities                  capabilities               = 1 [(dev.f110.kubeproto.field) = { go_name: "Capabilities", api_field_name: "capabilities", inline: false }];
+  optional bool                          privileged                 = 2 [(dev.f110.kubeproto.field) = { go_name: "Privileged", api_field_name: "privileged", inline: false }];
+  optional SELinuxOptions                selinux_options            = 3 [(dev.f110.kubeproto.field) = { go_name: "SELinuxOptions", api_field_name: "seLinuxOptions", inline: false }];
+  optional WindowsSecurityContextOptions windows_options            = 4 [(dev.f110.kubeproto.field) = { go_name: "WindowsOptions", api_field_name: "windowsOptions", inline: false }];
+  optional int64                         run_as_user                = 5 [(dev.f110.kubeproto.field) = { go_name: "RunAsUser", api_field_name: "runAsUser", inline: false }];
+  optional int64                         run_as_group               = 6 [(dev.f110.kubeproto.field) = { go_name: "RunAsGroup", api_field_name: "runAsGroup", inline: false }];
+  optional bool                          run_as_non_root            = 7 [(dev.f110.kubeproto.field) = { go_name: "RunAsNonRoot", api_field_name: "runAsNonRoot", inline: false }];
+  optional bool                          read_only_root_filesystem  = 8 [(dev.f110.kubeproto.field) = { go_name: "ReadOnlyRootFilesystem", api_field_name: "readOnlyRootFilesystem", inline: false }];
+  optional bool                          allow_privilege_escalation = 9 [(dev.f110.kubeproto.field) = { go_name: "AllowPrivilegeEscalation", api_field_name: "allowPrivilegeEscalation", inline: false }];
+  optional string                        proc_mount                 = 10 [(dev.f110.kubeproto.field) = { go_name: "ProcMount", api_field_name: "procMount", inline: false }];
+  optional SeccompProfile                seccomp_profile            = 11 [(dev.f110.kubeproto.field) = { go_name: "SeccompProfile", api_field_name: "seccompProfile", inline: false }];
+}
+
+message SerializedReference {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  ObjectReference                               reference = 2 [(dev.f110.kubeproto.field) = { go_name: "Reference", api_field_name: "reference", inline: false }];
+}
+
+message Service {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta   type_meta   = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  ServiceSpec                                     spec        = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
+  ServiceStatus                                   status      = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+}
+
+message ServiceAccount {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta   type_meta                       = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta                     = 2 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  repeated ObjectReference                        secrets                         = 3 [(dev.f110.kubeproto.field) = { go_name: "Secrets", api_field_name: "secrets", inline: false }];
+  repeated LocalObjectReference                   image_pull_secrets              = 4 [(dev.f110.kubeproto.field) = { go_name: "ImagePullSecrets", api_field_name: "imagePullSecrets", inline: false }];
+  optional bool                                   automount_service_account_token = 5 [(dev.f110.kubeproto.field) = { go_name: "AutomountServiceAccountToken", api_field_name: "automountServiceAccountToken", inline: false }];
+}
+
+message ServiceAccountList {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated ServiceAccount                       items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+}
+
+message ServiceAccountTokenProjection {
+  string         audience           = 1 [(dev.f110.kubeproto.field) = { go_name: "Audience", api_field_name: "audience", inline: false }];
+  optional int64 expiration_seconds = 2 [(dev.f110.kubeproto.field) = { go_name: "ExpirationSeconds", api_field_name: "expirationSeconds", inline: false }];
+  string         path               = 3 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
+}
+
+message ServiceList {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated Service                              items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+}
+
+message ServicePort {
+  string                                          name         = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  string                                          protocol     = 2 [(dev.f110.kubeproto.field) = { go_name: "Protocol", api_field_name: "protocol", inline: false }];
+  optional string                                 app_protocol = 3 [(dev.f110.kubeproto.field) = { go_name: "AppProtocol", api_field_name: "appProtocol", inline: false }];
+  int32                                           port         = 4 [(dev.f110.kubeproto.field) = { go_name: "Port", api_field_name: "port", inline: false }];
+  k8s.io.apimachinery.pkg.util.intstr.IntOrString target_port  = 5 [(dev.f110.kubeproto.field) = { go_name: "TargetPort", api_field_name: "targetPort", inline: false }];
+  int32                                           node_port    = 6 [(dev.f110.kubeproto.field) = { go_name: "NodePort", api_field_name: "nodePort", inline: false }];
+}
+
+message ServiceProxyOptions {
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  string                                        path      = 2 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
+}
+
+message ServiceSpec {
+  repeated ServicePort           ports                             = 1 [(dev.f110.kubeproto.field) = { go_name: "Ports", api_field_name: "ports", inline: false }];
+  map<string, string>            selector                          = 2 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", inline: false }];
+  string                         cluster_ip                        = 3 [(dev.f110.kubeproto.field) = { go_name: "ClusterIP", api_field_name: "clusterIP", inline: false }];
+  repeated string                cluster_ips                       = 4 [(dev.f110.kubeproto.field) = { go_name: "ClusterIPs", api_field_name: "clusterIPs", inline: false }];
+  string                         type                              = 5 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
+  repeated string                external_ips                      = 6 [(dev.f110.kubeproto.field) = { go_name: "ExternalIPs", api_field_name: "externalIPs", inline: false }];
+  string                         session_affinity                  = 7 [(dev.f110.kubeproto.field) = { go_name: "SessionAffinity", api_field_name: "sessionAffinity", inline: false }];
+  string                         load_balancer_ip                  = 8 [(dev.f110.kubeproto.field) = { go_name: "LoadBalancerIP", api_field_name: "loadBalancerIP", inline: false }];
+  repeated string                load_balancer_source_ranges       = 9 [(dev.f110.kubeproto.field) = { go_name: "LoadBalancerSourceRanges", api_field_name: "loadBalancerSourceRanges", inline: false }];
+  string                         external_name                     = 10 [(dev.f110.kubeproto.field) = { go_name: "ExternalName", api_field_name: "externalName", inline: false }];
+  string                         external_traffic_policy           = 11 [(dev.f110.kubeproto.field) = { go_name: "ExternalTrafficPolicy", api_field_name: "externalTrafficPolicy", inline: false }];
+  int32                          health_check_node_port            = 12 [(dev.f110.kubeproto.field) = { go_name: "HealthCheckNodePort", api_field_name: "healthCheckNodePort", inline: false }];
+  bool                           publish_not_ready_addresses       = 13 [(dev.f110.kubeproto.field) = { go_name: "PublishNotReadyAddresses", api_field_name: "publishNotReadyAddresses", inline: false }];
+  optional SessionAffinityConfig session_affinity_config           = 14 [(dev.f110.kubeproto.field) = { go_name: "SessionAffinityConfig", api_field_name: "sessionAffinityConfig", inline: false }];
+  repeated string                ip_families                       = 15 [(dev.f110.kubeproto.field) = { go_name: "IPFamilies", api_field_name: "ipFamilies", inline: false }];
+  optional string                ip_family_policy                  = 16 [(dev.f110.kubeproto.field) = { go_name: "IPFamilyPolicy", api_field_name: "ipFamilyPolicy", inline: false }];
+  optional bool                  allocate_load_balancer_node_ports = 17 [(dev.f110.kubeproto.field) = { go_name: "AllocateLoadBalancerNodePorts", api_field_name: "allocateLoadBalancerNodePorts", inline: false }];
+  optional string                load_balancer_class               = 18 [(dev.f110.kubeproto.field) = { go_name: "LoadBalancerClass", api_field_name: "loadBalancerClass", inline: false }];
+  optional string                internal_traffic_policy           = 19 [(dev.f110.kubeproto.field) = { go_name: "InternalTrafficPolicy", api_field_name: "internalTrafficPolicy", inline: false }];
+}
+
+message ServiceStatus {
+  LoadBalancerStatus load_balancer                                   = 1 [(dev.f110.kubeproto.field) = { go_name: "LoadBalancer", api_field_name: "loadBalancer", inline: false }];
+  repeated k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 2 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+}
+
+message SessionAffinityConfig {
+  optional ClientIPConfig client_ip = 1 [(dev.f110.kubeproto.field) = { go_name: "ClientIP", api_field_name: "clientIP", inline: false }];
+}
+
+message StorageOSPersistentVolumeSource {
+  string                   volume_name      = 1 [(dev.f110.kubeproto.field) = { go_name: "VolumeName", api_field_name: "volumeName", inline: false }];
+  string                   volume_namespace = 2 [(dev.f110.kubeproto.field) = { go_name: "VolumeNamespace", api_field_name: "volumeNamespace", inline: false }];
+  string                   fs_type          = 3 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
+  bool                     read_only        = 4 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+  optional ObjectReference secret_ref       = 5 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
+}
+
+message StorageOSVolumeSource {
+  string                        volume_name      = 1 [(dev.f110.kubeproto.field) = { go_name: "VolumeName", api_field_name: "volumeName", inline: false }];
+  string                        volume_namespace = 2 [(dev.f110.kubeproto.field) = { go_name: "VolumeNamespace", api_field_name: "volumeNamespace", inline: false }];
+  string                        fs_type          = 3 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
+  bool                          read_only        = 4 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+  optional LocalObjectReference secret_ref       = 5 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
+}
+
+message Sysctl {
+  string name  = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  string value = 2 [(dev.f110.kubeproto.field) = { go_name: "Value", api_field_name: "value", inline: false }];
+}
+
+message TCPSocketAction {
+  k8s.io.apimachinery.pkg.util.intstr.IntOrString port = 1 [(dev.f110.kubeproto.field) = { go_name: "Port", api_field_name: "port", inline: false }];
+  string                                          host = 2 [(dev.f110.kubeproto.field) = { go_name: "Host", api_field_name: "host", inline: false }];
+}
+
+message Taint {
+  string   key                                                  = 1 [(dev.f110.kubeproto.field) = { go_name: "Key", api_field_name: "key", inline: false }];
+  string   value                                                = 2 [(dev.f110.kubeproto.field) = { go_name: "Value", api_field_name: "value", inline: false }];
+  string   effect                                               = 3 [(dev.f110.kubeproto.field) = { go_name: "Effect", api_field_name: "effect", inline: false }];
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time time_added = 4 [(dev.f110.kubeproto.field) = { go_name: "TimeAdded", api_field_name: "timeAdded", inline: false }];
+}
+
+message Toleration {
+  string         key = 1 [(dev.f110.kubeproto.field) = { go_name: "Key", api_field_name: "key", inline: false }];
+  string         operator = 2 [(dev.f110.kubeproto.field) = { go_name: "Operator", api_field_name: "operator", inline: false }];
+  string         value              = 3 [(dev.f110.kubeproto.field) = { go_name: "Value", api_field_name: "value", inline: false }];
+  string         effect             = 4 [(dev.f110.kubeproto.field) = { go_name: "Effect", api_field_name: "effect", inline: false }];
+  optional int64 toleration_seconds = 5 [(dev.f110.kubeproto.field) = { go_name: "TolerationSeconds", api_field_name: "tolerationSeconds", inline: false }];
+}
+
+message TopologySelectorLabelRequirement {
+  string          key    = 1 [(dev.f110.kubeproto.field) = { go_name: "Key", api_field_name: "key", inline: false }];
+  repeated string values = 2 [(dev.f110.kubeproto.field) = { go_name: "Values", api_field_name: "values", inline: false }];
+}
+
+message TopologySelectorTerm {
+  repeated TopologySelectorLabelRequirement match_label_expressions = 1 [(dev.f110.kubeproto.field) = { go_name: "MatchLabelExpressions", api_field_name: "matchLabelExpressions", inline: false }];
+}
+
+message TopologySpreadConstraint {
+  int32    max_skew                                                          = 1 [(dev.f110.kubeproto.field) = { go_name: "MaxSkew", api_field_name: "maxSkew", inline: false }];
+  string   topology_key                                                      = 2 [(dev.f110.kubeproto.field) = { go_name: "TopologyKey", api_field_name: "topologyKey", inline: false }];
+  string   when_unsatisfiable                                                = 3 [(dev.f110.kubeproto.field) = { go_name: "WhenUnsatisfiable", api_field_name: "whenUnsatisfiable", inline: false }];
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector label_selector = 4 [(dev.f110.kubeproto.field) = { go_name: "LabelSelector", api_field_name: "labelSelector", inline: false }];
+}
+
+message TypedLocalObjectReference {
+  optional string api_group = 1 [(dev.f110.kubeproto.field) = { go_name: "APIGroup", api_field_name: "apiGroup", inline: false }];
+  string          kind      = 2 [(dev.f110.kubeproto.field) = { go_name: "Kind", api_field_name: "kind", inline: false }];
+  string          name      = 3 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+}
+
+message Volume {
+  string       name          = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  VolumeSource volume_source = 2 [(dev.f110.kubeproto.field) = { go_name: "VolumeSource", api_field_name: "", inline: true }];
+}
+
+message VolumeDevice {
+  string name        = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  string device_path = 2 [(dev.f110.kubeproto.field) = { go_name: "DevicePath", api_field_name: "devicePath", inline: false }];
+}
+
+message VolumeMount {
+  string          name              = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  bool            read_only         = 2 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
+  string          mount_path        = 3 [(dev.f110.kubeproto.field) = { go_name: "MountPath", api_field_name: "mountPath", inline: false }];
+  string          sub_path          = 4 [(dev.f110.kubeproto.field) = { go_name: "SubPath", api_field_name: "subPath", inline: false }];
+  optional string mount_propagation = 5 [(dev.f110.kubeproto.field) = { go_name: "MountPropagation", api_field_name: "mountPropagation", inline: false }];
+  string          sub_path_expr     = 6 [(dev.f110.kubeproto.field) = { go_name: "SubPathExpr", api_field_name: "subPathExpr", inline: false }];
+}
+
+message VolumeNodeAffinity {
+  optional NodeSelector required = 1 [(dev.f110.kubeproto.field) = { go_name: "Required", api_field_name: "required", inline: false }];
+}
+
+message VolumeProjection {
+  optional SecretProjection              secret                = 1 [(dev.f110.kubeproto.field) = { go_name: "Secret", api_field_name: "secret", inline: false }];
+  optional DownwardAPIProjection         downward_api          = 2 [(dev.f110.kubeproto.field) = { go_name: "DownwardAPI", api_field_name: "downwardAPI", inline: false }];
+  optional ConfigMapProjection           config_map            = 3 [(dev.f110.kubeproto.field) = { go_name: "ConfigMap", api_field_name: "configMap", inline: false }];
+  optional ServiceAccountTokenProjection service_account_token = 4 [(dev.f110.kubeproto.field) = { go_name: "ServiceAccountToken", api_field_name: "serviceAccountToken", inline: false }];
+}
+
+message VolumeSource {
+  optional HostPathVolumeSource              host_path               = 1 [(dev.f110.kubeproto.field) = { go_name: "HostPath", api_field_name: "hostPath", inline: false }];
+  optional EmptyDirVolumeSource              empty_dir               = 2 [(dev.f110.kubeproto.field) = { go_name: "EmptyDir", api_field_name: "emptyDir", inline: false }];
+  optional GCEPersistentDiskVolumeSource     gce_persistent_disk     = 3 [(dev.f110.kubeproto.field) = { go_name: "GCEPersistentDisk", api_field_name: "gcePersistentDisk", inline: false }];
+  optional AWSElasticBlockStoreVolumeSource  aws_elastic_block_store = 4 [(dev.f110.kubeproto.field) = { go_name: "AWSElasticBlockStore", api_field_name: "awsElasticBlockStore", inline: false }];
+  optional GitRepoVolumeSource               git_repo                = 5 [(dev.f110.kubeproto.field) = { go_name: "GitRepo", api_field_name: "gitRepo", inline: false }];
+  optional SecretVolumeSource                secret                  = 6 [(dev.f110.kubeproto.field) = { go_name: "Secret", api_field_name: "secret", inline: false }];
+  optional NFSVolumeSource                   nfs                     = 7 [(dev.f110.kubeproto.field) = { go_name: "NFS", api_field_name: "nfs", inline: false }];
+  optional ISCSIVolumeSource                 iscsi                   = 8 [(dev.f110.kubeproto.field) = { go_name: "ISCSI", api_field_name: "iscsi", inline: false }];
+  optional GlusterfsVolumeSource             glusterfs               = 9 [(dev.f110.kubeproto.field) = { go_name: "Glusterfs", api_field_name: "glusterfs", inline: false }];
+  optional PersistentVolumeClaimVolumeSource persistent_volume_claim = 10 [(dev.f110.kubeproto.field) = { go_name: "PersistentVolumeClaim", api_field_name: "persistentVolumeClaim", inline: false }];
+  optional RBDVolumeSource                   rbd                     = 11 [(dev.f110.kubeproto.field) = { go_name: "RBD", api_field_name: "rbd", inline: false }];
+  optional FlexVolumeSource                  flex_volume             = 12 [(dev.f110.kubeproto.field) = { go_name: "FlexVolume", api_field_name: "flexVolume", inline: false }];
+  optional CinderVolumeSource                cinder                  = 13 [(dev.f110.kubeproto.field) = { go_name: "Cinder", api_field_name: "cinder", inline: false }];
+  optional CephFSVolumeSource                ceph_fs                 = 14 [(dev.f110.kubeproto.field) = { go_name: "CephFS", api_field_name: "cephfs", inline: false }];
+  optional FlockerVolumeSource               flocker                 = 15 [(dev.f110.kubeproto.field) = { go_name: "Flocker", api_field_name: "flocker", inline: false }];
+  optional DownwardAPIVolumeSource           downward_api            = 16 [(dev.f110.kubeproto.field) = { go_name: "DownwardAPI", api_field_name: "downwardAPI", inline: false }];
+  optional FCVolumeSource                    fc                      = 17 [(dev.f110.kubeproto.field) = { go_name: "FC", api_field_name: "fc", inline: false }];
+  optional AzureFileVolumeSource             azure_file              = 18 [(dev.f110.kubeproto.field) = { go_name: "AzureFile", api_field_name: "azureFile", inline: false }];
+  optional ConfigMapVolumeSource             config_map              = 19 [(dev.f110.kubeproto.field) = { go_name: "ConfigMap", api_field_name: "configMap", inline: false }];
+  optional VsphereVirtualDiskVolumeSource    vsphere_volume          = 20 [(dev.f110.kubeproto.field) = { go_name: "VsphereVolume", api_field_name: "vsphereVolume", inline: false }];
+  optional QuobyteVolumeSource               quobyte                 = 21 [(dev.f110.kubeproto.field) = { go_name: "Quobyte", api_field_name: "quobyte", inline: false }];
+  optional AzureDiskVolumeSource             azure_disk              = 22 [(dev.f110.kubeproto.field) = { go_name: "AzureDisk", api_field_name: "azureDisk", inline: false }];
+  optional PhotonPersistentDiskVolumeSource  photon_persistent_disk  = 23 [(dev.f110.kubeproto.field) = { go_name: "PhotonPersistentDisk", api_field_name: "photonPersistentDisk", inline: false }];
+  optional ProjectedVolumeSource             projected               = 24 [(dev.f110.kubeproto.field) = { go_name: "Projected", api_field_name: "projected", inline: false }];
+  optional PortworxVolumeSource              portworx_volume         = 25 [(dev.f110.kubeproto.field) = { go_name: "PortworxVolume", api_field_name: "portworxVolume", inline: false }];
+  optional ScaleIOVolumeSource               scale_io                = 26 [(dev.f110.kubeproto.field) = { go_name: "ScaleIO", api_field_name: "scaleIO", inline: false }];
+  optional StorageOSVolumeSource             storage_os              = 27 [(dev.f110.kubeproto.field) = { go_name: "StorageOS", api_field_name: "storageos", inline: false }];
+  optional CSIVolumeSource                   csi                     = 28 [(dev.f110.kubeproto.field) = { go_name: "CSI", api_field_name: "csi", inline: false }];
+  optional EphemeralVolumeSource             ephemeral               = 29 [(dev.f110.kubeproto.field) = { go_name: "Ephemeral", api_field_name: "ephemeral", inline: false }];
+}
+
+message VsphereVirtualDiskVolumeSource {
+  string volume_path         = 1 [(dev.f110.kubeproto.field) = { go_name: "VolumePath", api_field_name: "volumePath", inline: false }];
+  string fs_type             = 2 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
+  string storage_policy_name = 3 [(dev.f110.kubeproto.field) = { go_name: "StoragePolicyName", api_field_name: "storagePolicyName", inline: false }];
+  string storage_policy_id   = 4 [(dev.f110.kubeproto.field) = { go_name: "StoragePolicyID", api_field_name: "storagePolicyID", inline: false }];
+}
+
+message WeightedPodAffinityTerm {
+  int32           weight            = 1 [(dev.f110.kubeproto.field) = { go_name: "Weight", api_field_name: "weight", inline: false }];
+  PodAffinityTerm pod_affinity_term = 2 [(dev.f110.kubeproto.field) = { go_name: "PodAffinityTerm", api_field_name: "podAffinityTerm", inline: false }];
+}
+
+message WindowsSecurityContextOptions {
+  optional string gmsa_credential_spec_name = 1 [(dev.f110.kubeproto.field) = { go_name: "GMSACredentialSpecName", api_field_name: "gmsaCredentialSpecName", inline: false }];
+  optional string gmsa_credential_spec      = 2 [(dev.f110.kubeproto.field) = { go_name: "GMSACredentialSpec", api_field_name: "gmsaCredentialSpec", inline: false }];
+  optional string run_as_user_name          = 3 [(dev.f110.kubeproto.field) = { go_name: "RunAsUserName", api_field_name: "runAsUserName", inline: false }];
+  optional bool   host_process              = 4 [(dev.f110.kubeproto.field) = { go_name: "HostProcess", api_field_name: "hostProcess", inline: false }];
+}
