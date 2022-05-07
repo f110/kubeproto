@@ -29,6 +29,20 @@ var packageMap = map[string]string{
 	"k8s.io/apimachinery/pkg/util/intstr":  "k8s.io.apimachinery.pkg.util.intstr",
 }
 
+type typeDeclaration struct {
+	Name                 string
+	ProtobufKind         string
+	ProtobufMapKeyKind   string
+	ProtobufMapValueKind string
+}
+
+func (t *typeDeclaration) ProtobufTypeDeclaration() string {
+	if t.ProtobufMapKeyKind != "" && t.ProtobufMapValueKind != "" {
+		return fmt.Sprintf("map<%s, %s>", t.ProtobufMapKeyKind, t.ProtobufMapValueKind)
+	}
+	return t.ProtobufKind
+}
+
 type Generator struct {
 	allStructs bool
 
@@ -39,6 +53,8 @@ type Generator struct {
 	packageMap          map[string]string
 	enumCandidates      map[string]struct{}
 	enumValueCandidates map[string][]*enumValue
+
+	typeDeclaration []*typeDeclaration
 }
 
 func New() *Generator {
@@ -79,6 +95,8 @@ func (g *Generator) AddDir(dir string, allStructs bool) error {
 					if enumName != "" {
 						g.enumCandidates[enumName] = struct{}{}
 					}
+					// string type is not only used enum but also just type declaration
+					g.typeDeclaration = append(g.typeDeclaration, g.parseTypeDeclaration(gen))
 				case isStructDeclaration(d):
 					gen := d.(*ast.GenDecl)
 					msg := g.structToProtobufMessage(gen)
@@ -95,8 +113,48 @@ func (g *Generator) AddDir(dir string, allStructs bool) error {
 					}
 
 					p.Messages = append(p.Messages, msg)
-
+				case isTypeDeclaration(d):
+					gen := d.(*ast.GenDecl)
+					g.typeDeclaration = append(g.typeDeclaration, g.parseTypeDeclaration(gen))
 				}
+			}
+		}
+	}
+
+	for k := range g.enumValueCandidates {
+		if _, ok := g.enumCandidates[k]; !ok {
+			delete(g.enumValueCandidates, k)
+		}
+	}
+
+	// Type resolving
+	typeMap := make(map[string]*typeDeclaration)
+	enumMap := make(map[string]string)
+	for _, v := range g.typeDeclaration {
+		if _, ok := g.enumValueCandidates[v.Name]; ok {
+			// This type is the enum
+			enumMap[v.Name] = v.ProtobufKind
+		}
+
+		typeMap[v.Name] = v
+	}
+	for _, v := range typeMap {
+		if v.ProtobufMapKeyKind != "" {
+			switch v.ProtobufMapKeyKind {
+			case "string", "int32":
+			default:
+				v.ProtobufMapKeyKind = typeMap[v.ProtobufMapKeyKind].ProtobufKind
+			}
+		}
+	}
+	for _, m := range p.Messages {
+		for _, f := range m.Fields {
+			if v, ok := enumMap[f.Kind]; ok {
+				f.Kind = v
+				continue
+			}
+			if v, ok := typeMap[f.Kind]; ok {
+				f.Kind = v.ProtobufTypeDeclaration()
 			}
 		}
 	}
@@ -125,12 +183,6 @@ func (g *Generator) SetGoPackage(p string) {
 }
 
 func (g *Generator) WriteFile(path string) error {
-	for k := range g.enumValueCandidates {
-		if _, ok := g.enumCandidates[k]; !ok {
-			delete(g.enumValueCandidates, k)
-		}
-	}
-
 	if g.protobufFile == nil {
 		return errors.New("not loaded any files. please call AddDir first")
 	}
@@ -181,7 +233,6 @@ func (g *Generator) WriteFile(path string) error {
 
 		w.F("enum %s {", name)
 		for i := 0; i < len(values); i++ {
-			//log.Printf("%s: %s", values[i].Value, stringsutil.ToUpperSnakeCase(values[i].Value))
 			enumName := values[i].Value
 			if enumName == "" {
 				enumName = strings.TrimPrefix(values[i].Name, name)
@@ -515,6 +566,26 @@ func (g *Generator) protobufDefinableToMessage(v *ast.GenDecl) *ProtobufMessage 
 	return m
 }
 
+func (g *Generator) parseTypeDeclaration(v *ast.GenDecl) *typeDeclaration {
+	typeSpec := v.Specs[0].(*ast.TypeSpec)
+
+	var protobufKind, keyKind, valueKind string
+	switch v := typeSpec.Type.(type) {
+	case *ast.MapType:
+		keyKind = g.goTypeToProtobufKind(v.Key)
+		valueKind = g.goTypeToProtobufKind(v.Value)
+	case *ast.Ident:
+		protobufKind = g.goTypeToProtobufKind(v)
+	}
+
+	return &typeDeclaration{
+		Name:                 typeSpec.Name.String(),
+		ProtobufKind:         protobufKind,
+		ProtobufMapKeyKind:   keyKind,
+		ProtobufMapValueKind: valueKind,
+	}
+}
+
 func isStructDeclaration(v ast.Decl) bool {
 	gen, ok := v.(*ast.GenDecl)
 	if !ok {
@@ -581,5 +652,23 @@ func isProtobufDefinableDeclaration(v ast.Decl) bool {
 	if _, ok := typeSpec.Type.(*ast.InterfaceType); ok {
 		return false
 	}
-	return true
+	if _, ok := typeSpec.Type.(*ast.ArrayType); ok {
+		return true
+	}
+	return false
+}
+
+func isTypeDeclaration(v ast.Decl) bool {
+	gen, ok := v.(*ast.GenDecl)
+	if !ok {
+		return false
+	}
+	if gen.Tok != token.TYPE {
+		return false
+	}
+	typeSpec := gen.Specs[0].(*ast.TypeSpec)
+	if _, ok := typeSpec.Type.(*ast.MapType); ok {
+		return true
+	}
+	return false
 }
