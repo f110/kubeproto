@@ -129,13 +129,7 @@ func (g *Generator) AddDir(dir string, allStructs bool) error {
 
 	// Type resolving
 	typeMap := make(map[string]*typeDeclaration)
-	enumMap := make(map[string]string)
 	for _, v := range g.typeDeclaration {
-		if _, ok := g.enumValueCandidates[v.Name]; ok {
-			// This type is the enum
-			enumMap[v.Name] = v.ProtobufKind
-		}
-
 		typeMap[v.Name] = v
 	}
 	for _, v := range typeMap {
@@ -151,8 +145,7 @@ func (g *Generator) AddDir(dir string, allStructs bool) error {
 	}
 	for _, m := range p.Messages {
 		for _, f := range m.Fields {
-			if v, ok := enumMap[f.Kind]; ok {
-				f.Kind = v
+			if _, ok := g.enumValueCandidates[f.Kind]; ok {
 				continue
 			}
 			if v, ok := typeMap[f.Kind]; ok {

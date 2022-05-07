@@ -305,7 +305,7 @@ message RootPaths {
 }
 
 message ServerAddressByClientCIDR {
-  string client_c_i_d_r = 1 [(dev.f110.kubeproto.field) = { go_name: "ClientCIDR", api_field_name: "clientCIDR", inline: false }];
+  string client_cidr    = 1 [(dev.f110.kubeproto.field) = { go_name: "ClientCIDR", api_field_name: "clientCIDR", inline: false }];
   string server_address = 2 [(dev.f110.kubeproto.field) = { go_name: "ServerAddress", api_field_name: "serverAddress", inline: false }];
 }
 
