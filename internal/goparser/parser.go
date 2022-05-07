@@ -281,6 +281,11 @@ func (g *Generator) WriteFile(path string) error {
 				f.Inline,
 			)
 		}
+
+		if m.Option != nil {
+			w.F("")
+			w.F("option (dev.f110.kubeproto.kind) = {};")
+		}
 		w.F("}")
 		w.F("")
 	}
@@ -466,6 +471,20 @@ func (g *Generator) structToProtobufMessage(v *ast.GenDecl) *ProtobufMessage {
 		})
 		i++
 	}
+
+	if m.IsRuntimeObject() {
+		m.Option = &ProtobufMessageOption{}
+		fields := make([]*ProtobufField, 0)
+		for _, f := range m.Fields {
+			switch f.Name {
+			case "type_meta", "object_meta":
+			default:
+				fields = append(fields, f)
+			}
+		}
+		m.Fields = fields
+	}
+
 	return m
 }
 

@@ -274,8 +274,8 @@ message OwnerReference {
 }
 
 message PartialObjectMetadata {
-  TypeMeta   type_meta   = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
-  ObjectMeta object_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  option (dev.f110.kubeproto.kind) = {
+  };
 }
 
 message PartialObjectMetadataList {

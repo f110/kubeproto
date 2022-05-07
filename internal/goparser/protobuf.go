@@ -14,6 +14,25 @@ type ProtobufMessage struct {
 	Name        string
 	Fields      []*ProtobufField
 	UseFieldsOf string
+	Option      *ProtobufMessageOption
+}
+
+type ProtobufMessageOption struct{}
+
+func (m *ProtobufMessage) IsRuntimeObject() bool {
+	var foundTypeMeta, foundObjectMeta bool
+	for _, f := range m.Fields {
+		if f.Name == "type_meta" {
+			foundTypeMeta = true
+			continue
+		}
+		if f.Name == "object_meta" {
+			foundObjectMeta = true
+			continue
+		}
+	}
+
+	return foundTypeMeta && foundObjectMeta
 }
 
 type ProtobufField struct {
