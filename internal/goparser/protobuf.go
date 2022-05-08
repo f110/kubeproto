@@ -45,4 +45,5 @@ type ProtobufField struct {
 	Optional        bool
 	Inline          bool
 	ExternalPackage string
+	Doc             string
 }

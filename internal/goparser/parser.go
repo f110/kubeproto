@@ -1,6 +1,7 @@
 package goparser
 
 import (
+	"bufio"
 	"context"
 	"errors"
 	"fmt"
@@ -267,6 +268,20 @@ func (g *Generator) WriteFile(path string) error {
 			}
 		}
 		for _, f := range fields {
+			if f.Doc != "" {
+				s := bufio.NewScanner(strings.NewReader(f.Doc))
+				for s.Scan() {
+					t := s.Text()
+					if len(t) == 0 {
+						continue
+					}
+					if t[0] == '+' || strings.HasPrefix(t, "TODO:") {
+						continue
+					}
+					w.F("// %s", t)
+				}
+			}
+
 			if f.Optional {
 				w.Fn("optional ")
 			}
@@ -468,6 +483,7 @@ func (g *Generator) structToProtobufMessage(v *ast.GenDecl) *ProtobufMessage {
 			Optional:        optional,
 			Repeated:        repeated,
 			Inline:          inline,
+			Doc:             f.Doc.Text(),
 		})
 		i++
 	}
