@@ -611,7 +611,7 @@ message ComponentStatus {
 }
 
 message ComponentStatusList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
@@ -646,14 +646,14 @@ message ConfigMap {
 
 message ConfigMapEnvSource {
   // The ConfigMap to select from.
-  LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", api_field_name: "", inline: true }];
+  LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", inline: true }];
   // Specify whether the ConfigMap must be defined
   optional bool optional = 2 [(dev.f110.kubeproto.field) = { go_name: "Optional", api_field_name: "optional", inline: false }];
 }
 
 message ConfigMapKeySelector {
   // The ConfigMap to select from.
-  LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", api_field_name: "", inline: true }];
+  LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", inline: true }];
   // The key to select.
   string key = 2 [(dev.f110.kubeproto.field) = { go_name: "Key", api_field_name: "key", inline: false }];
   // Specify whether the ConfigMap or its key must be defined
@@ -661,7 +661,7 @@ message ConfigMapKeySelector {
 }
 
 message ConfigMapList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // Items is the list of ConfigMaps.
@@ -687,7 +687,7 @@ message ConfigMapNodeConfigSource {
 }
 
 message ConfigMapProjection {
-  LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", api_field_name: "", inline: true }];
+  LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", inline: true }];
   // If unspecified, each key-value pair in the Data field of the referenced
   // ConfigMap will be projected into the volume as a file whose name is the
   // key and content is the value. If specified, the listed keys will be
@@ -701,7 +701,7 @@ message ConfigMapProjection {
 }
 
 message ConfigMapVolumeSource {
-  LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", api_field_name: "", inline: true }];
+  LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", inline: true }];
   // If unspecified, each key-value pair in the Data field of the referenced
   // ConfigMap will be projected into the volume as a file whose name is the
   // key and content is the value. If specified, the listed keys will be
@@ -1057,7 +1057,7 @@ message Endpoints {
 }
 
 message EndpointsList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
@@ -1109,7 +1109,7 @@ message EphemeralContainer {
   // specific to ephemeral containers. Fields in common with Container are in the
   // following inlined struct so than an EphemeralContainer may easily be converted
   // to a Container.
-  EphemeralContainerCommon ephemeral_container_common = 1 [(dev.f110.kubeproto.field) = { go_name: "EphemeralContainerCommon", api_field_name: "", inline: true }];
+  EphemeralContainerCommon ephemeral_container_common = 1 [(dev.f110.kubeproto.field) = { go_name: "EphemeralContainerCommon", inline: true }];
   // If set, the name of the container from PodSpec that this ephemeral container targets.
   // The ephemeral container will be run in the namespaces (IPC, PID, etc) of this container.
   // If not set then the ephemeral container uses the namespaces configured in the Pod spec.
@@ -1276,7 +1276,7 @@ message Event {
 }
 
 message EventList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
@@ -1625,7 +1625,7 @@ message LimitRangeItem {
 }
 
 message LimitRangeList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
@@ -1711,7 +1711,7 @@ message NamespaceCondition {
 }
 
 message NamespaceList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
@@ -1842,7 +1842,7 @@ message NodeDaemonEndpoints {
 }
 
 message NodeList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
@@ -1851,14 +1851,14 @@ message NodeList {
 }
 
 message NodeProxyOptions {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Path is the URL path to use for the current proxy request to node.
   string path = 2 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
 }
 
 message NodeResources {
   // Capacity represents the available resources of a node
-  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> capacity = 1 [(dev.f110.kubeproto.field) = { go_name: "Capacity", api_field_name: "", inline: false }];
+  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> capacity = 1 [(dev.f110.kubeproto.field) = { go_name: "Capacity", inline: false }];
 }
 
 message NodeSelector {
@@ -2052,7 +2052,7 @@ message PersistentVolumeClaimCondition {
 }
 
 message PersistentVolumeClaimList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
@@ -2158,7 +2158,7 @@ message PersistentVolumeClaimVolumeSource {
 }
 
 message PersistentVolumeList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
@@ -2235,7 +2235,7 @@ message PersistentVolumeSpec {
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#capacity
   map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> capacity = 1 [(dev.f110.kubeproto.field) = { go_name: "Capacity", api_field_name: "capacity", inline: false }];
   // The actual volume backing the persistent volume.
-  PersistentVolumeSource persistent_volume_source = 2 [(dev.f110.kubeproto.field) = { go_name: "PersistentVolumeSource", api_field_name: "", inline: true }];
+  PersistentVolumeSource persistent_volume_source = 2 [(dev.f110.kubeproto.field) = { go_name: "PersistentVolumeSource", inline: true }];
   // AccessModes contains all ways the volume can be mounted.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes
   repeated PersistentVolumeAccessMode access_modes = 3 [(dev.f110.kubeproto.field) = { go_name: "AccessModes", api_field_name: "accessModes", inline: false }];
@@ -2366,7 +2366,7 @@ message PodAntiAffinity {
 }
 
 message PodAttachOptions {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Stdin if true, redirects the standard input stream of the pod for this call.
   // Defaults to false.
   bool stdin = 2 [(dev.f110.kubeproto.field) = { go_name: "Stdin", api_field_name: "stdin", inline: false }];
@@ -2427,7 +2427,7 @@ message PodDNSConfigOption {
 }
 
 message PodExecOptions {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Redirect the standard input stream of the pod for this call.
   // Defaults to false.
   bool stdin = 2 [(dev.f110.kubeproto.field) = { go_name: "Stdin", api_field_name: "stdin", inline: false }];
@@ -2451,7 +2451,7 @@ message PodIP {
 }
 
 message PodList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
@@ -2461,7 +2461,7 @@ message PodList {
 }
 
 message PodLogOptions {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // The container for which to stream logs. Defaults to only container if there is one container in the pod.
   string container = 2 [(dev.f110.kubeproto.field) = { go_name: "Container", api_field_name: "container", inline: false }];
   // Follow the log stream of the pod. Defaults to false.
@@ -2506,14 +2506,14 @@ message PodOS {
 }
 
 message PodPortForwardOptions {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // List of ports to forward
   // Required when using WebSockets
   repeated int32 ports = 2 [(dev.f110.kubeproto.field) = { go_name: "Ports", api_field_name: "ports", inline: false }];
 }
 
 message PodProxyOptions {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Path is the URL path to use for the current proxy request to pod.
   string path = 2 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
 }
@@ -2875,7 +2875,7 @@ message PodTemplate {
 }
 
 message PodTemplateList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
@@ -2946,7 +2946,7 @@ message PreferredSchedulingTerm {
 
 message Probe {
   // The action taken to determine the health of a container
-  ProbeHandler probe_handler = 1 [(dev.f110.kubeproto.field) = { go_name: "ProbeHandler", api_field_name: "", inline: true }];
+  ProbeHandler probe_handler = 1 [(dev.f110.kubeproto.field) = { go_name: "ProbeHandler", inline: true }];
   // Number of seconds after the container has started before liveness probes are initiated.
   // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   int32 initial_delay_seconds = 2 [(dev.f110.kubeproto.field) = { go_name: "InitialDelaySeconds", api_field_name: "initialDelaySeconds", inline: false }];
@@ -3130,7 +3130,7 @@ message ReplicationControllerCondition {
 }
 
 message ReplicationControllerList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
@@ -3199,7 +3199,7 @@ message ResourceQuota {
 }
 
 message ResourceQuotaList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
@@ -3369,14 +3369,14 @@ message Secret {
 
 message SecretEnvSource {
   // The Secret to select from.
-  LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", api_field_name: "", inline: true }];
+  LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", inline: true }];
   // Specify whether the Secret must be defined
   optional bool optional = 2 [(dev.f110.kubeproto.field) = { go_name: "Optional", api_field_name: "optional", inline: false }];
 }
 
 message SecretKeySelector {
   // The name of the secret in the pod's namespace to select from.
-  LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", api_field_name: "", inline: true }];
+  LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", inline: true }];
   // The key of the secret to select from.  Must be a valid secret key.
   string key = 2 [(dev.f110.kubeproto.field) = { go_name: "Key", api_field_name: "key", inline: false }];
   // Specify whether the Secret or its key must be defined
@@ -3384,7 +3384,7 @@ message SecretKeySelector {
 }
 
 message SecretList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
@@ -3394,7 +3394,7 @@ message SecretList {
 }
 
 message SecretProjection {
-  LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", api_field_name: "", inline: true }];
+  LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", inline: true }];
   // If unspecified, each key-value pair in the Data field of the referenced
   // Secret will be projected into the volume as a file whose name is the
   // key and content is the value. If specified, the listed keys will be
@@ -3504,7 +3504,7 @@ message SecurityContext {
 }
 
 message SerializedReference {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // The reference to an object in the system.
   ObjectReference reference = 2 [(dev.f110.kubeproto.field) = { go_name: "Reference", api_field_name: "reference", inline: false }];
 }
@@ -3541,7 +3541,7 @@ message ServiceAccount {
 }
 
 message ServiceAccountList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
@@ -3569,7 +3569,7 @@ message ServiceAccountTokenProjection {
 }
 
 message ServiceList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
@@ -3618,7 +3618,7 @@ message ServicePort {
 }
 
 message ServiceProxyOptions {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Path is the part of URLs that include service endpoints, suffixes,
   // and parameters to use for the current proxy request to service.
   // For example, the whole request URL is
@@ -3994,7 +3994,7 @@ message Volume {
   // VolumeSource represents the location and type of the mounted volume.
   // If not specified, the Volume is implied to be an EmptyDir.
   // This implied behavior is deprecated and will be removed in a future version.
-  VolumeSource volume_source = 2 [(dev.f110.kubeproto.field) = { go_name: "VolumeSource", api_field_name: "", inline: true }];
+  VolumeSource volume_source = 2 [(dev.f110.kubeproto.field) = { go_name: "VolumeSource", inline: true }];
 }
 
 message VolumeDevice {

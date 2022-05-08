@@ -79,7 +79,7 @@ enum StatusReason {
 }
 
 message APIGroup {
-  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // name is the name of the group.
   string name = 2 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
   // versions are the versions supported in this group.
@@ -98,7 +98,7 @@ message APIGroup {
 }
 
 message APIGroupList {
-  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // groups is a list of APIGroup.
   repeated APIGroup groups = 2 [(dev.f110.kubeproto.field) = { go_name: "Groups", api_field_name: "groups", inline: false }];
 }
@@ -138,7 +138,7 @@ message APIResource {
 }
 
 message APIResourceList {
-  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // groupVersion is the group and version this APIResourceList is for.
   string group_version = 2 [(dev.f110.kubeproto.field) = { go_name: "GroupVersion", api_field_name: "groupVersion", inline: false }];
   // resources contains the name of the resources and if they are namespaced.
@@ -146,7 +146,7 @@ message APIResourceList {
 }
 
 message APIVersions {
-  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // versions are the api versions that are available.
   repeated string versions = 2 [(dev.f110.kubeproto.field) = { go_name: "Versions", api_field_name: "versions", inline: false }];
   // a map of client CIDR to server address that is serving this group.
@@ -160,7 +160,7 @@ message APIVersions {
 }
 
 message ApplyOptions {
-  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // When present, indicates that modifications should not be
   // persisted. An invalid or unrecognized dryRun directive will
   // result in an error response and no further processing of the
@@ -206,7 +206,7 @@ message Condition {
 }
 
 message CreateOptions {
-  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // When present, indicates that modifications should not be
   // persisted. An invalid or unrecognized dryRun directive will
   // result in an error response and no further processing of the
@@ -232,7 +232,7 @@ message CreateOptions {
 }
 
 message DeleteOptions {
-  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // The duration in seconds before the object should be deleted. Value must be non-negative integer.
   // The value zero indicates delete immediately. If this value is nil, the default grace period for the
   // specified type will be used.
@@ -264,7 +264,7 @@ message DeleteOptions {
 }
 
 message Duration {
-  int64 duration = 1 [(dev.f110.kubeproto.field) = { go_name: "Duration", api_field_name: "", inline: false }];
+  int64 duration = 1 [(dev.f110.kubeproto.field) = { go_name: "Duration", inline: false }];
 }
 
 message FieldsV1 {
@@ -273,7 +273,7 @@ message FieldsV1 {
 }
 
 message GetOptions {
-  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // resourceVersion sets a constraint on what resource versions a request may be served from.
   // See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for
   // details.
@@ -339,7 +339,7 @@ message LabelSelectorRequirement {
 }
 
 message List {
-  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
@@ -383,7 +383,7 @@ message ListMeta {
 }
 
 message ListOptions {
-  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // A selector to restrict the list of returned objects by their labels.
   // Defaults to everything.
   string label_selector = 2 [(dev.f110.kubeproto.field) = { go_name: "LabelSelector", api_field_name: "labelSelector", inline: false }];
@@ -647,7 +647,7 @@ message PartialObjectMetadata {
 }
 
 message PartialObjectMetadataList {
-  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
@@ -659,7 +659,7 @@ message Patch {
 }
 
 message PatchOptions {
-  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // When present, indicates that modifications should not be
   // persisted. An invalid or unrecognized dryRun directive will
   // result in an error response and no further processing of the
@@ -712,7 +712,7 @@ message ServerAddressByClientCIDR {
 }
 
 message Status {
-  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
@@ -778,7 +778,7 @@ message StatusDetails {
 }
 
 message TableOptions {
-  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // includeObject decides whether to include each object along with its columnar information.
   // Specifying "None" will return no object, specifying "Object" will return the full object contents, and
   // specifying "Metadata" (the default) will return the object's metadata in the PartialObjectMetadata kind
@@ -825,7 +825,7 @@ message TypeMeta {
 }
 
 message UpdateOptions {
-  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", api_field_name: "", inline: true }];
+  TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // When present, indicates that modifications should not be
   // persisted. An invalid or unrecognized dryRun directive will
   // result in an error response and no further processing of the
@@ -851,7 +851,7 @@ message UpdateOptions {
 }
 
 message Verbs {
-  repeated string items = 1 [(dev.f110.kubeproto.field) = { go_name: "", api_field_name: "", inline: false }];
+  repeated string items = 1 [(dev.f110.kubeproto.field) = { go_name: "", inline: false }];
 }
 
 message WatchEvent {

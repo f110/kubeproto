@@ -8,9 +8,9 @@ import "kube.proto";
 message Quantity {
   // Change Format at will. See the comment for Canonicalize for
   // more details.
-  string format = 1 [(dev.f110.kubeproto.field) = { go_name: "Format", api_field_name: "", inline: false }];
+  string format = 1 [(dev.f110.kubeproto.field) = { go_name: "Format", inline: false }];
 }
 
 message QuantityValue {
-  Quantity quantity = 1 [(dev.f110.kubeproto.field) = { go_name: "Quantity", api_field_name: "", inline: false }];
+  Quantity quantity = 1 [(dev.f110.kubeproto.field) = { go_name: "Quantity", inline: false }];
 }

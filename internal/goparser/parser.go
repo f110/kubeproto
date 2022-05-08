@@ -288,13 +288,13 @@ func (g *Generator) WriteFile(path string) error {
 			if f.Repeated {
 				w.Fn("repeated ")
 			}
-			w.F(
-				"%s %s = %d [(dev.f110.kubeproto.field) = {go_name: %q, api_field_name: %q, inline: %v}];",
-				f.Kind, f.Name, f.Index,
-				f.GoName,
-				f.APIFieldName,
-				f.Inline,
-			)
+			w.Fn("%s %s = %d ", f.Kind, f.Name, f.Index)
+			w.Fn("[(dev.f110.kubeproto.field) = {go_name: %q, ", f.GoName)
+			if f.APIFieldName != "" {
+				w.Fn("api_field_name: %q, ", f.APIFieldName)
+			}
+			w.Fn("inline: %v}];", f.Inline)
+			w.F("")
 		}
 
 		if m.Option != nil {

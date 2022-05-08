@@ -6,7 +6,7 @@ option  go_package = "k8s.io/apimachinery/pkg/util/intstr";
 import "kube.proto";
 
 message IntOrString {
-  int64  type    = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "", inline: false }];
-  int32  int_val = 2 [(dev.f110.kubeproto.field) = { go_name: "IntVal", api_field_name: "", inline: false }];
-  string str_val = 3 [(dev.f110.kubeproto.field) = { go_name: "StrVal", api_field_name: "", inline: false }];
+  int64  type    = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", inline: false }];
+  int32  int_val = 2 [(dev.f110.kubeproto.field) = { go_name: "IntVal", inline: false }];
+  string str_val = 3 [(dev.f110.kubeproto.field) = { go_name: "StrVal", inline: false }];
 }
