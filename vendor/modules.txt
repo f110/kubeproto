@@ -92,6 +92,7 @@ gopkg.in/yaml.v2
 gopkg.in/yaml.v3
 # k8s.io/api v0.23.6
 ## explicit; go 1.16
+k8s.io/api/apps/v1
 k8s.io/api/core/v1
 # k8s.io/apiextensions-apiserver v0.23.6
 ## explicit; go 1.16

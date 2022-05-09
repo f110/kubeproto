@@ -28,6 +28,8 @@ var packageMap = map[string]string{
 	"k8s.io/apimachinery/pkg/apis/meta/v1": "k8s.io.apimachinery.pkg.apis.meta.v1",
 	"k8s.io/apimachinery/pkg/api/resource": "k8s.io.apimachinery.pkg.api.resource",
 	"k8s.io/apimachinery/pkg/util/intstr":  "k8s.io.apimachinery.pkg.util.intstr",
+	"k8s.io/api/core/v1":                   "k8s.io.api.core.v1",
+	"k8s.io/api/apps/v1":                   "k8s.io.api.apps.v1",
 }
 
 type typeDeclaration struct {
@@ -451,6 +453,9 @@ func (g *Generator) structToProtobufMessage(v *ast.GenDecl) *ProtobufMessage {
 		case *ast.StarExpr:
 			optional = true
 			kind = g.goTypeToProtobufKind(v.X)
+			if s, ok := v.X.(*ast.SelectorExpr); ok {
+				externalPackage = g.resolveProtobufPackage(s.X.(*ast.Ident))
+			}
 		case *ast.ArrayType:
 			repeated = true
 			kind = g.goTypeToProtobufKind(v.Elt)
