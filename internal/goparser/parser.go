@@ -51,6 +51,9 @@ type Generator struct {
 
 	protoPackage string
 	goPackage    string
+	apiDomain    string
+	apiSubGroup  string
+	apiVersion   string
 	protobufFile *ProtobufFile
 
 	packageMap          map[string]string
@@ -180,6 +183,15 @@ func (g *Generator) SetGoPackage(p string) {
 	g.goPackage = p
 }
 
+func (g *Generator) SetAPIDomain(d, s string) {
+	g.apiDomain = d
+	g.apiSubGroup = s
+}
+
+func (g *Generator) SetAPIVersion(v string) {
+	g.apiVersion = v
+}
+
 func (g *Generator) WriteFile(path string) error {
 	if g.protobufFile == nil {
 		return errors.New("not loaded any files. please call AddDir first")
@@ -216,6 +228,19 @@ func (g *Generator) WriteFile(path string) error {
 	w.F("syntax = \"proto3\";")
 	w.F("package %s;", g.protoPackage)
 	w.F("option go_package = %q;", g.goPackage)
+	if g.apiDomain != "" || g.apiSubGroup != "" || g.apiVersion != "" {
+		w.F("option (dev.f110.kubeproto.k8s) = {")
+		if g.apiDomain != "" {
+			w.F("domain: %q,", g.apiDomain)
+		}
+		if g.apiSubGroup != "" {
+			w.F("sub_group: %q,", g.apiSubGroup)
+		}
+		if g.apiVersion != "" {
+			w.F("version: %q,", g.apiVersion)
+		}
+		w.F("};")
+	}
 	w.F("")
 	w.F("import \"kube.proto\";")
 	for _, v := range externalProtos {

@@ -11,13 +11,16 @@ import (
 )
 
 func genGoToProtobuf(args []string) error {
-	var out, protoPackage, goPackage string
+	var out, protoPackage, goPackage, apiDomain, apiSubGroup, apiVersion string
 	var allStructs bool
 	fs := pflag.NewFlagSet("gen-to-to-protobuf", pflag.PanicOnError)
 	fs.StringVar(&out, "out", "", "Output file")
 	fs.StringVar(&protoPackage, "proto-package", "", "Protobuf package name")
 	fs.StringVar(&goPackage, "go-package", "", "GO package name")
 	fs.BoolVar(&allStructs, "all", false, "Generate protobuf for all structs except marked as without generation")
+	fs.StringVar(&apiDomain, "api-domain", "", "API domain name (e,g, f110.dev)")
+	fs.StringVar(&apiSubGroup, "api-sub-group", "", "API sub group (e,g, minio)")
+	fs.StringVar(&apiVersion, "api-version", "", "API version")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
@@ -29,6 +32,8 @@ func genGoToProtobuf(args []string) error {
 		g := goparser.New()
 		g.SetProtoPackage(protoPackage)
 		g.SetGoPackage(goPackage)
+		g.SetAPIDomain(apiDomain, apiSubGroup)
+		g.SetAPIVersion(apiVersion)
 		if err := g.AddDir(v, allStructs); err != nil {
 			return err
 		}
