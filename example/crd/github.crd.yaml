@@ -213,9 +213,16 @@ spec:
                   matchExpressions:
                     properties:
                       key:
+                        description: key is the label key that the selector applies
+                          to.
                         type: string
                       values:
                         items:
+                          description: |-
+                            values is an array of string values. If the operator is In or NotIn,
+                             the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                             the values array must be empty. This array is replaced during a strategic
+                             merge patch.
                           type: string
                         type: array
                     type: object
@@ -230,13 +237,19 @@ spec:
               serviceAccountJSON:
                 properties:
                   key:
+                    description: The key of the secret to select from.  Must be a
+                      valid secret key.
                     type: string
                   localObjectReference:
                     properties:
                       name:
+                        description: |-
+                          Name of the referent.
+                           More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                         type: string
                     type: object
                   optional:
+                    description: Specify whether the Secret or its key must be defined
                     type: boolean
                 type: object
             type: object
@@ -290,13 +303,19 @@ spec:
               adminPasswordSecret:
                 properties:
                   key:
+                    description: The key of the secret to select from.  Must be a
+                      valid secret key.
                     type: string
                   localObjectReference:
                     properties:
                       name:
+                        description: |-
+                          Name of the referent.
+                           More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                         type: string
                     type: object
                   optional:
+                    description: Specify whether the Secret or its key must be defined
                     type: boolean
                 type: object
               mountPath:
@@ -310,9 +329,16 @@ spec:
                   matchExpressions:
                     properties:
                       key:
+                        description: key is the label key that the selector applies
+                          to.
                         type: string
                       values:
                         items:
+                          description: |-
+                            values is an array of string values. If the operator is In or NotIn,
+                             the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                             the values array must be empty. This array is replaced during a strategic
+                             merge patch.
                           type: string
                         type: array
                     type: object
@@ -327,6 +353,9 @@ spec:
               service:
                 properties:
                   name:
+                    description: |-
+                      Name of the referent.
+                       More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                     type: string
                 type: object
             type: object

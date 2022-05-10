@@ -58,7 +58,8 @@ func (g *ClientGenerator) Generate(out io.Writer, packageName, importPath string
 
 	writer.F("func init() {")
 	writer.F("for _, v := range []func(*runtime.Scheme) error{")
-	for _, v := range groupVersions {
+	for _, key := range sortByKey(groupVersions) {
+		v := groupVersions[key]
 		m := v[0]
 		writer.F("%s.AddToScheme,", path.Base(m.Package.Path))
 	}
@@ -370,16 +371,19 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 		writer.F("type %sInformer struct {", clientName)
 		writer.F("factory *InformerFactory")
 		writer.F("client  *%s", clientName)
+		writer.F("namespace string")
+		writer.F("resyncPeriod time.Duration")
+		writer.F("indexers cache.Indexers")
 		writer.F("}")
 		writer.F("")
-		writer.F("func New%sInformer(f *InformerFactory, client *%s) *%sInformer {", clientName, clientName, clientName)
-		writer.F("return &%sInformer{factory: f, client: client}", clientName)
+		writer.F("func New%sInformer(f *InformerFactory, client *%s, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) *%sInformer {", clientName, clientName, clientName)
+		writer.F("return &%sInformer{factory: f, client: client, namespace: namespace, resyncPeriod: resyncPeriod, indexers: indexers}", clientName)
 		writer.F("}")
 		writer.F("")
 
 		for _, m := range v {
 			writer.F(
-				"func(f *%sInformer) %sInformer(namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer{",
+				"func (f *%sInformer) %sInformer() cache.SharedIndexInformer{",
 				clientName,
 				m.ShortName,
 			)
@@ -387,19 +391,24 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 			writer.F("return cache.NewSharedIndexInformer(")
 			writer.F("&cache.ListWatch{")
 			writer.F("ListFunc: func (options metav1.ListOptions) (runtime.Object, error){")
-			writer.F("return f.client.List%s(context.TODO(), namespace, metav1.ListOptions{})", m.ShortName)
+			writer.F("return f.client.List%s(context.TODO(), f.namespace, metav1.ListOptions{})", m.ShortName)
 			writer.F("},") // end of ListFunc
 			writer.F("WatchFunc: func (options metav1.ListOptions) (watch.Interface, error){")
-			writer.F("return f.client.Watch%s(context.TODO(), namespace, metav1.ListOptions{})", m.ShortName)
+			writer.F("return f.client.Watch%s(context.TODO(), f.namespace, metav1.ListOptions{})", m.ShortName)
 			writer.F("},") // end of WatchFunc
 			writer.F("},")
 			writer.F("&%s.%s{},", m.Package.Name, m.ShortName)
-			writer.F("resyncPeriod,")
-			writer.F("indexers,")
+			writer.F("f.resyncPeriod,")
+			writer.F("f.indexers,")
 			writer.F(")")
-			writer.F("},")
-			writer.F(")")
-			writer.F("}") // end of XXXInformer
+			writer.F("})")
+			writer.F("}") // end of NewXXXInformer
+			writer.F("")
+
+			writer.F("func (f *%sInformer) %sLister() *%s%sLister {", clientName, m.ShortName, clientName, m.ShortName)
+			writer.F("return New%s%sLister(f.%sInformer().GetIndexer())", clientName, m.ShortName, m.ShortName)
+			writer.F("}")
+			writer.F("")
 		}
 	}
 
@@ -434,18 +443,18 @@ func (g *listerGenerator) WriteTo(writer *codegeneration.Writer) error {
 		m := v[0]
 		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
 
-		writer.F("type %sLister struct {", clientName)
-		writer.F("indexer cache.Indexer")
-		writer.F("}")
-		writer.F("")
-		writer.F("func New%sLister(indexer cache.Indexer) *%sLister {", clientName, clientName)
-		writer.F("return &%sLister{indexer: indexer}", clientName)
-		writer.F("}")
-		writer.F("")
-
 		for _, m := range v {
+			writer.F("type %s%sLister struct {", clientName, m.ShortName)
+			writer.F("indexer cache.Indexer")
+			writer.F("}")
+			writer.F("")
+			writer.F("func New%s%sLister(indexer cache.Indexer) *%s%sLister {", clientName, m.ShortName, clientName, m.ShortName)
+			writer.F("return &%s%sLister{indexer: indexer}", clientName, m.ShortName)
+			writer.F("}")
+			writer.F("")
+
 			// ListXXX
-			writer.F("func (x *%sLister) List%s(namespace string, selector labels.Selector) ([]*%s.%s, error) {", clientName, m.ShortName, m.Package.Name, m.ShortName)
+			writer.F("func (x *%s%sLister) List(namespace string, selector labels.Selector) ([]*%s.%s, error) {", clientName, m.ShortName, m.Package.Name, m.ShortName)
 			writer.F("var ret []*%s.%s", m.Package.Name, m.ShortName)
 			writer.F("err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {")
 			writer.F("ret = append(ret, m.(*%s.%s))", m.Package.Name, m.ShortName)
@@ -455,7 +464,7 @@ func (g *listerGenerator) WriteTo(writer *codegeneration.Writer) error {
 			writer.F("")
 
 			// GetXXX
-			writer.F("func (x *%sLister) Get%s(namespace, name string) (*%s.%s, error) {", clientName, m.ShortName, m.Package.Name, m.ShortName)
+			writer.F("func (x *%s%sLister) Get(namespace, name string) (*%s.%s, error) {", clientName, m.ShortName, m.Package.Name, m.ShortName)
 			writer.F("obj, exists, err := x.indexer.GetByKey(namespace + \"/\" + name)")
 			writer.F("if err != nil {")
 			writer.F("return nil, err")
@@ -468,5 +477,15 @@ func (g *listerGenerator) WriteTo(writer *codegeneration.Writer) error {
 			writer.F("")
 		}
 	}
+
 	return nil
+}
+
+func sortByKey[V any](in map[string]V) []string {
+	keys := make([]string, 0, len(in))
+	for k := range in {
+		keys = append(keys, k)
+	}
+
+	return keys
 }

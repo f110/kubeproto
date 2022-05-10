@@ -652,244 +652,182 @@ func (f *InformerFactory) Run(ctx context.Context) {
 }
 
 type GrafanaV1alpha1Informer struct {
-	factory *InformerFactory
-	client  *GrafanaV1alpha1
+	factory      *InformerFactory
+	client       *GrafanaV1alpha1
+	namespace    string
+	resyncPeriod time.Duration
+	indexers     cache.Indexers
 }
 
-func NewGrafanaV1alpha1Informer(f *InformerFactory, client *GrafanaV1alpha1) *GrafanaV1alpha1Informer {
-	return &GrafanaV1alpha1Informer{factory: f, client: client}
+func NewGrafanaV1alpha1Informer(f *InformerFactory, client *GrafanaV1alpha1, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) *GrafanaV1alpha1Informer {
+	return &GrafanaV1alpha1Informer{factory: f, client: client, namespace: namespace, resyncPeriod: resyncPeriod, indexers: indexers}
 }
 
-func (f *GrafanaV1alpha1Informer) GrafanaInformer(namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func (f *GrafanaV1alpha1Informer) GrafanaInformer() cache.SharedIndexInformer {
 	return f.factory.InformerFor(&githubv1alpha1.Grafana{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListGrafana(context.TODO(), namespace, metav1.ListOptions{})
+					return f.client.ListGrafana(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchGrafana(context.TODO(), namespace, metav1.ListOptions{})
+					return f.client.WatchGrafana(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
 			&githubv1alpha1.Grafana{},
-			resyncPeriod,
-			indexers,
+			f.resyncPeriod,
+			f.indexers,
 		)
-	},
-	)
+	})
 }
-func (f *GrafanaV1alpha1Informer) GrafanaUserInformer(namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+
+func (f *GrafanaV1alpha1Informer) GrafanaLister() *GrafanaV1alpha1GrafanaLister {
+	return NewGrafanaV1alpha1GrafanaLister(f.GrafanaInformer().GetIndexer())
+}
+
+func (f *GrafanaV1alpha1Informer) GrafanaUserInformer() cache.SharedIndexInformer {
 	return f.factory.InformerFor(&githubv1alpha1.GrafanaUser{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListGrafanaUser(context.TODO(), namespace, metav1.ListOptions{})
+					return f.client.ListGrafanaUser(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchGrafanaUser(context.TODO(), namespace, metav1.ListOptions{})
+					return f.client.WatchGrafanaUser(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
 			&githubv1alpha1.GrafanaUser{},
-			resyncPeriod,
-			indexers,
+			f.resyncPeriod,
+			f.indexers,
 		)
-	},
-	)
+	})
+}
+
+func (f *GrafanaV1alpha1Informer) GrafanaUserLister() *GrafanaV1alpha1GrafanaUserLister {
+	return NewGrafanaV1alpha1GrafanaUserLister(f.GrafanaUserInformer().GetIndexer())
 }
 
 type GrafanaV1alpha2Informer struct {
-	factory *InformerFactory
-	client  *GrafanaV1alpha2
+	factory      *InformerFactory
+	client       *GrafanaV1alpha2
+	namespace    string
+	resyncPeriod time.Duration
+	indexers     cache.Indexers
 }
 
-func NewGrafanaV1alpha2Informer(f *InformerFactory, client *GrafanaV1alpha2) *GrafanaV1alpha2Informer {
-	return &GrafanaV1alpha2Informer{factory: f, client: client}
+func NewGrafanaV1alpha2Informer(f *InformerFactory, client *GrafanaV1alpha2, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) *GrafanaV1alpha2Informer {
+	return &GrafanaV1alpha2Informer{factory: f, client: client, namespace: namespace, resyncPeriod: resyncPeriod, indexers: indexers}
 }
 
-func (f *GrafanaV1alpha2Informer) GrafanaInformer(namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func (f *GrafanaV1alpha2Informer) GrafanaInformer() cache.SharedIndexInformer {
 	return f.factory.InformerFor(&githubv1alpha2.Grafana{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListGrafana(context.TODO(), namespace, metav1.ListOptions{})
+					return f.client.ListGrafana(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchGrafana(context.TODO(), namespace, metav1.ListOptions{})
+					return f.client.WatchGrafana(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
 			&githubv1alpha2.Grafana{},
-			resyncPeriod,
-			indexers,
+			f.resyncPeriod,
+			f.indexers,
 		)
-	},
-	)
+	})
 }
-func (f *GrafanaV1alpha2Informer) GrafanaUserInformer(namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+
+func (f *GrafanaV1alpha2Informer) GrafanaLister() *GrafanaV1alpha2GrafanaLister {
+	return NewGrafanaV1alpha2GrafanaLister(f.GrafanaInformer().GetIndexer())
+}
+
+func (f *GrafanaV1alpha2Informer) GrafanaUserInformer() cache.SharedIndexInformer {
 	return f.factory.InformerFor(&githubv1alpha2.GrafanaUser{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListGrafanaUser(context.TODO(), namespace, metav1.ListOptions{})
+					return f.client.ListGrafanaUser(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchGrafanaUser(context.TODO(), namespace, metav1.ListOptions{})
+					return f.client.WatchGrafanaUser(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
 			&githubv1alpha2.GrafanaUser{},
-			resyncPeriod,
-			indexers,
+			f.resyncPeriod,
+			f.indexers,
 		)
-	},
-	)
+	})
+}
+
+func (f *GrafanaV1alpha2Informer) GrafanaUserLister() *GrafanaV1alpha2GrafanaUserLister {
+	return NewGrafanaV1alpha2GrafanaUserLister(f.GrafanaUserInformer().GetIndexer())
 }
 
 type MinioV1alpha1Informer struct {
-	factory *InformerFactory
-	client  *MinioV1alpha1
+	factory      *InformerFactory
+	client       *MinioV1alpha1
+	namespace    string
+	resyncPeriod time.Duration
+	indexers     cache.Indexers
 }
 
-func NewMinioV1alpha1Informer(f *InformerFactory, client *MinioV1alpha1) *MinioV1alpha1Informer {
-	return &MinioV1alpha1Informer{factory: f, client: client}
+func NewMinioV1alpha1Informer(f *InformerFactory, client *MinioV1alpha1, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) *MinioV1alpha1Informer {
+	return &MinioV1alpha1Informer{factory: f, client: client, namespace: namespace, resyncPeriod: resyncPeriod, indexers: indexers}
 }
 
-func (f *MinioV1alpha1Informer) MinIOBucketInformer(namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func (f *MinioV1alpha1Informer) MinIOBucketInformer() cache.SharedIndexInformer {
 	return f.factory.InformerFor(&miniov1alpha1.MinIOBucket{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListMinIOBucket(context.TODO(), namespace, metav1.ListOptions{})
+					return f.client.ListMinIOBucket(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchMinIOBucket(context.TODO(), namespace, metav1.ListOptions{})
+					return f.client.WatchMinIOBucket(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
 			&miniov1alpha1.MinIOBucket{},
-			resyncPeriod,
-			indexers,
+			f.resyncPeriod,
+			f.indexers,
 		)
-	},
-	)
+	})
 }
-func (f *MinioV1alpha1Informer) MinIOUserInformer(namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+
+func (f *MinioV1alpha1Informer) MinIOBucketLister() *MinioV1alpha1MinIOBucketLister {
+	return NewMinioV1alpha1MinIOBucketLister(f.MinIOBucketInformer().GetIndexer())
+}
+
+func (f *MinioV1alpha1Informer) MinIOUserInformer() cache.SharedIndexInformer {
 	return f.factory.InformerFor(&miniov1alpha1.MinIOUser{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListMinIOUser(context.TODO(), namespace, metav1.ListOptions{})
+					return f.client.ListMinIOUser(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchMinIOUser(context.TODO(), namespace, metav1.ListOptions{})
+					return f.client.WatchMinIOUser(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
 			&miniov1alpha1.MinIOUser{},
-			resyncPeriod,
-			indexers,
+			f.resyncPeriod,
+			f.indexers,
 		)
-	},
-	)
+	})
 }
 
-type GrafanaV1alpha2Lister struct {
+func (f *MinioV1alpha1Informer) MinIOUserLister() *MinioV1alpha1MinIOUserLister {
+	return NewMinioV1alpha1MinIOUserLister(f.MinIOUserInformer().GetIndexer())
+}
+
+type GrafanaV1alpha1GrafanaLister struct {
 	indexer cache.Indexer
 }
 
-func NewGrafanaV1alpha2Lister(indexer cache.Indexer) *GrafanaV1alpha2Lister {
-	return &GrafanaV1alpha2Lister{indexer: indexer}
+func NewGrafanaV1alpha1GrafanaLister(indexer cache.Indexer) *GrafanaV1alpha1GrafanaLister {
+	return &GrafanaV1alpha1GrafanaLister{indexer: indexer}
 }
 
-func (x *GrafanaV1alpha2Lister) ListGrafana(namespace string, selector labels.Selector) ([]*githubv1alpha2.Grafana, error) {
-	var ret []*githubv1alpha2.Grafana
-	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*githubv1alpha2.Grafana))
-	})
-	return ret, err
-}
-
-func (x *GrafanaV1alpha2Lister) GetGrafana(namespace, name string) (*githubv1alpha2.Grafana, error) {
-	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, k8serrors.NewNotFound(githubv1alpha2.SchemaGroupVersion.WithResource("grafana").GroupResource(), name)
-	}
-	return obj.(*githubv1alpha2.Grafana), nil
-}
-
-func (x *GrafanaV1alpha2Lister) ListGrafanaUser(namespace string, selector labels.Selector) ([]*githubv1alpha2.GrafanaUser, error) {
-	var ret []*githubv1alpha2.GrafanaUser
-	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*githubv1alpha2.GrafanaUser))
-	})
-	return ret, err
-}
-
-func (x *GrafanaV1alpha2Lister) GetGrafanaUser(namespace, name string) (*githubv1alpha2.GrafanaUser, error) {
-	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, k8serrors.NewNotFound(githubv1alpha2.SchemaGroupVersion.WithResource("grafanauser").GroupResource(), name)
-	}
-	return obj.(*githubv1alpha2.GrafanaUser), nil
-}
-
-type MinioV1alpha1Lister struct {
-	indexer cache.Indexer
-}
-
-func NewMinioV1alpha1Lister(indexer cache.Indexer) *MinioV1alpha1Lister {
-	return &MinioV1alpha1Lister{indexer: indexer}
-}
-
-func (x *MinioV1alpha1Lister) ListMinIOBucket(namespace string, selector labels.Selector) ([]*miniov1alpha1.MinIOBucket, error) {
-	var ret []*miniov1alpha1.MinIOBucket
-	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*miniov1alpha1.MinIOBucket))
-	})
-	return ret, err
-}
-
-func (x *MinioV1alpha1Lister) GetMinIOBucket(namespace, name string) (*miniov1alpha1.MinIOBucket, error) {
-	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, k8serrors.NewNotFound(miniov1alpha1.SchemaGroupVersion.WithResource("miniobucket").GroupResource(), name)
-	}
-	return obj.(*miniov1alpha1.MinIOBucket), nil
-}
-
-func (x *MinioV1alpha1Lister) ListMinIOUser(namespace string, selector labels.Selector) ([]*miniov1alpha1.MinIOUser, error) {
-	var ret []*miniov1alpha1.MinIOUser
-	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*miniov1alpha1.MinIOUser))
-	})
-	return ret, err
-}
-
-func (x *MinioV1alpha1Lister) GetMinIOUser(namespace, name string) (*miniov1alpha1.MinIOUser, error) {
-	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, k8serrors.NewNotFound(miniov1alpha1.SchemaGroupVersion.WithResource("miniouser").GroupResource(), name)
-	}
-	return obj.(*miniov1alpha1.MinIOUser), nil
-}
-
-type GrafanaV1alpha1Lister struct {
-	indexer cache.Indexer
-}
-
-func NewGrafanaV1alpha1Lister(indexer cache.Indexer) *GrafanaV1alpha1Lister {
-	return &GrafanaV1alpha1Lister{indexer: indexer}
-}
-
-func (x *GrafanaV1alpha1Lister) ListGrafana(namespace string, selector labels.Selector) ([]*githubv1alpha1.Grafana, error) {
+func (x *GrafanaV1alpha1GrafanaLister) List(namespace string, selector labels.Selector) ([]*githubv1alpha1.Grafana, error) {
 	var ret []*githubv1alpha1.Grafana
 	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
 		ret = append(ret, m.(*githubv1alpha1.Grafana))
@@ -897,7 +835,7 @@ func (x *GrafanaV1alpha1Lister) ListGrafana(namespace string, selector labels.Se
 	return ret, err
 }
 
-func (x *GrafanaV1alpha1Lister) GetGrafana(namespace, name string) (*githubv1alpha1.Grafana, error) {
+func (x *GrafanaV1alpha1GrafanaLister) Get(namespace, name string) (*githubv1alpha1.Grafana, error) {
 	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
 	if err != nil {
 		return nil, err
@@ -908,7 +846,15 @@ func (x *GrafanaV1alpha1Lister) GetGrafana(namespace, name string) (*githubv1alp
 	return obj.(*githubv1alpha1.Grafana), nil
 }
 
-func (x *GrafanaV1alpha1Lister) ListGrafanaUser(namespace string, selector labels.Selector) ([]*githubv1alpha1.GrafanaUser, error) {
+type GrafanaV1alpha1GrafanaUserLister struct {
+	indexer cache.Indexer
+}
+
+func NewGrafanaV1alpha1GrafanaUserLister(indexer cache.Indexer) *GrafanaV1alpha1GrafanaUserLister {
+	return &GrafanaV1alpha1GrafanaUserLister{indexer: indexer}
+}
+
+func (x *GrafanaV1alpha1GrafanaUserLister) List(namespace string, selector labels.Selector) ([]*githubv1alpha1.GrafanaUser, error) {
 	var ret []*githubv1alpha1.GrafanaUser
 	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
 		ret = append(ret, m.(*githubv1alpha1.GrafanaUser))
@@ -916,7 +862,7 @@ func (x *GrafanaV1alpha1Lister) ListGrafanaUser(namespace string, selector label
 	return ret, err
 }
 
-func (x *GrafanaV1alpha1Lister) GetGrafanaUser(namespace, name string) (*githubv1alpha1.GrafanaUser, error) {
+func (x *GrafanaV1alpha1GrafanaUserLister) Get(namespace, name string) (*githubv1alpha1.GrafanaUser, error) {
 	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
 	if err != nil {
 		return nil, err
@@ -925,4 +871,112 @@ func (x *GrafanaV1alpha1Lister) GetGrafanaUser(namespace, name string) (*githubv
 		return nil, k8serrors.NewNotFound(githubv1alpha1.SchemaGroupVersion.WithResource("grafanauser").GroupResource(), name)
 	}
 	return obj.(*githubv1alpha1.GrafanaUser), nil
+}
+
+type GrafanaV1alpha2GrafanaLister struct {
+	indexer cache.Indexer
+}
+
+func NewGrafanaV1alpha2GrafanaLister(indexer cache.Indexer) *GrafanaV1alpha2GrafanaLister {
+	return &GrafanaV1alpha2GrafanaLister{indexer: indexer}
+}
+
+func (x *GrafanaV1alpha2GrafanaLister) List(namespace string, selector labels.Selector) ([]*githubv1alpha2.Grafana, error) {
+	var ret []*githubv1alpha2.Grafana
+	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
+		ret = append(ret, m.(*githubv1alpha2.Grafana))
+	})
+	return ret, err
+}
+
+func (x *GrafanaV1alpha2GrafanaLister) Get(namespace, name string) (*githubv1alpha2.Grafana, error) {
+	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(githubv1alpha2.SchemaGroupVersion.WithResource("grafana").GroupResource(), name)
+	}
+	return obj.(*githubv1alpha2.Grafana), nil
+}
+
+type GrafanaV1alpha2GrafanaUserLister struct {
+	indexer cache.Indexer
+}
+
+func NewGrafanaV1alpha2GrafanaUserLister(indexer cache.Indexer) *GrafanaV1alpha2GrafanaUserLister {
+	return &GrafanaV1alpha2GrafanaUserLister{indexer: indexer}
+}
+
+func (x *GrafanaV1alpha2GrafanaUserLister) List(namespace string, selector labels.Selector) ([]*githubv1alpha2.GrafanaUser, error) {
+	var ret []*githubv1alpha2.GrafanaUser
+	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
+		ret = append(ret, m.(*githubv1alpha2.GrafanaUser))
+	})
+	return ret, err
+}
+
+func (x *GrafanaV1alpha2GrafanaUserLister) Get(namespace, name string) (*githubv1alpha2.GrafanaUser, error) {
+	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(githubv1alpha2.SchemaGroupVersion.WithResource("grafanauser").GroupResource(), name)
+	}
+	return obj.(*githubv1alpha2.GrafanaUser), nil
+}
+
+type MinioV1alpha1MinIOBucketLister struct {
+	indexer cache.Indexer
+}
+
+func NewMinioV1alpha1MinIOBucketLister(indexer cache.Indexer) *MinioV1alpha1MinIOBucketLister {
+	return &MinioV1alpha1MinIOBucketLister{indexer: indexer}
+}
+
+func (x *MinioV1alpha1MinIOBucketLister) List(namespace string, selector labels.Selector) ([]*miniov1alpha1.MinIOBucket, error) {
+	var ret []*miniov1alpha1.MinIOBucket
+	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
+		ret = append(ret, m.(*miniov1alpha1.MinIOBucket))
+	})
+	return ret, err
+}
+
+func (x *MinioV1alpha1MinIOBucketLister) Get(namespace, name string) (*miniov1alpha1.MinIOBucket, error) {
+	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(miniov1alpha1.SchemaGroupVersion.WithResource("miniobucket").GroupResource(), name)
+	}
+	return obj.(*miniov1alpha1.MinIOBucket), nil
+}
+
+type MinioV1alpha1MinIOUserLister struct {
+	indexer cache.Indexer
+}
+
+func NewMinioV1alpha1MinIOUserLister(indexer cache.Indexer) *MinioV1alpha1MinIOUserLister {
+	return &MinioV1alpha1MinIOUserLister{indexer: indexer}
+}
+
+func (x *MinioV1alpha1MinIOUserLister) List(namespace string, selector labels.Selector) ([]*miniov1alpha1.MinIOUser, error) {
+	var ret []*miniov1alpha1.MinIOUser
+	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
+		ret = append(ret, m.(*miniov1alpha1.MinIOUser))
+	})
+	return ret, err
+}
+
+func (x *MinioV1alpha1MinIOUserLister) Get(namespace, name string) (*miniov1alpha1.MinIOUser, error) {
+	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(miniov1alpha1.SchemaGroupVersion.WithResource("miniouser").GroupResource(), name)
+	}
+	return obj.(*miniov1alpha1.MinIOUser), nil
 }

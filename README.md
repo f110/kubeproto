@@ -15,7 +15,11 @@ github.proto
 syntax = "proto3";
 package example.apis.githubv1alpha1;
 option go_package = "go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha1";
-option (dev.f110.kubeproto.k8s) = {group: "grafana.f110.dev", version: "v1alpha1"};
+option (dev.f110.kubeproto.k8s) = {
+  domain: "f110.dev",
+  sub_group: "grafana",
+  version: "v1alpha1",
+};
 
 import "kube.proto";
 
@@ -27,7 +31,7 @@ message Grafana {
 }
 ```
 
-BUILD at pkg/apis/GROUP_AND_VERSION
+BUILD at pkg/apis/GROUP_AND_VERSION for generating deepcopy and register
 
 ```
 load("@rules_proto//proto:defs.bzl", "proto_library")
@@ -49,7 +53,7 @@ kubeproto_go_api(
 )
 ```
 
-BUILD file for CustomResourceDefinition
+BUILD file for generating CustomResourceDefinition
 
 ```
 load("//bazel/crd:def.bzl", "crd_proto_manifest")
