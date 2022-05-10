@@ -243,6 +243,25 @@ func (g *restClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 			writer.F("}") // end of UpdateXXX
 			writer.F("")
 
+			// UpdateStatusXXX
+			if m.IsDefinedSubResource() {
+				writer.F("func (c *%s) UpdateStatus%s(ctx context.Context, v *%s, opts metav1.UpdateOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg, structNameWithPkg)
+				writer.F("result := &%s{}", structNameWithPkg)
+				writer.F("err := c.client.Put().")
+				writer.F("Namespace(v.Namespace).")
+				writer.F("Resource(%q).", strings.ToLower(stringsutil.Plural(m.ShortName)))
+				writer.F("Name(v.Name).")
+				writer.F("SubResource(\"status\").")
+				writer.F("VersionedParams(&opts, ParameterCodec).")
+				writer.F("Body(v).")
+				writer.F("Do(ctx).")
+				writer.F("Into(result)")
+				writer.F("if err != nil {\nreturn nil, err\n}")
+				writer.F("return result, nil")
+				writer.F("}") // end of UpdateStatusXXX
+				writer.F("")
+			}
+
 			// DeleteXXX
 			writer.F("func (c *%s) Delete%s(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {", clientName, m.ShortName)
 			writer.F("return c.client.Delete().")
@@ -336,7 +355,7 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 	writer.F("")
 	writer.F("func NewInformerFactory() *InformerFactory {")
 	writer.F("return &InformerFactory{informers: make(map[reflect.Type]cache.SharedIndexInformer)}")
-	writer.F("}")
+	writer.F("}") // end of NewInformerFactory
 	writer.F("")
 	writer.F("func (f *InformerFactory) InformerFor(obj runtime.Object, newFunc func() cache.SharedIndexInformer) cache.SharedIndexInformer {")
 	writer.F("f.mu.Lock()")
@@ -352,7 +371,8 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 	writer.F("go informer.Run(f.ctx.Done())")
 	writer.F("}")
 	writer.F("return informer")
-	writer.F("}")
+	writer.F("}") // end of InformerFor
+	writer.F("")
 	writer.F("func (f *InformerFactory) Run(ctx context.Context) {")
 	writer.F("f.mu.Lock()")
 	writer.F("f.once.Do(func() {")
@@ -362,7 +382,8 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 	writer.F("f.ctx = ctx")
 	writer.F("})")
 	writer.F("f.mu.Unlock()")
-	writer.F("}")
+	writer.F("}") // end of Run
+	writer.F("")
 
 	for _, v := range g.groupVersions {
 		m := v[0]

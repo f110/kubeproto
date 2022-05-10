@@ -279,6 +279,16 @@ func (m *Message) Kubernetes() (*kubeproto.Kubernetes, error) {
 	return ext, nil
 }
 
+func (m *Message) IsDefinedSubResource() bool {
+	for _, f := range m.Fields {
+		if f.SubResource {
+			return true
+		}
+	}
+
+	return false
+}
+
 func extendAsKind(m *Message) {
 	m.Kind = true
 	found := false

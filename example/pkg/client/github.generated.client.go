@@ -480,6 +480,23 @@ func (c *MinioV1alpha1) UpdateMinIOBucket(ctx context.Context, v *miniov1alpha1.
 	return result, nil
 }
 
+func (c *MinioV1alpha1) UpdateStatusMinIOBucket(ctx context.Context, v *miniov1alpha1.MinIOBucket, opts metav1.UpdateOptions) (*miniov1alpha1.MinIOBucket, error) {
+	result := &miniov1alpha1.MinIOBucket{}
+	err := c.client.Put().
+		Namespace(v.Namespace).
+		Resource("miniobuckets").
+		Name(v.Name).
+		SubResource("status").
+		VersionedParams(&opts, ParameterCodec).
+		Body(v).
+		Do(ctx).
+		Into(result)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func (c *MinioV1alpha1) DeleteMinIOBucket(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.client.Delete().
 		Namespace(namespace).
@@ -569,6 +586,23 @@ func (c *MinioV1alpha1) UpdateMinIOUser(ctx context.Context, v *miniov1alpha1.Mi
 	return result, nil
 }
 
+func (c *MinioV1alpha1) UpdateStatusMinIOUser(ctx context.Context, v *miniov1alpha1.MinIOUser, opts metav1.UpdateOptions) (*miniov1alpha1.MinIOUser, error) {
+	result := &miniov1alpha1.MinIOUser{}
+	err := c.client.Put().
+		Namespace(v.Namespace).
+		Resource("miniousers").
+		Name(v.Name).
+		SubResource("status").
+		VersionedParams(&opts, ParameterCodec).
+		Body(v).
+		Do(ctx).
+		Into(result)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func (c *MinioV1alpha1) DeleteMinIOUser(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.client.Delete().
 		Namespace(namespace).
@@ -640,6 +674,7 @@ func (f *InformerFactory) InformerFor(obj runtime.Object, newFunc func() cache.S
 	}
 	return informer
 }
+
 func (f *InformerFactory) Run(ctx context.Context) {
 	f.mu.Lock()
 	f.once.Do(func() {
