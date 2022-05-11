@@ -26,9 +26,9 @@ var (
 
 func init() {
 	for _, v := range []func(*runtime.Scheme) error{
-		githubv1alpha1.AddToScheme,
 		githubv1alpha2.AddToScheme,
 		miniov1alpha1.AddToScheme,
+		githubv1alpha1.AddToScheme,
 	} {
 		if err := v(Scheme); err != nil {
 			panic(err)
@@ -865,7 +865,7 @@ func NewGrafanaV1alpha1GrafanaLister(indexer cache.Indexer) *GrafanaV1alpha1Graf
 func (x *GrafanaV1alpha1GrafanaLister) List(namespace string, selector labels.Selector) ([]*githubv1alpha1.Grafana, error) {
 	var ret []*githubv1alpha1.Grafana
 	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*githubv1alpha1.Grafana))
+		ret = append(ret, m.(*githubv1alpha1.Grafana).DeepCopy())
 	})
 	return ret, err
 }
@@ -878,7 +878,7 @@ func (x *GrafanaV1alpha1GrafanaLister) Get(namespace, name string) (*githubv1alp
 	if !exists {
 		return nil, k8serrors.NewNotFound(githubv1alpha1.SchemaGroupVersion.WithResource("grafana").GroupResource(), name)
 	}
-	return obj.(*githubv1alpha1.Grafana), nil
+	return obj.(*githubv1alpha1.Grafana).DeepCopy(), nil
 }
 
 type GrafanaV1alpha1GrafanaUserLister struct {
@@ -892,7 +892,7 @@ func NewGrafanaV1alpha1GrafanaUserLister(indexer cache.Indexer) *GrafanaV1alpha1
 func (x *GrafanaV1alpha1GrafanaUserLister) List(namespace string, selector labels.Selector) ([]*githubv1alpha1.GrafanaUser, error) {
 	var ret []*githubv1alpha1.GrafanaUser
 	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*githubv1alpha1.GrafanaUser))
+		ret = append(ret, m.(*githubv1alpha1.GrafanaUser).DeepCopy())
 	})
 	return ret, err
 }
@@ -905,7 +905,7 @@ func (x *GrafanaV1alpha1GrafanaUserLister) Get(namespace, name string) (*githubv
 	if !exists {
 		return nil, k8serrors.NewNotFound(githubv1alpha1.SchemaGroupVersion.WithResource("grafanauser").GroupResource(), name)
 	}
-	return obj.(*githubv1alpha1.GrafanaUser), nil
+	return obj.(*githubv1alpha1.GrafanaUser).DeepCopy(), nil
 }
 
 type GrafanaV1alpha2GrafanaLister struct {
@@ -919,7 +919,7 @@ func NewGrafanaV1alpha2GrafanaLister(indexer cache.Indexer) *GrafanaV1alpha2Graf
 func (x *GrafanaV1alpha2GrafanaLister) List(namespace string, selector labels.Selector) ([]*githubv1alpha2.Grafana, error) {
 	var ret []*githubv1alpha2.Grafana
 	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*githubv1alpha2.Grafana))
+		ret = append(ret, m.(*githubv1alpha2.Grafana).DeepCopy())
 	})
 	return ret, err
 }
@@ -932,7 +932,7 @@ func (x *GrafanaV1alpha2GrafanaLister) Get(namespace, name string) (*githubv1alp
 	if !exists {
 		return nil, k8serrors.NewNotFound(githubv1alpha2.SchemaGroupVersion.WithResource("grafana").GroupResource(), name)
 	}
-	return obj.(*githubv1alpha2.Grafana), nil
+	return obj.(*githubv1alpha2.Grafana).DeepCopy(), nil
 }
 
 type GrafanaV1alpha2GrafanaUserLister struct {
@@ -946,7 +946,7 @@ func NewGrafanaV1alpha2GrafanaUserLister(indexer cache.Indexer) *GrafanaV1alpha2
 func (x *GrafanaV1alpha2GrafanaUserLister) List(namespace string, selector labels.Selector) ([]*githubv1alpha2.GrafanaUser, error) {
 	var ret []*githubv1alpha2.GrafanaUser
 	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*githubv1alpha2.GrafanaUser))
+		ret = append(ret, m.(*githubv1alpha2.GrafanaUser).DeepCopy())
 	})
 	return ret, err
 }
@@ -959,7 +959,7 @@ func (x *GrafanaV1alpha2GrafanaUserLister) Get(namespace, name string) (*githubv
 	if !exists {
 		return nil, k8serrors.NewNotFound(githubv1alpha2.SchemaGroupVersion.WithResource("grafanauser").GroupResource(), name)
 	}
-	return obj.(*githubv1alpha2.GrafanaUser), nil
+	return obj.(*githubv1alpha2.GrafanaUser).DeepCopy(), nil
 }
 
 type MinioV1alpha1MinIOBucketLister struct {
@@ -973,7 +973,7 @@ func NewMinioV1alpha1MinIOBucketLister(indexer cache.Indexer) *MinioV1alpha1MinI
 func (x *MinioV1alpha1MinIOBucketLister) List(namespace string, selector labels.Selector) ([]*miniov1alpha1.MinIOBucket, error) {
 	var ret []*miniov1alpha1.MinIOBucket
 	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*miniov1alpha1.MinIOBucket))
+		ret = append(ret, m.(*miniov1alpha1.MinIOBucket).DeepCopy())
 	})
 	return ret, err
 }
@@ -986,7 +986,7 @@ func (x *MinioV1alpha1MinIOBucketLister) Get(namespace, name string) (*miniov1al
 	if !exists {
 		return nil, k8serrors.NewNotFound(miniov1alpha1.SchemaGroupVersion.WithResource("miniobucket").GroupResource(), name)
 	}
-	return obj.(*miniov1alpha1.MinIOBucket), nil
+	return obj.(*miniov1alpha1.MinIOBucket).DeepCopy(), nil
 }
 
 type MinioV1alpha1MinIOUserLister struct {
@@ -1000,7 +1000,7 @@ func NewMinioV1alpha1MinIOUserLister(indexer cache.Indexer) *MinioV1alpha1MinIOU
 func (x *MinioV1alpha1MinIOUserLister) List(namespace string, selector labels.Selector) ([]*miniov1alpha1.MinIOUser, error) {
 	var ret []*miniov1alpha1.MinIOUser
 	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*miniov1alpha1.MinIOUser))
+		ret = append(ret, m.(*miniov1alpha1.MinIOUser).DeepCopy())
 	})
 	return ret, err
 }
@@ -1013,5 +1013,5 @@ func (x *MinioV1alpha1MinIOUserLister) Get(namespace, name string) (*miniov1alph
 	if !exists {
 		return nil, k8serrors.NewNotFound(miniov1alpha1.SchemaGroupVersion.WithResource("miniouser").GroupResource(), name)
 	}
-	return obj.(*miniov1alpha1.MinIOUser), nil
+	return obj.(*miniov1alpha1.MinIOUser).DeepCopy(), nil
 }

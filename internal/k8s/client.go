@@ -478,7 +478,7 @@ func (g *listerGenerator) WriteTo(writer *codegeneration.Writer) error {
 			writer.F("func (x *%s%sLister) List(namespace string, selector labels.Selector) ([]*%s.%s, error) {", clientName, m.ShortName, m.Package.Name, m.ShortName)
 			writer.F("var ret []*%s.%s", m.Package.Name, m.ShortName)
 			writer.F("err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {")
-			writer.F("ret = append(ret, m.(*%s.%s))", m.Package.Name, m.ShortName)
+			writer.F("ret = append(ret, m.(*%s.%s).DeepCopy())", m.Package.Name, m.ShortName)
 			writer.F("})")
 			writer.F("return ret, err")
 			writer.F("}") // end of ListXXX
@@ -493,7 +493,7 @@ func (g *listerGenerator) WriteTo(writer *codegeneration.Writer) error {
 			writer.F("if !exists {")
 			writer.F("return nil, k8serrors.NewNotFound(%s.SchemaGroupVersion.WithResource(%q).GroupResource(), name)", m.Package.Name, strings.ToLower(m.ShortName))
 			writer.F("}")
-			writer.F("return obj.(*%s.%s), nil", m.Package.Name, m.ShortName)
+			writer.F("return obj.(*%s.%s).DeepCopy(), nil", m.Package.Name, m.ShortName)
 			writer.F("}")
 			writer.F("")
 		}
