@@ -26,9 +26,9 @@ var (
 
 func init() {
 	for _, v := range []func(*runtime.Scheme) error{
+		githubv1alpha1.AddToScheme,
 		githubv1alpha2.AddToScheme,
 		miniov1alpha1.AddToScheme,
-		githubv1alpha1.AddToScheme,
 	} {
 		if err := v(Scheme); err != nil {
 			panic(err)
@@ -694,8 +694,13 @@ type GrafanaV1alpha1Informer struct {
 	indexers     cache.Indexers
 }
 
-func NewGrafanaV1alpha1Informer(f *InformerFactory, client *GrafanaV1alpha1, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) *GrafanaV1alpha1Informer {
-	return &GrafanaV1alpha1Informer{factory: f, client: client, namespace: namespace, resyncPeriod: resyncPeriod, indexers: indexers}
+func NewGrafanaV1alpha1Informer(f *InformerFactory, client *GrafanaV1alpha1, namespace string, resyncPeriod time.Duration) *GrafanaV1alpha1Informer {
+	return &GrafanaV1alpha1Informer{
+		client:       client,
+		namespace:    namespace,
+		resyncPeriod: resyncPeriod,
+		indexers:     cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
+	}
 }
 
 func (f *GrafanaV1alpha1Informer) GrafanaInformer() cache.SharedIndexInformer {
@@ -750,8 +755,13 @@ type GrafanaV1alpha2Informer struct {
 	indexers     cache.Indexers
 }
 
-func NewGrafanaV1alpha2Informer(f *InformerFactory, client *GrafanaV1alpha2, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) *GrafanaV1alpha2Informer {
-	return &GrafanaV1alpha2Informer{factory: f, client: client, namespace: namespace, resyncPeriod: resyncPeriod, indexers: indexers}
+func NewGrafanaV1alpha2Informer(f *InformerFactory, client *GrafanaV1alpha2, namespace string, resyncPeriod time.Duration) *GrafanaV1alpha2Informer {
+	return &GrafanaV1alpha2Informer{
+		client:       client,
+		namespace:    namespace,
+		resyncPeriod: resyncPeriod,
+		indexers:     cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
+	}
 }
 
 func (f *GrafanaV1alpha2Informer) GrafanaInformer() cache.SharedIndexInformer {
@@ -806,8 +816,13 @@ type MinioV1alpha1Informer struct {
 	indexers     cache.Indexers
 }
 
-func NewMinioV1alpha1Informer(f *InformerFactory, client *MinioV1alpha1, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) *MinioV1alpha1Informer {
-	return &MinioV1alpha1Informer{factory: f, client: client, namespace: namespace, resyncPeriod: resyncPeriod, indexers: indexers}
+func NewMinioV1alpha1Informer(f *InformerFactory, client *MinioV1alpha1, namespace string, resyncPeriod time.Duration) *MinioV1alpha1Informer {
+	return &MinioV1alpha1Informer{
+		client:       client,
+		namespace:    namespace,
+		resyncPeriod: resyncPeriod,
+		indexers:     cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
+	}
 }
 
 func (f *MinioV1alpha1Informer) MinIOBucketInformer() cache.SharedIndexInformer {

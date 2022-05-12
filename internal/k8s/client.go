@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"path"
+	"sort"
 	"strings"
 
 	"google.golang.org/protobuf/reflect/protoregistry"
@@ -58,7 +59,7 @@ func (g *ClientGenerator) Generate(out io.Writer, packageName, importPath string
 
 	writer.F("func init() {")
 	writer.F("for _, v := range []func(*runtime.Scheme) error{")
-	for _, key := range sortByKey(groupVersions) {
+	for _, key := range keys(groupVersions) {
 		v := groupVersions[key]
 		m := v[0]
 		writer.F("%s.AddToScheme,", path.Base(m.Package.Path))
@@ -176,7 +177,8 @@ func (g *restClientGenerator) Import() map[string]string {
 }
 
 func (g *restClientGenerator) WriteTo(writer *codegeneration.Writer) error {
-	for _, v := range g.groupVersions {
+	for _, k := range keys(g.groupVersions) {
+		v := g.groupVersions[k]
 		m := v[0]
 		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
 		writer.F("type %s struct {", clientName)
@@ -385,7 +387,8 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 	writer.F("}") // end of Run
 	writer.F("")
 
-	for _, v := range g.groupVersions {
+	for _, k := range keys(g.groupVersions) {
+		v := g.groupVersions[k]
 		m := v[0]
 		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
 
@@ -397,9 +400,14 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 		writer.F("indexers cache.Indexers")
 		writer.F("}")
 		writer.F("")
-		writer.F("func New%sInformer(f *InformerFactory, client *%s, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) *%sInformer {", clientName, clientName, clientName)
-		writer.F("return &%sInformer{factory: f, client: client, namespace: namespace, resyncPeriod: resyncPeriod, indexers: indexers}", clientName)
+		writer.F("func New%sInformer(f *InformerFactory, client *%s, namespace string, resyncPeriod time.Duration) *%sInformer {", clientName, clientName, clientName)
+		writer.F("return &%sInformer{", clientName)
+		writer.F("client: client,")
+		writer.F("namespace: namespace,")
+		writer.F("resyncPeriod: resyncPeriod,")
+		writer.F("indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},")
 		writer.F("}")
+		writer.F("}") // end of NewXXXInformer
 		writer.F("")
 
 		for _, m := range v {
@@ -460,7 +468,8 @@ func (g *listerGenerator) Import() map[string]string {
 }
 
 func (g *listerGenerator) WriteTo(writer *codegeneration.Writer) error {
-	for _, v := range g.groupVersions {
+	for _, k := range keys(g.groupVersions) {
+		v := g.groupVersions[k]
 		m := v[0]
 		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
 
@@ -502,11 +511,12 @@ func (g *listerGenerator) WriteTo(writer *codegeneration.Writer) error {
 	return nil
 }
 
-func sortByKey[V any](in map[string]V) []string {
+func keys[V any](in map[string]V) []string {
 	keys := make([]string, 0, len(in))
 	for k := range in {
 		keys = append(keys, k)
 	}
 
+	sort.Strings(keys)
 	return keys
 }
