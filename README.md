@@ -68,6 +68,21 @@ crd_proto_manifest(
 )
 ```
 
+# How to use generated client
+
+```go
+    apiClient, err := NewGithubV1alpha1Client(cfg)
+	if err != nil {
+		return nil, err
+	}
+	
+	factory := NewInformerFactory()
+    githubInformers := NewGithubV1alpha1Informer(factory, apiClient, metav1.NamespaceAll, 30*time.Second)
+    githubGrafanaInformer := githubInformers.GrafanaInformer()
+    grafanaLister := githubInformers.GrafanaLister()
+
+```
+
 # Author
 
 Fumihiro Ito
