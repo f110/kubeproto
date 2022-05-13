@@ -1,0 +1,12 @@
+load("//bazel:def.bzl", "go_testing_client")
+
+go_testing_client(
+    name = "github",
+    srcs = [
+        "//example/pkg/apis/githubv1alpha1:github_proto",
+        "//example/pkg/apis/githubv1alpha2:github_proto",
+        "//example/pkg/apis/miniov1alpha1:minio_proto",
+    ],
+    importpath = "go.f110.dev/kubeproto/example/pkg/client/testingclient",
+    visibility = ["//visibility:public"],
+)

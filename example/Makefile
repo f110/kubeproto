@@ -31,6 +31,13 @@ pkg/client/github.generated.client.go: pkg/apis/githubv1alpha1/github.proto pkg/
 	cp ../bazel-bin/example/pkg/client/github.generated.client.go $(@D)
 	@chmod 644 $@
 
+.PHONY: pkg/client/testingclient/github.generated.testingclient.go
+pkg/client/testingclient/github.generated.testingclient.go: pkg/apis/githubv1alpha1/github.proto pkg/apis/githubv1alpha2/github.proto pkg/apis/miniov1alpha1/minio.proto
+	bazel build //example/pkg/client/testingclient:github
+	@rm -f $@
+	cp ../bazel-bin/example/pkg/client/testingclient/github.generated.testingclient.go $(@D)
+	@chmod 644 $@
+
 .PHONY: crd/github.crd.yaml
 crd/github.crd.yaml: pkg/apis/githubv1alpha1/github.proto pkg/apis/githubv1alpha2/github.proto pkg/apis/miniov1alpha1/minio.proto
 	bazel build //example/crd:github

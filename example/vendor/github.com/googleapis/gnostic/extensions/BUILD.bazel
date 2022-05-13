@@ -1,0 +1,19 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "extensions",
+    srcs = [
+        "extension.pb.go",
+        "extensions.go",
+    ],
+    importmap = "go.f110.dev/kubeproto/example/vendor/github.com/googleapis/gnostic/extensions",
+    importpath = "github.com/googleapis/gnostic/extensions",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/github.com/golang/protobuf/proto",
+        "//example/vendor/github.com/golang/protobuf/ptypes",
+        "//example/vendor/google.golang.org/protobuf/reflect/protoreflect",
+        "//example/vendor/google.golang.org/protobuf/runtime/protoimpl",
+        "//example/vendor/google.golang.org/protobuf/types/known/anypb",
+    ],
+)

@@ -1,0 +1,29 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "testing",
+    srcs = [
+        "actions.go",
+        "fake.go",
+        "fixture.go",
+        "interface.go",
+    ],
+    importmap = "go.f110.dev/kubeproto/example/vendor/k8s.io/client-go/testing",
+    importpath = "k8s.io/client-go/testing",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/github.com/evanphx/json-patch",
+        "//example/vendor/k8s.io/apimachinery/pkg/api/errors",
+        "//example/vendor/k8s.io/apimachinery/pkg/api/meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/fields",
+        "//example/vendor/k8s.io/apimachinery/pkg/labels",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
+        "//example/vendor/k8s.io/apimachinery/pkg/types",
+        "//example/vendor/k8s.io/apimachinery/pkg/util/json",
+        "//example/vendor/k8s.io/apimachinery/pkg/util/strategicpatch",
+        "//example/vendor/k8s.io/apimachinery/pkg/watch",
+        "//example/vendor/k8s.io/client-go/rest",
+    ],
+)

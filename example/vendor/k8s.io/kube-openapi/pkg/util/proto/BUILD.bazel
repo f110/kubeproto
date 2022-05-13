@@ -1,0 +1,17 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "proto",
+    srcs = [
+        "doc.go",
+        "document.go",
+        "openapi.go",
+    ],
+    importmap = "go.f110.dev/kubeproto/example/vendor/k8s.io/kube-openapi/pkg/util/proto",
+    importpath = "k8s.io/kube-openapi/pkg/util/proto",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/github.com/googleapis/gnostic/openapiv2",
+        "//example/vendor/gopkg.in/yaml.v2:yaml_v2",
+    ],
+)

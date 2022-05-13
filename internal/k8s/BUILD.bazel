@@ -6,6 +6,7 @@ go_library(
         "client.go",
         "crd.go",
         "deepcopy.go",
+        "testingclient.go",
         "register.go",
     ],
     importpath = "go.f110.dev/kubeproto/internal/k8s",
