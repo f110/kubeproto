@@ -91,10 +91,12 @@ func newRestFakeClientGenerator(groupVersions map[string][]*definition.Message) 
 
 func (g *restFakeClientGenerator) Import() map[string]string {
 	importPackages := map[string]string{
-		"k8s.io/apimachinery/pkg/apis/meta/v1": "metav1",
-		"k8s.io/apimachinery/pkg/watch":        "",
-		"k8s.io/apimachinery/pkg/labels":       "",
-		"k8s.io/client-go/testing":             "k8stesting",
+		"k8s.io/apimachinery/pkg/apis/meta/v1":       "metav1",
+		"k8s.io/apimachinery/pkg/watch":              "",
+		"k8s.io/apimachinery/pkg/labels":             "",
+		"k8s.io/apimachinery/pkg/runtime":            "",
+		"k8s.io/apimachinery/pkg/runtime/serializer": "",
+		"k8s.io/client-go/testing":                   "k8stesting",
 	}
 	for _, v := range g.groupVersions {
 		for _, m := range v {
@@ -106,17 +108,72 @@ func (g *restFakeClientGenerator) Import() map[string]string {
 }
 
 func (g *restFakeClientGenerator) WriteTo(writer *codegeneration.Writer) error {
+	writer.F("var (")
+	writer.F("scheme = runtime.NewScheme()")
+	writer.F("codecs = serializer.NewCodecFactory(scheme)")
+	writer.F(")")
+	writer.F("")
+
+	writer.F("func init() {")
+	writer.F("for _, v := range []func(*runtime.Scheme) error{")
+	for _, key := range keys(g.groupVersions) {
+		v := g.groupVersions[key]
+		m := v[0]
+		writer.F("%s.AddToScheme,", path.Base(m.Package.Path))
+	}
+	writer.F("} {")
+	writer.F("if err := v(scheme); err != nil {\npanic(err)\n}")
+	writer.F("}") // end of for
+	writer.F("}") // end of init()
+
+	writer.F("type Set struct {")
+	for _, k := range keys(g.groupVersions) {
+		m := g.groupVersions[k][0]
+		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
+		writer.F("%s *Testing%s", clientName, clientName)
+	}
+	writer.F("")
+	writer.F("tracker k8stesting.ObjectTracker")
+	writer.F("}")
+	writer.F("")
+	writer.F("func NewSet() *Set {")
+	writer.F("o := k8stesting.NewObjectTracker(scheme, codecs.UniversalDecoder())")
+	writer.F("fake := k8stesting.Fake{}")
+	writer.F("fake.AddReactor(\"*\", \"*\", k8stesting.ObjectReaction(o))")
+	writer.F("fake.AddWatchReactor(\"*\", func(action k8stesting.Action) (handled bool, ret watch.Interface, err error) {")
+	writer.F("w, err := o.Watch(action.GetResource(), action.GetNamespace())")
+	writer.F("if err != nil {")
+	writer.F("return false, nil, err")
+	writer.F("}")
+	writer.F("return true, w, nil")
+	writer.F("})")
+	writer.F("")
+	writer.F("return &Set{")
+	for _, k := range keys(g.groupVersions) {
+		m := g.groupVersions[k][0]
+		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
+		writer.F("%s: NewTesting%sClient(&fake),", clientName, clientName)
+	}
+	writer.F("tracker: o,")
+	writer.F("}")
+	writer.F("}")
+	writer.F("")
+	writer.F("func (s *Set) Tracker() k8stesting.ObjectTracker {")
+	writer.F("return s.tracker")
+	writer.F("}") // end of Tracker
+	writer.F("")
+
 	for _, k := range keys(g.groupVersions) {
 		v := g.groupVersions[k]
 		m := v[0]
 		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
-		writer.F("type Fake%s struct {", clientName)
+		writer.F("type Testing%s struct {", clientName)
 		writer.F("*k8stesting.Fake")
 		writer.F("}")
 		writer.F("")
 
-		writer.F("func NewFake%sClient() *Fake%s {", clientName, clientName)
-		writer.F("return &Fake%s{}", clientName)
+		writer.F("func NewTesting%sClient(fake *k8stesting.Fake) *Testing%s {", clientName, clientName)
+		writer.F("return &Testing%s{Fake: fake}", clientName)
 		writer.F("}") // end of NewFakeXXXClient
 		writer.F("")
 
@@ -124,7 +181,7 @@ func (g *restFakeClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 			structNameWithPkg := fmt.Sprintf("%s.%s", m.Package.Name, m.ShortName)
 			resourceName := strings.ToLower(stringsutil.Plural(m.ShortName))
 			// GetXXX
-			writer.F("func(c *Fake%s) Get%s(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg)
+			writer.F("func(c *Testing%s) Get%s(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg)
 			writer.F(
 				"obj, err := c.Fake.Invokes(k8stesting.NewGetAction(%s.SchemaGroupVersion.WithResource(%q), namespace, name), &%s{})",
 				m.Package.Name,
@@ -139,7 +196,7 @@ func (g *restFakeClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 			writer.F("")
 
 			// CreateXXX
-			writer.F("func (c *Fake%s) Create%s(ctx context.Context, v *%s, opts metav1.CreateOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg, structNameWithPkg)
+			writer.F("func (c *Testing%s) Create%s(ctx context.Context, v *%s, opts metav1.CreateOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg, structNameWithPkg)
 			writer.F("obj, err := c.Fake.")
 			writer.F("Invokes(k8stesting.NewCreateAction(%s.SchemaGroupVersion.WithResource(%q), v.Namespace, v), &%s{})", m.Package.Name, resourceName, structNameWithPkg)
 			writer.F("")
@@ -151,7 +208,7 @@ func (g *restFakeClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 			writer.F("")
 
 			// UpdateXXX
-			writer.F("func (c *Fake%s) Update%s(ctx context.Context, v *%s, opts metav1.UpdateOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg, structNameWithPkg)
+			writer.F("func (c *Testing%s) Update%s(ctx context.Context, v *%s, opts metav1.UpdateOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg, structNameWithPkg)
 			writer.F("obj, err := c.Fake.")
 			writer.F("Invokes(k8stesting.NewUpdateAction(%s.SchemaGroupVersion.WithResource(%q), v.Namespace, v), &%s{})", m.Package.Name, resourceName, structNameWithPkg)
 			writer.F("")
@@ -164,7 +221,7 @@ func (g *restFakeClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 
 			// UpdateStatusXXX
 			if m.IsDefinedSubResource() {
-				writer.F("func (c *Fake%s) UpdateStatus%s(ctx context.Context, v *%s, opts metav1.UpdateOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg, structNameWithPkg)
+				writer.F("func (c *Testing%s) UpdateStatus%s(ctx context.Context, v *%s, opts metav1.UpdateOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg, structNameWithPkg)
 				writer.F("obj, err := c.Fake.")
 				writer.F("Invokes(k8stesting.NewUpdateSubresourceAction(%s.SchemaGroupVersion.WithResource(%q), \"status\", v.Namespace, v), &%s{})", m.Package.Name, resourceName, structNameWithPkg)
 				writer.F("")
@@ -177,7 +234,7 @@ func (g *restFakeClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 			}
 
 			// DeleteXXX
-			writer.F("func (c *Fake%s) Delete%s(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {", clientName, m.ShortName)
+			writer.F("func (c *Testing%s) Delete%s(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {", clientName, m.ShortName)
 			writer.F("_, err := c.Fake.")
 			writer.F("Invokes(k8stesting.NewDeleteAction(%s.SchemaGroupVersion.WithResource(%q), namespace, name), &%s{})", m.Package.Name, resourceName, structNameWithPkg)
 			writer.F("")
@@ -186,7 +243,7 @@ func (g *restFakeClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 			writer.F("")
 
 			// ListXXX
-			writer.F("func (c *Fake%s) List%s(ctx context.Context, namespace string, opts metav1.ListOptions) (*%s.%sList, error) {", clientName, m.ShortName, m.Package.Name, m.ShortName)
+			writer.F("func (c *Testing%s) List%s(ctx context.Context, namespace string, opts metav1.ListOptions) (*%s.%sList, error) {", clientName, m.ShortName, m.Package.Name, m.ShortName)
 			writer.F("obj, err := c.Fake.")
 			writer.F("Invokes(k8stesting.NewListAction(%s.SchemaGroupVersion.WithResource(%q), %s.SchemaGroupVersion.WithKind(%q), namespace, opts), &%sList{})", m.Package.Name, resourceName, m.Package.Name, m.ShortName, structNameWithPkg)
 			writer.F("")
@@ -209,7 +266,7 @@ func (g *restFakeClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 			writer.F("")
 
 			// WatchXXX
-			writer.F("func (c *Fake%s) Watch%s(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {", clientName, m.ShortName)
+			writer.F("func (c *Testing%s) Watch%s(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {", clientName, m.ShortName)
 			writer.F("return c.Fake.InvokesWatch(k8stesting.NewWatchAction(%s.SchemaGroupVersion.WithResource(%q), namespace, opts))", m.Package.Name, resourceName)
 			writer.F("}") // end of WatchXXX
 			writer.F("")
