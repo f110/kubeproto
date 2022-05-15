@@ -70,6 +70,30 @@ func (g *ClientGenerator) Generate(out io.Writer, packageName, importPath string
 	writer.F("}") // end of init()
 	writer.F("")
 
+	writer.F("type Set struct {")
+	for _, key := range keys(groupVersions) {
+		m := groupVersions[key][0]
+		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
+		writer.F("%s *%s", clientName, clientName)
+	}
+	writer.F("}")
+	writer.F("")
+	writer.F("func NewSet(cfg *rest.Config) (*Set,error) {")
+	writer.F("s := &Set{}")
+	for _, key := range keys(groupVersions) {
+		m := groupVersions[key][0]
+		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
+		writer.F("{")
+		writer.F("c, err := New%sClient(cfg)", clientName)
+		writer.F("if err != nil {\nreturn nil, err\n}")
+		writer.F("s.%s = c", clientName)
+		writer.F("}")
+	}
+	writer.F("")
+	writer.F("return s, nil")
+	writer.F("}") // end of NewSet
+	writer.F("")
+
 	restClient := newRestClientGenerator(groupVersions)
 	if err := restClient.WriteTo(writer); err != nil {
 		return err

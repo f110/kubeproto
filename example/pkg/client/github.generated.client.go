@@ -36,6 +36,39 @@ func init() {
 	}
 }
 
+type Set struct {
+	GrafanaV1alpha1 *GrafanaV1alpha1
+	GrafanaV1alpha2 *GrafanaV1alpha2
+	MinioV1alpha1   *MinioV1alpha1
+}
+
+func NewSet(cfg *rest.Config) (*Set, error) {
+	s := &Set{}
+	{
+		c, err := NewGrafanaV1alpha1Client(cfg)
+		if err != nil {
+			return nil, err
+		}
+		s.GrafanaV1alpha1 = c
+	}
+	{
+		c, err := NewGrafanaV1alpha2Client(cfg)
+		if err != nil {
+			return nil, err
+		}
+		s.GrafanaV1alpha2 = c
+	}
+	{
+		c, err := NewMinioV1alpha1Client(cfg)
+		if err != nil {
+			return nil, err
+		}
+		s.MinioV1alpha1 = c
+	}
+
+	return s, nil
+}
+
 type GrafanaV1alpha1 struct {
 	client *rest.RESTClient
 }
