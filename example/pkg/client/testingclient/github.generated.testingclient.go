@@ -33,6 +33,8 @@ func init() {
 }
 
 type Set struct {
+	k8stesting.Fake
+
 	GrafanaV1alpha1 *TestingGrafanaV1alpha1
 	GrafanaV1alpha2 *TestingGrafanaV1alpha2
 	MinioV1alpha1   *TestingMinioV1alpha1
@@ -41,10 +43,10 @@ type Set struct {
 }
 
 func NewSet() *Set {
+	s := &Set{}
 	o := k8stesting.NewObjectTracker(scheme, codecs.UniversalDecoder())
-	fake := k8stesting.Fake{}
-	fake.AddReactor("*", "*", k8stesting.ObjectReaction(o))
-	fake.AddWatchReactor("*", func(action k8stesting.Action) (handled bool, ret watch.Interface, err error) {
+	s.AddReactor("*", "*", k8stesting.ObjectReaction(o))
+	s.AddWatchReactor("*", func(action k8stesting.Action) (handled bool, ret watch.Interface, err error) {
 		w, err := o.Watch(action.GetResource(), action.GetNamespace())
 		if err != nil {
 			return false, nil, err
@@ -53,9 +55,9 @@ func NewSet() *Set {
 	})
 
 	return &Set{
-		GrafanaV1alpha1: NewTestingGrafanaV1alpha1Client(&fake),
-		GrafanaV1alpha2: NewTestingGrafanaV1alpha2Client(&fake),
-		MinioV1alpha1:   NewTestingMinioV1alpha1Client(&fake),
+		GrafanaV1alpha1: NewTestingGrafanaV1alpha1Client(&s.Fake),
+		GrafanaV1alpha2: NewTestingGrafanaV1alpha2Client(&s.Fake),
+		MinioV1alpha1:   NewTestingMinioV1alpha1Client(&s.Fake),
 		tracker:         o,
 	}
 }

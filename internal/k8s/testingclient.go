@@ -127,6 +127,8 @@ func (g *restFakeClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 	writer.F("}") // end of init()
 
 	writer.F("type Set struct {")
+	writer.F("k8stesting.Fake")
+	writer.F("")
 	for _, k := range keys(g.groupVersions) {
 		m := g.groupVersions[k][0]
 		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
@@ -137,10 +139,10 @@ func (g *restFakeClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 	writer.F("}")
 	writer.F("")
 	writer.F("func NewSet() *Set {")
+	writer.F("s := &Set{}")
 	writer.F("o := k8stesting.NewObjectTracker(scheme, codecs.UniversalDecoder())")
-	writer.F("fake := k8stesting.Fake{}")
-	writer.F("fake.AddReactor(\"*\", \"*\", k8stesting.ObjectReaction(o))")
-	writer.F("fake.AddWatchReactor(\"*\", func(action k8stesting.Action) (handled bool, ret watch.Interface, err error) {")
+	writer.F("s.AddReactor(\"*\", \"*\", k8stesting.ObjectReaction(o))")
+	writer.F("s.AddWatchReactor(\"*\", func(action k8stesting.Action) (handled bool, ret watch.Interface, err error) {")
 	writer.F("w, err := o.Watch(action.GetResource(), action.GetNamespace())")
 	writer.F("if err != nil {")
 	writer.F("return false, nil, err")
@@ -152,7 +154,7 @@ func (g *restFakeClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 	for _, k := range keys(g.groupVersions) {
 		m := g.groupVersions[k][0]
 		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
-		writer.F("%s: NewTesting%sClient(&fake),", clientName, clientName)
+		writer.F("%s: NewTesting%sClient(&s.Fake),", clientName, clientName)
 	}
 	writer.F("tracker: o,")
 	writer.F("}")
