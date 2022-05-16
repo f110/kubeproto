@@ -33,6 +33,7 @@ func (g *ClientGenerator) Generate(out io.Writer, packageName, importPath string
 
 	// The key is a package path. The value is an alias.
 	importPackages := map[string]string{
+		"errors":                          "",
 		"context":                         "",
 		"time":                            "",
 		"k8s.io/apimachinery/pkg/runtime": "",
@@ -70,6 +71,114 @@ func (g *ClientGenerator) Generate(out io.Writer, packageName, importPath string
 	writer.F("}") // end of init()
 	writer.F("")
 
+	writer.F(`
+type Backend interface {
+	Get(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.GetOptions, result runtime.Object) error
+	List(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions, result runtime.Object) error
+	Create(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) error
+	Update(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) error
+	UpdateStatus(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) error
+	Delete(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.DeleteOptions) error
+	Watch(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions) (watch.Interface, error)
+}
+
+type restBackend struct {
+	client *rest.RESTClient
+}
+
+func (r *restBackend) Get(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.GetOptions, result runtime.Object) error {
+	return r.client.Get().
+		Namespace(namespace).
+		Resource(resourceName).
+		Name(name).
+		VersionedParams(&opts, ParameterCodec).
+		Do(ctx).
+		Into(result)
+}
+
+func (r *restBackend) List(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions, result runtime.Object) error {
+	var timeout time.Duration
+	if opts.TimeoutSeconds != nil {
+		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	}
+	return r.client.Get().
+		Namespace(namespace).
+		Resource(resourceName).
+		VersionedParams(&opts, ParameterCodec).
+		Timeout(timeout).
+		Do(ctx).
+		Into(result)
+}
+
+func (r *restBackend) Create(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) error {
+	m := obj.(metav1.Object)
+	if m == nil {
+		return errors.New("obj is not implement metav1.Object")
+	}
+	return r.client.Post().
+		Namespace(m.GetNamespace()).
+		Resource(resourceName).
+		VersionedParams(&opts, ParameterCodec).
+		Body(obj).
+		Do(ctx).
+		Into(result)
+}
+
+func (r *restBackend) Update(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) error {
+	m := obj.(metav1.Object)
+	if m == nil {
+		return errors.New("obj is not implement metav1.Object")
+	}
+	return r.client.Put().
+		Namespace(m.GetNamespace()).
+		Resource(resourceName).
+		Name(m.GetName()).
+		VersionedParams(&opts, ParameterCodec).
+		Body(obj).
+		Do(ctx).
+		Into(result)
+}
+
+func (r *restBackend) UpdateStatus(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) error {
+	m := obj.(metav1.Object)
+	if m == nil {
+		return errors.New("obj is not implement metav1.Object")
+	}
+	return r.client.Put().
+		Namespace(m.GetNamespace()).
+		Resource(resourceName).
+		Name(m.GetName()).
+		SubResource("status").
+		VersionedParams(&opts, ParameterCodec).
+		Body(obj).
+		Do(ctx).
+		Into(result)
+}
+
+func (r *restBackend) Delete(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.DeleteOptions) error {
+	return r.client.Delete().
+		Namespace(namespace).
+		Resource(resourceName).
+		Name(name).
+		Body(&opts).
+		Do(ctx).
+		Error()
+}
+
+func (r *restBackend) Watch(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
+	var timeout time.Duration
+	if opts.TimeoutSeconds != nil {
+		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	}
+	opts.Watch = true
+	return r.client.Get().
+		Namespace(namespace).
+		Resource(resourceName).
+		VersionedParams(&opts, ParameterCodec).
+		Timeout(timeout).
+		Watch(ctx)
+}`)
+
 	writer.F("type Set struct {")
 	for _, key := range keys(groupVersions) {
 		m := groupVersions[key][0]
@@ -79,16 +188,18 @@ func (g *ClientGenerator) Generate(out io.Writer, packageName, importPath string
 	writer.F("}")
 	writer.F("")
 	writer.F("func NewSet(cfg *rest.Config) (*Set,error) {")
-	writer.F("s := &Set{}")
+	writer.F("c, err := rest.RESTClientFor(cfg)")
+	writer.F("if err != nil {")
+	writer.F("return nil, err")
+	writer.F("}")
+	writer.F("b := &restBackend{client: c}")
+	writer.F("s := &Set{")
 	for _, key := range keys(groupVersions) {
 		m := groupVersions[key][0]
 		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
-		writer.F("{")
-		writer.F("c, err := New%sClient(cfg)", clientName)
-		writer.F("if err != nil {\nreturn nil, err\n}")
-		writer.F("s.%s = c", clientName)
-		writer.F("}")
+		writer.F("%s: New%sClient(b),", clientName, clientName)
 	}
+	writer.F("}")
 	writer.F("")
 	writer.F("return s, nil")
 	writer.F("}") // end of NewSet
@@ -205,19 +316,13 @@ func (g *restClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 		v := g.groupVersions[k]
 		m := v[0]
 		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
-		writer.F("type %s struct {", clientName)
-		writer.F("client *rest.RESTClient")
-		writer.F("}")
+		writer.F(`type %s struct {
+	backend Backend
+}`, clientName)
 		writer.F("")
 
-		writer.F("func New%sClient(c *rest.Config) (*%s, error) {", clientName, clientName)
-		writer.F("client, err := rest.RESTClientFor(c)")
-		writer.F("if err != nil {")
-		writer.F("return nil, err")
-		writer.F("}")
-		writer.F("return &%s{", clientName)
-		writer.F("client: client,")
-		writer.F("}, nil")
+		writer.F("func New%sClient(b Backend) *%s {", clientName, clientName)
+		writer.F("return &%s{backend: b}", clientName)
 		writer.F("}")
 		writer.F("")
 
@@ -226,14 +331,9 @@ func (g *restClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 			// GetXXX
 			writer.F("func(c *%s) Get%s(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg)
 			writer.F("result := &%s{}", structNameWithPkg)
-			writer.F("err := c.client.Get().")
-			writer.F("Namespace(namespace).")
-			writer.F("Resource(%q).", strings.ToLower(stringsutil.Plural(m.ShortName)))
-			writer.F("Name(name).")
-			writer.F("VersionedParams(&opts, ParameterCodec).")
-			writer.F("Do(ctx).")
-			writer.F("Into(result)")
-			writer.F("if err != nil {\nreturn nil, err\n}")
+			writer.F("if err := c.backend.Get(ctx, %q, %q, namespace, name, opts, result); err != nil {", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName)
+			writer.F("return nil, err")
+			writer.F("}")
 			writer.F("return result, nil")
 			writer.F("}") // end of GetXXX
 			writer.F("")
@@ -241,14 +341,9 @@ func (g *restClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 			// CreateXXX
 			writer.F("func (c *%s) Create%s(ctx context.Context, v *%s, opts metav1.CreateOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg, structNameWithPkg)
 			writer.F("result := &%s{}", structNameWithPkg)
-			writer.F("err := c.client.Post().")
-			writer.F("Namespace(v.Namespace).")
-			writer.F("Resource(%q).", strings.ToLower(stringsutil.Plural(m.ShortName)))
-			writer.F("VersionedParams(&opts, ParameterCodec).")
-			writer.F("Body(v).")
-			writer.F("Do(ctx).")
-			writer.F("Into(result)")
-			writer.F("if err != nil {\nreturn nil, err\n}")
+			writer.F("if err := c.backend.Create(ctx, %q, %q, v, opts, result); err != nil {", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName)
+			writer.F("return nil, err")
+			writer.F("}")
 			writer.F("return result, nil")
 			writer.F("}") // end of CreateXXX
 			writer.F("")
@@ -256,15 +351,9 @@ func (g *restClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 			// UpdateXXX
 			writer.F("func (c *%s) Update%s(ctx context.Context, v *%s, opts metav1.UpdateOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg, structNameWithPkg)
 			writer.F("result := &%s{}", structNameWithPkg)
-			writer.F("err := c.client.Put().")
-			writer.F("Namespace(v.Namespace).")
-			writer.F("Resource(%q).", strings.ToLower(stringsutil.Plural(m.ShortName)))
-			writer.F("Name(v.Name).")
-			writer.F("VersionedParams(&opts, ParameterCodec).")
-			writer.F("Body(v).")
-			writer.F("Do(ctx).")
-			writer.F("Into(result)")
-			writer.F("if err != nil {\nreturn nil, err\n}")
+			writer.F("if err := c.backend.Update(ctx, %q, %q, v, opts, result); err != nil {", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName)
+			writer.F("return nil, err")
+			writer.F("}")
 			writer.F("return result, nil")
 			writer.F("}") // end of UpdateXXX
 			writer.F("")
@@ -273,16 +362,9 @@ func (g *restClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 			if m.IsDefinedSubResource() {
 				writer.F("func (c *%s) UpdateStatus%s(ctx context.Context, v *%s, opts metav1.UpdateOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg, structNameWithPkg)
 				writer.F("result := &%s{}", structNameWithPkg)
-				writer.F("err := c.client.Put().")
-				writer.F("Namespace(v.Namespace).")
-				writer.F("Resource(%q).", strings.ToLower(stringsutil.Plural(m.ShortName)))
-				writer.F("Name(v.Name).")
-				writer.F("SubResource(\"status\").")
-				writer.F("VersionedParams(&opts, ParameterCodec).")
-				writer.F("Body(v).")
-				writer.F("Do(ctx).")
-				writer.F("Into(result)")
-				writer.F("if err != nil {\nreturn nil, err\n}")
+				writer.F("if err := c.backend.UpdateStatus(ctx, %q, %q, v, opts, result); err != nil {", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName)
+				writer.F("return nil, err")
+				writer.F("}")
 				writer.F("return result, nil")
 				writer.F("}") // end of UpdateStatusXXX
 				writer.F("")
@@ -290,48 +372,23 @@ func (g *restClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 
 			// DeleteXXX
 			writer.F("func (c *%s) Delete%s(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {", clientName, m.ShortName)
-			writer.F("return c.client.Delete().")
-			writer.F("Namespace(namespace).")
-			writer.F("Resource(%q).", strings.ToLower(stringsutil.Plural(m.ShortName)))
-			writer.F("Name(name).")
-			writer.F("Body(&opts).")
-			writer.F("Do(ctx).")
-			writer.F("Error()")
+			writer.F("return c.backend.Delete(ctx, %q, %q, namespace, name, opts)", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName)
 			writer.F("}") // end of DeleteXXX
 			writer.F("")
 
 			// ListXXX
 			writer.F("func (c *%s) List%s(ctx context.Context, namespace string, opts metav1.ListOptions) (*%s.%sList, error) {", clientName, m.ShortName, m.Package.Name, m.ShortName)
-			writer.F("var timeout time.Duration")
-			writer.F("if opts.TimeoutSeconds != nil {")
-			writer.F("timeout = time.Duration(*opts.TimeoutSeconds) * time.Second")
-			writer.F("}")
 			writer.F("result := &%s.%sList{}", m.Package.Name, m.ShortName)
-			writer.F("err := c.client.Get().")
-			writer.F("Namespace(namespace).")
-			writer.F("Resource(%q).", strings.ToLower(stringsutil.Plural(m.ShortName)))
-			writer.F("VersionedParams(&opts, ParameterCodec).")
-			writer.F("Timeout(timeout).")
-			writer.F("Do(ctx).")
-			writer.F("Into(result)")
-			writer.F("if err != nil {\nreturn nil, err\n}")
+			writer.F("if err := c.backend.List(ctx, %q, %q, namespace, opts, result); err != nil {", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName)
+			writer.F("return nil, err")
+			writer.F("}")
 			writer.F("return result, nil")
 			writer.F("}") // end of ListXXX
 			writer.F("")
 
 			// WatchXXX
 			writer.F("func (c *%s) Watch%s(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {", clientName, m.ShortName)
-			writer.F("var timeout time.Duration")
-			writer.F("if opts.TimeoutSeconds != nil {")
-			writer.F("timeout = time.Duration(*opts.TimeoutSeconds) * time.Second")
-			writer.F("}")
-			writer.F("opts.Watch = true")
-			writer.F("return c.client.Get().")
-			writer.F("Namespace(namespace).")
-			writer.F("Resource(%q).", strings.ToLower(stringsutil.Plural(m.ShortName)))
-			writer.F("VersionedParams(&opts, ParameterCodec).")
-			writer.F("Timeout(timeout).")
-			writer.F("Watch(ctx)")
+			writer.F("return c.backend.Watch(ctx, %q, %q, namespace, opts)", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName)
 			writer.F("}") // end of WatchXXX
 			writer.F("")
 		}

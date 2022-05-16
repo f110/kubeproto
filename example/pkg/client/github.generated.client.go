@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"errors"
 	"reflect"
 	"sync"
 	"time"
@@ -36,6 +37,113 @@ func init() {
 	}
 }
 
+type Backend interface {
+	Get(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.GetOptions, result runtime.Object) error
+	List(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions, result runtime.Object) error
+	Create(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) error
+	Update(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) error
+	UpdateStatus(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) error
+	Delete(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.DeleteOptions) error
+	Watch(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions) (watch.Interface, error)
+}
+
+type restBackend struct {
+	client *rest.RESTClient
+}
+
+func (r *restBackend) Get(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.GetOptions, result runtime.Object) error {
+	return r.client.Get().
+		Namespace(namespace).
+		Resource(resourceName).
+		Name(name).
+		VersionedParams(&opts, ParameterCodec).
+		Do(ctx).
+		Into(result)
+}
+
+func (r *restBackend) List(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions, result runtime.Object) error {
+	var timeout time.Duration
+	if opts.TimeoutSeconds != nil {
+		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	}
+	return r.client.Get().
+		Namespace(namespace).
+		Resource(resourceName).
+		VersionedParams(&opts, ParameterCodec).
+		Timeout(timeout).
+		Do(ctx).
+		Into(result)
+}
+
+func (r *restBackend) Create(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) error {
+	m := obj.(metav1.Object)
+	if m == nil {
+		return errors.New("obj is not implement metav1.Object")
+	}
+	return r.client.Post().
+		Namespace(m.GetNamespace()).
+		Resource(resourceName).
+		VersionedParams(&opts, ParameterCodec).
+		Body(obj).
+		Do(ctx).
+		Into(result)
+}
+
+func (r *restBackend) Update(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) error {
+	m := obj.(metav1.Object)
+	if m == nil {
+		return errors.New("obj is not implement metav1.Object")
+	}
+	return r.client.Put().
+		Namespace(m.GetNamespace()).
+		Resource(resourceName).
+		Name(m.GetName()).
+		VersionedParams(&opts, ParameterCodec).
+		Body(obj).
+		Do(ctx).
+		Into(result)
+}
+
+func (r *restBackend) UpdateStatus(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) error {
+	m := obj.(metav1.Object)
+	if m == nil {
+		return errors.New("obj is not implement metav1.Object")
+	}
+	return r.client.Put().
+		Namespace(m.GetNamespace()).
+		Resource(resourceName).
+		Name(m.GetName()).
+		SubResource("status").
+		VersionedParams(&opts, ParameterCodec).
+		Body(obj).
+		Do(ctx).
+		Into(result)
+}
+
+func (r *restBackend) Delete(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.DeleteOptions) error {
+	return r.client.Delete().
+		Namespace(namespace).
+		Resource(resourceName).
+		Name(name).
+		Body(&opts).
+		Do(ctx).
+		Error()
+}
+
+func (r *restBackend) Watch(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
+	var timeout time.Duration
+	if opts.TimeoutSeconds != nil {
+		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	}
+	opts.Watch = true
+	return r.client.Get().
+		Namespace(namespace).
+		Resource(resourceName).
+		VersionedParams(&opts, ParameterCodec).
+		Timeout(timeout).
+		Watch(ctx)
+}
+
 type Set struct {
 	GrafanaV1alpha1 *GrafanaV1alpha1
 	GrafanaV1alpha2 *GrafanaV1alpha2
@@ -43,56 +151,31 @@ type Set struct {
 }
 
 func NewSet(cfg *rest.Config) (*Set, error) {
-	s := &Set{}
-	{
-		c, err := NewGrafanaV1alpha1Client(cfg)
-		if err != nil {
-			return nil, err
-		}
-		s.GrafanaV1alpha1 = c
+	c, err := rest.RESTClientFor(cfg)
+	if err != nil {
+		return nil, err
 	}
-	{
-		c, err := NewGrafanaV1alpha2Client(cfg)
-		if err != nil {
-			return nil, err
-		}
-		s.GrafanaV1alpha2 = c
-	}
-	{
-		c, err := NewMinioV1alpha1Client(cfg)
-		if err != nil {
-			return nil, err
-		}
-		s.MinioV1alpha1 = c
+	b := &restBackend{client: c}
+	s := &Set{
+		GrafanaV1alpha1: NewGrafanaV1alpha1Client(b),
+		GrafanaV1alpha2: NewGrafanaV1alpha2Client(b),
+		MinioV1alpha1:   NewMinioV1alpha1Client(b),
 	}
 
 	return s, nil
 }
 
 type GrafanaV1alpha1 struct {
-	client *rest.RESTClient
+	backend Backend
 }
 
-func NewGrafanaV1alpha1Client(c *rest.Config) (*GrafanaV1alpha1, error) {
-	client, err := rest.RESTClientFor(c)
-	if err != nil {
-		return nil, err
-	}
-	return &GrafanaV1alpha1{
-		client: client,
-	}, nil
+func NewGrafanaV1alpha1Client(b Backend) *GrafanaV1alpha1 {
+	return &GrafanaV1alpha1{backend: b}
 }
 
 func (c *GrafanaV1alpha1) GetGrafana(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*githubv1alpha1.Grafana, error) {
 	result := &githubv1alpha1.Grafana{}
-	err := c.client.Get().
-		Namespace(namespace).
-		Resource("grafanas").
-		Name(name).
-		VersionedParams(&opts, ParameterCodec).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.Get(ctx, "grafanas", "Grafana", namespace, name, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -100,14 +183,7 @@ func (c *GrafanaV1alpha1) GetGrafana(ctx context.Context, namespace, name string
 
 func (c *GrafanaV1alpha1) CreateGrafana(ctx context.Context, v *githubv1alpha1.Grafana, opts metav1.CreateOptions) (*githubv1alpha1.Grafana, error) {
 	result := &githubv1alpha1.Grafana{}
-	err := c.client.Post().
-		Namespace(v.Namespace).
-		Resource("grafanas").
-		VersionedParams(&opts, ParameterCodec).
-		Body(v).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.Create(ctx, "grafanas", "Grafana", v, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -115,73 +191,31 @@ func (c *GrafanaV1alpha1) CreateGrafana(ctx context.Context, v *githubv1alpha1.G
 
 func (c *GrafanaV1alpha1) UpdateGrafana(ctx context.Context, v *githubv1alpha1.Grafana, opts metav1.UpdateOptions) (*githubv1alpha1.Grafana, error) {
 	result := &githubv1alpha1.Grafana{}
-	err := c.client.Put().
-		Namespace(v.Namespace).
-		Resource("grafanas").
-		Name(v.Name).
-		VersionedParams(&opts, ParameterCodec).
-		Body(v).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.Update(ctx, "grafanas", "Grafana", v, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
 func (c *GrafanaV1alpha1) DeleteGrafana(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.client.Delete().
-		Namespace(namespace).
-		Resource("grafanas").
-		Name(name).
-		Body(&opts).
-		Do(ctx).
-		Error()
+	return c.backend.Delete(ctx, "grafanas", "Grafana", namespace, name, opts)
 }
 
 func (c *GrafanaV1alpha1) ListGrafana(ctx context.Context, namespace string, opts metav1.ListOptions) (*githubv1alpha1.GrafanaList, error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
 	result := &githubv1alpha1.GrafanaList{}
-	err := c.client.Get().
-		Namespace(namespace).
-		Resource("grafanas").
-		VersionedParams(&opts, ParameterCodec).
-		Timeout(timeout).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.List(ctx, "grafanas", "Grafana", namespace, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
 func (c *GrafanaV1alpha1) WatchGrafana(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	opts.Watch = true
-	return c.client.Get().
-		Namespace(namespace).
-		Resource("grafanas").
-		VersionedParams(&opts, ParameterCodec).
-		Timeout(timeout).
-		Watch(ctx)
+	return c.backend.Watch(ctx, "grafanas", "Grafana", namespace, opts)
 }
 
 func (c *GrafanaV1alpha1) GetGrafanaUser(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*githubv1alpha1.GrafanaUser, error) {
 	result := &githubv1alpha1.GrafanaUser{}
-	err := c.client.Get().
-		Namespace(namespace).
-		Resource("grafanausers").
-		Name(name).
-		VersionedParams(&opts, ParameterCodec).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.Get(ctx, "grafanausers", "GrafanaUser", namespace, name, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -189,14 +223,7 @@ func (c *GrafanaV1alpha1) GetGrafanaUser(ctx context.Context, namespace, name st
 
 func (c *GrafanaV1alpha1) CreateGrafanaUser(ctx context.Context, v *githubv1alpha1.GrafanaUser, opts metav1.CreateOptions) (*githubv1alpha1.GrafanaUser, error) {
 	result := &githubv1alpha1.GrafanaUser{}
-	err := c.client.Post().
-		Namespace(v.Namespace).
-		Resource("grafanausers").
-		VersionedParams(&opts, ParameterCodec).
-		Body(v).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.Create(ctx, "grafanausers", "GrafanaUser", v, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -204,87 +231,39 @@ func (c *GrafanaV1alpha1) CreateGrafanaUser(ctx context.Context, v *githubv1alph
 
 func (c *GrafanaV1alpha1) UpdateGrafanaUser(ctx context.Context, v *githubv1alpha1.GrafanaUser, opts metav1.UpdateOptions) (*githubv1alpha1.GrafanaUser, error) {
 	result := &githubv1alpha1.GrafanaUser{}
-	err := c.client.Put().
-		Namespace(v.Namespace).
-		Resource("grafanausers").
-		Name(v.Name).
-		VersionedParams(&opts, ParameterCodec).
-		Body(v).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.Update(ctx, "grafanausers", "GrafanaUser", v, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
 func (c *GrafanaV1alpha1) DeleteGrafanaUser(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.client.Delete().
-		Namespace(namespace).
-		Resource("grafanausers").
-		Name(name).
-		Body(&opts).
-		Do(ctx).
-		Error()
+	return c.backend.Delete(ctx, "grafanausers", "GrafanaUser", namespace, name, opts)
 }
 
 func (c *GrafanaV1alpha1) ListGrafanaUser(ctx context.Context, namespace string, opts metav1.ListOptions) (*githubv1alpha1.GrafanaUserList, error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
 	result := &githubv1alpha1.GrafanaUserList{}
-	err := c.client.Get().
-		Namespace(namespace).
-		Resource("grafanausers").
-		VersionedParams(&opts, ParameterCodec).
-		Timeout(timeout).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.List(ctx, "grafanausers", "GrafanaUser", namespace, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
 func (c *GrafanaV1alpha1) WatchGrafanaUser(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	opts.Watch = true
-	return c.client.Get().
-		Namespace(namespace).
-		Resource("grafanausers").
-		VersionedParams(&opts, ParameterCodec).
-		Timeout(timeout).
-		Watch(ctx)
+	return c.backend.Watch(ctx, "grafanausers", "GrafanaUser", namespace, opts)
 }
 
 type GrafanaV1alpha2 struct {
-	client *rest.RESTClient
+	backend Backend
 }
 
-func NewGrafanaV1alpha2Client(c *rest.Config) (*GrafanaV1alpha2, error) {
-	client, err := rest.RESTClientFor(c)
-	if err != nil {
-		return nil, err
-	}
-	return &GrafanaV1alpha2{
-		client: client,
-	}, nil
+func NewGrafanaV1alpha2Client(b Backend) *GrafanaV1alpha2 {
+	return &GrafanaV1alpha2{backend: b}
 }
 
 func (c *GrafanaV1alpha2) GetGrafana(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*githubv1alpha2.Grafana, error) {
 	result := &githubv1alpha2.Grafana{}
-	err := c.client.Get().
-		Namespace(namespace).
-		Resource("grafanas").
-		Name(name).
-		VersionedParams(&opts, ParameterCodec).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.Get(ctx, "grafanas", "Grafana", namespace, name, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -292,14 +271,7 @@ func (c *GrafanaV1alpha2) GetGrafana(ctx context.Context, namespace, name string
 
 func (c *GrafanaV1alpha2) CreateGrafana(ctx context.Context, v *githubv1alpha2.Grafana, opts metav1.CreateOptions) (*githubv1alpha2.Grafana, error) {
 	result := &githubv1alpha2.Grafana{}
-	err := c.client.Post().
-		Namespace(v.Namespace).
-		Resource("grafanas").
-		VersionedParams(&opts, ParameterCodec).
-		Body(v).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.Create(ctx, "grafanas", "Grafana", v, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -307,73 +279,31 @@ func (c *GrafanaV1alpha2) CreateGrafana(ctx context.Context, v *githubv1alpha2.G
 
 func (c *GrafanaV1alpha2) UpdateGrafana(ctx context.Context, v *githubv1alpha2.Grafana, opts metav1.UpdateOptions) (*githubv1alpha2.Grafana, error) {
 	result := &githubv1alpha2.Grafana{}
-	err := c.client.Put().
-		Namespace(v.Namespace).
-		Resource("grafanas").
-		Name(v.Name).
-		VersionedParams(&opts, ParameterCodec).
-		Body(v).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.Update(ctx, "grafanas", "Grafana", v, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
 func (c *GrafanaV1alpha2) DeleteGrafana(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.client.Delete().
-		Namespace(namespace).
-		Resource("grafanas").
-		Name(name).
-		Body(&opts).
-		Do(ctx).
-		Error()
+	return c.backend.Delete(ctx, "grafanas", "Grafana", namespace, name, opts)
 }
 
 func (c *GrafanaV1alpha2) ListGrafana(ctx context.Context, namespace string, opts metav1.ListOptions) (*githubv1alpha2.GrafanaList, error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
 	result := &githubv1alpha2.GrafanaList{}
-	err := c.client.Get().
-		Namespace(namespace).
-		Resource("grafanas").
-		VersionedParams(&opts, ParameterCodec).
-		Timeout(timeout).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.List(ctx, "grafanas", "Grafana", namespace, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
 func (c *GrafanaV1alpha2) WatchGrafana(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	opts.Watch = true
-	return c.client.Get().
-		Namespace(namespace).
-		Resource("grafanas").
-		VersionedParams(&opts, ParameterCodec).
-		Timeout(timeout).
-		Watch(ctx)
+	return c.backend.Watch(ctx, "grafanas", "Grafana", namespace, opts)
 }
 
 func (c *GrafanaV1alpha2) GetGrafanaUser(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*githubv1alpha2.GrafanaUser, error) {
 	result := &githubv1alpha2.GrafanaUser{}
-	err := c.client.Get().
-		Namespace(namespace).
-		Resource("grafanausers").
-		Name(name).
-		VersionedParams(&opts, ParameterCodec).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.Get(ctx, "grafanausers", "GrafanaUser", namespace, name, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -381,14 +311,7 @@ func (c *GrafanaV1alpha2) GetGrafanaUser(ctx context.Context, namespace, name st
 
 func (c *GrafanaV1alpha2) CreateGrafanaUser(ctx context.Context, v *githubv1alpha2.GrafanaUser, opts metav1.CreateOptions) (*githubv1alpha2.GrafanaUser, error) {
 	result := &githubv1alpha2.GrafanaUser{}
-	err := c.client.Post().
-		Namespace(v.Namespace).
-		Resource("grafanausers").
-		VersionedParams(&opts, ParameterCodec).
-		Body(v).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.Create(ctx, "grafanausers", "GrafanaUser", v, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -396,87 +319,39 @@ func (c *GrafanaV1alpha2) CreateGrafanaUser(ctx context.Context, v *githubv1alph
 
 func (c *GrafanaV1alpha2) UpdateGrafanaUser(ctx context.Context, v *githubv1alpha2.GrafanaUser, opts metav1.UpdateOptions) (*githubv1alpha2.GrafanaUser, error) {
 	result := &githubv1alpha2.GrafanaUser{}
-	err := c.client.Put().
-		Namespace(v.Namespace).
-		Resource("grafanausers").
-		Name(v.Name).
-		VersionedParams(&opts, ParameterCodec).
-		Body(v).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.Update(ctx, "grafanausers", "GrafanaUser", v, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
 func (c *GrafanaV1alpha2) DeleteGrafanaUser(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.client.Delete().
-		Namespace(namespace).
-		Resource("grafanausers").
-		Name(name).
-		Body(&opts).
-		Do(ctx).
-		Error()
+	return c.backend.Delete(ctx, "grafanausers", "GrafanaUser", namespace, name, opts)
 }
 
 func (c *GrafanaV1alpha2) ListGrafanaUser(ctx context.Context, namespace string, opts metav1.ListOptions) (*githubv1alpha2.GrafanaUserList, error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
 	result := &githubv1alpha2.GrafanaUserList{}
-	err := c.client.Get().
-		Namespace(namespace).
-		Resource("grafanausers").
-		VersionedParams(&opts, ParameterCodec).
-		Timeout(timeout).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.List(ctx, "grafanausers", "GrafanaUser", namespace, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
 func (c *GrafanaV1alpha2) WatchGrafanaUser(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	opts.Watch = true
-	return c.client.Get().
-		Namespace(namespace).
-		Resource("grafanausers").
-		VersionedParams(&opts, ParameterCodec).
-		Timeout(timeout).
-		Watch(ctx)
+	return c.backend.Watch(ctx, "grafanausers", "GrafanaUser", namespace, opts)
 }
 
 type MinioV1alpha1 struct {
-	client *rest.RESTClient
+	backend Backend
 }
 
-func NewMinioV1alpha1Client(c *rest.Config) (*MinioV1alpha1, error) {
-	client, err := rest.RESTClientFor(c)
-	if err != nil {
-		return nil, err
-	}
-	return &MinioV1alpha1{
-		client: client,
-	}, nil
+func NewMinioV1alpha1Client(b Backend) *MinioV1alpha1 {
+	return &MinioV1alpha1{backend: b}
 }
 
 func (c *MinioV1alpha1) GetMinIOBucket(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*miniov1alpha1.MinIOBucket, error) {
 	result := &miniov1alpha1.MinIOBucket{}
-	err := c.client.Get().
-		Namespace(namespace).
-		Resource("miniobuckets").
-		Name(name).
-		VersionedParams(&opts, ParameterCodec).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.Get(ctx, "miniobuckets", "MinIOBucket", namespace, name, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -484,14 +359,7 @@ func (c *MinioV1alpha1) GetMinIOBucket(ctx context.Context, namespace, name stri
 
 func (c *MinioV1alpha1) CreateMinIOBucket(ctx context.Context, v *miniov1alpha1.MinIOBucket, opts metav1.CreateOptions) (*miniov1alpha1.MinIOBucket, error) {
 	result := &miniov1alpha1.MinIOBucket{}
-	err := c.client.Post().
-		Namespace(v.Namespace).
-		Resource("miniobuckets").
-		VersionedParams(&opts, ParameterCodec).
-		Body(v).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.Create(ctx, "miniobuckets", "MinIOBucket", v, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -499,15 +367,7 @@ func (c *MinioV1alpha1) CreateMinIOBucket(ctx context.Context, v *miniov1alpha1.
 
 func (c *MinioV1alpha1) UpdateMinIOBucket(ctx context.Context, v *miniov1alpha1.MinIOBucket, opts metav1.UpdateOptions) (*miniov1alpha1.MinIOBucket, error) {
 	result := &miniov1alpha1.MinIOBucket{}
-	err := c.client.Put().
-		Namespace(v.Namespace).
-		Resource("miniobuckets").
-		Name(v.Name).
-		VersionedParams(&opts, ParameterCodec).
-		Body(v).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.Update(ctx, "miniobuckets", "MinIOBucket", v, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -515,74 +375,31 @@ func (c *MinioV1alpha1) UpdateMinIOBucket(ctx context.Context, v *miniov1alpha1.
 
 func (c *MinioV1alpha1) UpdateStatusMinIOBucket(ctx context.Context, v *miniov1alpha1.MinIOBucket, opts metav1.UpdateOptions) (*miniov1alpha1.MinIOBucket, error) {
 	result := &miniov1alpha1.MinIOBucket{}
-	err := c.client.Put().
-		Namespace(v.Namespace).
-		Resource("miniobuckets").
-		Name(v.Name).
-		SubResource("status").
-		VersionedParams(&opts, ParameterCodec).
-		Body(v).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.UpdateStatus(ctx, "miniobuckets", "MinIOBucket", v, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
 func (c *MinioV1alpha1) DeleteMinIOBucket(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.client.Delete().
-		Namespace(namespace).
-		Resource("miniobuckets").
-		Name(name).
-		Body(&opts).
-		Do(ctx).
-		Error()
+	return c.backend.Delete(ctx, "miniobuckets", "MinIOBucket", namespace, name, opts)
 }
 
 func (c *MinioV1alpha1) ListMinIOBucket(ctx context.Context, namespace string, opts metav1.ListOptions) (*miniov1alpha1.MinIOBucketList, error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
 	result := &miniov1alpha1.MinIOBucketList{}
-	err := c.client.Get().
-		Namespace(namespace).
-		Resource("miniobuckets").
-		VersionedParams(&opts, ParameterCodec).
-		Timeout(timeout).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.List(ctx, "miniobuckets", "MinIOBucket", namespace, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
 func (c *MinioV1alpha1) WatchMinIOBucket(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	opts.Watch = true
-	return c.client.Get().
-		Namespace(namespace).
-		Resource("miniobuckets").
-		VersionedParams(&opts, ParameterCodec).
-		Timeout(timeout).
-		Watch(ctx)
+	return c.backend.Watch(ctx, "miniobuckets", "MinIOBucket", namespace, opts)
 }
 
 func (c *MinioV1alpha1) GetMinIOUser(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*miniov1alpha1.MinIOUser, error) {
 	result := &miniov1alpha1.MinIOUser{}
-	err := c.client.Get().
-		Namespace(namespace).
-		Resource("miniousers").
-		Name(name).
-		VersionedParams(&opts, ParameterCodec).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.Get(ctx, "miniousers", "MinIOUser", namespace, name, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -590,14 +407,7 @@ func (c *MinioV1alpha1) GetMinIOUser(ctx context.Context, namespace, name string
 
 func (c *MinioV1alpha1) CreateMinIOUser(ctx context.Context, v *miniov1alpha1.MinIOUser, opts metav1.CreateOptions) (*miniov1alpha1.MinIOUser, error) {
 	result := &miniov1alpha1.MinIOUser{}
-	err := c.client.Post().
-		Namespace(v.Namespace).
-		Resource("miniousers").
-		VersionedParams(&opts, ParameterCodec).
-		Body(v).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.Create(ctx, "miniousers", "MinIOUser", v, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -605,15 +415,7 @@ func (c *MinioV1alpha1) CreateMinIOUser(ctx context.Context, v *miniov1alpha1.Mi
 
 func (c *MinioV1alpha1) UpdateMinIOUser(ctx context.Context, v *miniov1alpha1.MinIOUser, opts metav1.UpdateOptions) (*miniov1alpha1.MinIOUser, error) {
 	result := &miniov1alpha1.MinIOUser{}
-	err := c.client.Put().
-		Namespace(v.Namespace).
-		Resource("miniousers").
-		Name(v.Name).
-		VersionedParams(&opts, ParameterCodec).
-		Body(v).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.Update(ctx, "miniousers", "MinIOUser", v, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -621,62 +423,26 @@ func (c *MinioV1alpha1) UpdateMinIOUser(ctx context.Context, v *miniov1alpha1.Mi
 
 func (c *MinioV1alpha1) UpdateStatusMinIOUser(ctx context.Context, v *miniov1alpha1.MinIOUser, opts metav1.UpdateOptions) (*miniov1alpha1.MinIOUser, error) {
 	result := &miniov1alpha1.MinIOUser{}
-	err := c.client.Put().
-		Namespace(v.Namespace).
-		Resource("miniousers").
-		Name(v.Name).
-		SubResource("status").
-		VersionedParams(&opts, ParameterCodec).
-		Body(v).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.UpdateStatus(ctx, "miniousers", "MinIOUser", v, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
 func (c *MinioV1alpha1) DeleteMinIOUser(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.client.Delete().
-		Namespace(namespace).
-		Resource("miniousers").
-		Name(name).
-		Body(&opts).
-		Do(ctx).
-		Error()
+	return c.backend.Delete(ctx, "miniousers", "MinIOUser", namespace, name, opts)
 }
 
 func (c *MinioV1alpha1) ListMinIOUser(ctx context.Context, namespace string, opts metav1.ListOptions) (*miniov1alpha1.MinIOUserList, error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
 	result := &miniov1alpha1.MinIOUserList{}
-	err := c.client.Get().
-		Namespace(namespace).
-		Resource("miniousers").
-		VersionedParams(&opts, ParameterCodec).
-		Timeout(timeout).
-		Do(ctx).
-		Into(result)
-	if err != nil {
+	if err := c.backend.List(ctx, "miniousers", "MinIOUser", namespace, opts, result); err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
 func (c *MinioV1alpha1) WatchMinIOUser(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	opts.Watch = true
-	return c.client.Get().
-		Namespace(namespace).
-		Resource("miniousers").
-		VersionedParams(&opts, ParameterCodec).
-		Timeout(timeout).
-		Watch(ctx)
+	return c.backend.Watch(ctx, "miniousers", "MinIOUser", namespace, opts)
 }
 
 var Factory = NewInformerFactory()
