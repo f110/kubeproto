@@ -484,6 +484,7 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 		writer.F("")
 		writer.F("func New%sInformer(f *InformerFactory, client *%s, namespace string, resyncPeriod time.Duration) *%sInformer {", clientName, clientName, clientName)
 		writer.F("return &%sInformer{", clientName)
+		writer.F("factory: f,")
 		writer.F("client: client,")
 		writer.F("namespace: namespace,")
 		writer.F("resyncPeriod: resyncPeriod,")

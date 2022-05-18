@@ -495,6 +495,7 @@ type GrafanaV1alpha1Informer struct {
 
 func NewGrafanaV1alpha1Informer(f *InformerFactory, client *GrafanaV1alpha1, namespace string, resyncPeriod time.Duration) *GrafanaV1alpha1Informer {
 	return &GrafanaV1alpha1Informer{
+		factory:      f,
 		client:       client,
 		namespace:    namespace,
 		resyncPeriod: resyncPeriod,
@@ -556,6 +557,7 @@ type GrafanaV1alpha2Informer struct {
 
 func NewGrafanaV1alpha2Informer(f *InformerFactory, client *GrafanaV1alpha2, namespace string, resyncPeriod time.Duration) *GrafanaV1alpha2Informer {
 	return &GrafanaV1alpha2Informer{
+		factory:      f,
 		client:       client,
 		namespace:    namespace,
 		resyncPeriod: resyncPeriod,
@@ -617,6 +619,7 @@ type MinioV1alpha1Informer struct {
 
 func NewMinioV1alpha1Informer(f *InformerFactory, client *MinioV1alpha1, namespace string, resyncPeriod time.Duration) *MinioV1alpha1Informer {
 	return &MinioV1alpha1Informer{
+		factory:      f,
 		client:       client,
 		namespace:    namespace,
 		resyncPeriod: resyncPeriod,
