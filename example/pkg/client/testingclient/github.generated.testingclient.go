@@ -7,12 +7,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apimachinery/pkg/watch"
 	k8stesting "k8s.io/client-go/testing"
 
-	"go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha1"
-	"go.f110.dev/kubeproto/example/pkg/apis/miniov1alpha1"
 	"go.f110.dev/kubeproto/example/pkg/client"
 )
 
@@ -54,7 +53,12 @@ type fakerBackend struct {
 }
 
 func (f *fakerBackend) Get(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error) {
-	obj, err := f.fake.Invokes(k8stesting.NewGetAction(githubv1alpha1.SchemaGroupVersion.WithResource(resourceName), namespace, name), result)
+	gvks, _, err := client.Scheme.ObjectKinds(result)
+	if err != nil {
+		return nil, err
+	}
+	gvk := gvks[0]
+	obj, err := f.fake.Invokes(k8stesting.NewGetAction(gvk.GroupVersion().WithResource(resourceName), namespace, name), result)
 	if obj == nil {
 		return nil, err
 	}
@@ -62,8 +66,12 @@ func (f *fakerBackend) Get(ctx context.Context, resourceName, kindName, namespac
 }
 
 func (f *fakerBackend) List(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error) {
-	obj, err := f.fake.
-		Invokes(k8stesting.NewListAction(githubv1alpha1.SchemaGroupVersion.WithResource(resourceName), githubv1alpha1.SchemaGroupVersion.WithKind(kindName), namespace, opts), result)
+	gvks, _, err := client.Scheme.ObjectKinds(result)
+	if err != nil {
+		return nil, err
+	}
+	gvk := gvks[0]
+	obj, err := f.fake.Invokes(k8stesting.NewListAction(gvk.GroupVersion().WithResource(resourceName), gvk, namespace, opts), result)
 
 	if obj == nil {
 		return nil, err
@@ -91,9 +99,13 @@ func (f *fakerBackend) List(ctx context.Context, resourceName, kindName, namespa
 }
 
 func (f *fakerBackend) Create(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error) {
+	gvks, _, err := client.Scheme.ObjectKinds(result)
+	if err != nil {
+		return nil, err
+	}
+	gvk := gvks[0]
 	m := obj.(metav1.Object)
-	obj, err := f.fake.
-		Invokes(k8stesting.NewCreateAction(githubv1alpha1.SchemaGroupVersion.WithResource(resourceName), m.GetNamespace(), obj), result)
+	obj, err = f.fake.Invokes(k8stesting.NewCreateAction(gvk.GroupVersion().WithResource(resourceName), m.GetNamespace(), obj), result)
 
 	if obj == nil {
 		return nil, err
@@ -102,9 +114,13 @@ func (f *fakerBackend) Create(ctx context.Context, resourceName, kindName string
 }
 
 func (f *fakerBackend) Update(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
+	gvks, _, err := client.Scheme.ObjectKinds(result)
+	if err != nil {
+		return nil, err
+	}
+	gvk := gvks[0]
 	m := obj.(metav1.Object)
-	obj, err := f.fake.
-		Invokes(k8stesting.NewUpdateAction(githubv1alpha1.SchemaGroupVersion.WithResource(resourceName), m.GetNamespace(), obj), result)
+	obj, err = f.fake.Invokes(k8stesting.NewUpdateAction(gvk.GroupVersion().WithResource(resourceName), m.GetNamespace(), obj), result)
 
 	if obj == nil {
 		return nil, err
@@ -114,9 +130,13 @@ func (f *fakerBackend) Update(ctx context.Context, resourceName, kindName string
 }
 
 func (f *fakerBackend) UpdateStatus(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
+	gvks, _, err := client.Scheme.ObjectKinds(result)
+	if err != nil {
+		return nil, err
+	}
+	gvk := gvks[0]
 	m := obj.(metav1.Object)
-	obj, err := f.fake.
-		Invokes(k8stesting.NewUpdateSubresourceAction(miniov1alpha1.SchemaGroupVersion.WithResource(resourceName), "status", m.GetNamespace(), obj), result)
+	obj, err = f.fake.Invokes(k8stesting.NewUpdateSubresourceAction(gvk.GroupVersion().WithResource(resourceName), "status", m.GetNamespace(), obj), result)
 
 	if obj == nil {
 		return nil, err
@@ -124,13 +144,12 @@ func (f *fakerBackend) UpdateStatus(ctx context.Context, resourceName, kindName 
 	return obj.DeepCopyObject(), err
 }
 
-func (f *fakerBackend) Delete(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.DeleteOptions) error {
-	_, err := f.fake.
-		Invokes(k8stesting.NewDeleteAction(miniov1alpha1.SchemaGroupVersion.WithResource(resourceName), namespace, name), nil)
+func (f *fakerBackend) Delete(ctx context.Context, gvr schema.GroupVersionResource, namespace, name string, opts metav1.DeleteOptions) error {
+	_, err := f.fake.Invokes(k8stesting.NewDeleteAction(gvr, namespace, name), nil)
 
 	return err
 }
 
-func (f *fakerBackend) Watch(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return f.fake.InvokesWatch(k8stesting.NewWatchAction(miniov1alpha1.SchemaGroupVersion.WithResource(resourceName), namespace, opts))
+func (f *fakerBackend) Watch(ctx context.Context, gvr schema.GroupVersionResource, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
+	return f.fake.InvokesWatch(k8stesting.NewWatchAction(gvr, namespace, opts))
 }

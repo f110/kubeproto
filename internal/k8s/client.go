@@ -33,10 +33,11 @@ func (g *ClientGenerator) Generate(out io.Writer, packageName, importPath string
 
 	// The key is a package path. The value is an alias.
 	importPackages := map[string]string{
-		"errors":                          "",
-		"context":                         "",
-		"time":                            "",
-		"k8s.io/apimachinery/pkg/runtime": "",
+		"errors":                                 "",
+		"context":                                "",
+		"time":                                   "",
+		"k8s.io/apimachinery/pkg/runtime":        "",
+		"k8s.io/apimachinery/pkg/runtime/schema": "",
 	}
 
 	messages := g.lister.GetMessages()
@@ -78,105 +79,8 @@ type Backend interface {
 	Create(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error)
 	Update(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	UpdateStatus(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
-	Delete(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.DeleteOptions) error
-	Watch(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions) (watch.Interface, error)
-}
-
-type restBackend struct {
-	client *rest.RESTClient
-}
-
-func (r *restBackend) Get(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error) {
-	return result, r.client.Get().
-		Namespace(namespace).
-		Resource(resourceName).
-		Name(name).
-		VersionedParams(&opts, ParameterCodec).
-		Do(ctx).
-		Into(result)
-}
-
-func (r *restBackend) List(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	return result, r.client.Get().
-		Namespace(namespace).
-		Resource(resourceName).
-		VersionedParams(&opts, ParameterCodec).
-		Timeout(timeout).
-		Do(ctx).
-		Into(result)
-}
-
-func (r *restBackend) Create(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error) {
-	m := obj.(metav1.Object)
-	if m == nil {
-		return nil, errors.New("obj is not implement metav1.Object")
-	}
-	return result, r.client.Post().
-		Namespace(m.GetNamespace()).
-		Resource(resourceName).
-		VersionedParams(&opts, ParameterCodec).
-		Body(obj).
-		Do(ctx).
-		Into(result)
-}
-
-func (r *restBackend) Update(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
-	m := obj.(metav1.Object)
-	if m == nil {
-		return nil, errors.New("obj is not implement metav1.Object")
-	}
-	return result, r.client.Put().
-		Namespace(m.GetNamespace()).
-		Resource(resourceName).
-		Name(m.GetName()).
-		VersionedParams(&opts, ParameterCodec).
-		Body(obj).
-		Do(ctx).
-		Into(result)
-}
-
-func (r *restBackend) UpdateStatus(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
-	m := obj.(metav1.Object)
-	if m == nil {
-		return nil, errors.New("obj is not implement metav1.Object")
-	}
-	return result, r.client.Put().
-		Namespace(m.GetNamespace()).
-		Resource(resourceName).
-		Name(m.GetName()).
-		SubResource("status").
-		VersionedParams(&opts, ParameterCodec).
-		Body(obj).
-		Do(ctx).
-		Into(result)
-}
-
-func (r *restBackend) Delete(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.DeleteOptions) error {
-	return r.client.Delete().
-		Namespace(namespace).
-		Resource(resourceName).
-		Name(name).
-		Body(&opts).
-		Do(ctx).
-		Error()
-}
-
-func (r *restBackend) Watch(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	opts.Watch = true
-	return r.client.Get().
-		Namespace(namespace).
-		Resource(resourceName).
-		VersionedParams(&opts, ParameterCodec).
-		Timeout(timeout).
-		Watch(ctx)
+	Delete(ctx context.Context, gvr schema.GroupVersionResource, namespace, name string, opts metav1.DeleteOptions) error
+	Watch(ctx context.Context, gvr schema.GroupVersionResource, namespace string, opts metav1.ListOptions) (watch.Interface, error)
 }`)
 
 	writer.F("type Set struct {")
@@ -312,6 +216,103 @@ func (g *restClientGenerator) Import() map[string]string {
 }
 
 func (g *restClientGenerator) WriteTo(writer *codegeneration.Writer) error {
+	writer.F(`type restBackend struct {
+	client *rest.RESTClient
+}
+
+func (r *restBackend) Get(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error) {
+	return result, r.client.Get().
+		Namespace(namespace).
+		Resource(resourceName).
+		Name(name).
+		VersionedParams(&opts, ParameterCodec).
+		Do(ctx).
+		Into(result)
+}
+
+func (r *restBackend) List(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error) {
+	var timeout time.Duration
+	if opts.TimeoutSeconds != nil {
+		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	}
+	return result, r.client.Get().
+		Namespace(namespace).
+		Resource(resourceName).
+		VersionedParams(&opts, ParameterCodec).
+		Timeout(timeout).
+		Do(ctx).
+		Into(result)
+}
+
+func (r *restBackend) Create(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error) {
+	m := obj.(metav1.Object)
+	if m == nil {
+		return nil, errors.New("obj is not implement metav1.Object")
+	}
+	return result, r.client.Post().
+		Namespace(m.GetNamespace()).
+		Resource(resourceName).
+		VersionedParams(&opts, ParameterCodec).
+		Body(obj).
+		Do(ctx).
+		Into(result)
+}
+
+func (r *restBackend) Update(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
+	m := obj.(metav1.Object)
+	if m == nil {
+		return nil, errors.New("obj is not implement metav1.Object")
+	}
+	return result, r.client.Put().
+		Namespace(m.GetNamespace()).
+		Resource(resourceName).
+		Name(m.GetName()).
+		VersionedParams(&opts, ParameterCodec).
+		Body(obj).
+		Do(ctx).
+		Into(result)
+}
+
+func (r *restBackend) UpdateStatus(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
+	m := obj.(metav1.Object)
+	if m == nil {
+		return nil, errors.New("obj is not implement metav1.Object")
+	}
+	return result, r.client.Put().
+		Namespace(m.GetNamespace()).
+		Resource(resourceName).
+		Name(m.GetName()).
+		SubResource("status").
+		VersionedParams(&opts, ParameterCodec).
+		Body(obj).
+		Do(ctx).
+		Into(result)
+}
+
+func (r *restBackend) Delete(ctx context.Context, gvr schema.GroupVersionResource, namespace, name string, opts metav1.DeleteOptions) error {
+	return r.client.Delete().
+		Namespace(namespace).
+		Resource(gvr.Resource).
+		Name(name).
+		Body(&opts).
+		Do(ctx).
+		Error()
+}
+
+func (r *restBackend) Watch(ctx context.Context, gvr schema.GroupVersionResource, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
+	var timeout time.Duration
+	if opts.TimeoutSeconds != nil {
+		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	}
+	opts.Watch = true
+	return r.client.Get().
+		Namespace(namespace).
+		Resource(gvr.Resource).
+		VersionedParams(&opts, ParameterCodec).
+		Timeout(timeout).
+		Watch(ctx)
+}`)
+
 	for _, k := range keys(g.groupVersions) {
 		v := g.groupVersions[k]
 		m := v[0]
@@ -372,7 +373,7 @@ func (g *restClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 
 			// DeleteXXX
 			writer.F("func (c *%s) Delete%s(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {", clientName, m.ShortName)
-			writer.F("return c.backend.Delete(ctx, %q, %q, namespace, name, opts)", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName)
+			writer.F("return c.backend.Delete(ctx, schema.GroupVersionResource{Group:%q, Version:%q, Resource:%q}, namespace, name, opts)", m.Group, m.Version, strings.ToLower(stringsutil.Plural(m.ShortName)))
 			writer.F("}") // end of DeleteXXX
 			writer.F("")
 
@@ -388,7 +389,7 @@ func (g *restClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 
 			// WatchXXX
 			writer.F("func (c *%s) Watch%s(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {", clientName, m.ShortName)
-			writer.F("return c.backend.Watch(ctx, %q, %q, namespace, opts)", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName)
+			writer.F("return c.backend.Watch(ctx, schema.GroupVersionResource{Group:%q, Version:%q, Resource:%q}, namespace, opts)", m.Group, m.Version, strings.ToLower(stringsutil.Plural(m.ShortName)))
 			writer.F("}") // end of WatchXXX
 			writer.F("")
 		}

@@ -11,6 +11,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
@@ -43,8 +44,28 @@ type Backend interface {
 	Create(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error)
 	Update(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	UpdateStatus(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
-	Delete(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.DeleteOptions) error
-	Watch(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions) (watch.Interface, error)
+	Delete(ctx context.Context, gvr schema.GroupVersionResource, namespace, name string, opts metav1.DeleteOptions) error
+	Watch(ctx context.Context, gvr schema.GroupVersionResource, namespace string, opts metav1.ListOptions) (watch.Interface, error)
+}
+type Set struct {
+	GrafanaV1alpha1 *GrafanaV1alpha1
+	GrafanaV1alpha2 *GrafanaV1alpha2
+	MinioV1alpha1   *MinioV1alpha1
+}
+
+func NewSet(cfg *rest.Config) (*Set, error) {
+	c, err := rest.RESTClientFor(cfg)
+	if err != nil {
+		return nil, err
+	}
+	b := &restBackend{client: c}
+	s := &Set{
+		GrafanaV1alpha1: NewGrafanaV1alpha1Client(b),
+		GrafanaV1alpha2: NewGrafanaV1alpha2Client(b),
+		MinioV1alpha1:   NewMinioV1alpha1Client(b),
+	}
+
+	return s, nil
 }
 
 type restBackend struct {
@@ -120,17 +141,17 @@ func (r *restBackend) UpdateStatus(ctx context.Context, resourceName, kindName s
 		Into(result)
 }
 
-func (r *restBackend) Delete(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.DeleteOptions) error {
+func (r *restBackend) Delete(ctx context.Context, gvr schema.GroupVersionResource, namespace, name string, opts metav1.DeleteOptions) error {
 	return r.client.Delete().
 		Namespace(namespace).
-		Resource(resourceName).
+		Resource(gvr.Resource).
 		Name(name).
 		Body(&opts).
 		Do(ctx).
 		Error()
 }
 
-func (r *restBackend) Watch(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
+func (r *restBackend) Watch(ctx context.Context, gvr schema.GroupVersionResource, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
@@ -138,31 +159,10 @@ func (r *restBackend) Watch(ctx context.Context, resourceName, kindName, namespa
 	opts.Watch = true
 	return r.client.Get().
 		Namespace(namespace).
-		Resource(resourceName).
+		Resource(gvr.Resource).
 		VersionedParams(&opts, ParameterCodec).
 		Timeout(timeout).
 		Watch(ctx)
-}
-
-type Set struct {
-	GrafanaV1alpha1 *GrafanaV1alpha1
-	GrafanaV1alpha2 *GrafanaV1alpha2
-	MinioV1alpha1   *MinioV1alpha1
-}
-
-func NewSet(cfg *rest.Config) (*Set, error) {
-	c, err := rest.RESTClientFor(cfg)
-	if err != nil {
-		return nil, err
-	}
-	b := &restBackend{client: c}
-	s := &Set{
-		GrafanaV1alpha1: NewGrafanaV1alpha1Client(b),
-		GrafanaV1alpha2: NewGrafanaV1alpha2Client(b),
-		MinioV1alpha1:   NewMinioV1alpha1Client(b),
-	}
-
-	return s, nil
 }
 
 type GrafanaV1alpha1 struct {
@@ -198,7 +198,7 @@ func (c *GrafanaV1alpha1) UpdateGrafana(ctx context.Context, v *githubv1alpha1.G
 }
 
 func (c *GrafanaV1alpha1) DeleteGrafana(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, "grafanas", "Grafana", namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "grafana.f110.dev", Version: "v1alpha1", Resource: "grafanas"}, namespace, name, opts)
 }
 
 func (c *GrafanaV1alpha1) ListGrafana(ctx context.Context, namespace string, opts metav1.ListOptions) (*githubv1alpha1.GrafanaList, error) {
@@ -210,7 +210,7 @@ func (c *GrafanaV1alpha1) ListGrafana(ctx context.Context, namespace string, opt
 }
 
 func (c *GrafanaV1alpha1) WatchGrafana(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, "grafanas", "Grafana", namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "grafana.f110.dev", Version: "v1alpha1", Resource: "grafanas"}, namespace, opts)
 }
 
 func (c *GrafanaV1alpha1) GetGrafanaUser(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*githubv1alpha1.GrafanaUser, error) {
@@ -238,7 +238,7 @@ func (c *GrafanaV1alpha1) UpdateGrafanaUser(ctx context.Context, v *githubv1alph
 }
 
 func (c *GrafanaV1alpha1) DeleteGrafanaUser(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, "grafanausers", "GrafanaUser", namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "grafana.f110.dev", Version: "v1alpha1", Resource: "grafanausers"}, namespace, name, opts)
 }
 
 func (c *GrafanaV1alpha1) ListGrafanaUser(ctx context.Context, namespace string, opts metav1.ListOptions) (*githubv1alpha1.GrafanaUserList, error) {
@@ -250,7 +250,7 @@ func (c *GrafanaV1alpha1) ListGrafanaUser(ctx context.Context, namespace string,
 }
 
 func (c *GrafanaV1alpha1) WatchGrafanaUser(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, "grafanausers", "GrafanaUser", namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "grafana.f110.dev", Version: "v1alpha1", Resource: "grafanausers"}, namespace, opts)
 }
 
 type GrafanaV1alpha2 struct {
@@ -286,7 +286,7 @@ func (c *GrafanaV1alpha2) UpdateGrafana(ctx context.Context, v *githubv1alpha2.G
 }
 
 func (c *GrafanaV1alpha2) DeleteGrafana(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, "grafanas", "Grafana", namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "grafana.f110.dev", Version: "v1alpha2", Resource: "grafanas"}, namespace, name, opts)
 }
 
 func (c *GrafanaV1alpha2) ListGrafana(ctx context.Context, namespace string, opts metav1.ListOptions) (*githubv1alpha2.GrafanaList, error) {
@@ -298,7 +298,7 @@ func (c *GrafanaV1alpha2) ListGrafana(ctx context.Context, namespace string, opt
 }
 
 func (c *GrafanaV1alpha2) WatchGrafana(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, "grafanas", "Grafana", namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "grafana.f110.dev", Version: "v1alpha2", Resource: "grafanas"}, namespace, opts)
 }
 
 func (c *GrafanaV1alpha2) GetGrafanaUser(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*githubv1alpha2.GrafanaUser, error) {
@@ -326,7 +326,7 @@ func (c *GrafanaV1alpha2) UpdateGrafanaUser(ctx context.Context, v *githubv1alph
 }
 
 func (c *GrafanaV1alpha2) DeleteGrafanaUser(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, "grafanausers", "GrafanaUser", namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "grafana.f110.dev", Version: "v1alpha2", Resource: "grafanausers"}, namespace, name, opts)
 }
 
 func (c *GrafanaV1alpha2) ListGrafanaUser(ctx context.Context, namespace string, opts metav1.ListOptions) (*githubv1alpha2.GrafanaUserList, error) {
@@ -338,7 +338,7 @@ func (c *GrafanaV1alpha2) ListGrafanaUser(ctx context.Context, namespace string,
 }
 
 func (c *GrafanaV1alpha2) WatchGrafanaUser(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, "grafanausers", "GrafanaUser", namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "grafana.f110.dev", Version: "v1alpha2", Resource: "grafanausers"}, namespace, opts)
 }
 
 type MinioV1alpha1 struct {
@@ -382,7 +382,7 @@ func (c *MinioV1alpha1) UpdateStatusMinIOBucket(ctx context.Context, v *miniov1a
 }
 
 func (c *MinioV1alpha1) DeleteMinIOBucket(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, "miniobuckets", "MinIOBucket", namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "minio.f110.dev", Version: "v1alpha1", Resource: "miniobuckets"}, namespace, name, opts)
 }
 
 func (c *MinioV1alpha1) ListMinIOBucket(ctx context.Context, namespace string, opts metav1.ListOptions) (*miniov1alpha1.MinIOBucketList, error) {
@@ -394,7 +394,7 @@ func (c *MinioV1alpha1) ListMinIOBucket(ctx context.Context, namespace string, o
 }
 
 func (c *MinioV1alpha1) WatchMinIOBucket(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, "miniobuckets", "MinIOBucket", namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "minio.f110.dev", Version: "v1alpha1", Resource: "miniobuckets"}, namespace, opts)
 }
 
 func (c *MinioV1alpha1) GetMinIOUser(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*miniov1alpha1.MinIOUser, error) {
@@ -430,7 +430,7 @@ func (c *MinioV1alpha1) UpdateStatusMinIOUser(ctx context.Context, v *miniov1alp
 }
 
 func (c *MinioV1alpha1) DeleteMinIOUser(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, "miniousers", "MinIOUser", namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "minio.f110.dev", Version: "v1alpha1", Resource: "miniousers"}, namespace, name, opts)
 }
 
 func (c *MinioV1alpha1) ListMinIOUser(ctx context.Context, namespace string, opts metav1.ListOptions) (*miniov1alpha1.MinIOUserList, error) {
@@ -442,7 +442,7 @@ func (c *MinioV1alpha1) ListMinIOUser(ctx context.Context, namespace string, opt
 }
 
 func (c *MinioV1alpha1) WatchMinIOUser(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, "miniousers", "MinIOUser", namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "minio.f110.dev", Version: "v1alpha1", Resource: "miniousers"}, namespace, opts)
 }
 
 var Factory = NewInformerFactory()
