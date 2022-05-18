@@ -145,6 +145,10 @@ func (g *restFakeClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 	writer.F("return s.tracker")
 	writer.F("}") // end of Tracker
 	writer.F("")
+	writer.F("func (s *Set) Actions() []k8stesting.Action {")
+	writer.F("return s.fake.Actions()")
+	writer.F("}")
+	writer.F("")
 
 	writer.F(`
 type fakerBackend struct {

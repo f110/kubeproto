@@ -48,6 +48,10 @@ func (s *Set) Tracker() k8stesting.ObjectTracker {
 	return s.tracker
 }
 
+func (s *Set) Actions() []k8stesting.Action {
+	return s.fake.Actions()
+}
+
 type fakerBackend struct {
 	fake *k8stesting.Fake
 }
