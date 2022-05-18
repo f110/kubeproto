@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -32,14 +33,15 @@ func genFakeClient() error {
 		return err
 	}
 
-	var outFile, importPath string
+	var outFile, importPath, clientPath string
 	opt := input.GetParameter()
 	if strings.Contains(opt, ",") {
 		s := strings.Split(opt, ",")
 		outFile = s[0]
 		importPath = s[1]
+		clientPath = s[2]
 	} else {
-		outFile = opt
+		return errors.New("import path and client path is mandatory")
 	}
 
 	var res pluginpb.CodeGeneratorResponse
@@ -48,7 +50,7 @@ func genFakeClient() error {
 	out := new(bytes.Buffer)
 	g := k8s.NewFakeClientGenerator(input.FileToGenerate, files)
 	packageName := path.Base(filepath.Dir(outFile))
-	if err := g.Generate(out, packageName, importPath); err != nil {
+	if err := g.Generate(out, packageName, importPath, clientPath); err != nil {
 		return err
 	}
 	res.File = append(res.File, &pluginpb.CodeGeneratorResponse_File{

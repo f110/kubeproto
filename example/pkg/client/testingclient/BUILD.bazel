@@ -8,5 +8,6 @@ go_testing_client(
         "//example/pkg/apis/miniov1alpha1:minio_proto",
     ],
     importpath = "go.f110.dev/kubeproto/example/pkg/client/testingclient",
+    client = "//example/pkg/client:github",
     visibility = ["//visibility:public"],
 )

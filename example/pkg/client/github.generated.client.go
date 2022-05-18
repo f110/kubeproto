@@ -38,11 +38,11 @@ func init() {
 }
 
 type Backend interface {
-	Get(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.GetOptions, result runtime.Object) error
-	List(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions, result runtime.Object) error
-	Create(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) error
-	Update(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) error
-	UpdateStatus(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) error
+	Get(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error)
+	List(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error)
+	Create(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error)
+	Update(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
+	UpdateStatus(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	Delete(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.DeleteOptions) error
 	Watch(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions) (watch.Interface, error)
 }
@@ -51,8 +51,8 @@ type restBackend struct {
 	client *rest.RESTClient
 }
 
-func (r *restBackend) Get(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.GetOptions, result runtime.Object) error {
-	return r.client.Get().
+func (r *restBackend) Get(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error) {
+	return result, r.client.Get().
 		Namespace(namespace).
 		Resource(resourceName).
 		Name(name).
@@ -61,12 +61,12 @@ func (r *restBackend) Get(ctx context.Context, resourceName, kindName, namespace
 		Into(result)
 }
 
-func (r *restBackend) List(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions, result runtime.Object) error {
+func (r *restBackend) List(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
 	}
-	return r.client.Get().
+	return result, r.client.Get().
 		Namespace(namespace).
 		Resource(resourceName).
 		VersionedParams(&opts, ParameterCodec).
@@ -75,12 +75,12 @@ func (r *restBackend) List(ctx context.Context, resourceName, kindName, namespac
 		Into(result)
 }
 
-func (r *restBackend) Create(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) error {
+func (r *restBackend) Create(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error) {
 	m := obj.(metav1.Object)
 	if m == nil {
-		return errors.New("obj is not implement metav1.Object")
+		return nil, errors.New("obj is not implement metav1.Object")
 	}
-	return r.client.Post().
+	return result, r.client.Post().
 		Namespace(m.GetNamespace()).
 		Resource(resourceName).
 		VersionedParams(&opts, ParameterCodec).
@@ -89,12 +89,12 @@ func (r *restBackend) Create(ctx context.Context, resourceName, kindName string,
 		Into(result)
 }
 
-func (r *restBackend) Update(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) error {
+func (r *restBackend) Update(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
 	m := obj.(metav1.Object)
 	if m == nil {
-		return errors.New("obj is not implement metav1.Object")
+		return nil, errors.New("obj is not implement metav1.Object")
 	}
-	return r.client.Put().
+	return result, r.client.Put().
 		Namespace(m.GetNamespace()).
 		Resource(resourceName).
 		Name(m.GetName()).
@@ -104,12 +104,12 @@ func (r *restBackend) Update(ctx context.Context, resourceName, kindName string,
 		Into(result)
 }
 
-func (r *restBackend) UpdateStatus(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) error {
+func (r *restBackend) UpdateStatus(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
 	m := obj.(metav1.Object)
 	if m == nil {
-		return errors.New("obj is not implement metav1.Object")
+		return nil, errors.New("obj is not implement metav1.Object")
 	}
-	return r.client.Put().
+	return result, r.client.Put().
 		Namespace(m.GetNamespace()).
 		Resource(resourceName).
 		Name(m.GetName()).
@@ -174,27 +174,27 @@ func NewGrafanaV1alpha1Client(b Backend) *GrafanaV1alpha1 {
 }
 
 func (c *GrafanaV1alpha1) GetGrafana(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*githubv1alpha1.Grafana, error) {
-	result := &githubv1alpha1.Grafana{}
-	if err := c.backend.Get(ctx, "grafanas", "Grafana", namespace, name, opts, result); err != nil {
+	result, err := c.backend.Get(ctx, "grafanas", "Grafana", namespace, name, opts, &githubv1alpha1.Grafana{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*githubv1alpha1.Grafana), nil
 }
 
 func (c *GrafanaV1alpha1) CreateGrafana(ctx context.Context, v *githubv1alpha1.Grafana, opts metav1.CreateOptions) (*githubv1alpha1.Grafana, error) {
-	result := &githubv1alpha1.Grafana{}
-	if err := c.backend.Create(ctx, "grafanas", "Grafana", v, opts, result); err != nil {
+	result, err := c.backend.Create(ctx, "grafanas", "Grafana", v, opts, &githubv1alpha1.Grafana{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*githubv1alpha1.Grafana), nil
 }
 
 func (c *GrafanaV1alpha1) UpdateGrafana(ctx context.Context, v *githubv1alpha1.Grafana, opts metav1.UpdateOptions) (*githubv1alpha1.Grafana, error) {
-	result := &githubv1alpha1.Grafana{}
-	if err := c.backend.Update(ctx, "grafanas", "Grafana", v, opts, result); err != nil {
+	result, err := c.backend.Update(ctx, "grafanas", "Grafana", v, opts, &githubv1alpha1.Grafana{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*githubv1alpha1.Grafana), nil
 }
 
 func (c *GrafanaV1alpha1) DeleteGrafana(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
@@ -202,11 +202,11 @@ func (c *GrafanaV1alpha1) DeleteGrafana(ctx context.Context, namespace, name str
 }
 
 func (c *GrafanaV1alpha1) ListGrafana(ctx context.Context, namespace string, opts metav1.ListOptions) (*githubv1alpha1.GrafanaList, error) {
-	result := &githubv1alpha1.GrafanaList{}
-	if err := c.backend.List(ctx, "grafanas", "Grafana", namespace, opts, result); err != nil {
+	result, err := c.backend.List(ctx, "grafanas", "Grafana", namespace, opts, &githubv1alpha1.GrafanaList{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*githubv1alpha1.GrafanaList), nil
 }
 
 func (c *GrafanaV1alpha1) WatchGrafana(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
@@ -214,27 +214,27 @@ func (c *GrafanaV1alpha1) WatchGrafana(ctx context.Context, namespace string, op
 }
 
 func (c *GrafanaV1alpha1) GetGrafanaUser(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*githubv1alpha1.GrafanaUser, error) {
-	result := &githubv1alpha1.GrafanaUser{}
-	if err := c.backend.Get(ctx, "grafanausers", "GrafanaUser", namespace, name, opts, result); err != nil {
+	result, err := c.backend.Get(ctx, "grafanausers", "GrafanaUser", namespace, name, opts, &githubv1alpha1.GrafanaUser{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*githubv1alpha1.GrafanaUser), nil
 }
 
 func (c *GrafanaV1alpha1) CreateGrafanaUser(ctx context.Context, v *githubv1alpha1.GrafanaUser, opts metav1.CreateOptions) (*githubv1alpha1.GrafanaUser, error) {
-	result := &githubv1alpha1.GrafanaUser{}
-	if err := c.backend.Create(ctx, "grafanausers", "GrafanaUser", v, opts, result); err != nil {
+	result, err := c.backend.Create(ctx, "grafanausers", "GrafanaUser", v, opts, &githubv1alpha1.GrafanaUser{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*githubv1alpha1.GrafanaUser), nil
 }
 
 func (c *GrafanaV1alpha1) UpdateGrafanaUser(ctx context.Context, v *githubv1alpha1.GrafanaUser, opts metav1.UpdateOptions) (*githubv1alpha1.GrafanaUser, error) {
-	result := &githubv1alpha1.GrafanaUser{}
-	if err := c.backend.Update(ctx, "grafanausers", "GrafanaUser", v, opts, result); err != nil {
+	result, err := c.backend.Update(ctx, "grafanausers", "GrafanaUser", v, opts, &githubv1alpha1.GrafanaUser{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*githubv1alpha1.GrafanaUser), nil
 }
 
 func (c *GrafanaV1alpha1) DeleteGrafanaUser(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
@@ -242,11 +242,11 @@ func (c *GrafanaV1alpha1) DeleteGrafanaUser(ctx context.Context, namespace, name
 }
 
 func (c *GrafanaV1alpha1) ListGrafanaUser(ctx context.Context, namespace string, opts metav1.ListOptions) (*githubv1alpha1.GrafanaUserList, error) {
-	result := &githubv1alpha1.GrafanaUserList{}
-	if err := c.backend.List(ctx, "grafanausers", "GrafanaUser", namespace, opts, result); err != nil {
+	result, err := c.backend.List(ctx, "grafanausers", "GrafanaUser", namespace, opts, &githubv1alpha1.GrafanaUserList{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*githubv1alpha1.GrafanaUserList), nil
 }
 
 func (c *GrafanaV1alpha1) WatchGrafanaUser(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
@@ -262,27 +262,27 @@ func NewGrafanaV1alpha2Client(b Backend) *GrafanaV1alpha2 {
 }
 
 func (c *GrafanaV1alpha2) GetGrafana(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*githubv1alpha2.Grafana, error) {
-	result := &githubv1alpha2.Grafana{}
-	if err := c.backend.Get(ctx, "grafanas", "Grafana", namespace, name, opts, result); err != nil {
+	result, err := c.backend.Get(ctx, "grafanas", "Grafana", namespace, name, opts, &githubv1alpha2.Grafana{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*githubv1alpha2.Grafana), nil
 }
 
 func (c *GrafanaV1alpha2) CreateGrafana(ctx context.Context, v *githubv1alpha2.Grafana, opts metav1.CreateOptions) (*githubv1alpha2.Grafana, error) {
-	result := &githubv1alpha2.Grafana{}
-	if err := c.backend.Create(ctx, "grafanas", "Grafana", v, opts, result); err != nil {
+	result, err := c.backend.Create(ctx, "grafanas", "Grafana", v, opts, &githubv1alpha2.Grafana{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*githubv1alpha2.Grafana), nil
 }
 
 func (c *GrafanaV1alpha2) UpdateGrafana(ctx context.Context, v *githubv1alpha2.Grafana, opts metav1.UpdateOptions) (*githubv1alpha2.Grafana, error) {
-	result := &githubv1alpha2.Grafana{}
-	if err := c.backend.Update(ctx, "grafanas", "Grafana", v, opts, result); err != nil {
+	result, err := c.backend.Update(ctx, "grafanas", "Grafana", v, opts, &githubv1alpha2.Grafana{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*githubv1alpha2.Grafana), nil
 }
 
 func (c *GrafanaV1alpha2) DeleteGrafana(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
@@ -290,11 +290,11 @@ func (c *GrafanaV1alpha2) DeleteGrafana(ctx context.Context, namespace, name str
 }
 
 func (c *GrafanaV1alpha2) ListGrafana(ctx context.Context, namespace string, opts metav1.ListOptions) (*githubv1alpha2.GrafanaList, error) {
-	result := &githubv1alpha2.GrafanaList{}
-	if err := c.backend.List(ctx, "grafanas", "Grafana", namespace, opts, result); err != nil {
+	result, err := c.backend.List(ctx, "grafanas", "Grafana", namespace, opts, &githubv1alpha2.GrafanaList{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*githubv1alpha2.GrafanaList), nil
 }
 
 func (c *GrafanaV1alpha2) WatchGrafana(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
@@ -302,27 +302,27 @@ func (c *GrafanaV1alpha2) WatchGrafana(ctx context.Context, namespace string, op
 }
 
 func (c *GrafanaV1alpha2) GetGrafanaUser(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*githubv1alpha2.GrafanaUser, error) {
-	result := &githubv1alpha2.GrafanaUser{}
-	if err := c.backend.Get(ctx, "grafanausers", "GrafanaUser", namespace, name, opts, result); err != nil {
+	result, err := c.backend.Get(ctx, "grafanausers", "GrafanaUser", namespace, name, opts, &githubv1alpha2.GrafanaUser{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*githubv1alpha2.GrafanaUser), nil
 }
 
 func (c *GrafanaV1alpha2) CreateGrafanaUser(ctx context.Context, v *githubv1alpha2.GrafanaUser, opts metav1.CreateOptions) (*githubv1alpha2.GrafanaUser, error) {
-	result := &githubv1alpha2.GrafanaUser{}
-	if err := c.backend.Create(ctx, "grafanausers", "GrafanaUser", v, opts, result); err != nil {
+	result, err := c.backend.Create(ctx, "grafanausers", "GrafanaUser", v, opts, &githubv1alpha2.GrafanaUser{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*githubv1alpha2.GrafanaUser), nil
 }
 
 func (c *GrafanaV1alpha2) UpdateGrafanaUser(ctx context.Context, v *githubv1alpha2.GrafanaUser, opts metav1.UpdateOptions) (*githubv1alpha2.GrafanaUser, error) {
-	result := &githubv1alpha2.GrafanaUser{}
-	if err := c.backend.Update(ctx, "grafanausers", "GrafanaUser", v, opts, result); err != nil {
+	result, err := c.backend.Update(ctx, "grafanausers", "GrafanaUser", v, opts, &githubv1alpha2.GrafanaUser{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*githubv1alpha2.GrafanaUser), nil
 }
 
 func (c *GrafanaV1alpha2) DeleteGrafanaUser(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
@@ -330,11 +330,11 @@ func (c *GrafanaV1alpha2) DeleteGrafanaUser(ctx context.Context, namespace, name
 }
 
 func (c *GrafanaV1alpha2) ListGrafanaUser(ctx context.Context, namespace string, opts metav1.ListOptions) (*githubv1alpha2.GrafanaUserList, error) {
-	result := &githubv1alpha2.GrafanaUserList{}
-	if err := c.backend.List(ctx, "grafanausers", "GrafanaUser", namespace, opts, result); err != nil {
+	result, err := c.backend.List(ctx, "grafanausers", "GrafanaUser", namespace, opts, &githubv1alpha2.GrafanaUserList{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*githubv1alpha2.GrafanaUserList), nil
 }
 
 func (c *GrafanaV1alpha2) WatchGrafanaUser(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
@@ -350,35 +350,35 @@ func NewMinioV1alpha1Client(b Backend) *MinioV1alpha1 {
 }
 
 func (c *MinioV1alpha1) GetMinIOBucket(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*miniov1alpha1.MinIOBucket, error) {
-	result := &miniov1alpha1.MinIOBucket{}
-	if err := c.backend.Get(ctx, "miniobuckets", "MinIOBucket", namespace, name, opts, result); err != nil {
+	result, err := c.backend.Get(ctx, "miniobuckets", "MinIOBucket", namespace, name, opts, &miniov1alpha1.MinIOBucket{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*miniov1alpha1.MinIOBucket), nil
 }
 
 func (c *MinioV1alpha1) CreateMinIOBucket(ctx context.Context, v *miniov1alpha1.MinIOBucket, opts metav1.CreateOptions) (*miniov1alpha1.MinIOBucket, error) {
-	result := &miniov1alpha1.MinIOBucket{}
-	if err := c.backend.Create(ctx, "miniobuckets", "MinIOBucket", v, opts, result); err != nil {
+	result, err := c.backend.Create(ctx, "miniobuckets", "MinIOBucket", v, opts, &miniov1alpha1.MinIOBucket{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*miniov1alpha1.MinIOBucket), nil
 }
 
 func (c *MinioV1alpha1) UpdateMinIOBucket(ctx context.Context, v *miniov1alpha1.MinIOBucket, opts metav1.UpdateOptions) (*miniov1alpha1.MinIOBucket, error) {
-	result := &miniov1alpha1.MinIOBucket{}
-	if err := c.backend.Update(ctx, "miniobuckets", "MinIOBucket", v, opts, result); err != nil {
+	result, err := c.backend.Update(ctx, "miniobuckets", "MinIOBucket", v, opts, &miniov1alpha1.MinIOBucket{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*miniov1alpha1.MinIOBucket), nil
 }
 
 func (c *MinioV1alpha1) UpdateStatusMinIOBucket(ctx context.Context, v *miniov1alpha1.MinIOBucket, opts metav1.UpdateOptions) (*miniov1alpha1.MinIOBucket, error) {
-	result := &miniov1alpha1.MinIOBucket{}
-	if err := c.backend.UpdateStatus(ctx, "miniobuckets", "MinIOBucket", v, opts, result); err != nil {
+	result, err := c.backend.UpdateStatus(ctx, "miniobuckets", "MinIOBucket", v, opts, &miniov1alpha1.MinIOBucket{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*miniov1alpha1.MinIOBucket), nil
 }
 
 func (c *MinioV1alpha1) DeleteMinIOBucket(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
@@ -386,11 +386,11 @@ func (c *MinioV1alpha1) DeleteMinIOBucket(ctx context.Context, namespace, name s
 }
 
 func (c *MinioV1alpha1) ListMinIOBucket(ctx context.Context, namespace string, opts metav1.ListOptions) (*miniov1alpha1.MinIOBucketList, error) {
-	result := &miniov1alpha1.MinIOBucketList{}
-	if err := c.backend.List(ctx, "miniobuckets", "MinIOBucket", namespace, opts, result); err != nil {
+	result, err := c.backend.List(ctx, "miniobuckets", "MinIOBucket", namespace, opts, &miniov1alpha1.MinIOBucketList{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*miniov1alpha1.MinIOBucketList), nil
 }
 
 func (c *MinioV1alpha1) WatchMinIOBucket(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
@@ -398,35 +398,35 @@ func (c *MinioV1alpha1) WatchMinIOBucket(ctx context.Context, namespace string, 
 }
 
 func (c *MinioV1alpha1) GetMinIOUser(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*miniov1alpha1.MinIOUser, error) {
-	result := &miniov1alpha1.MinIOUser{}
-	if err := c.backend.Get(ctx, "miniousers", "MinIOUser", namespace, name, opts, result); err != nil {
+	result, err := c.backend.Get(ctx, "miniousers", "MinIOUser", namespace, name, opts, &miniov1alpha1.MinIOUser{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*miniov1alpha1.MinIOUser), nil
 }
 
 func (c *MinioV1alpha1) CreateMinIOUser(ctx context.Context, v *miniov1alpha1.MinIOUser, opts metav1.CreateOptions) (*miniov1alpha1.MinIOUser, error) {
-	result := &miniov1alpha1.MinIOUser{}
-	if err := c.backend.Create(ctx, "miniousers", "MinIOUser", v, opts, result); err != nil {
+	result, err := c.backend.Create(ctx, "miniousers", "MinIOUser", v, opts, &miniov1alpha1.MinIOUser{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*miniov1alpha1.MinIOUser), nil
 }
 
 func (c *MinioV1alpha1) UpdateMinIOUser(ctx context.Context, v *miniov1alpha1.MinIOUser, opts metav1.UpdateOptions) (*miniov1alpha1.MinIOUser, error) {
-	result := &miniov1alpha1.MinIOUser{}
-	if err := c.backend.Update(ctx, "miniousers", "MinIOUser", v, opts, result); err != nil {
+	result, err := c.backend.Update(ctx, "miniousers", "MinIOUser", v, opts, &miniov1alpha1.MinIOUser{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*miniov1alpha1.MinIOUser), nil
 }
 
 func (c *MinioV1alpha1) UpdateStatusMinIOUser(ctx context.Context, v *miniov1alpha1.MinIOUser, opts metav1.UpdateOptions) (*miniov1alpha1.MinIOUser, error) {
-	result := &miniov1alpha1.MinIOUser{}
-	if err := c.backend.UpdateStatus(ctx, "miniousers", "MinIOUser", v, opts, result); err != nil {
+	result, err := c.backend.UpdateStatus(ctx, "miniousers", "MinIOUser", v, opts, &miniov1alpha1.MinIOUser{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*miniov1alpha1.MinIOUser), nil
 }
 
 func (c *MinioV1alpha1) DeleteMinIOUser(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
@@ -434,11 +434,11 @@ func (c *MinioV1alpha1) DeleteMinIOUser(ctx context.Context, namespace, name str
 }
 
 func (c *MinioV1alpha1) ListMinIOUser(ctx context.Context, namespace string, opts metav1.ListOptions) (*miniov1alpha1.MinIOUserList, error) {
-	result := &miniov1alpha1.MinIOUserList{}
-	if err := c.backend.List(ctx, "miniousers", "MinIOUser", namespace, opts, result); err != nil {
+	result, err := c.backend.List(ctx, "miniousers", "MinIOUser", namespace, opts, &miniov1alpha1.MinIOUserList{})
+	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.(*miniov1alpha1.MinIOUserList), nil
 }
 
 func (c *MinioV1alpha1) WatchMinIOUser(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {

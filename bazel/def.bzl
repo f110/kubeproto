@@ -1,5 +1,5 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
-load("@io_bazel_rules_go//go:def.bzl", "go_context")
+load("@io_bazel_rules_go//go:def.bzl", "go_context", "GoLibrary")
 load("@rules_proto//proto:defs.bzl", "ProtoInfo")
 
 def _crd_proto_manifest(ctx):
@@ -54,6 +54,8 @@ crd_proto_manifest = rule(
 )
 
 def _go_client(ctx):
+    go = go_context(ctx)
+
     args = ctx.actions.args()
     args.add("--plugin", ("protoc-gen-%s=%s" % (ctx.attr._compiler_name, ctx.executable._compiler.path)))
 
@@ -82,8 +84,14 @@ def _go_client(ctx):
         outputs = [out],
         arguments = [args],
     )
+    library = go.new_library(go, srcs = [out])
 
-    return [DefaultInfo(files = depset([out]))]
+    return [
+        library,
+        DefaultInfo(
+            files = depset([out]),
+        ),
+    ]
 
 go_client = rule(
     implementation = _go_client,
@@ -101,7 +109,11 @@ go_client = rule(
             default = "//cmd/protoc-gen-client",
         ),
         "_compiler_name": attr.string(default = "client"),
+        "_go_context_data": attr.label(
+            default = "@io_bazel_rules_go//:go_context_data",
+        ),
     },
+    toolchains = ["@io_bazel_rules_go//go:toolchain"],
 )
 
 def _go_testing_client(ctx):
@@ -121,7 +133,7 @@ def _go_testing_client(ctx):
 
     out = ctx.actions.declare_file("%s.generated.testingclient.go" % ctx.label.name)
     args.add("--testing-client_out=%s:." % out.path)
-    args.add("--testing-client_opt=%s" % ctx.attr.importpath)
+    args.add("--testing-client_opt=%s,%s" % (ctx.attr.importpath, ctx.attr.client[GoLibrary].importpath))
 
     ctx.actions.run(
         executable = ctx.executable.protoc,
@@ -141,6 +153,7 @@ go_testing_client = rule(
     attrs = {
         "srcs": attr.label_list(providers = [ProtoInfo]),
         "importpath": attr.string(mandatory = True),
+        "client": attr.label(mandatory = True, providers = [GoLibrary]),
         "protoc": attr.label(
             executable = True,
             cfg = "host",
@@ -202,7 +215,11 @@ def _kubeproto_go_api(ctx):
         ctx.attr.srcs,
     )
 
-    return [DefaultInfo(files = depset([deepcopyOut, registerOut]))]
+    return [
+        DefaultInfo(
+            files = depset([deepcopyOut, registerOut]),
+        ),
+    ]
 
 kubeproto_go_api = rule(
     implementation = _kubeproto_go_api,
