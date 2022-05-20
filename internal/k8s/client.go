@@ -476,6 +476,11 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 	writer.F("return &InformerFactory{set: s, cache: c, namespace: namespace, resyncPeriod: resyncPeriod}")
 	writer.F("}") // end of NewInformerFactory
 	writer.F("")
+	writer.F("func (f *InformerFactory) Cache() *InformerCache {")
+	writer.F("return f.cache")
+	writer.F("}") // end of Cache
+	writer.F("")
+
 	writer.F("func (f *InformerFactory) InformerFor(obj runtime.Object) cache.SharedIndexInformer {")
 	writer.F("switch obj.(type) {")
 	for _, k := range keys(g.groupVersions) {
@@ -492,7 +497,7 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 	writer.F("}") // end of InformerFor
 	writer.F("")
 
-	writer.F("func (f *InformerFactory) ForResource(gvr schema.GroupVersionResource) cache.SharedIndexInformer {")
+	writer.F("func (f *InformerFactory) InformerForResource(gvr schema.GroupVersionResource) cache.SharedIndexInformer {")
 	writer.F("switch gvr {")
 	for _, k := range keys(g.groupVersions) {
 		v := g.groupVersions[k]
@@ -505,7 +510,7 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 	writer.F("default:")
 	writer.F("return nil")
 	writer.F("}")
-	writer.F("}") // end of ForResource
+	writer.F("}") // end of InformerForResource
 	writer.F("")
 
 	writer.F("func (f *InformerFactory) Run(ctx context.Context) {")

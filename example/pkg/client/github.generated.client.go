@@ -492,6 +492,10 @@ func NewInformerFactory(s *Set, c *InformerCache, namespace string, resyncPeriod
 	return &InformerFactory{set: s, cache: c, namespace: namespace, resyncPeriod: resyncPeriod}
 }
 
+func (f *InformerFactory) Cache() *InformerCache {
+	return f.cache
+}
+
 func (f *InformerFactory) InformerFor(obj runtime.Object) cache.SharedIndexInformer {
 	switch obj.(type) {
 	case *githubv1alpha1.Grafana:
@@ -511,7 +515,7 @@ func (f *InformerFactory) InformerFor(obj runtime.Object) cache.SharedIndexInfor
 	}
 }
 
-func (f *InformerFactory) ForResource(gvr schema.GroupVersionResource) cache.SharedIndexInformer {
+func (f *InformerFactory) InformerForResource(gvr schema.GroupVersionResource) cache.SharedIndexInformer {
 	switch gvr {
 	case githubv1alpha1.SchemaGroupVersion.WithResource("grafanas"):
 		return NewGrafanaV1alpha1Informer(f.cache, f.set.GrafanaV1alpha1, f.namespace, f.resyncPeriod).GrafanaInformer()
