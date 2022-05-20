@@ -404,15 +404,16 @@ type informerGenerator struct {
 
 func (g *informerGenerator) Import() map[string]string {
 	importPackages := map[string]string{
-		"reflect":                              "",
-		"sync":                                 "",
-		"context":                              "",
-		"time":                                 "",
-		"k8s.io/client-go/rest":                "",
-		"k8s.io/apimachinery/pkg/apis/meta/v1": "metav1",
-		"k8s.io/apimachinery/pkg/watch":        "",
-		"k8s.io/apimachinery/pkg/runtime":      "",
-		"k8s.io/client-go/tools/cache":         "",
+		"reflect":                                "",
+		"sync":                                   "",
+		"context":                                "",
+		"time":                                   "",
+		"k8s.io/client-go/rest":                  "",
+		"k8s.io/apimachinery/pkg/apis/meta/v1":   "metav1",
+		"k8s.io/apimachinery/pkg/watch":          "",
+		"k8s.io/apimachinery/pkg/runtime":        "",
+		"k8s.io/apimachinery/pkg/runtime/schema": "",
+		"k8s.io/client-go/tools/cache":           "",
 	}
 	for _, v := range g.groupVersions {
 		for _, m := range v {
@@ -428,44 +429,89 @@ func newInformerGenerator(groupVersions map[string][]*definition.Message) *infor
 }
 
 func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
-	writer.F("var Factory = NewInformerFactory()")
-	writer.F("")
-	writer.F("type InformerFactory struct {")
-	writer.F("mu        sync.Mutex")
+	writer.F("type InformerCache struct {")
+	writer.F("mu sync.Mutex")
 	writer.F("informers map[reflect.Type]cache.SharedIndexInformer")
-	writer.F("once sync.Once")
-	writer.F("ctx  context.Context")
+	writer.F("}")
+	writer.F("func NewInformerCache() *InformerCache {")
+	writer.F("return &InformerCache{informers: make(map[reflect.Type]cache.SharedIndexInformer)}")
 	writer.F("}")
 	writer.F("")
-	writer.F("func NewInformerFactory() *InformerFactory {")
-	writer.F("return &InformerFactory{informers: make(map[reflect.Type]cache.SharedIndexInformer)}")
-	writer.F("}") // end of NewInformerFactory
-	writer.F("")
-	writer.F("func (f *InformerFactory) InformerFor(obj runtime.Object, newFunc func() cache.SharedIndexInformer) cache.SharedIndexInformer {")
-	writer.F("f.mu.Lock()")
-	writer.F("defer f.mu.Unlock()")
+	writer.F("func (c *InformerCache) Write(obj runtime.Object, newFunc func() cache.SharedIndexInformer) cache.SharedIndexInformer {")
+	writer.F("c.mu.Lock()")
+	writer.F("defer c.mu.Unlock()")
 	writer.F("")
 	writer.F("typ := reflect.TypeOf(obj)")
-	writer.F("if v, ok := f.informers[typ]; ok {")
+	writer.F("if v, ok := c.informers[typ]; ok {")
 	writer.F("return v")
 	writer.F("}")
 	writer.F("informer := newFunc()")
-	writer.F("f.informers[typ] = informer")
-	writer.F("if f.ctx != nil {")
-	writer.F("go informer.Run(f.ctx.Done())")
-	writer.F("}")
+	writer.F("c.informers[typ] = informer")
+	writer.F("")
 	writer.F("return informer")
+	writer.F("}") // end of Write
+	writer.F("")
+	writer.F("func (c *InformerCache) Informers() []cache.SharedIndexInformer {")
+	writer.F("c.mu.Lock()")
+	writer.F("defer c.mu.Unlock()")
+	writer.F("")
+	writer.F("a := make([]cache.SharedIndexInformer, 0, len(c.informers))")
+	writer.F("for _, v := range c.informers {")
+	writer.F("a = append(a, v)")
+	writer.F("}")
+	writer.F("")
+	writer.F("return a")
+	writer.F("}")
+	writer.F("")
+
+	writer.F("type InformerFactory struct {")
+	writer.F("set *Set")
+	writer.F("cache *InformerCache")
+	writer.F("")
+	writer.F("namespace string")
+	writer.F("resyncPeriod time.Duration")
+	writer.F("}")
+	writer.F("")
+	writer.F("func NewInformerFactory(s *Set, c *InformerCache, namespace string, resyncPeriod time.Duration) *InformerFactory {")
+	writer.F("return &InformerFactory{set: s, cache: c, namespace: namespace, resyncPeriod: resyncPeriod}")
+	writer.F("}") // end of NewInformerFactory
+	writer.F("")
+	writer.F("func (f *InformerFactory) InformerFor(obj runtime.Object) cache.SharedIndexInformer {")
+	writer.F("switch obj.(type) {")
+	for _, k := range keys(g.groupVersions) {
+		v := g.groupVersions[k]
+		for _, m := range v {
+			clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
+			writer.F("case *%s.%s:", m.Package.Name, m.ShortName)
+			writer.F("return New%sInformer(f.cache, f.set.%s, f.namespace, f.resyncPeriod).%sInformer()", clientName, clientName, m.ShortName)
+		}
+	}
+	writer.F("default:")
+	writer.F("return nil")
+	writer.F("}")
 	writer.F("}") // end of InformerFor
 	writer.F("")
+
+	writer.F("func (f *InformerFactory) ForResource(gvr schema.GroupVersionResource) cache.SharedIndexInformer {")
+	writer.F("switch gvr {")
+	for _, k := range keys(g.groupVersions) {
+		v := g.groupVersions[k]
+		for _, m := range v {
+			clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
+			writer.F("case %s.SchemaGroupVersion.WithResource(%q):", m.Package.Name, strings.ToLower(stringsutil.Plural(m.ShortName)))
+			writer.F("return New%sInformer(f.cache, f.set.%s, f.namespace, f.resyncPeriod).%sInformer()", clientName, clientName, m.ShortName)
+		}
+	}
+	writer.F("default:")
+	writer.F("return nil")
+	writer.F("}")
+	writer.F("}") // end of ForResource
+	writer.F("")
+
 	writer.F("func (f *InformerFactory) Run(ctx context.Context) {")
-	writer.F("f.mu.Lock()")
-	writer.F("f.once.Do(func() {")
-	writer.F("for _, v := range f.informers {")
+	writer.F("for _, v := range f.cache.Informers() {")
 	writer.F("go v.Run(ctx.Done())")
 	writer.F("}")
-	writer.F("f.ctx = ctx")
-	writer.F("})")
-	writer.F("f.mu.Unlock()")
 	writer.F("}") // end of Run
 	writer.F("")
 
@@ -475,16 +521,16 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
 
 		writer.F("type %sInformer struct {", clientName)
-		writer.F("factory *InformerFactory")
+		writer.F("cache *InformerCache")
 		writer.F("client  *%s", clientName)
 		writer.F("namespace string")
 		writer.F("resyncPeriod time.Duration")
 		writer.F("indexers cache.Indexers")
 		writer.F("}")
 		writer.F("")
-		writer.F("func New%sInformer(f *InformerFactory, client *%s, namespace string, resyncPeriod time.Duration) *%sInformer {", clientName, clientName, clientName)
+		writer.F("func New%sInformer(c *InformerCache, client *%s, namespace string, resyncPeriod time.Duration) *%sInformer {", clientName, clientName, clientName)
 		writer.F("return &%sInformer{", clientName)
-		writer.F("factory: f,")
+		writer.F("cache: c,")
 		writer.F("client: client,")
 		writer.F("namespace: namespace,")
 		writer.F("resyncPeriod: resyncPeriod,")
@@ -499,7 +545,7 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 				clientName,
 				m.ShortName,
 			)
-			writer.F("return f.factory.InformerFor(&%s.%s{}, func () cache.SharedIndexInformer{", m.Package.Name, m.ShortName)
+			writer.F("return f.cache.Write(&%s.%s{}, func () cache.SharedIndexInformer{", m.Package.Name, m.ShortName)
 			writer.F("return cache.NewSharedIndexInformer(")
 			writer.F("&cache.ListWatch{")
 			writer.F("ListFunc: func (options metav1.ListOptions) (runtime.Object, error){")

@@ -445,57 +445,108 @@ func (c *MinioV1alpha1) WatchMinIOUser(ctx context.Context, namespace string, op
 	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "minio.f110.dev", Version: "v1alpha1", Resource: "miniousers"}, namespace, opts)
 }
 
-var Factory = NewInformerFactory()
-
-type InformerFactory struct {
+type InformerCache struct {
 	mu        sync.Mutex
 	informers map[reflect.Type]cache.SharedIndexInformer
-	once      sync.Once
-	ctx       context.Context
 }
 
-func NewInformerFactory() *InformerFactory {
-	return &InformerFactory{informers: make(map[reflect.Type]cache.SharedIndexInformer)}
+func NewInformerCache() *InformerCache {
+	return &InformerCache{informers: make(map[reflect.Type]cache.SharedIndexInformer)}
 }
 
-func (f *InformerFactory) InformerFor(obj runtime.Object, newFunc func() cache.SharedIndexInformer) cache.SharedIndexInformer {
-	f.mu.Lock()
-	defer f.mu.Unlock()
+func (c *InformerCache) Write(obj runtime.Object, newFunc func() cache.SharedIndexInformer) cache.SharedIndexInformer {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 
 	typ := reflect.TypeOf(obj)
-	if v, ok := f.informers[typ]; ok {
+	if v, ok := c.informers[typ]; ok {
 		return v
 	}
 	informer := newFunc()
-	f.informers[typ] = informer
-	if f.ctx != nil {
-		go informer.Run(f.ctx.Done())
-	}
+	c.informers[typ] = informer
+
 	return informer
 }
 
+func (c *InformerCache) Informers() []cache.SharedIndexInformer {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	a := make([]cache.SharedIndexInformer, 0, len(c.informers))
+	for _, v := range c.informers {
+		a = append(a, v)
+	}
+
+	return a
+}
+
+type InformerFactory struct {
+	set   *Set
+	cache *InformerCache
+
+	namespace    string
+	resyncPeriod time.Duration
+}
+
+func NewInformerFactory(s *Set, c *InformerCache, namespace string, resyncPeriod time.Duration) *InformerFactory {
+	return &InformerFactory{set: s, cache: c, namespace: namespace, resyncPeriod: resyncPeriod}
+}
+
+func (f *InformerFactory) InformerFor(obj runtime.Object) cache.SharedIndexInformer {
+	switch obj.(type) {
+	case *githubv1alpha1.Grafana:
+		return NewGrafanaV1alpha1Informer(f.cache, f.set.GrafanaV1alpha1, f.namespace, f.resyncPeriod).GrafanaInformer()
+	case *githubv1alpha1.GrafanaUser:
+		return NewGrafanaV1alpha1Informer(f.cache, f.set.GrafanaV1alpha1, f.namespace, f.resyncPeriod).GrafanaUserInformer()
+	case *githubv1alpha2.Grafana:
+		return NewGrafanaV1alpha2Informer(f.cache, f.set.GrafanaV1alpha2, f.namespace, f.resyncPeriod).GrafanaInformer()
+	case *githubv1alpha2.GrafanaUser:
+		return NewGrafanaV1alpha2Informer(f.cache, f.set.GrafanaV1alpha2, f.namespace, f.resyncPeriod).GrafanaUserInformer()
+	case *miniov1alpha1.MinIOBucket:
+		return NewMinioV1alpha1Informer(f.cache, f.set.MinioV1alpha1, f.namespace, f.resyncPeriod).MinIOBucketInformer()
+	case *miniov1alpha1.MinIOUser:
+		return NewMinioV1alpha1Informer(f.cache, f.set.MinioV1alpha1, f.namespace, f.resyncPeriod).MinIOUserInformer()
+	default:
+		return nil
+	}
+}
+
+func (f *InformerFactory) ForResource(gvr schema.GroupVersionResource) cache.SharedIndexInformer {
+	switch gvr {
+	case githubv1alpha1.SchemaGroupVersion.WithResource("grafanas"):
+		return NewGrafanaV1alpha1Informer(f.cache, f.set.GrafanaV1alpha1, f.namespace, f.resyncPeriod).GrafanaInformer()
+	case githubv1alpha1.SchemaGroupVersion.WithResource("grafanausers"):
+		return NewGrafanaV1alpha1Informer(f.cache, f.set.GrafanaV1alpha1, f.namespace, f.resyncPeriod).GrafanaUserInformer()
+	case githubv1alpha2.SchemaGroupVersion.WithResource("grafanas"):
+		return NewGrafanaV1alpha2Informer(f.cache, f.set.GrafanaV1alpha2, f.namespace, f.resyncPeriod).GrafanaInformer()
+	case githubv1alpha2.SchemaGroupVersion.WithResource("grafanausers"):
+		return NewGrafanaV1alpha2Informer(f.cache, f.set.GrafanaV1alpha2, f.namespace, f.resyncPeriod).GrafanaUserInformer()
+	case miniov1alpha1.SchemaGroupVersion.WithResource("miniobuckets"):
+		return NewMinioV1alpha1Informer(f.cache, f.set.MinioV1alpha1, f.namespace, f.resyncPeriod).MinIOBucketInformer()
+	case miniov1alpha1.SchemaGroupVersion.WithResource("miniousers"):
+		return NewMinioV1alpha1Informer(f.cache, f.set.MinioV1alpha1, f.namespace, f.resyncPeriod).MinIOUserInformer()
+	default:
+		return nil
+	}
+}
+
 func (f *InformerFactory) Run(ctx context.Context) {
-	f.mu.Lock()
-	f.once.Do(func() {
-		for _, v := range f.informers {
-			go v.Run(ctx.Done())
-		}
-		f.ctx = ctx
-	})
-	f.mu.Unlock()
+	for _, v := range f.cache.Informers() {
+		go v.Run(ctx.Done())
+	}
 }
 
 type GrafanaV1alpha1Informer struct {
-	factory      *InformerFactory
+	cache        *InformerCache
 	client       *GrafanaV1alpha1
 	namespace    string
 	resyncPeriod time.Duration
 	indexers     cache.Indexers
 }
 
-func NewGrafanaV1alpha1Informer(f *InformerFactory, client *GrafanaV1alpha1, namespace string, resyncPeriod time.Duration) *GrafanaV1alpha1Informer {
+func NewGrafanaV1alpha1Informer(c *InformerCache, client *GrafanaV1alpha1, namespace string, resyncPeriod time.Duration) *GrafanaV1alpha1Informer {
 	return &GrafanaV1alpha1Informer{
-		factory:      f,
+		cache:        c,
 		client:       client,
 		namespace:    namespace,
 		resyncPeriod: resyncPeriod,
@@ -504,7 +555,7 @@ func NewGrafanaV1alpha1Informer(f *InformerFactory, client *GrafanaV1alpha1, nam
 }
 
 func (f *GrafanaV1alpha1Informer) GrafanaInformer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&githubv1alpha1.Grafana{}, func() cache.SharedIndexInformer {
+	return f.cache.Write(&githubv1alpha1.Grafana{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
@@ -526,7 +577,7 @@ func (f *GrafanaV1alpha1Informer) GrafanaLister() *GrafanaV1alpha1GrafanaLister 
 }
 
 func (f *GrafanaV1alpha1Informer) GrafanaUserInformer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&githubv1alpha1.GrafanaUser{}, func() cache.SharedIndexInformer {
+	return f.cache.Write(&githubv1alpha1.GrafanaUser{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
@@ -548,16 +599,16 @@ func (f *GrafanaV1alpha1Informer) GrafanaUserLister() *GrafanaV1alpha1GrafanaUse
 }
 
 type GrafanaV1alpha2Informer struct {
-	factory      *InformerFactory
+	cache        *InformerCache
 	client       *GrafanaV1alpha2
 	namespace    string
 	resyncPeriod time.Duration
 	indexers     cache.Indexers
 }
 
-func NewGrafanaV1alpha2Informer(f *InformerFactory, client *GrafanaV1alpha2, namespace string, resyncPeriod time.Duration) *GrafanaV1alpha2Informer {
+func NewGrafanaV1alpha2Informer(c *InformerCache, client *GrafanaV1alpha2, namespace string, resyncPeriod time.Duration) *GrafanaV1alpha2Informer {
 	return &GrafanaV1alpha2Informer{
-		factory:      f,
+		cache:        c,
 		client:       client,
 		namespace:    namespace,
 		resyncPeriod: resyncPeriod,
@@ -566,7 +617,7 @@ func NewGrafanaV1alpha2Informer(f *InformerFactory, client *GrafanaV1alpha2, nam
 }
 
 func (f *GrafanaV1alpha2Informer) GrafanaInformer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&githubv1alpha2.Grafana{}, func() cache.SharedIndexInformer {
+	return f.cache.Write(&githubv1alpha2.Grafana{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
@@ -588,7 +639,7 @@ func (f *GrafanaV1alpha2Informer) GrafanaLister() *GrafanaV1alpha2GrafanaLister 
 }
 
 func (f *GrafanaV1alpha2Informer) GrafanaUserInformer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&githubv1alpha2.GrafanaUser{}, func() cache.SharedIndexInformer {
+	return f.cache.Write(&githubv1alpha2.GrafanaUser{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
@@ -610,16 +661,16 @@ func (f *GrafanaV1alpha2Informer) GrafanaUserLister() *GrafanaV1alpha2GrafanaUse
 }
 
 type MinioV1alpha1Informer struct {
-	factory      *InformerFactory
+	cache        *InformerCache
 	client       *MinioV1alpha1
 	namespace    string
 	resyncPeriod time.Duration
 	indexers     cache.Indexers
 }
 
-func NewMinioV1alpha1Informer(f *InformerFactory, client *MinioV1alpha1, namespace string, resyncPeriod time.Duration) *MinioV1alpha1Informer {
+func NewMinioV1alpha1Informer(c *InformerCache, client *MinioV1alpha1, namespace string, resyncPeriod time.Duration) *MinioV1alpha1Informer {
 	return &MinioV1alpha1Informer{
-		factory:      f,
+		cache:        c,
 		client:       client,
 		namespace:    namespace,
 		resyncPeriod: resyncPeriod,
@@ -628,7 +679,7 @@ func NewMinioV1alpha1Informer(f *InformerFactory, client *MinioV1alpha1, namespa
 }
 
 func (f *MinioV1alpha1Informer) MinIOBucketInformer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&miniov1alpha1.MinIOBucket{}, func() cache.SharedIndexInformer {
+	return f.cache.Write(&miniov1alpha1.MinIOBucket{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
@@ -650,7 +701,7 @@ func (f *MinioV1alpha1Informer) MinIOBucketLister() *MinioV1alpha1MinIOBucketLis
 }
 
 func (f *MinioV1alpha1Informer) MinIOUserInformer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&miniov1alpha1.MinIOUser{}, func() cache.SharedIndexInformer {
+	return f.cache.Write(&miniov1alpha1.MinIOUser{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
