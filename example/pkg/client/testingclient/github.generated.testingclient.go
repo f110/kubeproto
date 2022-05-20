@@ -28,10 +28,10 @@ type Set struct {
 
 func NewSet() *Set {
 	s := &Set{}
-	o := k8stesting.NewObjectTracker(client.Scheme, codecs.UniversalDecoder())
-	s.fake.AddReactor("*", "*", k8stesting.ObjectReaction(o))
+	s.tracker = k8stesting.NewObjectTracker(client.Scheme, codecs.UniversalDecoder())
+	s.fake.AddReactor("*", "*", k8stesting.ObjectReaction(s.tracker))
 	s.fake.AddWatchReactor("*", func(action k8stesting.Action) (handled bool, ret watch.Interface, err error) {
-		w, err := o.Watch(action.GetResource(), action.GetNamespace())
+		w, err := s.tracker.Watch(action.GetResource(), action.GetNamespace())
 		if err != nil {
 			return false, nil, err
 		}
