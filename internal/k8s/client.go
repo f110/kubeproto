@@ -38,6 +38,7 @@ func (g *ClientGenerator) Generate(out io.Writer, packageName, importPath string
 		"time":                                   "",
 		"k8s.io/apimachinery/pkg/runtime":        "",
 		"k8s.io/apimachinery/pkg/runtime/schema": "",
+		"k8s.io/apimachinery/pkg/runtime/serializer": "",
 	}
 
 	messages := g.lister.GetMessages()
@@ -56,6 +57,7 @@ func (g *ClientGenerator) Generate(out io.Writer, packageName, importPath string
 	writer.F("var (")
 	writer.F("Scheme = runtime.NewScheme()")
 	writer.F("ParameterCodec = runtime.NewParameterCodec(Scheme)")
+	writer.F("Codecs = serializer.NewCodecFactory(Scheme)")
 	writer.F(")")
 	writer.F("")
 
@@ -92,18 +94,22 @@ type Backend interface {
 	writer.F("}")
 	writer.F("")
 	writer.F("func NewSet(cfg *rest.Config) (*Set,error) {")
-	writer.F("c, err := rest.RESTClientFor(cfg)")
-	writer.F("if err != nil {")
-	writer.F("return nil, err")
-	writer.F("}")
-	writer.F("b := &restBackend{client: c}")
-	writer.F("s := &Set{")
+	writer.F("s := &Set{}")
 	for _, key := range keys(groupVersions) {
 		m := groupVersions[key][0]
 		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
-		writer.F("%s: New%sClient(b),", clientName, clientName)
+		writer.F("{")
+		writer.F("conf := *cfg")
+		writer.F("conf.GroupVersion = &%s.SchemaGroupVersion", m.Package.Name)
+		writer.F("conf.APIPath = \"/apis\"")
+		writer.F("conf.NegotiatedSerializer = Codecs.WithoutConversion()")
+		writer.F("c, err := rest.RESTClientFor(&conf)")
+		writer.F("if err != nil {")
+		writer.F("return nil, err")
+		writer.F("}")
+		writer.F("s.%s = New%sClient(&restBackend{client: c})", clientName, clientName)
+		writer.F("}")
 	}
-	writer.F("}")
 	writer.F("")
 	writer.F("return s, nil")
 	writer.F("}") // end of NewSet
