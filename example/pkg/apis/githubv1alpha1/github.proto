@@ -7,6 +7,7 @@ option (dev.f110.kubeproto.k8s) = {
   version: "v1alpha1",
 };
 
+import "k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto";
 import "kube.proto";
 
 message Grafana {
@@ -38,8 +39,9 @@ enum GrafanaUserPhase {
 }
 
 message GrafanaStatus {
-  int64        observed_generation = 1;
-  GrafanaPhase phase               = 2;
+  int64        observed_generation                                 = 1;
+  GrafanaPhase phase                                               = 2;
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time observed_time = 3;
 }
 
 message GrafanaUser {

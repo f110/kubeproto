@@ -155,14 +155,22 @@ func (g *CRDGenerator) ToOpenAPISchema(m *definition.Message) *apiextensionsv1.J
 		case protoreflect.BoolKind, protoreflect.StringKind, protoreflect.Int64Kind, protoreflect.Int32Kind:
 			properties[f.FieldName] = g.fieldToJSONSchemaProps(f)
 		case protoreflect.MessageKind:
-			child := g.lister.GetMessages().Find(f.MessageName)
-			props := g.ToOpenAPISchema(child)
-			if f.Inline {
-				for k, v := range props.Properties {
-					properties[k] = v
+			switch f.MessageName {
+			case "k8s.io.apimachinery.pkg.apis.meta.v1.Time":
+				properties[f.FieldName] = apiextensionsv1.JSONSchemaProps{
+					Type:   "string",
+					Format: "date-time",
 				}
-			} else {
-				properties[f.FieldName] = *props
+			default:
+				child := g.lister.GetMessages().Find(f.MessageName)
+				props := g.ToOpenAPISchema(child)
+				if f.Inline {
+					for k, v := range props.Properties {
+						properties[k] = v
+					}
+				} else {
+					properties[f.FieldName] = *props
+				}
 			}
 		}
 	}

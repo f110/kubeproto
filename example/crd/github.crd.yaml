@@ -47,6 +47,9 @@ spec:
             properties:
               observedGeneration:
                 type: integer
+              observedTime:
+                format: date-time
+                type: string
             type: object
         type: object
     served: false
