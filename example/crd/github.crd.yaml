@@ -53,6 +53,11 @@ spec:
               observedTime:
                 format: date-time
                 type: string
+              phase:
+                enum:
+                - Created
+                - Creating
+                type: string
             type: object
         type: object
     served: false
@@ -216,12 +221,31 @@ spec:
             type: object
           spec:
             properties:
+              bucketFinalizePolicy:
+                description: |-
+                  bucket_finalize_policy is a policy when deleted CR Object.
+                   If bucket_finalize_policy is an empty string, then it is the same as "keep".
+                enum:
+                - Delete
+                - Keep
+                type: string
               createIndexFile:
                 description: create_index_file is a flag that creates index.html on
                   top of bucket.
                 type: boolean
               maxBackups:
                 type: integer
+              policy:
+                description: |-
+                  policy is the policy of the bucket. One of public, readOnly, private.
+                   If you don't want to give public access, set private or an empty value.
+                   If it is an empty value, The bucket will not have any policy.
+                   Currently, MinIOBucket can't use prefix based policy.
+                enum:
+                - Public
+                - ReadOnly
+                - Private
+                type: string
               selector:
                 properties:
                   matchExpressions:

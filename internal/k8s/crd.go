@@ -176,9 +176,6 @@ func (g *CRDGenerator) Generate(out io.Writer) error {
 }
 
 func (g *CRDGenerator) ToOpenAPISchema(m *definition.Message) *apiextensionsv1.JSONSchemaProps {
-	props := &apiextensionsv1.JSONSchemaProps{
-		Type: "object",
-	}
 	properties := make(map[string]apiextensionsv1.JSONSchemaProps)
 	for _, f := range m.Fields {
 		switch f.Kind {
@@ -193,9 +190,25 @@ func (g *CRDGenerator) ToOpenAPISchema(m *definition.Message) *apiextensionsv1.J
 			} else {
 				properties[f.FieldName] = *props
 			}
+		case protoreflect.EnumKind:
+			enum := g.lister.GetEnums().Find(f.MessageName)
+			if enum != nil {
+				var values []apiextensionsv1.JSON
+				for _, v := range enum.Values {
+					values = append(values, apiextensionsv1.JSON{Raw: []byte(fmt.Sprintf("%q", v))})
+				}
+				properties[f.FieldName] = apiextensionsv1.JSONSchemaProps{
+					Description: f.Description,
+					Type:        "string",
+					Enum:        values,
+				}
+			}
 		}
 	}
-	props.Properties = properties
+	props := &apiextensionsv1.JSONSchemaProps{
+		Type:       "object",
+		Properties: properties,
+	}
 
 	return props
 }
