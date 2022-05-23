@@ -54,8 +54,8 @@ message MinIOBucketStatus {
 }
 
 message MinIOUser {
-  MinIOUserSpec     spec   = 1;
-  MinIOBucketStatus status = 2 [(dev.f110.kubeproto.field) = { sub_resource: true }];
+  MinIOUserSpec   spec   = 1;
+  MinIOUserStatus status = 2 [(dev.f110.kubeproto.field) = { sub_resource: true }];
 
   option (dev.f110.kubeproto.kind) = {
     additional_printer_columns: { name: "ready", type: "string", json_path: ".status.ready", description: "Ready", format: "byte", priority: 0 }
@@ -73,8 +73,9 @@ message MinIOUserSpec {
   optional k8s.io.api.core.v1.LocalObjectReference service            = 5;
 }
 
-message MInIOUserStatus {
-  bool   ready      = 1;
-  string access_key = 2;
-  bool   vault      = 3;
+message MinIOUserStatus {
+  bool   ready          = 1;
+  string access_key     = 2;
+  bool   vault          = 3;
+  int64  last_commit_id = 4;
 }

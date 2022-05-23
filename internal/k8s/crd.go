@@ -205,6 +205,10 @@ func (g *CRDGenerator) fieldToJSONSchemaProps(f *definition.Field) apiextensions
 		Description: f.Description,
 	}
 	props.Type = definition.ProtoreflectKindToJSONSchemaType[f.Kind]
+	switch f.Kind {
+	case protoreflect.Int64Kind:
+		props.Format = "int64"
+	}
 
 	if f.Repeated {
 		return apiextensionsv1.JSONSchemaProps{

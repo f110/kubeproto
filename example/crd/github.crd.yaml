@@ -48,6 +48,7 @@ spec:
           status:
             properties:
               observedGeneration:
+                format: int64
                 type: integer
               observedTime:
                 format: date-time
@@ -87,6 +88,7 @@ spec:
                   type: object
                 type: array
               observedGeneration:
+                format: int64
                 type: integer
             type: object
         type: object
@@ -378,7 +380,14 @@ spec:
             type: object
           status:
             properties:
+              accessKey:
+                type: string
+              lastCommitId:
+                format: int64
+                type: integer
               ready:
+                type: boolean
+              vault:
                 type: boolean
             type: object
         type: object
