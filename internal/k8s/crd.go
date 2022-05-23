@@ -99,9 +99,9 @@ func (g *CRDGenerator) Generate(out io.Writer) error {
 						subResources = &apiextensionsv1.CustomResourceSubresources{}
 					}
 					switch f.Name {
-					case "status":
+					case "Status":
 						subResources.Status = &apiextensionsv1.CustomResourceSubresourceStatus{}
-					case "scale":
+					case "Scale":
 						subResources.Scale = &apiextensionsv1.CustomResourceSubresourceScale{}
 					}
 				}
