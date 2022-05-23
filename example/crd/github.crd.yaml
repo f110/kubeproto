@@ -86,9 +86,11 @@ spec:
           status:
             properties:
               history:
+                description: history is a list of History
                 items:
                   properties:
                     message:
+                      description: message contains the result from the server
                       type: string
                   type: object
                 type: array
@@ -249,6 +251,8 @@ spec:
               selector:
                 properties:
                   matchExpressions:
+                    description: matchExpressions is a list of label selector requirements.
+                      The requirements are ANDed.
                     items:
                       properties:
                         key:
@@ -256,12 +260,12 @@ spec:
                             to.
                           type: string
                         values:
+                          description: |-
+                            values is an array of string values. If the operator is In or NotIn,
+                             the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                             the values array must be empty. This array is replaced during a strategic
+                             merge patch.
                           items:
-                            description: |-
-                              values is an array of string values. If the operator is In or NotIn,
-                               the values array must be non-empty. If the operator is Exists or DoesNotExist,
-                               the values array must be empty. This array is replaced during a strategic
-                               merge patch.
                             type: string
                           type: array
                       type: object
@@ -368,6 +372,8 @@ spec:
               selector:
                 properties:
                   matchExpressions:
+                    description: matchExpressions is a list of label selector requirements.
+                      The requirements are ANDed.
                     items:
                       properties:
                         key:
@@ -375,12 +381,12 @@ spec:
                             to.
                           type: string
                         values:
+                          description: |-
+                            values is an array of string values. If the operator is In or NotIn,
+                             the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                             the values array must be empty. This array is replaced during a strategic
+                             merge patch.
                           items:
-                            description: |-
-                              values is an array of string values. If the operator is In or NotIn,
-                               the values array must be non-empty. If the operator is Exists or DoesNotExist,
-                               the values array must be empty. This array is replaced during a strategic
-                               merge patch.
                             type: string
                           type: array
                       type: object
@@ -401,6 +407,11 @@ spec:
                        More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                     type: string
                 type: object
+              subGroups:
+                description: sub_groups is a list of the name of group
+                items:
+                  type: string
+                type: array
             type: object
           status:
             properties:

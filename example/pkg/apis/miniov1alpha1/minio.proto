@@ -71,6 +71,8 @@ message MinIOUserSpec {
   string   mount_path                                                 = 3;
   optional k8s.io.api.core.v1.SecretKeySelector admin_password_secret = 4;
   optional k8s.io.api.core.v1.LocalObjectReference service            = 5;
+  // sub_groups is a list of the name of group
+  repeated string sub_groups = 6;
 }
 
 message MinIOUserStatus {

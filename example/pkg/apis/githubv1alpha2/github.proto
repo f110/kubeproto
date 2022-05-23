@@ -22,11 +22,13 @@ message GrafanaSpec {
 }
 
 message GrafanaStatus {
-  int64            observed_generation = 1;
-  repeated History history             = 2;
+  int64 observed_generation = 1;
+  // history is a list of History
+  repeated History history = 2;
 }
 
 message History {
+  // message contains the result from the server
   string message = 1;
 }
 

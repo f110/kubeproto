@@ -224,8 +224,10 @@ func (g *CRDGenerator) fieldToJSONSchemaProps(f *definition.Field) apiextensions
 	}
 
 	if f.Repeated {
+		props.Description = ""
 		return apiextensionsv1.JSONSchemaProps{
-			Type: "array",
+			Type:        "array",
+			Description: f.Description,
 			Items: &apiextensionsv1.JSONSchemaPropsOrArray{
 				Schema: &props,
 			},
@@ -250,8 +252,10 @@ func (g *CRDGenerator) messageToJSONSchemaProps(f *definition.Field) *apiextensi
 	}
 
 	if f.Repeated {
+		props.Description = ""
 		return &apiextensionsv1.JSONSchemaProps{
-			Type: "array",
+			Type:        "array",
+			Description: f.Description,
 			Items: &apiextensionsv1.JSONSchemaPropsOrArray{
 				Schema: props,
 			},
