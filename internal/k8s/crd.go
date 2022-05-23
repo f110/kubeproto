@@ -50,9 +50,12 @@ func (g *CRDGenerator) Generate(out io.Writer) error {
 	}
 	sort.Strings(keys)
 
-	for _, msgs := range kinds {
+	for key, msgs := range kinds {
 		served := false
 		storage := false
+		sort.Slice(kinds[key], func(i, j int) bool {
+			return kinds[key][i].Version < kinds[key][j].Version
+		})
 		for _, m := range msgs {
 			k8sExt, err := m.Kubernetes()
 			if err != nil {
