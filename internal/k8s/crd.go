@@ -155,22 +155,13 @@ func (g *CRDGenerator) ToOpenAPISchema(m *definition.Message) *apiextensionsv1.J
 		case protoreflect.BoolKind, protoreflect.StringKind, protoreflect.Int64Kind, protoreflect.Int32Kind:
 			properties[f.FieldName] = g.fieldToJSONSchemaProps(f)
 		case protoreflect.MessageKind:
-			switch f.MessageName {
-			case "k8s.io.apimachinery.pkg.apis.meta.v1.Time":
-				properties[f.FieldName] = apiextensionsv1.JSONSchemaProps{
-					Type:   "string",
-					Format: "date-time",
+			props := g.messageToJSONSchemaProps(f)
+			if f.Inline {
+				for k, v := range props.Properties {
+					properties[k] = v
 				}
-			default:
-				child := g.lister.GetMessages().Find(f.MessageName)
-				props := g.ToOpenAPISchema(child)
-				if f.Inline {
-					for k, v := range props.Properties {
-						properties[k] = v
-					}
-				} else {
-					properties[f.FieldName] = *props
-				}
+			} else {
+				properties[f.FieldName] = *props
 			}
 		}
 	}
@@ -190,6 +181,32 @@ func (g *CRDGenerator) fieldToJSONSchemaProps(f *definition.Field) apiextensions
 			Type: "array",
 			Items: &apiextensionsv1.JSONSchemaPropsOrArray{
 				Schema: &props,
+			},
+		}
+	}
+
+	return props
+}
+
+func (g *CRDGenerator) messageToJSONSchemaProps(f *definition.Field) *apiextensionsv1.JSONSchemaProps {
+	props := &apiextensionsv1.JSONSchemaProps{
+		Description: f.Description,
+	}
+
+	switch f.MessageName {
+	case "k8s.io.apimachinery.pkg.apis.meta.v1.Time":
+		props.Type = "string"
+		props.Format = "date-time"
+	default:
+		child := g.lister.GetMessages().Find(f.MessageName)
+		props = g.ToOpenAPISchema(child)
+	}
+
+	if f.Repeated {
+		return &apiextensionsv1.JSONSchemaProps{
+			Type: "array",
+			Items: &apiextensionsv1.JSONSchemaPropsOrArray{
+				Schema: props,
 			},
 		}
 	}

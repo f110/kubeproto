@@ -22,7 +22,12 @@ message GrafanaSpec {
 }
 
 message GrafanaStatus {
-  int64 observed_generation = 1;
+  int64            observed_generation = 1;
+  repeated History history             = 2;
+}
+
+message History {
+  string message = 1;
 }
 
 message GrafanaUser {

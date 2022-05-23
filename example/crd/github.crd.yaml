@@ -38,10 +38,12 @@ spec:
                   type: string
                 type: array
               volumes:
-                properties:
-                  name:
-                    type: string
-                type: object
+                items:
+                  properties:
+                    name:
+                      type: string
+                  type: object
+                type: array
             type: object
           status:
             properties:
@@ -77,6 +79,13 @@ spec:
             type: object
           status:
             properties:
+              history:
+                items:
+                  properties:
+                    message:
+                      type: string
+                  type: object
+                type: array
               observedGeneration:
                 type: integer
             type: object
@@ -214,21 +223,23 @@ spec:
               selector:
                 properties:
                   matchExpressions:
-                    properties:
-                      key:
-                        description: key is the label key that the selector applies
-                          to.
-                        type: string
-                      values:
-                        items:
-                          description: |-
-                            values is an array of string values. If the operator is In or NotIn,
-                             the values array must be non-empty. If the operator is Exists or DoesNotExist,
-                             the values array must be empty. This array is replaced during a strategic
-                             merge patch.
+                    items:
+                      properties:
+                        key:
+                          description: key is the label key that the selector applies
+                            to.
                           type: string
-                        type: array
-                    type: object
+                        values:
+                          items:
+                            description: |-
+                              values is an array of string values. If the operator is In or NotIn,
+                               the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                               the values array must be empty. This array is replaced during a strategic
+                               merge patch.
+                            type: string
+                          type: array
+                      type: object
+                    type: array
                   matchLabels:
                     properties:
                       key:
@@ -330,21 +341,23 @@ spec:
               selector:
                 properties:
                   matchExpressions:
-                    properties:
-                      key:
-                        description: key is the label key that the selector applies
-                          to.
-                        type: string
-                      values:
-                        items:
-                          description: |-
-                            values is an array of string values. If the operator is In or NotIn,
-                             the values array must be non-empty. If the operator is Exists or DoesNotExist,
-                             the values array must be empty. This array is replaced during a strategic
-                             merge patch.
+                    items:
+                      properties:
+                        key:
+                          description: key is the label key that the selector applies
+                            to.
                           type: string
-                        type: array
-                    type: object
+                        values:
+                          items:
+                            description: |-
+                              values is an array of string values. If the operator is In or NotIn,
+                               the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                               the values array must be empty. This array is replaced during a strategic
+                               merge patch.
+                            type: string
+                          type: array
+                      type: object
+                    type: array
                   matchLabels:
                     properties:
                       key:
