@@ -50,6 +50,33 @@ func (g *CRDGenerator) Generate(out io.Writer) error {
 	}
 	sort.Strings(keys)
 
+	for _, msgs := range kinds {
+		served := false
+		storage := false
+		for _, m := range msgs {
+			k8sExt, err := m.Kubernetes()
+			if err != nil {
+				return err
+			}
+			if k8sExt.Served {
+				served = true
+			}
+			if k8sExt.Storage {
+				storage = true
+			}
+		}
+		if !served {
+			m := msgs[len(msgs)-1]
+			k8sExt, _ := m.Kubernetes()
+			k8sExt.Served = true
+		}
+		if !storage {
+			m := msgs[len(msgs)-1]
+			k8sExt, _ := m.Kubernetes()
+			k8sExt.Storage = true
+		}
+	}
+
 	i := 0
 	for _, name := range keys {
 		msgs := kinds[name]
