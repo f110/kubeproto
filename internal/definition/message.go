@@ -179,7 +179,7 @@ func NewMessageFromMessageDescriptor(m protoreflect.MessageDescriptor, f protore
 		v := m.Fields().Get(i)
 
 		var name, fieldName string
-		var subResource bool
+		var subResource, inline bool
 		e := proto.GetExtension(v.Options(), kubeproto.E_Field)
 		ext := e.(*kubeproto.Field)
 		if ext != nil {
@@ -188,6 +188,7 @@ func NewMessageFromMessageDescriptor(m protoreflect.MessageDescriptor, f protore
 			if ext.ApiFieldName != "" {
 				fieldName = ext.ApiFieldName
 			}
+			inline = ext.Inline
 		}
 		if name == "" {
 			name = stringsutil.ToUpperCamelCase(string(v.Name()))
@@ -216,6 +217,7 @@ func NewMessageFromMessageDescriptor(m protoreflect.MessageDescriptor, f protore
 			Repeated:    repeated,
 			MessageName: messageName,
 			Description: description,
+			Inline:      inline,
 			Optional:    v.HasOptionalKeyword(),
 			SubResource: subResource,
 		})

@@ -284,14 +284,11 @@ spec:
                     description: The key of the secret to select from.  Must be a
                       valid secret key.
                     type: string
-                  localObjectReference:
-                    properties:
-                      name:
-                        description: |-
-                          Name of the referent.
-                           More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                        type: string
-                    type: object
+                  name:
+                    description: |-
+                      Name of the referent.
+                       More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                    type: string
                   optional:
                     description: Specify whether the Secret or its key must be defined
                     type: boolean
@@ -351,14 +348,11 @@ spec:
                     description: The key of the secret to select from.  Must be a
                       valid secret key.
                     type: string
-                  localObjectReference:
-                    properties:
-                      name:
-                        description: |-
-                          Name of the referent.
-                           More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                        type: string
-                    type: object
+                  name:
+                    description: |-
+                      Name of the referent.
+                       More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                    type: string
                   optional:
                     description: Specify whether the Secret or its key must be defined
                     type: boolean
