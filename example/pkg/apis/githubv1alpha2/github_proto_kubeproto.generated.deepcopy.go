@@ -156,10 +156,19 @@ func (in *GrafanaSpec) DeepCopy() *GrafanaSpec {
 
 type GrafanaStatus struct {
 	ObservedGeneration int64 `json:"observedGeneration"`
+	// history is a list of History
+	History []History `json:"history"`
 }
 
 func (in *GrafanaStatus) DeepCopyInto(out *GrafanaStatus) {
 	*out = *in
+	if in.History != nil {
+		l := make([]History, len(in.History))
+		for i := range in.History {
+			in.History[i].DeepCopyInto(&l[i])
+		}
+		out.History = l
+	}
 }
 
 func (in *GrafanaStatus) DeepCopy() *GrafanaStatus {
@@ -202,6 +211,24 @@ func (in *GrafanaUserStatus) DeepCopy() *GrafanaUserStatus {
 		return nil
 	}
 	out := new(GrafanaUserStatus)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type History struct {
+	// message contains the result from the server
+	Message string `json:"message"`
+}
+
+func (in *History) DeepCopyInto(out *History) {
+	*out = *in
+}
+
+func (in *History) DeepCopy() *History {
+	if in == nil {
+		return nil
+	}
+	out := new(History)
 	in.DeepCopyInto(out)
 	return out
 }

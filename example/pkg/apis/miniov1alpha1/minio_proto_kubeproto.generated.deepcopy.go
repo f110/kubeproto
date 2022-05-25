@@ -90,8 +90,8 @@ func (in *MinIOBucketList) DeepCopyObject() runtime.Object {
 type MinIOUser struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
-	Spec              MinIOUserSpec     `json:"spec"`
-	Status            MinIOBucketStatus `json:"status"`
+	Spec              MinIOUserSpec   `json:"spec"`
+	Status            MinIOUserStatus `json:"status"`
 }
 
 func (in *MinIOUser) DeepCopyInto(out *MinIOUser) {
@@ -215,6 +215,8 @@ type MinIOUserSpec struct {
 	MountPath           string                       `json:"mountPath"`
 	AdminPasswordSecret *corev1.SecretKeySelector    `json:"adminPasswordSecret,omitempty"`
 	Service             *corev1.LocalObjectReference `json:"service,omitempty"`
+	// sub_groups is a list of the name of group
+	SubGroups []string `json:"subGroups"`
 }
 
 func (in *MinIOUserSpec) DeepCopyInto(out *MinIOUserSpec) {
@@ -230,6 +232,11 @@ func (in *MinIOUserSpec) DeepCopyInto(out *MinIOUserSpec) {
 		*out = new(corev1.LocalObjectReference)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.SubGroups != nil {
+		t := make([]string, len(in.SubGroups))
+		copy(t, in.SubGroups)
+		out.SubGroups = t
+	}
 }
 
 func (in *MinIOUserSpec) DeepCopy() *MinIOUserSpec {
@@ -237,6 +244,26 @@ func (in *MinIOUserSpec) DeepCopy() *MinIOUserSpec {
 		return nil
 	}
 	out := new(MinIOUserSpec)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type MinIOUserStatus struct {
+	Ready        bool   `json:"ready"`
+	AccessKey    string `json:"accessKey"`
+	Vault        bool   `json:"vault"`
+	LastCommitId int64  `json:"lastCommitId"`
+}
+
+func (in *MinIOUserStatus) DeepCopyInto(out *MinIOUserStatus) {
+	*out = *in
+}
+
+func (in *MinIOUserStatus) DeepCopy() *MinIOUserStatus {
+	if in == nil {
+		return nil
+	}
+	out := new(MinIOUserStatus)
 	in.DeepCopyInto(out)
 	return out
 }

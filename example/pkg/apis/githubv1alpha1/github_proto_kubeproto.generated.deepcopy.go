@@ -185,10 +185,16 @@ func (in *GrafanaSpec) DeepCopy() *GrafanaSpec {
 type GrafanaStatus struct {
 	ObservedGeneration int64        `json:"observedGeneration"`
 	Phase              GrafanaPhase `json:"phase"`
+	ObservedTime       *metav1.Time `json:"observedTime,omitempty"`
 }
 
 func (in *GrafanaStatus) DeepCopyInto(out *GrafanaStatus) {
 	*out = *in
+	if in.ObservedTime != nil {
+		in, out := &in.ObservedTime, &out.ObservedTime
+		*out = new(metav1.Time)
+		(*in).DeepCopyInto(*out)
+	}
 }
 
 func (in *GrafanaStatus) DeepCopy() *GrafanaStatus {
