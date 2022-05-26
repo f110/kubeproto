@@ -21,6 +21,8 @@ type Enum struct {
 	ShortName string
 	Values    []string
 	Package   ImportPackage
+	// External indicates that this enum is defined by imported proto.
+	External bool
 }
 
 func NewEnum(f *descriptorpb.FileDescriptorProto, enum *descriptorpb.EnumDescriptorProto) *Enum {
@@ -46,7 +48,7 @@ func NewEnum(f *descriptorpb.FileDescriptorProto, enum *descriptorpb.EnumDescrip
 	}
 }
 
-func NewEnumFromEnumDescriptor(e protoreflect.EnumDescriptor, f protoreflect.FileDescriptor) *Enum {
+func NewEnumFromEnumDescriptor(e protoreflect.EnumDescriptor, f protoreflect.FileDescriptor, external bool) *Enum {
 	var values []string
 	prefix := stringsutil.ToUpperSnakeCase(string(e.Name())) + "_"
 	for i := 0; i < e.Values().Len(); i++ {
@@ -72,6 +74,7 @@ func NewEnumFromEnumDescriptor(e protoreflect.EnumDescriptor, f protoreflect.Fil
 			Name: path.Base(goPackage),
 			Path: goPackage,
 		},
+		External: external,
 	}
 }
 
@@ -90,6 +93,9 @@ func (e Enums) Find(name string) *Enum {
 func (e *Enums) Own() Enums {
 	m := make(map[string]*Enum)
 	for _, v := range *e {
+		if v.External {
+			continue
+		}
 		m[v.ShortName] = v
 	}
 
