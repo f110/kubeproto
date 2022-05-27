@@ -156,6 +156,10 @@ func (g *Generator) AddDir(dir string, allStructs bool) error {
 			}
 			if v, ok := typeMap[f.Kind]; ok {
 				f.Kind = v.ProtobufTypeDeclaration()
+				// optional map is an invalid type
+				if f.Optional {
+					f.Optional = false
+				}
 			}
 		}
 	}
@@ -451,7 +455,7 @@ func (g *Generator) structToProtobufMessage(v *ast.GenDecl) *ProtobufMessage {
 			continue
 		}
 
-		var inline bool
+		var inline, optional bool
 		var apiFieldName string
 		if f.Tag != nil && f.Tag.Value != "" {
 			tag := reflect.StructTag(f.Tag.Value[1 : len(f.Tag.Value)-1])
@@ -464,14 +468,19 @@ func (g *Generator) structToProtobufMessage(v *ast.GenDecl) *ProtobufMessage {
 			}
 
 			s := strings.Split(tag.Get("json"), ",")
-			if len(s) == 2 && strings.Contains(s[1], "inline") {
-				inline = true
+			if len(s) == 2 {
+				if strings.Contains(s[1], "inline") {
+					inline = true
+				}
+				if strings.Contains(s[1], "omitempty") {
+					optional = true
+				}
 			}
 			apiFieldName = s[0]
 		}
 
 		var kind, externalPackage string
-		var optional, repeated bool
+		var repeated bool
 		switch v := f.Type.(type) {
 		case *ast.Ident:
 			kind = g.goTypeToProtobufKind(v)
@@ -501,6 +510,15 @@ func (g *Generator) structToProtobufMessage(v *ast.GenDecl) *ProtobufMessage {
 			kind = "bytes"
 			repeated = false
 			optional = true
+		}
+
+		// optional repeated is an invalid type in protobuf
+		if repeated && optional {
+			optional = false
+		}
+		// optional map is an invalid type in protobuf
+		if len(kind) > 4 && kind[:4] == "map<" && optional {
+			optional = false
 		}
 
 		m.Fields = append(m.Fields, &ProtobufField{
