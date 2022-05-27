@@ -308,6 +308,7 @@ func extendAsKind(m *Message) {
 				Kind:        protoreflect.MessageKind,
 				Inline:      true,
 				Embed:       true,
+				Optional:    true,
 			},
 			{
 				Name:        "ObjectMeta",
@@ -315,6 +316,7 @@ func extendAsKind(m *Message) {
 				MessageName: ".k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta",
 				Kind:        protoreflect.MessageKind,
 				Embed:       true,
+				Optional:    true,
 			},
 		}, m.Fields...)
 	}
@@ -335,8 +337,10 @@ type Field struct {
 	// Inline indicates the embed field
 	Inline bool
 	// Optional indicates that this field is an optional field.
-	Optional    bool
-	Embed       bool
+	Optional bool
+	// Embed indicates that this field is embed
+	Embed bool
+	// SubResource indicates that this field is the sub resource of Kind
 	SubResource bool
 
 	typeName string

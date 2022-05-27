@@ -176,19 +176,29 @@ func (g *CRDGenerator) Generate(out io.Writer) error {
 }
 
 func (g *CRDGenerator) ToOpenAPISchema(m *definition.Message) *apiextensionsv1.JSONSchemaProps {
+	required := make([]string, 0)
 	properties := make(map[string]apiextensionsv1.JSONSchemaProps)
 	for _, f := range m.Fields {
 		switch f.Kind {
 		case protoreflect.BoolKind, protoreflect.StringKind, protoreflect.Int64Kind, protoreflect.Int32Kind:
 			properties[f.FieldName] = g.fieldToJSONSchemaProps(f)
+			if !f.Optional {
+				required = append(required, f.FieldName)
+			}
 		case protoreflect.MessageKind:
 			props := g.messageToJSONSchemaProps(f)
 			if f.Inline {
 				for k, v := range props.Properties {
 					properties[k] = v
 				}
+				if len(props.Required) > 0 {
+					required = append(required, props.Required...)
+				}
 			} else {
 				properties[f.FieldName] = *props
+				if !f.Optional && !m.Kind {
+					required = append(required, f.FieldName)
+				}
 			}
 		case protoreflect.EnumKind:
 			enum := g.lister.GetEnums().Find(f.MessageName)
@@ -202,12 +212,16 @@ func (g *CRDGenerator) ToOpenAPISchema(m *definition.Message) *apiextensionsv1.J
 					Type:        "string",
 					Enum:        values,
 				}
+				if !f.Optional {
+					required = append(required, f.FieldName)
+				}
 			}
 		}
 	}
 	props := &apiextensionsv1.JSONSchemaProps{
 		Type:       "object",
 		Properties: properties,
+		Required:   required,
 	}
 
 	return props

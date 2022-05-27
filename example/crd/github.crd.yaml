@@ -42,8 +42,14 @@ spec:
                   properties:
                     name:
                       type: string
+                  required:
+                  - name
                   type: object
                 type: array
+            required:
+            - apiVersion
+            - featureGates
+            - volumes
             type: object
           status:
             properties:
@@ -58,6 +64,9 @@ spec:
                 - Created
                 - Creating
                 type: string
+            required:
+            - observedGeneration
+            - phase
             type: object
         type: object
     served: false
@@ -92,11 +101,16 @@ spec:
                     message:
                       description: message contains the result from the server
                       type: string
+                  required:
+                  - message
                   type: object
                 type: array
               observedGeneration:
                 format: int64
                 type: integer
+            required:
+            - observedGeneration
+            - history
             type: object
         type: object
     served: true
@@ -140,11 +154,16 @@ spec:
                 type: boolean
               email:
                 type: string
+            required:
+            - email
+            - admin
             type: object
           status:
             properties:
               ready:
                 type: boolean
+            required:
+            - ready
             type: object
         type: object
     served: false
@@ -171,11 +190,16 @@ spec:
                 type: boolean
               email:
                 type: string
+            required:
+            - email
+            - admin
             type: object
           status:
             properties:
               ready:
                 type: boolean
+            required:
+            - ready
             type: object
         type: object
     served: true
@@ -278,6 +302,10 @@ spec:
                           items:
                             type: string
                           type: array
+                      required:
+                      - key
+                      - operator
+                      - values
                       type: object
                     type: array
                   matchLabels:
@@ -286,7 +314,13 @@ spec:
                         type: string
                       value:
                         type: string
+                    required:
+                    - key
+                    - value
                     type: object
+                required:
+                - matchLabels
+                - matchExpressions
                 type: object
               serviceAccountJSON:
                 properties:
@@ -302,12 +336,23 @@ spec:
                   optional:
                     description: Specify whether the Secret or its key must be defined
                     type: boolean
+                required:
+                - name
+                - key
                 type: object
+            required:
+            - selector
+            - bucketFinalizePolicy
+            - policy
+            - createIndexFile
+            - maxBackups
             type: object
           status:
             properties:
               ready:
                 type: boolean
+            required:
+            - ready
             type: object
         type: object
     served: true
@@ -366,6 +411,9 @@ spec:
                   optional:
                     description: Specify whether the Secret or its key must be defined
                     type: boolean
+                required:
+                - name
+                - key
                 type: object
               mountPath:
                 description: mount_path is a mount path of KV secrets engine.
@@ -403,6 +451,10 @@ spec:
                           items:
                             type: string
                           type: array
+                      required:
+                      - key
+                      - operator
+                      - values
                       type: object
                     type: array
                   matchLabels:
@@ -411,7 +463,13 @@ spec:
                         type: string
                       value:
                         type: string
+                    required:
+                    - key
+                    - value
                     type: object
+                required:
+                - matchLabels
+                - matchExpressions
                 type: object
               service:
                 properties:
@@ -420,12 +478,19 @@ spec:
                       Name of the referent.
                        More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                     type: string
+                required:
+                - name
                 type: object
               subGroups:
                 description: sub_groups is a list of the name of group
                 items:
                   type: string
                 type: array
+            required:
+            - selector
+            - path
+            - mountPath
+            - subGroups
             type: object
           status:
             properties:
@@ -438,6 +503,11 @@ spec:
                 type: boolean
               vault:
                 type: boolean
+            required:
+            - ready
+            - accessKey
+            - vault
+            - lastCommitId
             type: object
         type: object
     served: true
