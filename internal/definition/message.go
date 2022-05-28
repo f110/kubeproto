@@ -308,7 +308,6 @@ func extendAsKind(m *Message) {
 				Kind:        protoreflect.MessageKind,
 				Inline:      true,
 				Embed:       true,
-				Optional:    true,
 			},
 			{
 				Name:        "ObjectMeta",
@@ -316,7 +315,6 @@ func extendAsKind(m *Message) {
 				MessageName: ".k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta",
 				Kind:        protoreflect.MessageKind,
 				Embed:       true,
-				Optional:    true,
 			},
 		}, m.Fields...)
 	}

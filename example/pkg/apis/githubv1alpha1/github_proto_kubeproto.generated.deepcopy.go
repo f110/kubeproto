@@ -151,10 +151,11 @@ func (in *GrafanaUserList) DeepCopyObject() runtime.Object {
 }
 
 type GrafanaSpec struct {
-	AdminUser    string   `json:"adminUser,omitempty"`
-	APIVersion   string   `json:"apiVersion"`
-	FeatureGates []string `json:"featureGates"`
-	Volumes      []Volume `json:"volumes"`
+	AdminUser    string               `json:"adminUser,omitempty"`
+	APIVersion   string               `json:"apiVersion"`
+	FeatureGates []string             `json:"featureGates"`
+	Volumes      []Volume             `json:"volumes"`
+	UserSelector metav1.LabelSelector `json:"userSelector"`
 }
 
 func (in *GrafanaSpec) DeepCopyInto(out *GrafanaSpec) {
@@ -171,6 +172,7 @@ func (in *GrafanaSpec) DeepCopyInto(out *GrafanaSpec) {
 		}
 		out.Volumes = l
 	}
+	in.UserSelector.DeepCopyInto(&out.UserSelector)
 }
 
 func (in *GrafanaSpec) DeepCopy() *GrafanaSpec {

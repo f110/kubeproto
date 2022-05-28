@@ -37,6 +37,56 @@ spec:
                 items:
                   type: string
                 type: array
+              userSelector:
+                properties:
+                  matchExpressions:
+                    description: matchExpressions is a list of label selector requirements.
+                      The requirements are ANDed.
+                    items:
+                      properties:
+                        key:
+                          description: key is the label key that the selector applies
+                            to.
+                          type: string
+                        operator:
+                          description: |-
+                            operator represents a key's relationship to a set of values.
+                             Valid operators are In, NotIn, Exists and DoesNotExist.
+                          enum:
+                          - In
+                          - NotIn
+                          - Exists
+                          - DoesNotExist
+                          type: string
+                        values:
+                          description: |-
+                            values is an array of string values. If the operator is In or NotIn,
+                             the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                             the values array must be empty. This array is replaced during a strategic
+                             merge patch.
+                          items:
+                            type: string
+                          type: array
+                      required:
+                      - key
+                      - operator
+                      - values
+                      type: object
+                    type: array
+                  matchLabels:
+                    properties:
+                      key:
+                        type: string
+                      value:
+                        type: string
+                    required:
+                    - key
+                    - value
+                    type: object
+                required:
+                - matchLabels
+                - matchExpressions
+                type: object
               volumes:
                 items:
                   properties:
@@ -50,6 +100,7 @@ spec:
             - apiVersion
             - featureGates
             - volumes
+            - userSelector
             type: object
           status:
             properties:
@@ -337,7 +388,6 @@ spec:
                     description: Specify whether the Secret or its key must be defined
                     type: boolean
                 required:
-                - name
                 - key
                 type: object
             required:
@@ -412,7 +462,6 @@ spec:
                     description: Specify whether the Secret or its key must be defined
                     type: boolean
                 required:
-                - name
                 - key
                 type: object
               mountPath:
@@ -478,8 +527,6 @@ spec:
                       Name of the referent.
                        More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                     type: string
-                required:
-                - name
                 type: object
               subGroups:
                 description: sub_groups is a list of the name of group
