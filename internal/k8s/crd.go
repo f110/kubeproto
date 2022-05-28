@@ -256,6 +256,12 @@ func (g *CRDGenerator) messageToJSONSchemaProps(f *definition.Field) *apiextensi
 		Description: f.Description,
 	}
 
+	if f.IsMap() {
+		props.Type = "object"
+		props.AdditionalProperties = &apiextensionsv1.JSONSchemaPropsOrBool{Schema: &apiextensionsv1.JSONSchemaProps{Type: "string"}}
+		return props
+	}
+
 	switch f.MessageName {
 	case "k8s.io.apimachinery.pkg.apis.meta.v1.Time":
 		props.Type = "string"

@@ -220,6 +220,7 @@ func NewMessageFromMessageDescriptor(m protoreflect.MessageDescriptor, f protore
 			Inline:      inline,
 			Optional:    v.HasOptionalKeyword(),
 			SubResource: subResource,
+			descriptor:  v,
 		})
 	}
 
@@ -341,7 +342,8 @@ type Field struct {
 	// SubResource indicates that this field is the sub resource of Kind
 	SubResource bool
 
-	typeName string
+	typeName   string
+	descriptor protoreflect.FieldDescriptor
 }
 
 func (f *Field) Tag() string {
@@ -364,6 +366,13 @@ func (f *Field) Tag() string {
 		return ""
 	}
 	return s.String()
+}
+
+func (f *Field) IsMap() bool {
+	if f.descriptor == nil {
+		return false
+	}
+	return f.descriptor.IsMap()
 }
 
 type Fields []*Field
