@@ -13,6 +13,7 @@ proto_library(
     name = "k8s_proto",
     srcs = glob(["k8s.io/**/*.proto"]),
     visibility = ["//visibility:public"],
+    deps = [":kubeproto"],
 )
 
 proto_library(
