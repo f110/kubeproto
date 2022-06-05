@@ -81,9 +81,6 @@ spec:
                        map is equivalent to an element of matchExpressions, whose key field is "key", the
                        operator is "In", and the values array contains only "value". The requirements are ANDed.
                     type: object
-                required:
-                - matchLabels
-                - matchExpressions
                 type: object
               volumes:
                 items:
@@ -97,7 +94,6 @@ spec:
             required:
             - apiVersion
             - featureGates
-            - volumes
             - userSelector
             type: object
           status:
@@ -159,7 +155,6 @@ spec:
                 type: integer
             required:
             - observedGeneration
-            - history
             type: object
         type: object
     served: true
@@ -365,9 +360,6 @@ spec:
                        map is equivalent to an element of matchExpressions, whose key field is "key", the
                        operator is "In", and the values array contains only "value". The requirements are ANDed.
                     type: object
-                required:
-                - matchLabels
-                - matchExpressions
                 type: object
               serviceAccountJSON:
                 properties:
@@ -510,9 +502,6 @@ spec:
                        map is equivalent to an element of matchExpressions, whose key field is "key", the
                        operator is "In", and the values array contains only "value". The requirements are ANDed.
                     type: object
-                required:
-                - matchLabels
-                - matchExpressions
                 type: object
               service:
                 properties:

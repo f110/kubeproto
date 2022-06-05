@@ -196,7 +196,7 @@ func (g *CRDGenerator) ToOpenAPISchema(m *definition.Message) *apiextensionsv1.J
 				}
 			} else {
 				properties[f.FieldName] = *props
-				if !f.Optional && !m.Kind {
+				if !f.Optional && !m.Kind && !f.IsMap() && !f.Repeated {
 					required = append(required, f.FieldName)
 				}
 			}
