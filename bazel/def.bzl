@@ -85,9 +85,11 @@ def _go_client(ctx):
         arguments = [args],
     )
     library = go.new_library(go, srcs = [out])
+    source = go.library_to_source(go, ctx.attr, library, False)
 
     return [
         library,
+        source,
         DefaultInfo(
             files = depset([out]),
         ),
@@ -200,6 +202,8 @@ def _execute_protoc(ctx, compiler, compiler_name, suffix, srcs):
     return out
 
 def _kubeproto_go_api(ctx):
+    go = go_context(ctx)
+
     deepcopyOut = _execute_protoc(
         ctx,
         ctx.executable._deepcopy_compiler,
@@ -214,8 +218,12 @@ def _kubeproto_go_api(ctx):
         "generated.register.go",
         ctx.attr.srcs,
     )
+    library = go.new_library(go, srcs = [deepcopyOut, registerOut])
+    source = go.library_to_source(go, ctx.attr, library, False)
 
     return [
+        library,
+        source,
         DefaultInfo(
             files = depset([deepcopyOut, registerOut]),
         ),
@@ -243,5 +251,9 @@ kubeproto_go_api = rule(
             default = "//cmd/protoc-gen-register",
         ),
         "_register_compiler_name": attr.string(default = "register"),
+        "_go_context_data": attr.label(
+            default = "@io_bazel_rules_go//:go_context_data",
+        ),
     },
+    toolchains = ["@io_bazel_rules_go//go:toolchain"],
 )
