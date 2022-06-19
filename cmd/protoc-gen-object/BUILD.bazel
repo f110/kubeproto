@@ -1,9 +1,9 @@
 load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
 
 go_library(
-    name = "protoc-gen-register_lib",
+    name = "protoc-gen-object_lib",
     srcs = ["main.go"],
-    importpath = "go.f110.dev/kubeproto/cmd/protoc-gen-register",
+    importpath = "go.f110.dev/kubeproto/cmd/protoc-gen-object",
     visibility = ["//visibility:private"],
     deps = [
         "//internal/k8s",
@@ -15,7 +15,7 @@ go_library(
 )
 
 go_binary(
-    name = "protoc-gen-register",
-    embed = [":protoc-gen-register_lib"],
+    name = "protoc-gen-object",
+    embed = [":protoc-gen-object_lib"],
     visibility = ["//visibility:public"],
 )

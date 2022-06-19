@@ -14,7 +14,7 @@ import (
 	"go.f110.dev/kubeproto/internal/k8s"
 )
 
-func genRegister() error {
+func genObject() error {
 	buf, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		return err
@@ -33,7 +33,7 @@ func genRegister() error {
 	var res pluginpb.CodeGeneratorResponse
 	supportedFeatures := uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)
 	res.SupportedFeatures = &supportedFeatures
-	g, err := k8s.NewRegisterGenerator(input.FileToGenerate, files)
+	g, err := k8s.NewObjectGenerator(input.FileToGenerate, files)
 	if err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ func genRegister() error {
 }
 
 func main() {
-	if err := genRegister(); err != nil {
+	if err := genObject(); err != nil {
 		fmt.Fprintf(os.Stderr, "%+v\n", err)
 		os.Exit(1)
 	}

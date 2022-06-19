@@ -204,28 +204,21 @@ def _execute_protoc(ctx, compiler, compiler_name, suffix, srcs):
 def _kubeproto_go_api(ctx):
     go = go_context(ctx)
 
-    deepcopyOut = _execute_protoc(
+    objectOut = _execute_protoc(
         ctx,
-        ctx.executable._deepcopy_compiler,
-        ctx.attr._deepcopy_compiler_name,
-        "generated.deepcopy.go",
+        ctx.executable._object_compiler,
+        ctx.attr._object_compiler_name,
+        "generated.object.go",
         ctx.attr.srcs,
     )
-    registerOut = _execute_protoc(
-        ctx,
-        ctx.executable._register_compiler,
-        ctx.attr._register_compiler_name,
-        "generated.register.go",
-        ctx.attr.srcs,
-    )
-    library = go.new_library(go, srcs = [deepcopyOut, registerOut])
+    library = go.new_library(go, srcs = [objectOut])
     source = go.library_to_source(go, ctx.attr, library, False)
 
     return [
         library,
         source,
         DefaultInfo(
-            files = depset([deepcopyOut, registerOut]),
+            files = depset([objectOut]),
         ),
     ]
 
@@ -239,18 +232,12 @@ kubeproto_go_api = rule(
             cfg = "host",
             default = "@com_google_protobuf//:protoc",
         ),
-        "_deepcopy_compiler": attr.label(
+        "_object_compiler": attr.label(
             executable = True,
             cfg = "host",
-            default = "//cmd/protoc-gen-deepcopy",
+            default = "//cmd/protoc-gen-object",
         ),
-        "_deepcopy_compiler_name": attr.string(default = "deepcopy"),
-        "_register_compiler": attr.label(
-            executable = True,
-            cfg = "host",
-            default = "//cmd/protoc-gen-register",
-        ),
-        "_register_compiler_name": attr.string(default = "register"),
+        "_object_compiler_name": attr.string(default = "object"),
         "_go_context_data": attr.label(
             default = "@io_bazel_rules_go//:go_context_data",
         ),
