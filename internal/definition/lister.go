@@ -29,6 +29,17 @@ func (l *Lister) GetMessages() Messages {
 		return l.messages
 	}
 
+	kinds := make(map[string]struct{})
+	l.allFiles.RangeFiles(func(desc protoreflect.FileDescriptor) bool {
+		for i := 0; i < desc.Messages().Len(); i++ {
+			m := desc.Messages().Get(i)
+			if isKind(m) {
+				kinds[string(m.Name())] = struct{}{}
+			}
+		}
+		return true
+	})
+
 	var msgs Messages
 	addMessage := func(m protoreflect.MessageDescriptor, desc protoreflect.FileDescriptor) bool {
 		msg, err := NewMessageFromMessageDescriptor(m, desc)
@@ -38,18 +49,54 @@ func (l *Lister) GetMessages() Messages {
 		if _, ok := l.files[desc.Path()]; !ok {
 			msg.Dep = true
 		}
-		if exists := msgs.Find(msg.Name); exists == nil {
-			msgs = append(msgs, msg)
+		if exists := msgs.Find(msg.Name); exists != nil {
+			return true
+		}
+		msgs = append(msgs, msg)
+
+		if _, ok := kinds[msg.ShortName+"List"]; !ok {
+			listMessage := &Message{
+				Name:      fmt.Sprintf("%sList", msg.Name),
+				ShortName: fmt.Sprintf("%sList", msg.ShortName),
+				Fields: []*Field{
+					{
+						Name:        "TypeMeta",
+						MessageName: ".k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta",
+						Kind:        protoreflect.MessageKind,
+						Inline:      true,
+						Embed:       true,
+					},
+					{
+						Name:        "ListMeta",
+						FieldName:   "metadata",
+						MessageName: ".k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta",
+						Kind:        protoreflect.MessageKind,
+						Embed:       true,
+					},
+					{
+						Name:        "Items",
+						FieldName:   "items",
+						Kind:        protoreflect.MessageKind,
+						Repeated:    true,
+						MessageName: msg.Name,
+					},
+				},
+				Kind:    true,
+				Virtual: true,
+			}
+			msgs = append(msgs, listMessage)
 		}
 
 		return true
 	}
+
 	l.allFiles.RangeFiles(func(desc protoreflect.FileDescriptor) bool {
 		for i := 0; i < desc.Messages().Len(); i++ {
 			m := desc.Messages().Get(i)
 			if !addMessage(m, desc) {
 				return false
 			}
+			// For nested message declarations
 			for i := 0; i < m.Messages().Len(); i++ {
 				if !addMessage(m.Messages().Get(i), desc) {
 					return false

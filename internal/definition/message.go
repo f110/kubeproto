@@ -77,46 +77,15 @@ func (m *Messages) FilterKind() Messages {
 		if v.Dep {
 			continue
 		}
+		// Skip virtual message (e.g. XXXList)
+		if v.messageDescriptor == nil {
+			continue
+		}
 		if !isKind(v.messageDescriptor) {
 			continue
 		}
 		kinds = append(kinds, v)
 		kindMap[v.ShortName] = v
-	}
-	for name, v := range kindMap {
-		if _, ok := kindMap[name+"List"]; !ok {
-			listMessage := &Message{
-				Name:      fmt.Sprintf("%sList", v.Name),
-				ShortName: fmt.Sprintf("%sList", v.ShortName),
-				Fields: []*Field{
-					{
-						Name:        "TypeMeta",
-						MessageName: ".k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta",
-						Kind:        protoreflect.MessageKind,
-						Inline:      true,
-						Embed:       true,
-					},
-					{
-						Name:        "ListMeta",
-						FieldName:   "metadata",
-						MessageName: ".k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta",
-						Kind:        protoreflect.MessageKind,
-						Embed:       true,
-					},
-					{
-						Name:        "Items",
-						FieldName:   "items",
-						Kind:        protoreflect.MessageKind,
-						Repeated:    true,
-						MessageName: v.Name,
-					},
-				},
-				Kind:    true,
-				Virtual: true,
-			}
-			*m = append(*m, listMessage)
-			kinds = append(kinds, listMessage)
-		}
 	}
 
 	sort.Slice(kinds, func(i, j int) bool {
