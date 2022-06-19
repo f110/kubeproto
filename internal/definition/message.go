@@ -77,11 +77,7 @@ func (m *Messages) FilterKind() Messages {
 		if v.Dep {
 			continue
 		}
-		// Skip virtual message (e.g. XXXList)
-		if v.messageDescriptor == nil {
-			continue
-		}
-		if !isKind(v.messageDescriptor) {
+		if v.messageDescriptor != nil && !isKind(v.messageDescriptor) {
 			continue
 		}
 		kinds = append(kinds, v)

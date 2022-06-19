@@ -54,7 +54,7 @@ func (l *Lister) GetMessages() Messages {
 		}
 		msgs = append(msgs, msg)
 
-		if _, ok := kinds[msg.ShortName+"List"]; !ok {
+		if _, ok := kinds[msg.ShortName+"List"]; !ok && msg.Kind {
 			listMessage := &Message{
 				Name:      fmt.Sprintf("%sList", msg.Name),
 				ShortName: fmt.Sprintf("%sList", msg.ShortName),
@@ -83,6 +83,7 @@ func (l *Lister) GetMessages() Messages {
 				},
 				Kind:    true,
 				Virtual: true,
+				Dep:     msg.Dep,
 			}
 			msgs = append(msgs, listMessage)
 		}
