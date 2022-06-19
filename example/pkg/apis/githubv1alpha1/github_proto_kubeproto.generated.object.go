@@ -18,7 +18,9 @@ var (
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemaGroupVersion,
 		&Grafana{},
+		&GrafanaList{},
 		&GrafanaUser{},
+		&GrafanaUserList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemaGroupVersion)
 	return nil
@@ -68,6 +70,41 @@ func (in *Grafana) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+type GrafanaList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata"`
+	Items           []Grafana `json:"items"`
+}
+
+func (in *GrafanaList) DeepCopyInto(out *GrafanaList) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
+	if in.Items != nil {
+		l := make([]Grafana, len(in.Items))
+		for i := range in.Items {
+			in.Items[i].DeepCopyInto(&l[i])
+		}
+		out.Items = l
+	}
+}
+
+func (in *GrafanaList) DeepCopy() *GrafanaList {
+	if in == nil {
+		return nil
+	}
+	out := new(GrafanaList)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *GrafanaList) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	}
+	return nil
+}
+
 type GrafanaUser struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
@@ -93,6 +130,41 @@ func (in *GrafanaUser) DeepCopy() *GrafanaUser {
 }
 
 func (in *GrafanaUser) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	}
+	return nil
+}
+
+type GrafanaUserList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata"`
+	Items           []GrafanaUser `json:"items"`
+}
+
+func (in *GrafanaUserList) DeepCopyInto(out *GrafanaUserList) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
+	if in.Items != nil {
+		l := make([]GrafanaUser, len(in.Items))
+		for i := range in.Items {
+			in.Items[i].DeepCopyInto(&l[i])
+		}
+		out.Items = l
+	}
+}
+
+func (in *GrafanaUserList) DeepCopy() *GrafanaUserList {
+	if in == nil {
+		return nil
+	}
+	out := new(GrafanaUserList)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *GrafanaUserList) DeepCopyObject() runtime.Object {
 	if c := in.DeepCopy(); c != nil {
 		return c
 	}
