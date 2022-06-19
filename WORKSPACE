@@ -28,6 +28,21 @@ http_archive(
     ],
 )
 
+# This is workaround for dependency problem.
+# Ref: https://github.com/bazelbuild/bazel-gazelle/issues/1217
+
+load("@bazel_gazelle//:deps.bzl", "go_repository")
+
+go_repository(
+    name = "org_golang_x_mod",
+    build_external = "external",
+    importpath = "golang.org/x/mod",
+    sum = "h1:kQgndtyPBW/JIYERgdxfwMYh3AVStj88WQTlNDi2a+o=",
+    version = "v0.6.0-dev.0.20220106191415-9b9b3d81d5e3",
+)
+
+# End of workaround
+
 load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 
 protobuf_deps()
