@@ -21,10 +21,7 @@ kubeproto_go_api(
 
 go_library(
     name = "miniov1alpha1",
-    srcs = [
-        "minio_proto_kubeproto.generated.deepcopy.go",
-        "minio_proto_kubeproto.generated.register.go",
-    ],
+    srcs = ["minio_proto_kubeproto.generated.object.go"],
     importpath = "go.f110.dev/kubeproto/example/pkg/apis/miniov1alpha1",
     visibility = ["//visibility:public"],
     deps = [

@@ -4,7 +4,26 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
+
+const GroupName = "minio.f110.dev"
+
+var (
+	GroupVersion       = metav1.GroupVersion{Group: GroupName, Version: "v1alpha1"}
+	SchemeBuilder      = runtime.NewSchemeBuilder(addKnownTypes)
+	AddToScheme        = SchemeBuilder.AddToScheme
+	SchemaGroupVersion = schema.GroupVersion{Group: "minio.f110.dev", Version: "v1alpha1"}
+)
+
+func addKnownTypes(scheme *runtime.Scheme) error {
+	scheme.AddKnownTypes(SchemaGroupVersion,
+		&MinIOBucket{},
+		&MinIOUser{},
+	)
+	metav1.AddToGroupVersion(scheme, SchemaGroupVersion)
+	return nil
+}
 
 type BucketFinalizePolicy string
 
@@ -52,41 +71,6 @@ func (in *MinIOBucket) DeepCopyObject() runtime.Object {
 	return nil
 }
 
-type MinIOBucketList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata"`
-	Items           []MinIOBucket `json:"items"`
-}
-
-func (in *MinIOBucketList) DeepCopyInto(out *MinIOBucketList) {
-	*out = *in
-	out.TypeMeta = in.TypeMeta
-	in.ListMeta.DeepCopyInto(&out.ListMeta)
-	if in.Items != nil {
-		l := make([]MinIOBucket, len(in.Items))
-		for i := range in.Items {
-			in.Items[i].DeepCopyInto(&l[i])
-		}
-		out.Items = l
-	}
-}
-
-func (in *MinIOBucketList) DeepCopy() *MinIOBucketList {
-	if in == nil {
-		return nil
-	}
-	out := new(MinIOBucketList)
-	in.DeepCopyInto(out)
-	return out
-}
-
-func (in *MinIOBucketList) DeepCopyObject() runtime.Object {
-	if c := in.DeepCopy(); c != nil {
-		return c
-	}
-	return nil
-}
-
 type MinIOUser struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
@@ -112,41 +96,6 @@ func (in *MinIOUser) DeepCopy() *MinIOUser {
 }
 
 func (in *MinIOUser) DeepCopyObject() runtime.Object {
-	if c := in.DeepCopy(); c != nil {
-		return c
-	}
-	return nil
-}
-
-type MinIOUserList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata"`
-	Items           []MinIOUser `json:"items"`
-}
-
-func (in *MinIOUserList) DeepCopyInto(out *MinIOUserList) {
-	*out = *in
-	out.TypeMeta = in.TypeMeta
-	in.ListMeta.DeepCopyInto(&out.ListMeta)
-	if in.Items != nil {
-		l := make([]MinIOUser, len(in.Items))
-		for i := range in.Items {
-			in.Items[i].DeepCopyInto(&l[i])
-		}
-		out.Items = l
-	}
-}
-
-func (in *MinIOUserList) DeepCopy() *MinIOUserList {
-	if in == nil {
-		return nil
-	}
-	out := new(MinIOUserList)
-	in.DeepCopyInto(out)
-	return out
-}
-
-func (in *MinIOUserList) DeepCopyObject() runtime.Object {
 	if c := in.DeepCopy(); c != nil {
 		return c
 	}

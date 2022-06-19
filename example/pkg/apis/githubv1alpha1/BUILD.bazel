@@ -6,8 +6,8 @@ proto_library(
     srcs = ["github.proto"],
     visibility = ["//visibility:public"],
     deps = [
-        "//:kubeproto",
         "//:k8s_proto",
+        "//:kubeproto",
     ],
 )
 
@@ -15,15 +15,11 @@ go_test(
     name = "githubv1alpha1_test",
     srcs = ["test_test.go"],
     embed = [":githubv1alpha1"],
-    deps = ["//example/pkg/apis"],
 )
 
 go_library(
     name = "githubv1alpha1",
-    srcs = [
-        "github_proto_kubeproto.generated.deepcopy.go",
-        "github_proto_kubeproto.generated.register.go",
-    ],
+    srcs = ["github_proto_kubeproto.generated.object.go"],
     importpath = "go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha1",
     visibility = ["//visibility:public"],
     deps = [

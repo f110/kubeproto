@@ -1,3 +1,4 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 load("//bazel:def.bzl", "go_testing_client")
 
 go_testing_client(
@@ -7,7 +8,25 @@ go_testing_client(
         "//example/pkg/apis/githubv1alpha2:github_proto",
         "//example/pkg/apis/miniov1alpha1:minio_proto",
     ],
-    importpath = "go.f110.dev/kubeproto/example/pkg/client/testingclient",
     client = "//example/pkg/client:github",
+    importpath = "go.f110.dev/kubeproto/example/pkg/client/testingclient",
     visibility = ["//visibility:public"],
+)
+
+go_library(
+    name = "testingclient",
+    srcs = ["github.generated.testingclient.go"],
+    importpath = "go.f110.dev/kubeproto/example/pkg/client/testingclient",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/pkg/client",
+        "//example/vendor/k8s.io/apimachinery/pkg/api/meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/labels",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime/serializer",
+        "//example/vendor/k8s.io/apimachinery/pkg/watch",
+        "//example/vendor/k8s.io/client-go/testing",
+    ],
 )

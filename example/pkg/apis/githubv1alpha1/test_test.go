@@ -2,15 +2,13 @@ package githubv1alpha1
 
 import (
 	"testing"
-
-	"go.f110.dev/kubeproto/example/pkg/apis"
 )
 
 func Test(t *testing.T) {
-	g := &apis.Grafana{
-		Spec: apis.GrafanaSpec{
+	g := &Grafana{
+		Spec: GrafanaSpec{
 			FeatureGates: []string{"foo", "bar"},
-			Volumes: []apis.Volume{
+			Volumes: []Volume{
 				{
 					Name: "foo",
 				},
@@ -20,7 +18,7 @@ func Test(t *testing.T) {
 	newG := g.DeepCopy()
 
 	g.Spec.FeatureGates[1] = "baz"
-	g.Spec.Volumes = append(g.Spec.Volumes, apis.Volume{Name: "bar"})
+	g.Spec.Volumes = append(g.Spec.Volumes, Volume{Name: "bar"})
 	g.Spec.Volumes[0].Name = "baz"
 
 	if len(newG.Spec.FeatureGates) != 2 {
