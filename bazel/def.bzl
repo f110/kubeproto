@@ -55,34 +55,13 @@ crd_proto_manifest = rule(
 
 def _go_client(ctx):
     go = go_context(ctx)
-
-    args = ctx.actions.args()
-    args.add("--plugin", ("protoc-gen-%s=%s" % (ctx.attr._compiler_name, ctx.executable._compiler.path)))
-
-    proto_files = []
-    transitive_protos = []
-    for src in ctx.attr.srcs:
-        proto = src[ProtoInfo]
-        transitive_protos.append(proto.transitive_imports)
-        args.add_all(proto.transitive_proto_path, format_each = "--proto_path=%s")
-
-        for s in proto.direct_sources:
-            args.add(s.path)
-            proto_files.append(s)
-
-    out = ctx.actions.declare_file("%s.generated.client.go" % ctx.label.name)
-    args.add("--client_out=%s:." % out.path)
-    args.add("--client_opt=%s" % ctx.attr.importpath)
-
-    ctx.actions.run(
-        executable = ctx.executable.protoc,
-        tools = [ctx.executable._compiler],
-        inputs = depset(
-            direct = proto_files,
-            transitive = transitive_protos,
-        ),
-        outputs = [out],
-        arguments = [args],
+    out = _execute_protoc(
+        ctx,
+        ctx.executable._compiler,
+        ctx.attr._compiler_name,
+        "generated.client.go",
+        ctx.attr.srcs,
+        ctx.attr.importpath,
     )
     library = go.new_library(go, srcs = [out])
     source = go.library_to_source(go, ctx.attr, library, False)
@@ -119,36 +98,25 @@ go_client = rule(
 )
 
 def _go_testing_client(ctx):
-    args = ctx.actions.args()
-    args.add("--plugin", ("protoc-gen-%s=%s" % (ctx.attr._compiler_name, ctx.executable._compiler.path)))
-
-    proto_files = []
-    transitive_protos = []
-    for src in ctx.attr.srcs:
-        proto = src[ProtoInfo]
-        transitive_protos.append(proto.transitive_imports)
-        args.add_all(proto.transitive_proto_path, format_each = "--proto_path=%s")
-
-        for s in proto.direct_sources:
-            args.add(s.path)
-            proto_files.append(s)
-
-    out = ctx.actions.declare_file("%s.generated.testingclient.go" % ctx.label.name)
-    args.add("--testing-client_out=%s:." % out.path)
-    args.add("--testing-client_opt=%s,%s" % (ctx.attr.importpath, ctx.attr.client[GoLibrary].importpath))
-
-    ctx.actions.run(
-        executable = ctx.executable.protoc,
-        tools = [ctx.executable._compiler],
-        inputs = depset(
-            direct = proto_files,
-            transitive = transitive_protos,
-        ),
-        outputs = [out],
-        arguments = [args],
+    go = go_context(ctx)
+    out = _execute_protoc(
+        ctx,
+        ctx.executable._compiler,
+        ctx.attr._compiler_name,
+        "generated.testingclient.go",
+        ctx.attr.srcs,
+        "%s,%s" % (ctx.attr.importpath, ctx.attr.client[GoLibrary].importpath),
     )
+    library = go.new_library(go, srcs = [out])
+    source = go.library_to_source(go, ctx.attr, library, False)
 
-    return [DefaultInfo(files = depset([out]))]
+    return [
+        library,
+        source,
+        DefaultInfo(
+            files = depset([out]),
+        ),
+    ]
 
 go_testing_client = rule(
     implementation = _go_testing_client,
@@ -167,10 +135,14 @@ go_testing_client = rule(
             default = "//cmd/protoc-gen-testing-client",
         ),
         "_compiler_name": attr.string(default = "testing-client"),
+        "_go_context_data": attr.label(
+            default = "@io_bazel_rules_go//:go_context_data",
+        ),
     },
+    toolchains = ["@io_bazel_rules_go//go:toolchain"],
 )
 
-def _execute_protoc(ctx, compiler, compiler_name, suffix, srcs):
+def _execute_protoc(ctx, compiler, compiler_name, suffix, srcs, opts = ""):
     args = ctx.actions.args()
     args.add("--plugin", ("protoc-gen-%s=%s" % (compiler_name, compiler.path)))
 
@@ -187,6 +159,8 @@ def _execute_protoc(ctx, compiler, compiler_name, suffix, srcs):
 
     out = ctx.actions.declare_file("%s.%s" % (ctx.label.name, suffix))
     args.add("--%s_out=%s:." % (compiler_name, out.path))
+    if opts:
+        args.add("--%s_opt=%s" % (compiler_name, opts))
 
     ctx.actions.run(
         executable = ctx.executable.protoc,
