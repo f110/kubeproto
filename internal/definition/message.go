@@ -183,7 +183,7 @@ func NewMessageFromMessageDescriptor(m protoreflect.MessageDescriptor, f protore
 			MessageName: messageName,
 			Description: description,
 			Inline:      inline,
-			Optional:    v.HasOptionalKeyword(),
+			Optional:    v.HasOptionalKeyword() || v.IsMap(),
 			SubResource: subResource,
 			descriptor:  v,
 		})
@@ -338,6 +338,10 @@ func (f *Field) IsMap() bool {
 		return false
 	}
 	return f.descriptor.IsMap()
+}
+
+func (f *Field) MapKeyValue() (protoreflect.FieldDescriptor, protoreflect.FieldDescriptor) {
+	return f.descriptor.MapKey(), f.descriptor.MapValue()
 }
 
 type Fields []*Field

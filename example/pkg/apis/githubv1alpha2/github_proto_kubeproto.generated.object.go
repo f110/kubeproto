@@ -159,11 +159,19 @@ func (in *GrafanaUserList) DeepCopyObject() runtime.Object {
 }
 
 type GrafanaSpec struct {
-	AdminUser string `json:"adminUser,omitempty"`
+	AdminUser string            `json:"adminUser,omitempty"`
+	Labels    map[string]string `json:"labels,omitempty"`
 }
 
 func (in *GrafanaSpec) DeepCopyInto(out *GrafanaSpec) {
 	*out = *in
+	if in.Labels != nil {
+		in, out := &in.Labels, &out.Labels
+		*out = make(map[string]string, len(*in))
+		for k, v := range *in {
+			(*out)[k] = v
+		}
+	}
 }
 
 func (in *GrafanaSpec) DeepCopy() *GrafanaSpec {
@@ -232,6 +240,24 @@ func (in *GrafanaUserStatus) DeepCopy() *GrafanaUserStatus {
 		return nil
 	}
 	out := new(GrafanaUserStatus)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type LabelsEntry struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+func (in *LabelsEntry) DeepCopyInto(out *LabelsEntry) {
+	*out = *in
+}
+
+func (in *LabelsEntry) DeepCopy() *LabelsEntry {
+	if in == nil {
+		return nil
+	}
+	out := new(LabelsEntry)
 	in.DeepCopyInto(out)
 	return out
 }

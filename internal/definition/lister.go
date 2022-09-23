@@ -139,6 +139,13 @@ func (l *Lister) ResolveGoType(packageName string, f *Field) string {
 		return f.typeName
 	}
 
+	if f.IsMap() {
+		key, value := f.MapKeyValue()
+		keyTyp := protoreflectKindMap[key.Kind()]
+		valTyp := protoreflectKindMap[value.Kind()]
+		return fmt.Sprintf("map[%s]%s", keyTyp, valTyp)
+	}
+
 	var typ string
 	switch f.Kind {
 	case protoreflect.MessageKind:
@@ -146,6 +153,7 @@ func (l *Lister) ResolveGoType(packageName string, f *Field) string {
 		if m == nil {
 			return ""
 		}
+
 		if m.Package.Path != "" && m.Package.Path != packageName {
 			alias := m.Package.Alias
 			if alias == "" {

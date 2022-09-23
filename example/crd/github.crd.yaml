@@ -136,6 +136,10 @@ spec:
             properties:
               adminUser:
                 type: string
+              labels:
+                additionalProperties:
+                  type: string
+                type: object
             type: object
           status:
             properties:

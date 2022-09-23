@@ -18,7 +18,8 @@ message Grafana {
 }
 
 message GrafanaSpec {
-  optional string admin_user = 1;
+  optional string     admin_user = 1;
+  map<string, string> labels     = 2;
 }
 
 message GrafanaStatus {

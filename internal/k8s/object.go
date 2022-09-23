@@ -147,9 +147,17 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 				}
 				if f.Optional {
 					defW.F("if in.%s != nil {", f.Name)
-					defW.F("in, out := &in.%s, &out.%s", f.Name, f.Name)
-					defW.F("*out = new(%s)", g.lister.ResolveGoType(packageName, f)[1:])
-					defW.F("(*in).DeepCopyInto(*out)")
+					if f.IsMap() {
+						defW.F("in, out := &in.%s, &out.%s", f.Name, f.Name)
+						defW.F("*out = make(%s, len(*in))", g.lister.ResolveGoType(packageName, f))
+						defW.F("for k, v := range *in {")
+						defW.F("(*out)[k] = v")
+						defW.F("}")
+					} else {
+						defW.F("in, out := &in.%s, &out.%s", f.Name, f.Name)
+						defW.F("*out = new(%s)", g.lister.ResolveGoType(packageName, f)[1:])
+						defW.F("(*in).DeepCopyInto(*out)")
+					}
 					defW.F("}")
 					continue
 				}
