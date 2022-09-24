@@ -117,6 +117,7 @@ type Generator struct {
 
 	// importedPackages is a list of imported packages
 	importedPackages []*packageInformation
+	importPrefix     string
 
 	typeDeclaration []*typeDeclaration
 }
@@ -274,7 +275,11 @@ func (g *Generator) SetAPIVersion(v string) {
 	g.apiVersion = v
 }
 
-func (g *Generator) WriteFile(path string) error {
+func (g *Generator) SetImportPrefix(v string) {
+	g.importPrefix = v
+}
+
+func (g *Generator) WriteFile(outputFilePath string) error {
 	if g.protobufFile == nil {
 		return errors.New("not loaded any files. please call AddDir first")
 	}
@@ -323,7 +328,11 @@ func (g *Generator) WriteFile(path string) error {
 	w.F("")
 	w.F("import \"kube.proto\";")
 	for _, v := range externalProtos {
-		w.F("import %q;", v)
+		if g.isPredefinedPackage(v) {
+			w.F("import %q;", v)
+		} else {
+			w.F("import %q;", path.Join(g.importPrefix, v))
+		}
 	}
 	w.F("")
 
@@ -419,7 +428,7 @@ func (g *Generator) WriteFile(path string) error {
 		w.F("")
 	}
 
-	f, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	f, err := os.OpenFile(outputFilePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
 	}
@@ -431,7 +440,7 @@ func (g *Generator) WriteFile(path string) error {
 	}
 
 	if _, err := exec.LookPath("clang-format"); err == nil {
-		cmd := exec.CommandContext(context.Background(), "clang-format", "-i", path)
+		cmd := exec.CommandContext(context.Background(), "clang-format", "-i", outputFilePath)
 		if err := cmd.Run(); err != nil {
 			return err
 		}
@@ -721,6 +730,16 @@ func (g *Generator) resolveImportPathFromProtobufPackage(in string) string {
 	}
 
 	return ""
+}
+
+func (g *Generator) isPredefinedPackage(importPath string) bool {
+	for _, v := range preDefinedPackages {
+		if strings.HasPrefix(importPath, v.ImportPath) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (g *Generator) protobufDefinableToMessage(v *ast.GenDecl) *ProtobufMessage {
