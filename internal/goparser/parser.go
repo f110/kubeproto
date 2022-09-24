@@ -21,15 +21,67 @@ import (
 	"go.f110.dev/kubeproto/internal/stringsutil"
 )
 
-var packageMap = map[string]string{
-	// Go package to protobuf package
-	"k8s.io/apimachinery/pkg/runtime":      "k8s.io.apimachinery.pkg.runtime",
-	"k8s.io/apimachinery/pkg/types":        "k8s.io.apimachinery.pkg.types",
-	"k8s.io/apimachinery/pkg/apis/meta/v1": "k8s.io.apimachinery.pkg.apis.meta.v1",
-	"k8s.io/apimachinery/pkg/api/resource": "k8s.io.apimachinery.pkg.api.resource",
-	"k8s.io/apimachinery/pkg/util/intstr":  "k8s.io.apimachinery.pkg.util.intstr",
-	"k8s.io/api/core/v1":                   "k8s.io.api.core.v1",
-	"k8s.io/api/apps/v1":                   "k8s.io.api.apps.v1",
+type packageInformation struct {
+	GoPackage       string
+	ProtobufPackage string
+	ImportPath      string
+}
+
+var preDefinedPackages = []packageInformation{
+	{
+		GoPackage:       "k8s.io/apimachinery/pkg/runtime",
+		ProtobufPackage: "k8s.io.apimachinery.pkg.runtime",
+		ImportPath:      "k8s.io/apimachinery/pkg/runtime",
+	},
+	{
+		GoPackage:       "k8s.io/apimachinery/pkg/types",
+		ProtobufPackage: "k8s.io.apimachinery.pkg.types",
+		ImportPath:      "k8s.io/apimachinery/pkg/types",
+	},
+	{
+		GoPackage:       "k8s.io/apimachinery/pkg/apis/meta/v1",
+		ProtobufPackage: "k8s.io.apimachinery.pkg.apis.meta.v1",
+		ImportPath:      "k8s.io/apimachinery/pkg/apis/meta/v1",
+	},
+	{
+		GoPackage:       "k8s.io/apimachinery/pkg/api/resource",
+		ProtobufPackage: "k8s.io.apimachinery.pkg.api.resource",
+		ImportPath:      "k8s.io/apimachinery/pkg/api/resource",
+	},
+	{
+		GoPackage:       "k8s.io/apimachinery/pkg/util/intstr",
+		ProtobufPackage: "k8s.io.apimachinery.pkg.util.intstr",
+		ImportPath:      "k8s.io/apimachinery/pkg/util/intstr",
+	},
+	{
+		GoPackage:       "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1",
+		ProtobufPackage: "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1",
+		ImportPath:      "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1",
+	},
+	{
+		GoPackage:       "k8s.io/api/core/v1",
+		ProtobufPackage: "k8s.io.api.core.v1",
+		ImportPath:      "k8s.io/api/core/v1",
+	},
+	{
+		GoPackage:       "k8s.io/api/apps/v1",
+		ProtobufPackage: "k8s.io.api.apps.v1",
+		ImportPath:      "k8s.io/api/apps/v1",
+	},
+	{
+		GoPackage:       "sigs.k8s.io/gateway-api/apis/v1alpha2",
+		ProtobufPackage: "sigs.k8s.io.gateway_api.apis.v1alpha2",
+		ImportPath:      "sigs.k8s.io/gateway-api/apis/v1alpha2",
+	},
+}
+
+// Go package to protobuf package
+var packageMap = map[string]string{}
+
+func init() {
+	for _, v := range preDefinedPackages {
+		packageMap[v.GoPackage] = v.ProtobufPackage
+	}
 }
 
 type typeDeclaration struct {
@@ -56,9 +108,15 @@ type Generator struct {
 	apiVersion   string
 	protobufFile *ProtobufFile
 
+	// packageMap is a map for type resolving.
+	// The key of map is an import alias.
+	// The value of map is an import path.
 	packageMap          map[string]string
 	enumCandidates      map[string]struct{}
 	enumValueCandidates map[string][]*enumValue
+
+	// importedPackages is a list of imported packages
+	importedPackages []*packageInformation
 
 	typeDeclaration []*typeDeclaration
 }
@@ -105,7 +163,7 @@ func (g *Generator) AddDir(dir string, allStructs bool) error {
 					g.typeDeclaration = append(g.typeDeclaration, g.parseTypeDeclaration(gen))
 				case isStructDeclaration(d):
 					gen := d.(*ast.GenDecl)
-					msg := g.structToProtobufMessage(gen)
+					msg := g.structToProtobufMessage(gen, g.allStructs)
 					if msg == nil {
 						continue
 					}
@@ -154,6 +212,14 @@ func (g *Generator) AddDir(dir string, allStructs bool) error {
 			if _, ok := g.enumValueCandidates[f.Kind]; ok {
 				continue
 			}
+			if f.IsMap {
+				if v, ok := typeMap[f.MapKeyKind]; ok {
+					f.MapKeyKind = v.ProtobufTypeDeclaration()
+				}
+				if v, ok := typeMap[f.MapValueKind]; ok {
+					f.MapValueKind = v.ProtobufTypeDeclaration()
+				}
+			}
 			if v, ok := typeMap[f.Kind]; ok {
 				f.Kind = v.ProtobufTypeDeclaration()
 				// optional map is an invalid type
@@ -166,6 +232,18 @@ func (g *Generator) AddDir(dir string, allStructs bool) error {
 
 	g.protobufFile = p
 	return nil
+}
+
+func (g *Generator) AddImport(imports ...string) {
+	for _, v := range imports {
+		s := strings.Split(v, ":")
+		goPackage, protobufPkg, importPath := s[0], s[1], s[2]
+		g.importedPackages = append(g.importedPackages, &packageInformation{
+			GoPackage:       goPackage,
+			ProtobufPackage: protobufPkg,
+			ImportPath:      importPath,
+		})
+	}
 }
 
 func (g *Generator) addPackageMap(in *ast.ImportSpec) {
@@ -219,10 +297,7 @@ func (g *Generator) WriteFile(path string) error {
 		if k == "k8s.io.apimachinery.pkg.types" {
 			continue
 		}
-		protoFile := k
-		if strings.HasPrefix(protoFile, "k8s.io.") {
-			protoFile = "k8s.io/" + strings.Replace(strings.TrimPrefix(protoFile, "k8s.io."), ".", "/", -1) + "/generated.proto"
-		}
+		protoFile := g.resolveImportPathFromProtobufPackage(k) + "/generated.proto"
 		externalProtos = append(externalProtos, protoFile)
 	}
 	sort.Strings(externalProtos)
@@ -270,7 +345,7 @@ func (g *Generator) WriteFile(path string) error {
 			if stringsutil.ToUpperCamelCase(enumName) == values[i].Value {
 				w.F("%s_%s = %d;", stringsutil.ToUpperSnakeCase(name), enumName, i)
 			} else {
-				for _, v := range []string{"-", ".", "/"} {
+				for _, v := range []string{"-", ".", "/", " "} {
 					enumName = strings.Replace(enumName, v, "_", -1)
 				}
 				w.F(
@@ -313,13 +388,21 @@ func (g *Generator) WriteFile(path string) error {
 				}
 			}
 
-			if f.Optional {
+			if f.Optional && !f.IsMap {
 				w.Fn("optional ")
 			}
 			if f.Repeated {
 				w.Fn("repeated ")
 			}
-			w.Fn("%s %s = %d ", f.Kind, f.Name, f.Index)
+			if f.IsMap {
+				if f.InvalidProtobuf {
+					w.F("// This field can not be represented by protobuf.")
+					w.Fn("// ")
+				}
+				w.Fn("map<%s, %s> %s = %d ", f.MapKeyKind, f.MapValueKind, f.Name, f.Index)
+			} else {
+				w.Fn("%s %s = %d ", f.Kind, f.Name, f.Index)
+			}
 			w.Fn("[(dev.f110.kubeproto.field) = {go_name: %q, ", f.GoName)
 			if f.APIFieldName != "" {
 				w.Fn("api_field_name: %q, ", f.APIFieldName)
@@ -397,14 +480,14 @@ func (g *Generator) constToEnumValue(v *ast.GenDecl) map[string][]*enumValue {
 	return constDefinitions
 }
 
-func (g *Generator) structToProtobufMessage(v *ast.GenDecl) *ProtobufMessage {
+func (g *Generator) structToProtobufMessage(v *ast.GenDecl, allStruct bool) *ProtobufMessage {
 	typeSpec := v.Specs[0].(*ast.TypeSpec)
 	if unicode.IsLower(rune(typeSpec.Name.String()[0])) {
 		// Private struct
 		return nil
 	}
 
-	if !g.allStructs {
+	if !allStruct {
 		var toGenerate bool
 		if v.Doc != nil {
 			for _, line := range v.Doc.List {
@@ -479,8 +562,8 @@ func (g *Generator) structToProtobufMessage(v *ast.GenDecl) *ProtobufMessage {
 			apiFieldName = s[0]
 		}
 
-		var kind, externalPackage string
-		var repeated bool
+		var kind, mapKeyKind, mapValueKind, externalPackage string
+		var repeated, isMap, invalidProtobuf bool
 		switch v := f.Type.(type) {
 		case *ast.Ident:
 			kind = g.goTypeToProtobufKind(v)
@@ -488,18 +571,23 @@ func (g *Generator) structToProtobufMessage(v *ast.GenDecl) *ProtobufMessage {
 			optional = true
 			kind = g.goTypeToProtobufKind(v.X)
 			if s, ok := v.X.(*ast.SelectorExpr); ok {
-				externalPackage = g.resolveProtobufPackage(s.X.(*ast.Ident))
+				externalPackage = g.resolveProtobufPackageFromGoPackage(s.X.(*ast.Ident))
 			}
 		case *ast.ArrayType:
 			repeated = true
 			kind = g.goTypeToProtobufKind(v.Elt)
+			if s, ok := v.Elt.(*ast.SelectorExpr); ok {
+				externalPackage = g.resolveProtobufPackageFromGoPackage(s.X.(*ast.Ident))
+			}
 		case *ast.SelectorExpr:
 			kind = g.goTypeToProtobufKind(v)
-			externalPackage = g.resolveProtobufPackage(v.X.(*ast.Ident))
+			externalPackage = g.resolveProtobufPackageFromGoPackage(v.X.(*ast.Ident))
 		case *ast.MapType:
-			keyKind := g.goTypeToProtobufKind(v.Key)
-			valueKind := g.goTypeToProtobufKind(v.Value)
-			kind = fmt.Sprintf("map<%s, %s>", keyKind, valueKind)
+			mapKeyKind, mapValueKind = g.goTypeToProtobufKind(v.Key), g.goTypeToProtobufKind(v.Value)
+			isMap = true
+			if mapKeyKind == "" || mapValueKind == "" {
+				invalidProtobuf = true
+			}
 		default:
 			log.Printf("%T", v)
 			kind = "string"
@@ -526,6 +614,10 @@ func (g *Generator) structToProtobufMessage(v *ast.GenDecl) *ProtobufMessage {
 			GoName:          name,
 			APIFieldName:    apiFieldName,
 			Kind:            kind,
+			IsMap:           isMap,
+			InvalidProtobuf: invalidProtobuf,
+			MapKeyKind:      mapKeyKind,
+			MapValueKind:    mapValueKind,
 			ExternalPackage: externalPackage,
 			Index:           i,
 			Optional:        optional,
@@ -560,6 +652,8 @@ func (g *Generator) goTypeToProtobufKind(in ast.Expr) string {
 			return v.Name
 		case "int":
 			return "int32"
+		case "float64":
+			return "float"
 		default:
 			return v.Name
 		}
@@ -570,7 +664,7 @@ func (g *Generator) goTypeToProtobufKind(in ast.Expr) string {
 			return "int64"
 		}
 
-		protobufPackage := g.resolveProtobufPackage(nameIdent)
+		protobufPackage := g.resolveProtobufPackageFromGoPackage(nameIdent)
 		// Special type resolve for types.UID.
 		if protobufPackage == "k8s.io.apimachinery.pkg.types" && v.Sel.Name == "UID" {
 			return "string"
@@ -592,15 +686,38 @@ func (g *Generator) goTypeToProtobufKind(in ast.Expr) string {
 	}
 }
 
-func (g *Generator) resolveProtobufPackage(in *ast.Ident) string {
+func (g *Generator) resolveProtobufPackageFromGoPackage(in *ast.Ident) string {
 	if packageFullPath, ok := g.packageMap[in.Name]; ok {
 		if protobufPackage, ok := packageMap[packageFullPath]; ok {
 			return protobufPackage
 		} else {
+			for _, v := range g.importedPackages {
+				if v.GoPackage == packageFullPath {
+					return v.ProtobufPackage
+				}
+			}
 			log.Printf("Not found protobuf package corresponding to %s", packageFullPath)
 		}
 	} else {
 		log.Printf("Package full path not found: %s", in.Name)
+	}
+
+	return ""
+}
+
+func (g *Generator) resolveImportPathFromProtobufPackage(in string) string {
+	for _, v := range preDefinedPackages {
+		if v.ProtobufPackage == in {
+			return v.ImportPath
+		}
+	}
+	if importPath, ok := g.packageMap[in]; ok {
+		return importPath
+	}
+	for _, v := range g.importedPackages {
+		if v.ProtobufPackage == in {
+			return v.ImportPath
+		}
 	}
 
 	return ""

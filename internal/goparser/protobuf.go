@@ -40,6 +40,10 @@ type ProtobufField struct {
 	GoName          string
 	APIFieldName    string
 	Kind            string
+	IsMap           bool
+	InvalidProtobuf bool
+	MapKeyKind      string
+	MapValueKind    string
 	Index           int
 	Repeated        bool
 	Optional        bool

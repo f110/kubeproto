@@ -7,9 +7,9 @@ import (
 	"github.com/gertd/go-pluralize"
 )
 
-var word = []string{"UUID", "UID", "WWIDs", "IQN", "ISCSI", "API", "CHAP", "CIDRs", "CIDR", "PID", "ID", "DNS", "IPC",
+var word = []string{"UUID", "UID", "WWIDs", "IQN", "ISCSI", "API", "ACME", "CHAP", "CIDRs", "CIDR", "PID", "ID", "DNS", "IPC",
 	"IPs", "IP", "QOS", "OS", "NFS", "FS", "FC", "RBD", "TCP", "UDP", "SCTP", "URI", "URL", "TLS", "HTTPS", "HTTP",
-	"SELinux", "FQDN", "TTY", "WWNs", "GCE", "AWS", "IO", "CSI", "GRPC", "SSL", "GMSA"}
+	"SELinux", "FQDN", "TTY", "WWNs", "GCE", "AWS", "IO", "CSI", "GRPC", "SSL", "GMSA", "HMAC"}
 
 var wordDic map[string]struct{}
 
