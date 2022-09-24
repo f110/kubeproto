@@ -342,21 +342,20 @@ enum UnsatisfiableConstraintAction {
 }
 
 message AWSElasticBlockStoreVolumeSource {
-  // Unique ID of the persistent disk resource in AWS (Amazon EBS volume).
+  // volumeID is unique ID of the persistent disk resource in AWS (Amazon EBS volume).
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
   string volume_id = 1 [(dev.f110.kubeproto.field) = { go_name: "VolumeID", api_field_name: "volumeID", inline: false }];
-  // Filesystem type of the volume that you want to mount.
+  // fsType is the filesystem type of the volume that you want to mount.
   // Tip: Ensure that the filesystem type is supported by the host operating system.
   // Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
   optional string fs_type = 2 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
-  // The partition in the volume that you want to mount.
+  // partition is the partition in the volume that you want to mount.
   // If omitted, the default is to mount by volume name.
   // Examples: For volume /dev/sda1, you specify the partition as "1".
   // Similarly, the volume partition for /dev/sda is "0" (or you can leave the property empty).
   optional int32 partition = 3 [(dev.f110.kubeproto.field) = { go_name: "Partition", api_field_name: "partition", inline: false }];
-  // Specify "true" to force and set the ReadOnly property in VolumeMounts to "true".
-  // If omitted, the default is "false".
+  // readOnly value true will force the readOnly setting in VolumeMounts.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
   optional bool read_only = 4 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
 }
@@ -384,42 +383,42 @@ message AvoidPods {
 }
 
 message AzureDiskVolumeSource {
-  // The Name of the data disk in the blob storage
+  // diskName is the Name of the data disk in the blob storage
   string disk_name = 1 [(dev.f110.kubeproto.field) = { go_name: "DiskName", api_field_name: "diskName", inline: false }];
-  // The URI the data disk in the blob storage
+  // diskURI is the URI of data disk in the blob storage
   string data_disk_uri = 2 [(dev.f110.kubeproto.field) = { go_name: "DataDiskURI", api_field_name: "diskURI", inline: false }];
-  // Host Caching mode: None, Read Only, Read Write.
+  // cachingMode is the Host Caching mode: None, Read Only, Read Write.
   optional AzureDataDiskCachingMode caching_mode = 3 [(dev.f110.kubeproto.field) = { go_name: "CachingMode", api_field_name: "cachingMode", inline: false }];
-  // Filesystem type to mount.
+  // fsType is Filesystem type to mount.
   // Must be a filesystem type supported by the host operating system.
   // Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
   optional string fs_type = 4 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
-  // Defaults to false (read/write). ReadOnly here will force
+  // readOnly Defaults to false (read/write). ReadOnly here will force
   // the ReadOnly setting in VolumeMounts.
   optional bool read_only = 5 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
-  // Expected values Shared: multiple blob disks per storage account  Dedicated: single blob disk per storage account  Managed: azure managed data disk (only in managed availability set). defaults to shared
+  // kind expected values are Shared: multiple blob disks per storage account  Dedicated: single blob disk per storage account  Managed: azure managed data disk (only in managed availability set). defaults to shared
   optional AzureDataDiskKind kind = 6 [(dev.f110.kubeproto.field) = { go_name: "Kind", api_field_name: "kind", inline: false }];
 }
 
 message AzureFilePersistentVolumeSource {
-  // the name of secret that contains Azure Storage Account Name and Key
+  // secretName is the name of secret that contains Azure Storage Account Name and Key
   string secret_name = 1 [(dev.f110.kubeproto.field) = { go_name: "SecretName", api_field_name: "secretName", inline: false }];
-  // Share Name
+  // shareName is the azure Share Name
   string share_name = 2 [(dev.f110.kubeproto.field) = { go_name: "ShareName", api_field_name: "shareName", inline: false }];
-  // Defaults to false (read/write). ReadOnly here will force
+  // readOnly defaults to false (read/write). ReadOnly here will force
   // the ReadOnly setting in VolumeMounts.
   optional bool read_only = 3 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
-  // the namespace of the secret that contains Azure Storage Account Name and Key
+  // secretNamespace is the namespace of the secret that contains Azure Storage Account Name and Key
   // default is the same as the Pod
   optional string secret_namespace = 4 [(dev.f110.kubeproto.field) = { go_name: "SecretNamespace", api_field_name: "secretNamespace", inline: false }];
 }
 
 message AzureFileVolumeSource {
-  // the name of secret that contains Azure Storage Account Name and Key
+  // secretName is the  name of secret that contains Azure Storage Account Name and Key
   string secret_name = 1 [(dev.f110.kubeproto.field) = { go_name: "SecretName", api_field_name: "secretName", inline: false }];
-  // Share Name
+  // shareName is the azure share Name
   string share_name = 2 [(dev.f110.kubeproto.field) = { go_name: "ShareName", api_field_name: "shareName", inline: false }];
-  // Defaults to false (read/write). ReadOnly here will force
+  // readOnly defaults to false (read/write). ReadOnly here will force
   // the ReadOnly setting in VolumeMounts.
   optional bool read_only = 3 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
 }
@@ -433,41 +432,40 @@ message Binding {
 }
 
 message CSIPersistentVolumeSource {
-  // Driver is the name of the driver to use for this volume.
+  // driver is the name of the driver to use for this volume.
   // Required.
   string driver = 1 [(dev.f110.kubeproto.field) = { go_name: "Driver", api_field_name: "driver", inline: false }];
-  // VolumeHandle is the unique volume name returned by the CSI volume
+  // volumeHandle is the unique volume name returned by the CSI volume
   // plugin’s CreateVolume to refer to the volume on all subsequent calls.
   // Required.
   string volume_handle = 2 [(dev.f110.kubeproto.field) = { go_name: "VolumeHandle", api_field_name: "volumeHandle", inline: false }];
-  // Optional: The value to pass to ControllerPublishVolumeRequest.
+  // readOnly value to pass to ControllerPublishVolumeRequest.
   // Defaults to false (read/write).
   optional bool read_only = 3 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
-  // Filesystem type to mount.
-  // Must be a filesystem type supported by the host operating system.
+  // fsType to mount. Must be a filesystem type supported by the host operating system.
   // Ex. "ext4", "xfs", "ntfs".
   optional string fs_type = 4 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
-  // Attributes of the volume to publish.
+  // volumeAttributes of the volume to publish.
   map<string, string> volume_attributes = 5 [(dev.f110.kubeproto.field) = { go_name: "VolumeAttributes", api_field_name: "volumeAttributes", inline: false }];
-  // ControllerPublishSecretRef is a reference to the secret object containing
+  // controllerPublishSecretRef is a reference to the secret object containing
   // sensitive information to pass to the CSI driver to complete the CSI
   // ControllerPublishVolume and ControllerUnpublishVolume calls.
   // This field is optional, and may be empty if no secret is required. If the
   // secret object contains more than one secret, all secrets are passed.
   optional SecretReference controller_publish_secret_ref = 6 [(dev.f110.kubeproto.field) = { go_name: "ControllerPublishSecretRef", api_field_name: "controllerPublishSecretRef", inline: false }];
-  // NodeStageSecretRef is a reference to the secret object containing sensitive
+  // nodeStageSecretRef is a reference to the secret object containing sensitive
   // information to pass to the CSI driver to complete the CSI NodeStageVolume
   // and NodeStageVolume and NodeUnstageVolume calls.
   // This field is optional, and may be empty if no secret is required. If the
   // secret object contains more than one secret, all secrets are passed.
   optional SecretReference node_stage_secret_ref = 7 [(dev.f110.kubeproto.field) = { go_name: "NodeStageSecretRef", api_field_name: "nodeStageSecretRef", inline: false }];
-  // NodePublishSecretRef is a reference to the secret object containing
+  // nodePublishSecretRef is a reference to the secret object containing
   // sensitive information to pass to the CSI driver to complete the CSI
   // NodePublishVolume and NodeUnpublishVolume calls.
   // This field is optional, and may be empty if no secret is required. If the
   // secret object contains more than one secret, all secrets are passed.
   optional SecretReference node_publish_secret_ref = 8 [(dev.f110.kubeproto.field) = { go_name: "NodePublishSecretRef", api_field_name: "nodePublishSecretRef", inline: false }];
-  // ControllerExpandSecretRef is a reference to the secret object containing
+  // controllerExpandSecretRef is a reference to the secret object containing
   // sensitive information to pass to the CSI driver to complete the CSI
   // ControllerExpandVolume call.
   // This is an alpha field and requires enabling ExpandCSIVolumes feature gate.
@@ -477,20 +475,20 @@ message CSIPersistentVolumeSource {
 }
 
 message CSIVolumeSource {
-  // Driver is the name of the CSI driver that handles this volume.
+  // driver is the name of the CSI driver that handles this volume.
   // Consult with your admin for the correct name as registered in the cluster.
   string driver = 1 [(dev.f110.kubeproto.field) = { go_name: "Driver", api_field_name: "driver", inline: false }];
-  // Specifies a read-only configuration for the volume.
+  // readOnly specifies a read-only configuration for the volume.
   // Defaults to false (read/write).
   optional bool read_only = 2 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
-  // Filesystem type to mount. Ex. "ext4", "xfs", "ntfs".
+  // fsType to mount. Ex. "ext4", "xfs", "ntfs".
   // If not provided, the empty value is passed to the associated CSI driver
   // which will determine the default filesystem to apply.
   optional string fs_type = 3 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
-  // VolumeAttributes stores driver-specific properties that are passed to the CSI
+  // volumeAttributes stores driver-specific properties that are passed to the CSI
   // driver. Consult your driver's documentation for supported values.
   map<string, string> volume_attributes = 4 [(dev.f110.kubeproto.field) = { go_name: "VolumeAttributes", api_field_name: "volumeAttributes", inline: false }];
-  // NodePublishSecretRef is a reference to the secret object containing
+  // nodePublishSecretRef is a reference to the secret object containing
   // sensitive information to pass to the CSI driver to complete the CSI
   // NodePublishVolume and NodeUnpublishVolume calls.
   // This field is optional, and  may be empty if no secret is required. If the
@@ -506,79 +504,79 @@ message Capabilities {
 }
 
 message CephFSPersistentVolumeSource {
-  // Required: Monitors is a collection of Ceph monitors
+  // monitors is Required: Monitors is a collection of Ceph monitors
   // More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
   repeated string monitors = 1 [(dev.f110.kubeproto.field) = { go_name: "Monitors", api_field_name: "monitors", inline: false }];
-  // Optional: Used as the mounted root, rather than the full Ceph tree, default is /
+  // path is Optional: Used as the mounted root, rather than the full Ceph tree, default is /
   optional string path = 2 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
-  // Optional: User is the rados user name, default is admin
+  // user is Optional: User is the rados user name, default is admin
   // More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
   optional string user = 3 [(dev.f110.kubeproto.field) = { go_name: "User", api_field_name: "user", inline: false }];
-  // Optional: SecretFile is the path to key ring for User, default is /etc/ceph/user.secret
+  // secretFile is Optional: SecretFile is the path to key ring for User, default is /etc/ceph/user.secret
   // More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
   optional string secret_file = 4 [(dev.f110.kubeproto.field) = { go_name: "SecretFile", api_field_name: "secretFile", inline: false }];
-  // Optional: SecretRef is reference to the authentication secret for User, default is empty.
+  // secretRef is Optional: SecretRef is reference to the authentication secret for User, default is empty.
   // More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
   optional SecretReference secret_ref = 5 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
-  // Optional: Defaults to false (read/write). ReadOnly here will force
+  // readOnly is Optional: Defaults to false (read/write). ReadOnly here will force
   // the ReadOnly setting in VolumeMounts.
   // More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
   optional bool read_only = 6 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
 }
 
 message CephFSVolumeSource {
-  // Required: Monitors is a collection of Ceph monitors
+  // monitors is Required: Monitors is a collection of Ceph monitors
   // More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
   repeated string monitors = 1 [(dev.f110.kubeproto.field) = { go_name: "Monitors", api_field_name: "monitors", inline: false }];
-  // Optional: Used as the mounted root, rather than the full Ceph tree, default is /
+  // path is Optional: Used as the mounted root, rather than the full Ceph tree, default is /
   optional string path = 2 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
-  // Optional: User is the rados user name, default is admin
+  // user is optional: User is the rados user name, default is admin
   // More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
   optional string user = 3 [(dev.f110.kubeproto.field) = { go_name: "User", api_field_name: "user", inline: false }];
-  // Optional: SecretFile is the path to key ring for User, default is /etc/ceph/user.secret
+  // secretFile is Optional: SecretFile is the path to key ring for User, default is /etc/ceph/user.secret
   // More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
   optional string secret_file = 4 [(dev.f110.kubeproto.field) = { go_name: "SecretFile", api_field_name: "secretFile", inline: false }];
-  // Optional: SecretRef is reference to the authentication secret for User, default is empty.
+  // secretRef is Optional: SecretRef is reference to the authentication secret for User, default is empty.
   // More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
   optional LocalObjectReference secret_ref = 5 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
-  // Optional: Defaults to false (read/write). ReadOnly here will force
+  // readOnly is Optional: Defaults to false (read/write). ReadOnly here will force
   // the ReadOnly setting in VolumeMounts.
   // More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
   optional bool read_only = 6 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
 }
 
 message CinderPersistentVolumeSource {
-  // volume id used to identify the volume in cinder.
+  // volumeID used to identify the volume in cinder.
   // More info: https://examples.k8s.io/mysql-cinder-pd/README.md
   string volume_id = 1 [(dev.f110.kubeproto.field) = { go_name: "VolumeID", api_field_name: "volumeID", inline: false }];
-  // Filesystem type to mount.
+  // fsType Filesystem type to mount.
   // Must be a filesystem type supported by the host operating system.
   // Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
   // More info: https://examples.k8s.io/mysql-cinder-pd/README.md
   optional string fs_type = 2 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
-  // Optional: Defaults to false (read/write). ReadOnly here will force
+  // readOnly is Optional: Defaults to false (read/write). ReadOnly here will force
   // the ReadOnly setting in VolumeMounts.
   // More info: https://examples.k8s.io/mysql-cinder-pd/README.md
   optional bool read_only = 3 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
-  // Optional: points to a secret object containing parameters used to connect
+  // secretRef is Optional: points to a secret object containing parameters used to connect
   // to OpenStack.
   optional SecretReference secret_ref = 4 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
 }
 
 message CinderVolumeSource {
-  // volume id used to identify the volume in cinder.
+  // volumeID used to identify the volume in cinder.
   // More info: https://examples.k8s.io/mysql-cinder-pd/README.md
   string volume_id = 1 [(dev.f110.kubeproto.field) = { go_name: "VolumeID", api_field_name: "volumeID", inline: false }];
-  // Filesystem type to mount.
+  // fsType is the filesystem type to mount.
   // Must be a filesystem type supported by the host operating system.
   // Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
   // More info: https://examples.k8s.io/mysql-cinder-pd/README.md
   optional string fs_type = 2 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
-  // Optional: Defaults to false (read/write). ReadOnly here will force
+  // readOnly defaults to false (read/write). ReadOnly here will force
   // the ReadOnly setting in VolumeMounts.
   // More info: https://examples.k8s.io/mysql-cinder-pd/README.md
   optional bool read_only = 3 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
-  // Optional: points to a secret object containing parameters used to connect
+  // secretRef is optional: points to a secret object containing parameters used to connect
   // to OpenStack.
   optional LocalObjectReference secret_ref = 4 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
 }
@@ -691,7 +689,7 @@ message ConfigMapNodeConfigSource {
 
 message ConfigMapProjection {
   LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", inline: true }];
-  // If unspecified, each key-value pair in the Data field of the referenced
+  // items if unspecified, each key-value pair in the Data field of the referenced
   // ConfigMap will be projected into the volume as a file whose name is the
   // key and content is the value. If specified, the listed keys will be
   // projected into the specified paths, and unlisted keys will not be
@@ -699,13 +697,13 @@ message ConfigMapProjection {
   // the volume setup will error unless it is marked optional. Paths must be
   // relative and may not contain the '..' path or start with '..'.
   repeated KeyToPath items = 2 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
-  // Specify whether the ConfigMap or its keys must be defined
+  // optional specify whether the ConfigMap or its keys must be defined
   optional bool optional = 3 [(dev.f110.kubeproto.field) = { go_name: "Optional", api_field_name: "optional", inline: false }];
 }
 
 message ConfigMapVolumeSource {
   LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", inline: true }];
-  // If unspecified, each key-value pair in the Data field of the referenced
+  // items if unspecified, each key-value pair in the Data field of the referenced
   // ConfigMap will be projected into the volume as a file whose name is the
   // key and content is the value. If specified, the listed keys will be
   // projected into the specified paths, and unlisted keys will not be
@@ -713,7 +711,7 @@ message ConfigMapVolumeSource {
   // the volume setup will error unless it is marked optional. Paths must be
   // relative and may not contain the '..' path or start with '..'.
   repeated KeyToPath items = 2 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
-  // Optional: mode bits used to set permissions on created files by default.
+  // defaultMode is optional: mode bits used to set permissions on created files by default.
   // Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
   // YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
   // Defaults to 0644.
@@ -721,7 +719,7 @@ message ConfigMapVolumeSource {
   // This might be in conflict with other options that affect the file
   // mode, like fsGroup, and the result can be other mode bits set.
   optional int32 default_mode = 3 [(dev.f110.kubeproto.field) = { go_name: "DefaultMode", api_field_name: "defaultMode", inline: false }];
-  // Specify whether the ConfigMap or its keys must be defined
+  // optional specify whether the ConfigMap or its keys must be defined
   optional bool optional = 4 [(dev.f110.kubeproto.field) = { go_name: "Optional", api_field_name: "optional", inline: false }];
 }
 
@@ -730,13 +728,13 @@ message Container {
   // Each container in a pod must have a unique name (DNS_LABEL).
   // Cannot be updated.
   string name = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
-  // Docker image name.
+  // Container image name.
   // More info: https://kubernetes.io/docs/concepts/containers/images
   // This field is optional to allow higher level config management to default or override
   // container images in workload controllers like Deployments and StatefulSets.
   optional string image = 2 [(dev.f110.kubeproto.field) = { go_name: "Image", api_field_name: "image", inline: false }];
   // Entrypoint array. Not executed within a shell.
-  // The docker image's ENTRYPOINT is used if this is not provided.
+  // The container image's ENTRYPOINT is used if this is not provided.
   // Variable references $(VAR_NAME) are expanded using the container's environment. If a variable
   // cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced
   // to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will
@@ -745,7 +743,7 @@ message Container {
   // More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
   repeated string command = 3 [(dev.f110.kubeproto.field) = { go_name: "Command", api_field_name: "command", inline: false }];
   // Arguments to the entrypoint.
-  // The docker image's CMD is used if this is not provided.
+  // The container image's CMD is used if this is not provided.
   // Variable references $(VAR_NAME) are expanded using the container's environment. If a variable
   // cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced
   // to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will
@@ -904,7 +902,7 @@ message ContainerStateTerminated {
   optional k8s.io.apimachinery.pkg.apis.meta.v1.Time started_at = 5 [(dev.f110.kubeproto.field) = { go_name: "StartedAt", api_field_name: "startedAt", inline: false }];
   // Time at which the container last terminated
   optional k8s.io.apimachinery.pkg.apis.meta.v1.Time finished_at = 6 [(dev.f110.kubeproto.field) = { go_name: "FinishedAt", api_field_name: "finishedAt", inline: false }];
-  // Container's ID in the format 'docker://<container_id>'
+  // Container's ID in the format '<type>://<container_id>'
   optional string container_id = 7 [(dev.f110.kubeproto.field) = { go_name: "ContainerID", api_field_name: "containerID", inline: false }];
 }
 
@@ -932,7 +930,7 @@ message ContainerStatus {
   string image = 6 [(dev.f110.kubeproto.field) = { go_name: "Image", api_field_name: "image", inline: false }];
   // ImageID of the container's image.
   string image_id = 7 [(dev.f110.kubeproto.field) = { go_name: "ImageID", api_field_name: "imageID", inline: false }];
-  // Container's ID in the format 'docker://<container_id>'.
+  // Container's ID in the format '<type>://<container_id>'.
   optional string container_id = 8 [(dev.f110.kubeproto.field) = { go_name: "ContainerID", api_field_name: "containerID", inline: false }];
   // Specifies whether the container has passed its startup probe.
   // Initialized as false, becomes true after startupProbe is considered successful.
@@ -983,12 +981,12 @@ message DownwardAPIVolumeSource {
 }
 
 message EmptyDirVolumeSource {
-  // What type of storage medium should back this directory.
+  // medium represents what type of storage medium should back this directory.
   // The default is "" which means to use the node's default medium.
   // Must be an empty string (default) or Memory.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#emptydir
   optional StorageMedium medium = 1 [(dev.f110.kubeproto.field) = { go_name: "Medium", api_field_name: "medium", inline: false }];
-  // Total amount of local storage required for this EmptyDir volume.
+  // sizeLimit is the total amount of local storage required for this EmptyDir volume.
   // The size limit is also applicable for memory medium.
   // The maximum usage on memory medium EmptyDir would be the minimum value between
   // the SizeLimit specified here and the sum of memory limits of all containers in a pod.
@@ -1027,7 +1025,7 @@ message EndpointPort {
   // The application protocol for this port.
   // This field follows standard Kubernetes label syntax.
   // Un-prefixed names are reserved for IANA standard service names (as per
-  // RFC-6335 and http://www.iana.org/assignments/service-names).
+  // RFC-6335 and https://www.iana.org/assignments/service-names).
   // Non-standard protocols should use prefixed names such as
   // mycompany.com/my-custom-protocol.
   optional string app_protocol = 4 [(dev.f110.kubeproto.field) = { go_name: "AppProtocol", api_field_name: "appProtocol", inline: false }];
@@ -1125,11 +1123,11 @@ message EphemeralContainerCommon {
   // Name of the ephemeral container specified as a DNS_LABEL.
   // This name must be unique among all containers, init containers and ephemeral containers.
   string name = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
-  // Docker image name.
+  // Container image name.
   // More info: https://kubernetes.io/docs/concepts/containers/images
   optional string image = 2 [(dev.f110.kubeproto.field) = { go_name: "Image", api_field_name: "image", inline: false }];
   // Entrypoint array. Not executed within a shell.
-  // The docker image's ENTRYPOINT is used if this is not provided.
+  // The image's ENTRYPOINT is used if this is not provided.
   // Variable references $(VAR_NAME) are expanded using the container's environment. If a variable
   // cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced
   // to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will
@@ -1138,7 +1136,7 @@ message EphemeralContainerCommon {
   // More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
   repeated string command = 3 [(dev.f110.kubeproto.field) = { go_name: "Command", api_field_name: "command", inline: false }];
   // Arguments to the entrypoint.
-  // The docker image's CMD is used if this is not provided.
+  // The image's CMD is used if this is not provided.
   // Variable references $(VAR_NAME) are expanded using the container's environment. If a variable
   // cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced
   // to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will
@@ -1311,86 +1309,86 @@ message ExecAction {
 }
 
 message FCVolumeSource {
-  // Optional: FC target worldwide names (WWNs)
+  // targetWWNs is Optional: FC target worldwide names (WWNs)
   repeated string target_wwns = 1 [(dev.f110.kubeproto.field) = { go_name: "TargetWWNs", api_field_name: "targetWWNs", inline: false }];
-  // Optional: FC target lun number
+  // lun is Optional: FC target lun number
   optional int32 lun = 2 [(dev.f110.kubeproto.field) = { go_name: "Lun", api_field_name: "lun", inline: false }];
-  // Filesystem type to mount.
+  // fsType is the filesystem type to mount.
   // Must be a filesystem type supported by the host operating system.
   // Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
   optional string fs_type = 3 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
-  // Optional: Defaults to false (read/write). ReadOnly here will force
+  // readOnly is Optional: Defaults to false (read/write). ReadOnly here will force
   // the ReadOnly setting in VolumeMounts.
   optional bool read_only = 4 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
-  // Optional: FC volume world wide identifiers (wwids)
+  // wwids Optional: FC volume world wide identifiers (wwids)
   // Either wwids or combination of targetWWNs and lun must be set, but not both simultaneously.
   repeated string wwids = 5 [(dev.f110.kubeproto.field) = { go_name: "WWIDs", api_field_name: "wwids", inline: false }];
 }
 
 message FlexPersistentVolumeSource {
-  // Driver is the name of the driver to use for this volume.
+  // driver is the name of the driver to use for this volume.
   string driver = 1 [(dev.f110.kubeproto.field) = { go_name: "Driver", api_field_name: "driver", inline: false }];
-  // Filesystem type to mount.
+  // fsType is the Filesystem type to mount.
   // Must be a filesystem type supported by the host operating system.
   // Ex. "ext4", "xfs", "ntfs". The default filesystem depends on FlexVolume script.
   optional string fs_type = 2 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
-  // Optional: SecretRef is reference to the secret object containing
+  // secretRef is Optional: SecretRef is reference to the secret object containing
   // sensitive information to pass to the plugin scripts. This may be
   // empty if no secret object is specified. If the secret object
   // contains more than one secret, all secrets are passed to the plugin
   // scripts.
   optional SecretReference secret_ref = 3 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
-  // Optional: Defaults to false (read/write). ReadOnly here will force
+  // readOnly is Optional: defaults to false (read/write). ReadOnly here will force
   // the ReadOnly setting in VolumeMounts.
   optional bool read_only = 4 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
-  // Optional: Extra command options if any.
+  // options is Optional: this field holds extra command options if any.
   map<string, string> options = 5 [(dev.f110.kubeproto.field) = { go_name: "Options", api_field_name: "options", inline: false }];
 }
 
 message FlexVolumeSource {
-  // Driver is the name of the driver to use for this volume.
+  // driver is the name of the driver to use for this volume.
   string driver = 1 [(dev.f110.kubeproto.field) = { go_name: "Driver", api_field_name: "driver", inline: false }];
-  // Filesystem type to mount.
+  // fsType is the filesystem type to mount.
   // Must be a filesystem type supported by the host operating system.
   // Ex. "ext4", "xfs", "ntfs". The default filesystem depends on FlexVolume script.
   optional string fs_type = 2 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
-  // Optional: SecretRef is reference to the secret object containing
+  // secretRef is Optional: secretRef is reference to the secret object containing
   // sensitive information to pass to the plugin scripts. This may be
   // empty if no secret object is specified. If the secret object
   // contains more than one secret, all secrets are passed to the plugin
   // scripts.
   optional LocalObjectReference secret_ref = 3 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
-  // Optional: Defaults to false (read/write). ReadOnly here will force
+  // readOnly is Optional: defaults to false (read/write). ReadOnly here will force
   // the ReadOnly setting in VolumeMounts.
   optional bool read_only = 4 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
-  // Optional: Extra command options if any.
+  // options is Optional: this field holds extra command options if any.
   map<string, string> options = 5 [(dev.f110.kubeproto.field) = { go_name: "Options", api_field_name: "options", inline: false }];
 }
 
 message FlockerVolumeSource {
-  // Name of the dataset stored as metadata -> name on the dataset for Flocker
+  // datasetName is Name of the dataset stored as metadata -> name on the dataset for Flocker
   // should be considered as deprecated
   optional string dataset_name = 1 [(dev.f110.kubeproto.field) = { go_name: "DatasetName", api_field_name: "datasetName", inline: false }];
-  // UUID of the dataset. This is unique identifier of a Flocker dataset
+  // datasetUUID is the UUID of the dataset. This is unique identifier of a Flocker dataset
   optional string dataset_uuid = 2 [(dev.f110.kubeproto.field) = { go_name: "DatasetUUID", api_field_name: "datasetUUID", inline: false }];
 }
 
 message GCEPersistentDiskVolumeSource {
-  // Unique name of the PD resource in GCE. Used to identify the disk in GCE.
+  // pdName is unique name of the PD resource in GCE. Used to identify the disk in GCE.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
   string p_d_name = 1 [(dev.f110.kubeproto.field) = { go_name: "PDName", api_field_name: "pdName", inline: false }];
-  // Filesystem type of the volume that you want to mount.
+  // fsType is filesystem type of the volume that you want to mount.
   // Tip: Ensure that the filesystem type is supported by the host operating system.
   // Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
   optional string fs_type = 2 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
-  // The partition in the volume that you want to mount.
+  // partition is the partition in the volume that you want to mount.
   // If omitted, the default is to mount by volume name.
   // Examples: For volume /dev/sda1, you specify the partition as "1".
   // Similarly, the volume partition for /dev/sda is "0" (or you can leave the property empty).
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
   optional int32 partition = 3 [(dev.f110.kubeproto.field) = { go_name: "Partition", api_field_name: "partition", inline: false }];
-  // ReadOnly here will force the ReadOnly setting in VolumeMounts.
+  // readOnly here will force the ReadOnly setting in VolumeMounts.
   // Defaults to false.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
   optional bool read_only = 4 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
@@ -1406,11 +1404,11 @@ message GRPCAction {
 }
 
 message GitRepoVolumeSource {
-  // Repository URL
+  // repository is the URL
   string repository = 1 [(dev.f110.kubeproto.field) = { go_name: "Repository", api_field_name: "repository", inline: false }];
-  // Commit hash for the specified revision.
+  // revision is the commit hash for the specified revision.
   optional string revision = 2 [(dev.f110.kubeproto.field) = { go_name: "Revision", api_field_name: "revision", inline: false }];
-  // Target directory name.
+  // directory is the target directory name.
   // Must not contain or start with '..'.  If '.' is supplied, the volume directory will be the
   // git repository.  Otherwise, if specified, the volume will contain the git repository in
   // the subdirectory with the given name.
@@ -1418,30 +1416,30 @@ message GitRepoVolumeSource {
 }
 
 message GlusterfsPersistentVolumeSource {
-  // EndpointsName is the endpoint name that details Glusterfs topology.
+  // endpoints is the endpoint name that details Glusterfs topology.
   // More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
   string endpoints_name = 1 [(dev.f110.kubeproto.field) = { go_name: "EndpointsName", api_field_name: "endpoints", inline: false }];
-  // Path is the Glusterfs volume path.
+  // path is the Glusterfs volume path.
   // More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
   string path = 2 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
-  // ReadOnly here will force the Glusterfs volume to be mounted with read-only permissions.
+  // readOnly here will force the Glusterfs volume to be mounted with read-only permissions.
   // Defaults to false.
   // More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
   optional bool read_only = 3 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
-  // EndpointsNamespace is the namespace that contains Glusterfs endpoint.
+  // endpointsNamespace is the namespace that contains Glusterfs endpoint.
   // If this field is empty, the EndpointNamespace defaults to the same namespace as the bound PVC.
   // More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
   optional string endpoints_namespace = 4 [(dev.f110.kubeproto.field) = { go_name: "EndpointsNamespace", api_field_name: "endpointsNamespace", inline: false }];
 }
 
 message GlusterfsVolumeSource {
-  // EndpointsName is the endpoint name that details Glusterfs topology.
+  // endpoints is the endpoint name that details Glusterfs topology.
   // More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
   string endpoints_name = 1 [(dev.f110.kubeproto.field) = { go_name: "EndpointsName", api_field_name: "endpoints", inline: false }];
-  // Path is the Glusterfs volume path.
+  // path is the Glusterfs volume path.
   // More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
   string path = 2 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
-  // ReadOnly here will force the Glusterfs volume to be mounted with read-only permissions.
+  // readOnly here will force the Glusterfs volume to be mounted with read-only permissions.
   // Defaults to false.
   // More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
   optional bool read_only = 3 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
@@ -1479,93 +1477,93 @@ message HostAlias {
 }
 
 message HostPathVolumeSource {
-  // Path of the directory on the host.
+  // path of the directory on the host.
   // If the path is a symlink, it will follow the link to the real path.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath
   string path = 1 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
-  // Type for HostPath Volume
+  // type for HostPath Volume
   // Defaults to ""
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath
   optional HostPathType type = 2 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
 }
 
 message ISCSIPersistentVolumeSource {
-  // iSCSI Target Portal. The Portal is either an IP or ip_addr:port if the port
+  // targetPortal is iSCSI Target Portal. The Portal is either an IP or ip_addr:port if the port
   // is other than default (typically TCP ports 860 and 3260).
   string target_portal = 1 [(dev.f110.kubeproto.field) = { go_name: "TargetPortal", api_field_name: "targetPortal", inline: false }];
-  // Target iSCSI Qualified Name.
+  // iqn is Target iSCSI Qualified Name.
   string iqn = 2 [(dev.f110.kubeproto.field) = { go_name: "IQN", api_field_name: "iqn", inline: false }];
-  // iSCSI Target Lun number.
+  // lun is iSCSI Target Lun number.
   int32 lun = 3 [(dev.f110.kubeproto.field) = { go_name: "Lun", api_field_name: "lun", inline: false }];
-  // iSCSI Interface Name that uses an iSCSI transport.
+  // iscsiInterface is the interface Name that uses an iSCSI transport.
   // Defaults to 'default' (tcp).
   optional string iscsi_interface = 4 [(dev.f110.kubeproto.field) = { go_name: "ISCSIInterface", api_field_name: "iscsiInterface", inline: false }];
-  // Filesystem type of the volume that you want to mount.
+  // fsType is the filesystem type of the volume that you want to mount.
   // Tip: Ensure that the filesystem type is supported by the host operating system.
   // Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#iscsi
   optional string fs_type = 5 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
-  // ReadOnly here will force the ReadOnly setting in VolumeMounts.
+  // readOnly here will force the ReadOnly setting in VolumeMounts.
   // Defaults to false.
   optional bool read_only = 6 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
-  // iSCSI Target Portal List. The Portal is either an IP or ip_addr:port if the port
+  // portals is the iSCSI Target Portal List. The Portal is either an IP or ip_addr:port if the port
   // is other than default (typically TCP ports 860 and 3260).
   repeated string portals = 7 [(dev.f110.kubeproto.field) = { go_name: "Portals", api_field_name: "portals", inline: false }];
-  // whether support iSCSI Discovery CHAP authentication
+  // chapAuthDiscovery defines whether support iSCSI Discovery CHAP authentication
   optional bool discovery_chap_auth = 8 [(dev.f110.kubeproto.field) = { go_name: "DiscoveryCHAPAuth", api_field_name: "chapAuthDiscovery", inline: false }];
-  // whether support iSCSI Session CHAP authentication
+  // chapAuthSession defines whether support iSCSI Session CHAP authentication
   optional bool session_chap_auth = 9 [(dev.f110.kubeproto.field) = { go_name: "SessionCHAPAuth", api_field_name: "chapAuthSession", inline: false }];
-  // CHAP Secret for iSCSI target and initiator authentication
+  // secretRef is the CHAP Secret for iSCSI target and initiator authentication
   optional SecretReference secret_ref = 10 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
-  // Custom iSCSI Initiator Name.
+  // initiatorName is the custom iSCSI Initiator Name.
   // If initiatorName is specified with iscsiInterface simultaneously, new iSCSI interface
   // <target portal>:<volume name> will be created for the connection.
   optional string initiator_name = 11 [(dev.f110.kubeproto.field) = { go_name: "InitiatorName", api_field_name: "initiatorName", inline: false }];
 }
 
 message ISCSIVolumeSource {
-  // iSCSI Target Portal. The Portal is either an IP or ip_addr:port if the port
+  // targetPortal is iSCSI Target Portal. The Portal is either an IP or ip_addr:port if the port
   // is other than default (typically TCP ports 860 and 3260).
   string target_portal = 1 [(dev.f110.kubeproto.field) = { go_name: "TargetPortal", api_field_name: "targetPortal", inline: false }];
-  // Target iSCSI Qualified Name.
+  // iqn is the target iSCSI Qualified Name.
   string iqn = 2 [(dev.f110.kubeproto.field) = { go_name: "IQN", api_field_name: "iqn", inline: false }];
-  // iSCSI Target Lun number.
+  // lun represents iSCSI Target Lun number.
   int32 lun = 3 [(dev.f110.kubeproto.field) = { go_name: "Lun", api_field_name: "lun", inline: false }];
-  // iSCSI Interface Name that uses an iSCSI transport.
+  // iscsiInterface is the interface Name that uses an iSCSI transport.
   // Defaults to 'default' (tcp).
   optional string iscsi_interface = 4 [(dev.f110.kubeproto.field) = { go_name: "ISCSIInterface", api_field_name: "iscsiInterface", inline: false }];
-  // Filesystem type of the volume that you want to mount.
+  // fsType is the filesystem type of the volume that you want to mount.
   // Tip: Ensure that the filesystem type is supported by the host operating system.
   // Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#iscsi
   optional string fs_type = 5 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
-  // ReadOnly here will force the ReadOnly setting in VolumeMounts.
+  // readOnly here will force the ReadOnly setting in VolumeMounts.
   // Defaults to false.
   optional bool read_only = 6 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
-  // iSCSI Target Portal List. The portal is either an IP or ip_addr:port if the port
+  // portals is the iSCSI Target Portal List. The portal is either an IP or ip_addr:port if the port
   // is other than default (typically TCP ports 860 and 3260).
   repeated string portals = 7 [(dev.f110.kubeproto.field) = { go_name: "Portals", api_field_name: "portals", inline: false }];
-  // whether support iSCSI Discovery CHAP authentication
+  // chapAuthDiscovery defines whether support iSCSI Discovery CHAP authentication
   optional bool discovery_chap_auth = 8 [(dev.f110.kubeproto.field) = { go_name: "DiscoveryCHAPAuth", api_field_name: "chapAuthDiscovery", inline: false }];
-  // whether support iSCSI Session CHAP authentication
+  // chapAuthSession defines whether support iSCSI Session CHAP authentication
   optional bool session_chap_auth = 9 [(dev.f110.kubeproto.field) = { go_name: "SessionCHAPAuth", api_field_name: "chapAuthSession", inline: false }];
-  // CHAP Secret for iSCSI target and initiator authentication
+  // secretRef is the CHAP Secret for iSCSI target and initiator authentication
   optional LocalObjectReference secret_ref = 10 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
-  // Custom iSCSI Initiator Name.
+  // initiatorName is the custom iSCSI Initiator Name.
   // If initiatorName is specified with iscsiInterface simultaneously, new iSCSI interface
   // <target portal>:<volume name> will be created for the connection.
   optional string initiator_name = 11 [(dev.f110.kubeproto.field) = { go_name: "InitiatorName", api_field_name: "initiatorName", inline: false }];
 }
 
 message KeyToPath {
-  // The key to project.
+  // key is the key to project.
   string key = 1 [(dev.f110.kubeproto.field) = { go_name: "Key", api_field_name: "key", inline: false }];
-  // The relative path of the file to map the key to.
+  // path is the relative path of the file to map the key to.
   // May not be an absolute path.
   // May not contain the path element '..'.
   // May not start with the string '..'.
   string path = 2 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
-  // Optional: mode bits used to set permissions on this file.
+  // mode is Optional: mode bits used to set permissions on this file.
   // Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
   // YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
   // If not specified, the volume defaultMode will be used.
@@ -1667,10 +1665,10 @@ message LocalObjectReference {
 }
 
 message LocalVolumeSource {
-  // The full path to the volume on the node.
+  // path of the full path to the volume on the node.
   // It can be either a directory or block device (disk, partition, ...).
   string path = 1 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
-  // Filesystem type to mount.
+  // fsType is the filesystem type to mount.
   // It applies only when the Path is a block device.
   // Must be a filesystem type supported by the host operating system.
   // Ex. "ext4", "xfs", "ntfs". The default value is to auto-select a filesystem if unspecified.
@@ -1678,14 +1676,13 @@ message LocalVolumeSource {
 }
 
 message NFSVolumeSource {
-  // Server is the hostname or IP address of the NFS server.
+  // server is the hostname or IP address of the NFS server.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs
   string server = 1 [(dev.f110.kubeproto.field) = { go_name: "Server", api_field_name: "server", inline: false }];
-  // Path that is exported by the NFS server.
+  // path that is exported by the NFS server.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs
   string path = 2 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
-  // ReadOnly here will force
-  // the NFS export to be mounted with read-only permissions.
+  // readOnly here will force the NFS export to be mounted with read-only permissions.
   // Defaults to false.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs
   optional bool read_only = 3 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
@@ -1904,9 +1901,7 @@ message NodeSpec {
   optional bool unschedulable = 4 [(dev.f110.kubeproto.field) = { go_name: "Unschedulable", api_field_name: "unschedulable", inline: false }];
   // If specified, the node's taints.
   repeated Taint taints = 5 [(dev.f110.kubeproto.field) = { go_name: "Taints", api_field_name: "taints", inline: false }];
-  // Deprecated. If specified, the source of the node's configuration.
-  // The DynamicKubeletConfig feature gate must be enabled for the Kubelet to use this field.
-  // This field is deprecated as of 1.22: https://git.k8s.io/enhancements/keps/sig-node/281-dynamic-kubelet-configuration
+  // Deprecated: Previously used to specify the source of the node's configuration for the DynamicKubeletConfig feature. This feature is removed from Kubelets as of 1.24 and will be fully removed in 1.26.
   optional NodeConfigSource config_source = 6 [(dev.f110.kubeproto.field) = { go_name: "ConfigSource", api_field_name: "configSource", inline: false }];
   // Deprecated. Not all kubelets will set this field. Remove field after 1.13.
   // see: https://issues.k8s.io/61966
@@ -1964,7 +1959,7 @@ message NodeSystemInfo {
   string kernel_version = 4 [(dev.f110.kubeproto.field) = { go_name: "KernelVersion", api_field_name: "kernelVersion", inline: false }];
   // OS Image reported by the node from /etc/os-release (e.g. Debian GNU/Linux 7 (wheezy)).
   string os_image = 5 [(dev.f110.kubeproto.field) = { go_name: "OSImage", api_field_name: "osImage", inline: false }];
-  // ContainerRuntime Version reported by the node through runtime remote API (e.g. docker://1.5.0).
+  // ContainerRuntime Version reported by the node through runtime remote API (e.g. containerd://1.4.2).
   string container_runtime_version = 6 [(dev.f110.kubeproto.field) = { go_name: "ContainerRuntimeVersion", api_field_name: "containerRuntimeVersion", inline: false }];
   // Kubelet Version reported by the node.
   string kubelet_version = 7 [(dev.f110.kubeproto.field) = { go_name: "KubeletVersion", api_field_name: "kubeletVersion", inline: false }];
@@ -2012,11 +2007,11 @@ message ObjectReference {
 }
 
 message PersistentVolume {
-  // Spec defines a specification of a persistent volume owned by the cluster.
+  // spec defines a specification of a persistent volume owned by the cluster.
   // Provisioned by an administrator.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistent-volumes
   optional PersistentVolumeSpec spec = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
-  // Status represents the current information/status for the persistent volume.
+  // status represents the current information/status for the persistent volume.
   // Populated by the system.
   // Read-only.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistent-volumes
@@ -2027,10 +2022,10 @@ message PersistentVolume {
 }
 
 message PersistentVolumeClaim {
-  // Spec defines the desired characteristics of a volume requested by a pod author.
+  // spec defines the desired characteristics of a volume requested by a pod author.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
   optional PersistentVolumeClaimSpec spec = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
-  // Status represents the current information/status of a persistent volume claim.
+  // status represents the current information/status of a persistent volume claim.
   // Read-only.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
   optional PersistentVolumeClaimStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
@@ -2042,15 +2037,15 @@ message PersistentVolumeClaim {
 message PersistentVolumeClaimCondition {
   PersistentVolumeClaimConditionType type   = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
   ConditionStatus                    status = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
-  // Last time we probed the condition.
+  // lastProbeTime is the time we probed the condition.
   optional k8s.io.apimachinery.pkg.apis.meta.v1.Time last_probe_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastProbeTime", api_field_name: "lastProbeTime", inline: false }];
-  // Last time the condition transitioned from one status to another.
+  // lastTransitionTime is the time the condition transitioned from one status to another.
   optional k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 4 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
-  // Unique, this should be a short, machine understandable string that gives the reason
+  // reason is a unique, this should be a short, machine understandable string that gives the reason
   // for condition's last transition. If it reports "ResizeStarted" that means the underlying
   // persistent volume is being resized.
   optional string reason = 5 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
-  // Human-readable message indicating details about last transition.
+  // message is the human-readable message indicating details about last transition.
   optional string message = 6 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
 }
 
@@ -2059,32 +2054,32 @@ message PersistentVolumeClaimList {
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
-  // A list of persistent volume claims.
+  // items is a list of persistent volume claims.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
   repeated PersistentVolumeClaim items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
 
 message PersistentVolumeClaimSpec {
-  // AccessModes contains the desired access modes the volume should have.
+  // accessModes contains the desired access modes the volume should have.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1
   repeated PersistentVolumeAccessMode access_modes = 1 [(dev.f110.kubeproto.field) = { go_name: "AccessModes", api_field_name: "accessModes", inline: false }];
-  // A label query over volumes to consider for binding.
+  // selector is a label query over volumes to consider for binding.
   optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector selector = 2 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", inline: false }];
-  // Resources represents the minimum resources the volume should have.
+  // resources represents the minimum resources the volume should have.
   // If RecoverVolumeExpansionFailure feature is enabled users are allowed to specify resource requirements
   // that are lower than previous value but must still be higher than capacity recorded in the
   // status field of the claim.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources
   optional ResourceRequirements resources = 3 [(dev.f110.kubeproto.field) = { go_name: "Resources", api_field_name: "resources", inline: false }];
-  // VolumeName is the binding reference to the PersistentVolume backing this claim.
+  // volumeName is the binding reference to the PersistentVolume backing this claim.
   optional string volume_name = 4 [(dev.f110.kubeproto.field) = { go_name: "VolumeName", api_field_name: "volumeName", inline: false }];
-  // Name of the StorageClass required by the claim.
+  // storageClassName is the name of the StorageClass required by the claim.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1
   optional string storage_class_name = 5 [(dev.f110.kubeproto.field) = { go_name: "StorageClassName", api_field_name: "storageClassName", inline: false }];
   // volumeMode defines what type of volume is required by the claim.
   // Value of Filesystem is implied when not included in claim spec.
   optional PersistentVolumeMode volume_mode = 6 [(dev.f110.kubeproto.field) = { go_name: "VolumeMode", api_field_name: "volumeMode", inline: false }];
-  // This field can be used to specify either:
+  // dataSource field can be used to specify either:
   // * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot)
   // * An existing PVC (PersistentVolumeClaim)
   // If the provisioner or an external controller can support the specified data source,
@@ -2092,7 +2087,7 @@ message PersistentVolumeClaimSpec {
   // If the AnyVolumeDataSource feature gate is enabled, this field will always have
   // the same contents as the DataSourceRef field.
   optional TypedLocalObjectReference data_source = 7 [(dev.f110.kubeproto.field) = { go_name: "DataSource", api_field_name: "dataSource", inline: false }];
-  // Specifies the object from which to populate the volume with data, if a non-empty
+  // dataSourceRef specifies the object from which to populate the volume with data, if a non-empty
   // volume is desired. This may be any local object from a non-empty API group (non
   // core object) or a PersistentVolumeClaim object.
   // When this field is specified, volume binding will only succeed if the type of
@@ -2108,22 +2103,22 @@ message PersistentVolumeClaimSpec {
   // * While DataSource ignores disallowed values (dropping them), DataSourceRef
   //   preserves all values, and generates an error if a disallowed value is
   //   specified.
-  // (Alpha) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
+  // (Beta) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
   optional TypedLocalObjectReference data_source_ref = 8 [(dev.f110.kubeproto.field) = { go_name: "DataSourceRef", api_field_name: "dataSourceRef", inline: false }];
 }
 
 message PersistentVolumeClaimStatus {
-  // Phase represents the current phase of PersistentVolumeClaim.
+  // phase represents the current phase of PersistentVolumeClaim.
   optional PersistentVolumeClaimPhase phase = 1 [(dev.f110.kubeproto.field) = { go_name: "Phase", api_field_name: "phase", inline: false }];
-  // AccessModes contains the actual access modes the volume backing the PVC has.
+  // accessModes contains the actual access modes the volume backing the PVC has.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1
   repeated PersistentVolumeAccessMode access_modes = 2 [(dev.f110.kubeproto.field) = { go_name: "AccessModes", api_field_name: "accessModes", inline: false }];
-  // Represents the actual resources of the underlying volume.
+  // capacity represents the actual resources of the underlying volume.
   map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> capacity = 3 [(dev.f110.kubeproto.field) = { go_name: "Capacity", api_field_name: "capacity", inline: false }];
-  // Current Condition of persistent volume claim. If underlying persistent volume is being
+  // conditions is the current Condition of persistent volume claim. If underlying persistent volume is being
   // resized then the Condition will be set to 'ResizeStarted'.
   repeated PersistentVolumeClaimCondition conditions = 4 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
-  // The storage resource within AllocatedResources tracks the capacity allocated to a PVC. It may
+  // allocatedResources is the storage resource within AllocatedResources tracks the capacity allocated to a PVC. It may
   // be larger than the actual capacity when a volume expansion operation is requested.
   // For storage quota, the larger value from allocatedResources and PVC.spec.resources is used.
   // If allocatedResources is not set, PVC.spec.resources alone is used for quota calculation.
@@ -2132,7 +2127,7 @@ message PersistentVolumeClaimStatus {
   // is equal or lower than the requested capacity.
   // This is an alpha field and requires enabling RecoverVolumeExpansionFailure feature.
   map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> allocated_resources = 5 [(dev.f110.kubeproto.field) = { go_name: "AllocatedResources", api_field_name: "allocatedResources", inline: false }];
-  // ResizeStatus stores status of resize operation.
+  // resizeStatus stores status of resize operation.
   // ResizeStatus is not set by default but when expansion is complete resizeStatus is set to empty
   // string by resize controller or kubelet.
   // This is an alpha field and requires enabling RecoverVolumeExpansionFailure feature.
@@ -2152,10 +2147,10 @@ message PersistentVolumeClaimTemplate {
 }
 
 message PersistentVolumeClaimVolumeSource {
-  // ClaimName is the name of a PersistentVolumeClaim in the same namespace as the pod using this volume.
+  // claimName is the name of a PersistentVolumeClaim in the same namespace as the pod using this volume.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
   string claim_name = 1 [(dev.f110.kubeproto.field) = { go_name: "ClaimName", api_field_name: "claimName", inline: false }];
-  // Will force the ReadOnly setting in VolumeMounts.
+  // readOnly Will force the ReadOnly setting in VolumeMounts.
   // Default false.
   optional bool read_only = 2 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
 }
@@ -2165,124 +2160,124 @@ message PersistentVolumeList {
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
-  // List of persistent volumes.
+  // items is a list of persistent volumes.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes
   repeated PersistentVolume items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
 
 message PersistentVolumeSource {
-  // GCEPersistentDisk represents a GCE Disk resource that is attached to a
+  // gcePersistentDisk represents a GCE Disk resource that is attached to a
   // kubelet's host machine and then exposed to the pod. Provisioned by an admin.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
   optional GCEPersistentDiskVolumeSource gce_persistent_disk = 1 [(dev.f110.kubeproto.field) = { go_name: "GCEPersistentDisk", api_field_name: "gcePersistentDisk", inline: false }];
-  // AWSElasticBlockStore represents an AWS Disk resource that is attached to a
+  // awsElasticBlockStore represents an AWS Disk resource that is attached to a
   // kubelet's host machine and then exposed to the pod.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
   optional AWSElasticBlockStoreVolumeSource aws_elastic_block_store = 2 [(dev.f110.kubeproto.field) = { go_name: "AWSElasticBlockStore", api_field_name: "awsElasticBlockStore", inline: false }];
-  // HostPath represents a directory on the host.
+  // hostPath represents a directory on the host.
   // Provisioned by a developer or tester.
   // This is useful for single-node development and testing only!
   // On-host storage is not supported in any way and WILL NOT WORK in a multi-node cluster.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath
   optional HostPathVolumeSource host_path = 3 [(dev.f110.kubeproto.field) = { go_name: "HostPath", api_field_name: "hostPath", inline: false }];
-  // Glusterfs represents a Glusterfs volume that is attached to a host and
+  // glusterfs represents a Glusterfs volume that is attached to a host and
   // exposed to the pod. Provisioned by an admin.
   // More info: https://examples.k8s.io/volumes/glusterfs/README.md
   optional GlusterfsPersistentVolumeSource glusterfs = 4 [(dev.f110.kubeproto.field) = { go_name: "Glusterfs", api_field_name: "glusterfs", inline: false }];
-  // NFS represents an NFS mount on the host. Provisioned by an admin.
+  // nfs represents an NFS mount on the host. Provisioned by an admin.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs
   optional NFSVolumeSource nfs = 5 [(dev.f110.kubeproto.field) = { go_name: "NFS", api_field_name: "nfs", inline: false }];
-  // RBD represents a Rados Block Device mount on the host that shares a pod's lifetime.
+  // rbd represents a Rados Block Device mount on the host that shares a pod's lifetime.
   // More info: https://examples.k8s.io/volumes/rbd/README.md
   optional RBDPersistentVolumeSource rbd = 6 [(dev.f110.kubeproto.field) = { go_name: "RBD", api_field_name: "rbd", inline: false }];
-  // ISCSI represents an ISCSI Disk resource that is attached to a
+  // iscsi represents an ISCSI Disk resource that is attached to a
   // kubelet's host machine and then exposed to the pod. Provisioned by an admin.
   optional ISCSIPersistentVolumeSource iscsi = 7 [(dev.f110.kubeproto.field) = { go_name: "ISCSI", api_field_name: "iscsi", inline: false }];
-  // Cinder represents a cinder volume attached and mounted on kubelets host machine.
+  // cinder represents a cinder volume attached and mounted on kubelets host machine.
   // More info: https://examples.k8s.io/mysql-cinder-pd/README.md
   optional CinderPersistentVolumeSource cinder = 8 [(dev.f110.kubeproto.field) = { go_name: "Cinder", api_field_name: "cinder", inline: false }];
-  // CephFS represents a Ceph FS mount on the host that shares a pod's lifetime
+  // cephFS represents a Ceph FS mount on the host that shares a pod's lifetime
   optional CephFSPersistentVolumeSource ceph_fs = 9 [(dev.f110.kubeproto.field) = { go_name: "CephFS", api_field_name: "cephfs", inline: false }];
-  // FC represents a Fibre Channel resource that is attached to a kubelet's host machine and then exposed to the pod.
+  // fc represents a Fibre Channel resource that is attached to a kubelet's host machine and then exposed to the pod.
   optional FCVolumeSource fc = 10 [(dev.f110.kubeproto.field) = { go_name: "FC", api_field_name: "fc", inline: false }];
-  // Flocker represents a Flocker volume attached to a kubelet's host machine and exposed to the pod for its usage. This depends on the Flocker control service being running
+  // flocker represents a Flocker volume attached to a kubelet's host machine and exposed to the pod for its usage. This depends on the Flocker control service being running
   optional FlockerVolumeSource flocker = 11 [(dev.f110.kubeproto.field) = { go_name: "Flocker", api_field_name: "flocker", inline: false }];
-  // FlexVolume represents a generic volume resource that is
+  // flexVolume represents a generic volume resource that is
   // provisioned/attached using an exec based plugin.
   optional FlexPersistentVolumeSource flex_volume = 12 [(dev.f110.kubeproto.field) = { go_name: "FlexVolume", api_field_name: "flexVolume", inline: false }];
-  // AzureFile represents an Azure File Service mount on the host and bind mount to the pod.
+  // azureFile represents an Azure File Service mount on the host and bind mount to the pod.
   optional AzureFilePersistentVolumeSource azure_file = 13 [(dev.f110.kubeproto.field) = { go_name: "AzureFile", api_field_name: "azureFile", inline: false }];
-  // VsphereVolume represents a vSphere volume attached and mounted on kubelets host machine
+  // vsphereVolume represents a vSphere volume attached and mounted on kubelets host machine
   optional VsphereVirtualDiskVolumeSource vsphere_volume = 14 [(dev.f110.kubeproto.field) = { go_name: "VsphereVolume", api_field_name: "vsphereVolume", inline: false }];
-  // Quobyte represents a Quobyte mount on the host that shares a pod's lifetime
+  // quobyte represents a Quobyte mount on the host that shares a pod's lifetime
   optional QuobyteVolumeSource quobyte = 15 [(dev.f110.kubeproto.field) = { go_name: "Quobyte", api_field_name: "quobyte", inline: false }];
-  // AzureDisk represents an Azure Data Disk mount on the host and bind mount to the pod.
+  // azureDisk represents an Azure Data Disk mount on the host and bind mount to the pod.
   optional AzureDiskVolumeSource azure_disk = 16 [(dev.f110.kubeproto.field) = { go_name: "AzureDisk", api_field_name: "azureDisk", inline: false }];
-  // PhotonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine
+  // photonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine
   optional PhotonPersistentDiskVolumeSource photon_persistent_disk = 17 [(dev.f110.kubeproto.field) = { go_name: "PhotonPersistentDisk", api_field_name: "photonPersistentDisk", inline: false }];
-  // PortworxVolume represents a portworx volume attached and mounted on kubelets host machine
+  // portworxVolume represents a portworx volume attached and mounted on kubelets host machine
   optional PortworxVolumeSource portworx_volume = 18 [(dev.f110.kubeproto.field) = { go_name: "PortworxVolume", api_field_name: "portworxVolume", inline: false }];
-  // ScaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes.
+  // scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes.
   optional ScaleIOPersistentVolumeSource scale_io = 19 [(dev.f110.kubeproto.field) = { go_name: "ScaleIO", api_field_name: "scaleIO", inline: false }];
-  // Local represents directly-attached storage with node affinity
+  // local represents directly-attached storage with node affinity
   optional LocalVolumeSource local = 20 [(dev.f110.kubeproto.field) = { go_name: "Local", api_field_name: "local", inline: false }];
-  // StorageOS represents a StorageOS volume that is attached to the kubelet's host machine and mounted into the pod
+  // storageOS represents a StorageOS volume that is attached to the kubelet's host machine and mounted into the pod
   // More info: https://examples.k8s.io/volumes/storageos/README.md
   optional StorageOSPersistentVolumeSource storage_os = 21 [(dev.f110.kubeproto.field) = { go_name: "StorageOS", api_field_name: "storageos", inline: false }];
-  // CSI represents storage that is handled by an external CSI driver (Beta feature).
+  // csi represents storage that is handled by an external CSI driver (Beta feature).
   optional CSIPersistentVolumeSource csi = 22 [(dev.f110.kubeproto.field) = { go_name: "CSI", api_field_name: "csi", inline: false }];
 }
 
 message PersistentVolumeSpec {
-  // A description of the persistent volume's resources and capacity.
+  // capacity is the description of the persistent volume's resources and capacity.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#capacity
   map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> capacity = 1 [(dev.f110.kubeproto.field) = { go_name: "Capacity", api_field_name: "capacity", inline: false }];
-  // The actual volume backing the persistent volume.
+  // persistentVolumeSource is the actual volume backing the persistent volume.
   PersistentVolumeSource persistent_volume_source = 2 [(dev.f110.kubeproto.field) = { go_name: "PersistentVolumeSource", inline: true }];
-  // AccessModes contains all ways the volume can be mounted.
+  // accessModes contains all ways the volume can be mounted.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes
   repeated PersistentVolumeAccessMode access_modes = 3 [(dev.f110.kubeproto.field) = { go_name: "AccessModes", api_field_name: "accessModes", inline: false }];
-  // ClaimRef is part of a bi-directional binding between PersistentVolume and PersistentVolumeClaim.
+  // claimRef is part of a bi-directional binding between PersistentVolume and PersistentVolumeClaim.
   // Expected to be non-nil when bound.
   // claim.VolumeName is the authoritative bind between PV and PVC.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#binding
   optional ObjectReference claim_ref = 4 [(dev.f110.kubeproto.field) = { go_name: "ClaimRef", api_field_name: "claimRef", inline: false }];
-  // What happens to a persistent volume when released from its claim.
+  // persistentVolumeReclaimPolicy defines what happens to a persistent volume when released from its claim.
   // Valid options are Retain (default for manually created PersistentVolumes), Delete (default
   // for dynamically provisioned PersistentVolumes), and Recycle (deprecated).
   // Recycle must be supported by the volume plugin underlying this PersistentVolume.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#reclaiming
   optional PersistentVolumeReclaimPolicy persistent_volume_reclaim_policy = 5 [(dev.f110.kubeproto.field) = { go_name: "PersistentVolumeReclaimPolicy", api_field_name: "persistentVolumeReclaimPolicy", inline: false }];
-  // Name of StorageClass to which this persistent volume belongs. Empty value
+  // storageClassName is the name of StorageClass to which this persistent volume belongs. Empty value
   // means that this volume does not belong to any StorageClass.
   optional string storage_class_name = 6 [(dev.f110.kubeproto.field) = { go_name: "StorageClassName", api_field_name: "storageClassName", inline: false }];
-  // A list of mount options, e.g. ["ro", "soft"]. Not validated - mount will
+  // mountOptions is the list of mount options, e.g. ["ro", "soft"]. Not validated - mount will
   // simply fail if one is invalid.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes/#mount-options
   repeated string mount_options = 7 [(dev.f110.kubeproto.field) = { go_name: "MountOptions", api_field_name: "mountOptions", inline: false }];
   // volumeMode defines if a volume is intended to be used with a formatted filesystem
   // or to remain in raw block state. Value of Filesystem is implied when not included in spec.
   optional PersistentVolumeMode volume_mode = 8 [(dev.f110.kubeproto.field) = { go_name: "VolumeMode", api_field_name: "volumeMode", inline: false }];
-  // NodeAffinity defines constraints that limit what nodes this volume can be accessed from.
+  // nodeAffinity defines constraints that limit what nodes this volume can be accessed from.
   // This field influences the scheduling of pods that use this volume.
   optional VolumeNodeAffinity node_affinity = 9 [(dev.f110.kubeproto.field) = { go_name: "NodeAffinity", api_field_name: "nodeAffinity", inline: false }];
 }
 
 message PersistentVolumeStatus {
-  // Phase indicates if a volume is available, bound to a claim, or released by a claim.
+  // phase indicates if a volume is available, bound to a claim, or released by a claim.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#phase
   optional PersistentVolumePhase phase = 1 [(dev.f110.kubeproto.field) = { go_name: "Phase", api_field_name: "phase", inline: false }];
-  // A human-readable message indicating details about why the volume is in this state.
+  // message is a human-readable message indicating details about why the volume is in this state.
   optional string message = 2 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
-  // Reason is a brief CamelCase string that describes any failure and is meant
+  // reason is a brief CamelCase string that describes any failure and is meant
   // for machine parsing and tidy display in the CLI.
   optional string reason = 3 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
 }
 
 message PhotonPersistentDiskVolumeSource {
-  // ID that identifies Photon Controller persistent disk
+  // pdID is the ID that identifies Photon Controller persistent disk
   string pd_id = 1 [(dev.f110.kubeproto.field) = { go_name: "PdID", api_field_name: "pdID", inline: false }];
-  // Filesystem type to mount.
+  // fsType is the filesystem type to mount.
   // Must be a filesystem type supported by the host operating system.
   // Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
   optional string fs_type = 2 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
@@ -2330,7 +2325,7 @@ message PodAffinityTerm {
   // namespaces specifies a static list of namespace names that the term applies to.
   // The term is applied to the union of the namespaces listed in this field
   // and the ones selected by namespaceSelector.
-  // null or empty namespaces list and null namespaceSelector means "this pod's namespace"
+  // null or empty namespaces list and null namespaceSelector means "this pod's namespace".
   repeated string namespaces = 2 [(dev.f110.kubeproto.field) = { go_name: "Namespaces", api_field_name: "namespaces", inline: false }];
   // This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
   // the labelSelector in the specified namespaces, where co-located is defined as running on a node
@@ -2343,7 +2338,6 @@ message PodAffinityTerm {
   // and the ones listed in the namespaces field.
   // null selector and null or empty namespaces list means "this pod's namespace".
   // An empty selector ({}) matches all namespaces.
-  // This field is beta-level and is only honored when PodAffinityNamespaceSelector feature is enabled.
   optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector namespace_selector = 4 [(dev.f110.kubeproto.field) = { go_name: "NamespaceSelector", api_field_name: "namespaceSelector", inline: false }];
 }
 
@@ -2686,8 +2680,7 @@ message PodSpec {
   // Optional: Defaults to empty.  See type description for default values of each field.
   optional PodSecurityContext security_context = 18 [(dev.f110.kubeproto.field) = { go_name: "SecurityContext", api_field_name: "securityContext", inline: false }];
   // ImagePullSecrets is an optional list of references to secrets in the same namespace to use for pulling any of the images used by this PodSpec.
-  // If specified, these secrets will be passed to individual puller implementations for them to use. For example,
-  // in the case of docker, only DockerConfig type secrets are honored.
+  // If specified, these secrets will be passed to individual puller implementations for them to use.
   // More info: https://kubernetes.io/docs/concepts/containers/images#specifying-imagepullsecrets-on-a-pod
   repeated LocalObjectReference image_pull_secrets = 19 [(dev.f110.kubeproto.field) = { go_name: "ImagePullSecrets", api_field_name: "imagePullSecrets", inline: false }];
   // Specifies the hostname of the Pod
@@ -2733,7 +2726,6 @@ message PodSpec {
   // If unset or empty, the "legacy" RuntimeClass will be used, which is an implicit class with an
   // empty definition that uses the default runtime handler.
   // More info: https://git.k8s.io/enhancements/keps/sig-node/585-runtime-class
-  // This is a beta feature as of Kubernetes v1.14.
   optional string runtime_class_name = 30 [(dev.f110.kubeproto.field) = { go_name: "RuntimeClassName", api_field_name: "runtimeClassName", inline: false }];
   // EnableServiceLinks indicates whether information about services should be injected into pod's
   // environment variables, matching the syntax of Docker links.
@@ -2742,7 +2734,6 @@ message PodSpec {
   // PreemptionPolicy is the Policy for preempting pods with lower priority.
   // One of Never, PreemptLowerPriority.
   // Defaults to PreemptLowerPriority if unset.
-  // This field is beta-level, gated by the NonPreemptingPriority feature-gate.
   optional PreemptionPolicy preemption_policy = 32 [(dev.f110.kubeproto.field) = { go_name: "PreemptionPolicy", api_field_name: "preemptionPolicy", inline: false }];
   // Overhead represents the resource overhead associated with running a pod for a given RuntimeClass.
   // This field will be autopopulated at admission time by the RuntimeClass admission controller. If
@@ -2751,7 +2742,6 @@ message PodSpec {
   // set. If RuntimeClass is configured and selected in the PodSpec, Overhead will be set to the value
   // defined in the corresponding RuntimeClass, otherwise it will remain unset and treated as zero.
   // More info: https://git.k8s.io/enhancements/keps/sig-node/688-pod-overhead/README.md
-  // This field is beta-level as of Kubernetes v1.18, and is only honored by servers that enable the PodOverhead feature.
   map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> overhead = 33 [(dev.f110.kubeproto.field) = { go_name: "Overhead", api_field_name: "overhead", inline: false }];
   // TopologySpreadConstraints describes how a group of pods ought to spread across topology
   // domains. Scheduler will schedule pods in a way which abides by the constraints.
@@ -2788,7 +2778,7 @@ message PodSpec {
   // - spec.containers[*].securityContext.procMount
   // - spec.containers[*].securityContext.runAsUser
   // - spec.containers[*].securityContext.runAsGroup
-  // This is an alpha field and requires the IdentifyPodOS feature
+  // This is a beta field and requires the IdentifyPodOS feature
   optional PodOS os = 36 [(dev.f110.kubeproto.field) = { go_name: "OS", api_field_name: "os", inline: false }];
 }
 
@@ -2843,8 +2833,7 @@ message PodStatus {
   // startTime set.
   // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
   repeated ContainerStatus init_container_statuses = 10 [(dev.f110.kubeproto.field) = { go_name: "InitContainerStatuses", api_field_name: "initContainerStatuses", inline: false }];
-  // The list has one entry per container in the manifest. Each entry is currently the output
-  // of `docker inspect`.
+  // The list has one entry per container in the manifest.
   // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
   repeated ContainerStatus container_statuses = 11 [(dev.f110.kubeproto.field) = { go_name: "ContainerStatuses", api_field_name: "containerStatuses", inline: false }];
   // The Quality of Service (QOS) classification assigned to the pod based on resource requirements
@@ -2913,13 +2902,13 @@ message PortStatus {
 }
 
 message PortworxVolumeSource {
-  // VolumeID uniquely identifies a Portworx volume
+  // volumeID uniquely identifies a Portworx volume
   string volume_id = 1 [(dev.f110.kubeproto.field) = { go_name: "VolumeID", api_field_name: "volumeID", inline: false }];
-  // FSType represents the filesystem type to mount
+  // fSType represents the filesystem type to mount
   // Must be a filesystem type supported by the host operating system.
   // Ex. "ext4", "xfs". Implicitly inferred to be "ext4" if unspecified.
   optional string fs_type = 2 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
-  // Defaults to false (read/write). ReadOnly here will force
+  // readOnly defaults to false (read/write). ReadOnly here will force
   // the ReadOnly setting in VolumeMounts.
   optional bool read_only = 3 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
 }
@@ -2987,14 +2976,14 @@ message ProbeHandler {
   // TCPSocket specifies an action involving a TCP port.
   optional TCPSocketAction tcp_socket = 3 [(dev.f110.kubeproto.field) = { go_name: "TCPSocket", api_field_name: "tcpSocket", inline: false }];
   // GRPC specifies an action involving a GRPC port.
-  // This is an alpha field and requires enabling GRPCContainerProbe feature gate.
+  // This is a beta field and requires enabling GRPCContainerProbe feature gate.
   optional GRPCAction grpc = 4 [(dev.f110.kubeproto.field) = { go_name: "GRPC", api_field_name: "grpc", inline: false }];
 }
 
 message ProjectedVolumeSource {
-  // list of volume projections
+  // sources is the list of volume projections
   repeated VolumeProjection sources = 1 [(dev.f110.kubeproto.field) = { go_name: "Sources", api_field_name: "sources", inline: false }];
-  // Mode bits used to set permissions on created files by default.
+  // defaultMode are the mode bits used to set permissions on created files by default.
   // Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
   // YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
   // Directories within the path are not affected by this setting.
@@ -3004,91 +2993,91 @@ message ProjectedVolumeSource {
 }
 
 message QuobyteVolumeSource {
-  // Registry represents a single or multiple Quobyte Registry services
+  // registry represents a single or multiple Quobyte Registry services
   // specified as a string as host:port pair (multiple entries are separated with commas)
   // which acts as the central registry for volumes
   string registry = 1 [(dev.f110.kubeproto.field) = { go_name: "Registry", api_field_name: "registry", inline: false }];
-  // Volume is a string that references an already created Quobyte volume by name.
+  // volume is a string that references an already created Quobyte volume by name.
   string volume = 2 [(dev.f110.kubeproto.field) = { go_name: "Volume", api_field_name: "volume", inline: false }];
-  // ReadOnly here will force the Quobyte volume to be mounted with read-only permissions.
+  // readOnly here will force the Quobyte volume to be mounted with read-only permissions.
   // Defaults to false.
   optional bool read_only = 3 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
-  // User to map volume access to
+  // user to map volume access to
   // Defaults to serivceaccount user
   optional string user = 4 [(dev.f110.kubeproto.field) = { go_name: "User", api_field_name: "user", inline: false }];
-  // Group to map volume access to
+  // group to map volume access to
   // Default is no group
   optional string group = 5 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
-  // Tenant owning the given Quobyte volume in the Backend
+  // tenant owning the given Quobyte volume in the Backend
   // Used with dynamically provisioned Quobyte volumes, value is set by the plugin
   optional string tenant = 6 [(dev.f110.kubeproto.field) = { go_name: "Tenant", api_field_name: "tenant", inline: false }];
 }
 
 message RBDPersistentVolumeSource {
-  // A collection of Ceph monitors.
+  // monitors is a collection of Ceph monitors.
   // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   repeated string ceph_monitors = 1 [(dev.f110.kubeproto.field) = { go_name: "CephMonitors", api_field_name: "monitors", inline: false }];
-  // The rados image name.
+  // image is the rados image name.
   // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   string rbd_image = 2 [(dev.f110.kubeproto.field) = { go_name: "RBDImage", api_field_name: "image", inline: false }];
-  // Filesystem type of the volume that you want to mount.
+  // fsType is the filesystem type of the volume that you want to mount.
   // Tip: Ensure that the filesystem type is supported by the host operating system.
   // Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#rbd
   optional string fs_type = 3 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
-  // The rados pool name.
+  // pool is the rados pool name.
   // Default is rbd.
   // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   optional string rbd_pool = 4 [(dev.f110.kubeproto.field) = { go_name: "RBDPool", api_field_name: "pool", inline: false }];
-  // The rados user name.
+  // user is the rados user name.
   // Default is admin.
   // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   optional string rados_user = 5 [(dev.f110.kubeproto.field) = { go_name: "RadosUser", api_field_name: "user", inline: false }];
-  // Keyring is the path to key ring for RBDUser.
+  // keyring is the path to key ring for RBDUser.
   // Default is /etc/ceph/keyring.
   // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   optional string keyring = 6 [(dev.f110.kubeproto.field) = { go_name: "Keyring", api_field_name: "keyring", inline: false }];
-  // SecretRef is name of the authentication secret for RBDUser. If provided
+  // secretRef is name of the authentication secret for RBDUser. If provided
   // overrides keyring.
   // Default is nil.
   // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   optional SecretReference secret_ref = 7 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
-  // ReadOnly here will force the ReadOnly setting in VolumeMounts.
+  // readOnly here will force the ReadOnly setting in VolumeMounts.
   // Defaults to false.
   // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   optional bool read_only = 8 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
 }
 
 message RBDVolumeSource {
-  // A collection of Ceph monitors.
+  // monitors is a collection of Ceph monitors.
   // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   repeated string ceph_monitors = 1 [(dev.f110.kubeproto.field) = { go_name: "CephMonitors", api_field_name: "monitors", inline: false }];
-  // The rados image name.
+  // image is the rados image name.
   // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   string rbd_image = 2 [(dev.f110.kubeproto.field) = { go_name: "RBDImage", api_field_name: "image", inline: false }];
-  // Filesystem type of the volume that you want to mount.
+  // fsType is the filesystem type of the volume that you want to mount.
   // Tip: Ensure that the filesystem type is supported by the host operating system.
   // Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#rbd
   optional string fs_type = 3 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
-  // The rados pool name.
+  // pool is the rados pool name.
   // Default is rbd.
   // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   optional string rbd_pool = 4 [(dev.f110.kubeproto.field) = { go_name: "RBDPool", api_field_name: "pool", inline: false }];
-  // The rados user name.
+  // user is the rados user name.
   // Default is admin.
   // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   optional string rados_user = 5 [(dev.f110.kubeproto.field) = { go_name: "RadosUser", api_field_name: "user", inline: false }];
-  // Keyring is the path to key ring for RBDUser.
+  // keyring is the path to key ring for RBDUser.
   // Default is /etc/ceph/keyring.
   // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   optional string keyring = 6 [(dev.f110.kubeproto.field) = { go_name: "Keyring", api_field_name: "keyring", inline: false }];
-  // SecretRef is name of the authentication secret for RBDUser. If provided
+  // secretRef is name of the authentication secret for RBDUser. If provided
   // overrides keyring.
   // Default is nil.
   // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   optional LocalObjectReference secret_ref = 7 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
-  // ReadOnly here will force the ReadOnly setting in VolumeMounts.
+  // readOnly here will force the ReadOnly setting in VolumeMounts.
   // Defaults to false.
   // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   optional bool read_only = 8 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
@@ -3255,61 +3244,61 @@ message SELinuxOptions {
 }
 
 message ScaleIOPersistentVolumeSource {
-  // The host address of the ScaleIO API Gateway.
+  // gateway is the host address of the ScaleIO API Gateway.
   string gateway = 1 [(dev.f110.kubeproto.field) = { go_name: "Gateway", api_field_name: "gateway", inline: false }];
-  // The name of the storage system as configured in ScaleIO.
+  // system is the name of the storage system as configured in ScaleIO.
   string system = 2 [(dev.f110.kubeproto.field) = { go_name: "System", api_field_name: "system", inline: false }];
-  // SecretRef references to the secret for ScaleIO user and other
+  // secretRef references to the secret for ScaleIO user and other
   // sensitive information. If this is not provided, Login operation will fail.
   optional SecretReference secret_ref = 3 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
-  // Flag to enable/disable SSL communication with Gateway, default false
+  // sslEnabled is the flag to enable/disable SSL communication with Gateway, default false
   optional bool ssl_enabled = 4 [(dev.f110.kubeproto.field) = { go_name: "SSLEnabled", api_field_name: "sslEnabled", inline: false }];
-  // The name of the ScaleIO Protection Domain for the configured storage.
+  // protectionDomain is the name of the ScaleIO Protection Domain for the configured storage.
   optional string protection_domain = 5 [(dev.f110.kubeproto.field) = { go_name: "ProtectionDomain", api_field_name: "protectionDomain", inline: false }];
-  // The ScaleIO Storage Pool associated with the protection domain.
+  // storagePool is the ScaleIO Storage Pool associated with the protection domain.
   optional string storage_pool = 6 [(dev.f110.kubeproto.field) = { go_name: "StoragePool", api_field_name: "storagePool", inline: false }];
-  // Indicates whether the storage for a volume should be ThickProvisioned or ThinProvisioned.
+  // storageMode indicates whether the storage for a volume should be ThickProvisioned or ThinProvisioned.
   // Default is ThinProvisioned.
   optional string storage_mode = 7 [(dev.f110.kubeproto.field) = { go_name: "StorageMode", api_field_name: "storageMode", inline: false }];
-  // The name of a volume already created in the ScaleIO system
+  // volumeName is the name of a volume already created in the ScaleIO system
   // that is associated with this volume source.
   optional string volume_name = 8 [(dev.f110.kubeproto.field) = { go_name: "VolumeName", api_field_name: "volumeName", inline: false }];
-  // Filesystem type to mount.
+  // fsType is the filesystem type to mount.
   // Must be a filesystem type supported by the host operating system.
   // Ex. "ext4", "xfs", "ntfs".
   // Default is "xfs"
   optional string fs_type = 9 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
-  // Defaults to false (read/write). ReadOnly here will force
+  // readOnly defaults to false (read/write). ReadOnly here will force
   // the ReadOnly setting in VolumeMounts.
   optional bool read_only = 10 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
 }
 
 message ScaleIOVolumeSource {
-  // The host address of the ScaleIO API Gateway.
+  // gateway is the host address of the ScaleIO API Gateway.
   string gateway = 1 [(dev.f110.kubeproto.field) = { go_name: "Gateway", api_field_name: "gateway", inline: false }];
-  // The name of the storage system as configured in ScaleIO.
+  // system is the name of the storage system as configured in ScaleIO.
   string system = 2 [(dev.f110.kubeproto.field) = { go_name: "System", api_field_name: "system", inline: false }];
-  // SecretRef references to the secret for ScaleIO user and other
+  // secretRef references to the secret for ScaleIO user and other
   // sensitive information. If this is not provided, Login operation will fail.
   optional LocalObjectReference secret_ref = 3 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
-  // Flag to enable/disable SSL communication with Gateway, default false
+  // sslEnabled Flag enable/disable SSL communication with Gateway, default false
   optional bool ssl_enabled = 4 [(dev.f110.kubeproto.field) = { go_name: "SSLEnabled", api_field_name: "sslEnabled", inline: false }];
-  // The name of the ScaleIO Protection Domain for the configured storage.
+  // protectionDomain is the name of the ScaleIO Protection Domain for the configured storage.
   optional string protection_domain = 5 [(dev.f110.kubeproto.field) = { go_name: "ProtectionDomain", api_field_name: "protectionDomain", inline: false }];
-  // The ScaleIO Storage Pool associated with the protection domain.
+  // storagePool is the ScaleIO Storage Pool associated with the protection domain.
   optional string storage_pool = 6 [(dev.f110.kubeproto.field) = { go_name: "StoragePool", api_field_name: "storagePool", inline: false }];
-  // Indicates whether the storage for a volume should be ThickProvisioned or ThinProvisioned.
+  // storageMode indicates whether the storage for a volume should be ThickProvisioned or ThinProvisioned.
   // Default is ThinProvisioned.
   optional string storage_mode = 7 [(dev.f110.kubeproto.field) = { go_name: "StorageMode", api_field_name: "storageMode", inline: false }];
-  // The name of a volume already created in the ScaleIO system
+  // volumeName is the name of a volume already created in the ScaleIO system
   // that is associated with this volume source.
   optional string volume_name = 8 [(dev.f110.kubeproto.field) = { go_name: "VolumeName", api_field_name: "volumeName", inline: false }];
-  // Filesystem type to mount.
+  // fsType is the filesystem type to mount.
   // Must be a filesystem type supported by the host operating system.
   // Ex. "ext4", "xfs", "ntfs".
   // Default is "xfs".
   optional string fs_type = 9 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
-  // Defaults to false (read/write). ReadOnly here will force
+  // readOnly Defaults to false (read/write). ReadOnly here will force
   // the ReadOnly setting in VolumeMounts.
   optional bool read_only = 10 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
 }
@@ -3398,7 +3387,7 @@ message SecretList {
 
 message SecretProjection {
   LocalObjectReference local_object_reference = 1 [(dev.f110.kubeproto.field) = { go_name: "LocalObjectReference", inline: true }];
-  // If unspecified, each key-value pair in the Data field of the referenced
+  // items if unspecified, each key-value pair in the Data field of the referenced
   // Secret will be projected into the volume as a file whose name is the
   // key and content is the value. If specified, the listed keys will be
   // projected into the specified paths, and unlisted keys will not be
@@ -3406,22 +3395,22 @@ message SecretProjection {
   // the volume setup will error unless it is marked optional. Paths must be
   // relative and may not contain the '..' path or start with '..'.
   repeated KeyToPath items = 2 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
-  // Specify whether the Secret or its key must be defined
+  // optional field specify whether the Secret or its key must be defined
   optional bool optional = 3 [(dev.f110.kubeproto.field) = { go_name: "Optional", api_field_name: "optional", inline: false }];
 }
 
 message SecretReference {
-  // Name is unique within a namespace to reference a secret resource.
+  // name is unique within a namespace to reference a secret resource.
   optional string name = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
-  // Namespace defines the space within which the secret name must be unique.
+  // namespace defines the space within which the secret name must be unique.
   optional string namespace = 2 [(dev.f110.kubeproto.field) = { go_name: "Namespace", api_field_name: "namespace", inline: false }];
 }
 
 message SecretVolumeSource {
-  // Name of the secret in the pod's namespace to use.
+  // secretName is the name of the secret in the pod's namespace to use.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#secret
   optional string secret_name = 1 [(dev.f110.kubeproto.field) = { go_name: "SecretName", api_field_name: "secretName", inline: false }];
-  // If unspecified, each key-value pair in the Data field of the referenced
+  // items If unspecified, each key-value pair in the Data field of the referenced
   // Secret will be projected into the volume as a file whose name is the
   // key and content is the value. If specified, the listed keys will be
   // projected into the specified paths, and unlisted keys will not be
@@ -3429,7 +3418,7 @@ message SecretVolumeSource {
   // the volume setup will error unless it is marked optional. Paths must be
   // relative and may not contain the '..' path or start with '..'.
   repeated KeyToPath items = 2 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
-  // Optional: mode bits used to set permissions on created files by default.
+  // defaultMode is Optional: mode bits used to set permissions on created files by default.
   // Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
   // YAML accepts both octal and decimal values, JSON requires decimal values
   // for mode bits. Defaults to 0644.
@@ -3437,7 +3426,7 @@ message SecretVolumeSource {
   // This might be in conflict with other options that affect the file
   // mode, like fsGroup, and the result can be other mode bits set.
   optional int32 default_mode = 3 [(dev.f110.kubeproto.field) = { go_name: "DefaultMode", api_field_name: "defaultMode", inline: false }];
-  // Specify whether the Secret or its keys must be defined
+  // optional field specify whether the Secret or its keys must be defined
   optional bool optional = 4 [(dev.f110.kubeproto.field) = { go_name: "Optional", api_field_name: "optional", inline: false }];
 }
 
@@ -3527,7 +3516,10 @@ message Service {
 }
 
 message ServiceAccount {
-  // Secrets is the list of secrets allowed to be used by pods running using this ServiceAccount.
+  // Secrets is a list of the secrets in the same namespace that pods running using this ServiceAccount are allowed to use.
+  // Pods are only limited to this list if this service account has a "kubernetes.io/enforce-mountable-secrets" annotation set to "true".
+  // This field should not be used to find auto-generated service account token secrets for use outside of pods.
+  // Instead, tokens can be requested directly using the TokenRequest API, or service account token secrets can be manually created.
   // More info: https://kubernetes.io/docs/concepts/configuration/secret
   repeated ObjectReference secrets = 3 [(dev.f110.kubeproto.field) = { go_name: "Secrets", api_field_name: "secrets", inline: false }];
   // ImagePullSecrets is a list of references to secrets in the same namespace to use for pulling any images
@@ -3554,19 +3546,19 @@ message ServiceAccountList {
 }
 
 message ServiceAccountTokenProjection {
-  // Audience is the intended audience of the token. A recipient of a token
+  // audience is the intended audience of the token. A recipient of a token
   // must identify itself with an identifier specified in the audience of the
   // token, and otherwise should reject the token. The audience defaults to the
   // identifier of the apiserver.
   optional string audience = 1 [(dev.f110.kubeproto.field) = { go_name: "Audience", api_field_name: "audience", inline: false }];
-  // ExpirationSeconds is the requested duration of validity of the service
+  // expirationSeconds is the requested duration of validity of the service
   // account token. As the token approaches expiration, the kubelet volume
   // plugin will proactively rotate the service account token. The kubelet will
   // start trying to rotate the token if the token is older than 80 percent of
   // its time to live or if the token is older than 24 hours.Defaults to 1 hour
   // and must be at least 10 minutes.
   optional int64 expiration_seconds = 2 [(dev.f110.kubeproto.field) = { go_name: "ExpirationSeconds", api_field_name: "expirationSeconds", inline: false }];
-  // Path is the path relative to the mount point of the file to project the
+  // path is the path relative to the mount point of the file to project the
   // token into.
   string path = 3 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
 }
@@ -3593,7 +3585,7 @@ message ServicePort {
   // The application protocol for this port.
   // This field follows standard Kubernetes label syntax.
   // Un-prefixed names are reserved for IANA standard service names (as per
-  // RFC-6335 and http://www.iana.org/assignments/service-names).
+  // RFC-6335 and https://www.iana.org/assignments/service-names).
   // Non-standard protocols should use prefixed names such as
   // mycompany.com/my-custom-protocol.
   optional string app_protocol = 3 [(dev.f110.kubeproto.field) = { go_name: "AppProtocol", api_field_name: "appProtocol", inline: false }];
@@ -3709,11 +3701,14 @@ message ServiceSpec {
   // Defaults to None.
   // More info: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
   optional ServiceAffinity session_affinity = 7 [(dev.f110.kubeproto.field) = { go_name: "SessionAffinity", api_field_name: "sessionAffinity", inline: false }];
-  // Only applies to Service Type: LoadBalancer
-  // LoadBalancer will get created with the IP specified in this field.
+  // Only applies to Service Type: LoadBalancer.
   // This feature depends on whether the underlying cloud-provider supports specifying
   // the loadBalancerIP when a load balancer is created.
   // This field will be ignored if the cloud-provider does not support the feature.
+  // Deprecated: This field was under-specified and its meaning varies across implementations,
+  // and it cannot support dual-stack.
+  // As of Kubernetes v1.24, users are encouraged to use implementation-specific annotations when available.
+  // This field may be removed in a future API version.
   optional string load_balancer_ip = 8 [(dev.f110.kubeproto.field) = { go_name: "LoadBalancerIP", api_field_name: "loadBalancerIP", inline: false }];
   // If specified and supported by the platform, this will restrict traffic through the cloud-provider
   // load-balancer will be restricted to the specified client IPs. This field will be ignored if the
@@ -3785,7 +3780,6 @@ message ServiceSpec {
   // value), those requests will be respected, regardless of this field.
   // This field may only be set for services with type LoadBalancer and will
   // be cleared if the type is changed to any other type.
-  // This field is beta-level and is only honored by servers that enable the ServiceLBNodePortControl feature.
   optional bool allocate_load_balancer_node_ports = 17 [(dev.f110.kubeproto.field) = { go_name: "AllocateLoadBalancerNodePorts", api_field_name: "allocateLoadBalancerNodePorts", inline: false }];
   // loadBalancerClass is the class of the load balancer implementation this Service belongs to.
   // If specified, the value of this field must be a label-style identifier, with an optional prefix,
@@ -3821,47 +3815,47 @@ message SessionAffinityConfig {
 }
 
 message StorageOSPersistentVolumeSource {
-  // VolumeName is the human-readable name of the StorageOS volume.  Volume
+  // volumeName is the human-readable name of the StorageOS volume.  Volume
   // names are only unique within a namespace.
   optional string volume_name = 1 [(dev.f110.kubeproto.field) = { go_name: "VolumeName", api_field_name: "volumeName", inline: false }];
-  // VolumeNamespace specifies the scope of the volume within StorageOS.  If no
+  // volumeNamespace specifies the scope of the volume within StorageOS.  If no
   // namespace is specified then the Pod's namespace will be used.  This allows the
   // Kubernetes name scoping to be mirrored within StorageOS for tighter integration.
   // Set VolumeName to any name to override the default behaviour.
   // Set to "default" if you are not using namespaces within StorageOS.
   // Namespaces that do not pre-exist within StorageOS will be created.
   optional string volume_namespace = 2 [(dev.f110.kubeproto.field) = { go_name: "VolumeNamespace", api_field_name: "volumeNamespace", inline: false }];
-  // Filesystem type to mount.
+  // fsType is the filesystem type to mount.
   // Must be a filesystem type supported by the host operating system.
   // Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
   optional string fs_type = 3 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
-  // Defaults to false (read/write). ReadOnly here will force
+  // readOnly defaults to false (read/write). ReadOnly here will force
   // the ReadOnly setting in VolumeMounts.
   optional bool read_only = 4 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
-  // SecretRef specifies the secret to use for obtaining the StorageOS API
+  // secretRef specifies the secret to use for obtaining the StorageOS API
   // credentials.  If not specified, default values will be attempted.
   optional ObjectReference secret_ref = 5 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
 }
 
 message StorageOSVolumeSource {
-  // VolumeName is the human-readable name of the StorageOS volume.  Volume
+  // volumeName is the human-readable name of the StorageOS volume.  Volume
   // names are only unique within a namespace.
   optional string volume_name = 1 [(dev.f110.kubeproto.field) = { go_name: "VolumeName", api_field_name: "volumeName", inline: false }];
-  // VolumeNamespace specifies the scope of the volume within StorageOS.  If no
+  // volumeNamespace specifies the scope of the volume within StorageOS.  If no
   // namespace is specified then the Pod's namespace will be used.  This allows the
   // Kubernetes name scoping to be mirrored within StorageOS for tighter integration.
   // Set VolumeName to any name to override the default behaviour.
   // Set to "default" if you are not using namespaces within StorageOS.
   // Namespaces that do not pre-exist within StorageOS will be created.
   optional string volume_namespace = 2 [(dev.f110.kubeproto.field) = { go_name: "VolumeNamespace", api_field_name: "volumeNamespace", inline: false }];
-  // Filesystem type to mount.
+  // fsType is the filesystem type to mount.
   // Must be a filesystem type supported by the host operating system.
   // Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
   optional string fs_type = 3 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
-  // Defaults to false (read/write). ReadOnly here will force
+  // readOnly defaults to false (read/write). ReadOnly here will force
   // the ReadOnly setting in VolumeMounts.
   optional bool read_only = 4 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
-  // SecretRef specifies the secret to use for obtaining the StorageOS API
+  // secretRef specifies the secret to use for obtaining the StorageOS API
   // credentials.  If not specified, default values will be attempted.
   optional LocalObjectReference secret_ref = 5 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
 }
@@ -3935,12 +3929,15 @@ message TopologySpreadConstraint {
   // MaxSkew describes the degree to which pods may be unevenly distributed.
   // When `whenUnsatisfiable=DoNotSchedule`, it is the maximum permitted difference
   // between the number of matching pods in the target topology and the global minimum.
+  // The global minimum is the minimum number of matching pods in an eligible domain
+  // or zero if the number of eligible domains is less than MinDomains.
   // For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same
-  // labelSelector spread as 1/1/0:
+  // labelSelector spread as 2/2/1:
+  // In this case, the global minimum is 1.
   // | zone1 | zone2 | zone3 |
-  // |   P   |   P   |       |
-  // - if MaxSkew is 1, incoming pod can only be scheduled to zone3 to become 1/1/1;
-  // scheduling it onto zone1(zone2) would make the ActualSkew(2-0) on zone1(zone2)
+  // |  P P  |  P P  |   P   |
+  // - if MaxSkew is 1, incoming pod can only be scheduled to zone3 to become 2/2/2;
+  // scheduling it onto zone1(zone2) would make the ActualSkew(3-1) on zone1(zone2)
   // violate MaxSkew(1).
   // - if MaxSkew is 2, incoming pod can be scheduled onto any zone.
   // When `whenUnsatisfiable=ScheduleAnyway`, it is used to give higher precedence
@@ -3951,6 +3948,10 @@ message TopologySpreadConstraint {
   // and identical values are considered to be in the same topology.
   // We consider each <key, value> as a "bucket", and try to put balanced number
   // of pods into each bucket.
+  // We define a domain as a particular instance of a topology.
+  // Also, we define an eligible domain as a domain whose nodes match the node selector.
+  // e.g. If TopologyKey is "kubernetes.io/hostname", each Node is a domain of that topology.
+  // And, if TopologyKey is "topology.kubernetes.io/zone", each zone is a domain of that topology.
   // It's a required field.
   string topology_key = 2 [(dev.f110.kubeproto.field) = { go_name: "TopologyKey", api_field_name: "topologyKey", inline: false }];
   // WhenUnsatisfiable indicates how to deal with a pod if it doesn't satisfy
@@ -3976,6 +3977,26 @@ message TopologySpreadConstraint {
   // Pods that match this label selector are counted to determine the number of pods
   // in their corresponding topology domain.
   optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector label_selector = 4 [(dev.f110.kubeproto.field) = { go_name: "LabelSelector", api_field_name: "labelSelector", inline: false }];
+  // MinDomains indicates a minimum number of eligible domains.
+  // When the number of eligible domains with matching topology keys is less than minDomains,
+  // Pod Topology Spread treats "global minimum" as 0, and then the calculation of Skew is performed.
+  // And when the number of eligible domains with matching topology keys equals or greater than minDomains,
+  // this value has no effect on scheduling.
+  // As a result, when the number of eligible domains is less than minDomains,
+  // scheduler won't schedule more than maxSkew Pods to those domains.
+  // If value is nil, the constraint behaves as if MinDomains is equal to 1.
+  // Valid values are integers greater than 0.
+  // When value is not nil, WhenUnsatisfiable must be DoNotSchedule.
+  // For example, in a 3-zone cluster, MaxSkew is set to 2, MinDomains is set to 5 and pods with the same
+  // labelSelector spread as 2/2/2:
+  // | zone1 | zone2 | zone3 |
+  // |  P P  |  P P  |  P P  |
+  // The number of domains is less than 5(MinDomains), so "global minimum" is treated as 0.
+  // In this situation, new pod with the same labelSelector cannot be scheduled,
+  // because computed skew will be 3(3 - 0) if new Pod is scheduled to any of the three zones,
+  // it will violate MaxSkew.
+  // This is an alpha field and requires enabling MinDomainsInPodTopologySpread feature gate.
+  optional int32 min_domains = 5 [(dev.f110.kubeproto.field) = { go_name: "MinDomains", api_field_name: "minDomains", inline: false }];
 }
 
 message TypedLocalObjectReference {
@@ -3990,11 +4011,11 @@ message TypedLocalObjectReference {
 }
 
 message Volume {
-  // Volume's name.
+  // name of the volume.
   // Must be a DNS_LABEL and unique within the pod.
   // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
   string name = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
-  // VolumeSource represents the location and type of the mounted volume.
+  // volumeSource represents the location and type of the mounted volume.
   // If not specified, the Volume is implied to be an EmptyDir.
   // This implied behavior is deprecated and will be removed in a future version.
   VolumeSource volume_source = 2 [(dev.f110.kubeproto.field) = { go_name: "VolumeSource", inline: true }];
@@ -4032,23 +4053,23 @@ message VolumeMount {
 }
 
 message VolumeNodeAffinity {
-  // Required specifies hard node constraints that must be met.
+  // required specifies hard node constraints that must be met.
   optional NodeSelector required = 1 [(dev.f110.kubeproto.field) = { go_name: "Required", api_field_name: "required", inline: false }];
 }
 
 message VolumeProjection {
-  // information about the secret data to project
+  // secret information about the secret data to project
   optional SecretProjection secret = 1 [(dev.f110.kubeproto.field) = { go_name: "Secret", api_field_name: "secret", inline: false }];
-  // information about the downwardAPI data to project
+  // downwardAPI information about the downwardAPI data to project
   optional DownwardAPIProjection downward_api = 2 [(dev.f110.kubeproto.field) = { go_name: "DownwardAPI", api_field_name: "downwardAPI", inline: false }];
-  // information about the configMap data to project
+  // configMap information about the configMap data to project
   optional ConfigMapProjection config_map = 3 [(dev.f110.kubeproto.field) = { go_name: "ConfigMap", api_field_name: "configMap", inline: false }];
-  // information about the serviceAccountToken data to project
+  // serviceAccountToken is information about the serviceAccountToken data to project
   optional ServiceAccountTokenProjection service_account_token = 4 [(dev.f110.kubeproto.field) = { go_name: "ServiceAccountToken", api_field_name: "serviceAccountToken", inline: false }];
 }
 
 message VolumeSource {
-  // HostPath represents a pre-existing file or directory on the host
+  // hostPath represents a pre-existing file or directory on the host
   // machine that is directly exposed to the container. This is generally
   // used for system agents or other privileged things that are allowed
   // to see the host machine. Most containers will NOT need this.
@@ -4057,79 +4078,79 @@ message VolumeSource {
   // TODO(jonesdl) We need to restrict who can use host directory mounts and who can/can not
   // mount host directories as read/write.
   optional HostPathVolumeSource host_path = 1 [(dev.f110.kubeproto.field) = { go_name: "HostPath", api_field_name: "hostPath", inline: false }];
-  // EmptyDir represents a temporary directory that shares a pod's lifetime.
+  // emptyDir represents a temporary directory that shares a pod's lifetime.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#emptydir
   optional EmptyDirVolumeSource empty_dir = 2 [(dev.f110.kubeproto.field) = { go_name: "EmptyDir", api_field_name: "emptyDir", inline: false }];
-  // GCEPersistentDisk represents a GCE Disk resource that is attached to a
+  // gcePersistentDisk represents a GCE Disk resource that is attached to a
   // kubelet's host machine and then exposed to the pod.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
   optional GCEPersistentDiskVolumeSource gce_persistent_disk = 3 [(dev.f110.kubeproto.field) = { go_name: "GCEPersistentDisk", api_field_name: "gcePersistentDisk", inline: false }];
-  // AWSElasticBlockStore represents an AWS Disk resource that is attached to a
+  // awsElasticBlockStore represents an AWS Disk resource that is attached to a
   // kubelet's host machine and then exposed to the pod.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
   optional AWSElasticBlockStoreVolumeSource aws_elastic_block_store = 4 [(dev.f110.kubeproto.field) = { go_name: "AWSElasticBlockStore", api_field_name: "awsElasticBlockStore", inline: false }];
-  // GitRepo represents a git repository at a particular revision.
+  // gitRepo represents a git repository at a particular revision.
   // DEPRECATED: GitRepo is deprecated. To provision a container with a git repo, mount an
   // EmptyDir into an InitContainer that clones the repo using git, then mount the EmptyDir
   // into the Pod's container.
   optional GitRepoVolumeSource git_repo = 5 [(dev.f110.kubeproto.field) = { go_name: "GitRepo", api_field_name: "gitRepo", inline: false }];
-  // Secret represents a secret that should populate this volume.
+  // secret represents a secret that should populate this volume.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#secret
   optional SecretVolumeSource secret = 6 [(dev.f110.kubeproto.field) = { go_name: "Secret", api_field_name: "secret", inline: false }];
-  // NFS represents an NFS mount on the host that shares a pod's lifetime
+  // nfs represents an NFS mount on the host that shares a pod's lifetime
   // More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs
   optional NFSVolumeSource nfs = 7 [(dev.f110.kubeproto.field) = { go_name: "NFS", api_field_name: "nfs", inline: false }];
-  // ISCSI represents an ISCSI Disk resource that is attached to a
+  // iscsi represents an ISCSI Disk resource that is attached to a
   // kubelet's host machine and then exposed to the pod.
   // More info: https://examples.k8s.io/volumes/iscsi/README.md
   optional ISCSIVolumeSource iscsi = 8 [(dev.f110.kubeproto.field) = { go_name: "ISCSI", api_field_name: "iscsi", inline: false }];
-  // Glusterfs represents a Glusterfs mount on the host that shares a pod's lifetime.
+  // glusterfs represents a Glusterfs mount on the host that shares a pod's lifetime.
   // More info: https://examples.k8s.io/volumes/glusterfs/README.md
   optional GlusterfsVolumeSource glusterfs = 9 [(dev.f110.kubeproto.field) = { go_name: "Glusterfs", api_field_name: "glusterfs", inline: false }];
-  // PersistentVolumeClaimVolumeSource represents a reference to a
+  // persistentVolumeClaimVolumeSource represents a reference to a
   // PersistentVolumeClaim in the same namespace.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
   optional PersistentVolumeClaimVolumeSource persistent_volume_claim = 10 [(dev.f110.kubeproto.field) = { go_name: "PersistentVolumeClaim", api_field_name: "persistentVolumeClaim", inline: false }];
-  // RBD represents a Rados Block Device mount on the host that shares a pod's lifetime.
+  // rbd represents a Rados Block Device mount on the host that shares a pod's lifetime.
   // More info: https://examples.k8s.io/volumes/rbd/README.md
   optional RBDVolumeSource rbd = 11 [(dev.f110.kubeproto.field) = { go_name: "RBD", api_field_name: "rbd", inline: false }];
-  // FlexVolume represents a generic volume resource that is
+  // flexVolume represents a generic volume resource that is
   // provisioned/attached using an exec based plugin.
   optional FlexVolumeSource flex_volume = 12 [(dev.f110.kubeproto.field) = { go_name: "FlexVolume", api_field_name: "flexVolume", inline: false }];
-  // Cinder represents a cinder volume attached and mounted on kubelets host machine.
+  // cinder represents a cinder volume attached and mounted on kubelets host machine.
   // More info: https://examples.k8s.io/mysql-cinder-pd/README.md
   optional CinderVolumeSource cinder = 13 [(dev.f110.kubeproto.field) = { go_name: "Cinder", api_field_name: "cinder", inline: false }];
-  // CephFS represents a Ceph FS mount on the host that shares a pod's lifetime
+  // cephFS represents a Ceph FS mount on the host that shares a pod's lifetime
   optional CephFSVolumeSource ceph_fs = 14 [(dev.f110.kubeproto.field) = { go_name: "CephFS", api_field_name: "cephfs", inline: false }];
-  // Flocker represents a Flocker volume attached to a kubelet's host machine. This depends on the Flocker control service being running
+  // flocker represents a Flocker volume attached to a kubelet's host machine. This depends on the Flocker control service being running
   optional FlockerVolumeSource flocker = 15 [(dev.f110.kubeproto.field) = { go_name: "Flocker", api_field_name: "flocker", inline: false }];
-  // DownwardAPI represents downward API about the pod that should populate this volume
+  // downwardAPI represents downward API about the pod that should populate this volume
   optional DownwardAPIVolumeSource downward_api = 16 [(dev.f110.kubeproto.field) = { go_name: "DownwardAPI", api_field_name: "downwardAPI", inline: false }];
-  // FC represents a Fibre Channel resource that is attached to a kubelet's host machine and then exposed to the pod.
+  // fc represents a Fibre Channel resource that is attached to a kubelet's host machine and then exposed to the pod.
   optional FCVolumeSource fc = 17 [(dev.f110.kubeproto.field) = { go_name: "FC", api_field_name: "fc", inline: false }];
-  // AzureFile represents an Azure File Service mount on the host and bind mount to the pod.
+  // azureFile represents an Azure File Service mount on the host and bind mount to the pod.
   optional AzureFileVolumeSource azure_file = 18 [(dev.f110.kubeproto.field) = { go_name: "AzureFile", api_field_name: "azureFile", inline: false }];
-  // ConfigMap represents a configMap that should populate this volume
+  // configMap represents a configMap that should populate this volume
   optional ConfigMapVolumeSource config_map = 19 [(dev.f110.kubeproto.field) = { go_name: "ConfigMap", api_field_name: "configMap", inline: false }];
-  // VsphereVolume represents a vSphere volume attached and mounted on kubelets host machine
+  // vsphereVolume represents a vSphere volume attached and mounted on kubelets host machine
   optional VsphereVirtualDiskVolumeSource vsphere_volume = 20 [(dev.f110.kubeproto.field) = { go_name: "VsphereVolume", api_field_name: "vsphereVolume", inline: false }];
-  // Quobyte represents a Quobyte mount on the host that shares a pod's lifetime
+  // quobyte represents a Quobyte mount on the host that shares a pod's lifetime
   optional QuobyteVolumeSource quobyte = 21 [(dev.f110.kubeproto.field) = { go_name: "Quobyte", api_field_name: "quobyte", inline: false }];
-  // AzureDisk represents an Azure Data Disk mount on the host and bind mount to the pod.
+  // azureDisk represents an Azure Data Disk mount on the host and bind mount to the pod.
   optional AzureDiskVolumeSource azure_disk = 22 [(dev.f110.kubeproto.field) = { go_name: "AzureDisk", api_field_name: "azureDisk", inline: false }];
-  // PhotonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine
+  // photonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine
   optional PhotonPersistentDiskVolumeSource photon_persistent_disk = 23 [(dev.f110.kubeproto.field) = { go_name: "PhotonPersistentDisk", api_field_name: "photonPersistentDisk", inline: false }];
-  // Items for all in one resources secrets, configmaps, and downward API
+  // projected items for all in one resources secrets, configmaps, and downward API
   optional ProjectedVolumeSource projected = 24 [(dev.f110.kubeproto.field) = { go_name: "Projected", api_field_name: "projected", inline: false }];
-  // PortworxVolume represents a portworx volume attached and mounted on kubelets host machine
+  // portworxVolume represents a portworx volume attached and mounted on kubelets host machine
   optional PortworxVolumeSource portworx_volume = 25 [(dev.f110.kubeproto.field) = { go_name: "PortworxVolume", api_field_name: "portworxVolume", inline: false }];
-  // ScaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes.
+  // scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes.
   optional ScaleIOVolumeSource scale_io = 26 [(dev.f110.kubeproto.field) = { go_name: "ScaleIO", api_field_name: "scaleIO", inline: false }];
-  // StorageOS represents a StorageOS volume attached and mounted on Kubernetes nodes.
+  // storageOS represents a StorageOS volume attached and mounted on Kubernetes nodes.
   optional StorageOSVolumeSource storage_os = 27 [(dev.f110.kubeproto.field) = { go_name: "StorageOS", api_field_name: "storageos", inline: false }];
-  // CSI (Container Storage Interface) represents ephemeral storage that is handled by certain external CSI drivers (Beta feature).
+  // csi (Container Storage Interface) represents ephemeral storage that is handled by certain external CSI drivers (Beta feature).
   optional CSIVolumeSource csi = 28 [(dev.f110.kubeproto.field) = { go_name: "CSI", api_field_name: "csi", inline: false }];
-  // Ephemeral represents a volume that is handled by a cluster storage driver.
+  // ephemeral represents a volume that is handled by a cluster storage driver.
   // The volume's lifecycle is tied to the pod that defines it - it will be created before the pod starts,
   // and deleted when the pod is removed.
   // Use this if:
@@ -4153,15 +4174,15 @@ message VolumeSource {
 }
 
 message VsphereVirtualDiskVolumeSource {
-  // Path that identifies vSphere volume vmdk
+  // volumePath is the path that identifies vSphere volume vmdk
   string volume_path = 1 [(dev.f110.kubeproto.field) = { go_name: "VolumePath", api_field_name: "volumePath", inline: false }];
-  // Filesystem type to mount.
+  // fsType is filesystem type to mount.
   // Must be a filesystem type supported by the host operating system.
   // Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
   optional string fs_type = 2 [(dev.f110.kubeproto.field) = { go_name: "FSType", api_field_name: "fsType", inline: false }];
-  // Storage Policy Based Management (SPBM) profile name.
+  // storagePolicyName is the storage Policy Based Management (SPBM) profile name.
   optional string storage_policy_name = 3 [(dev.f110.kubeproto.field) = { go_name: "StoragePolicyName", api_field_name: "storagePolicyName", inline: false }];
-  // Storage Policy Based Management (SPBM) profile ID associated with the StoragePolicyName.
+  // storagePolicyID is the storage Policy Based Management (SPBM) profile ID associated with the StoragePolicyName.
   optional string storage_policy_id = 4 [(dev.f110.kubeproto.field) = { go_name: "StoragePolicyID", api_field_name: "storagePolicyID", inline: false }];
 }
 
