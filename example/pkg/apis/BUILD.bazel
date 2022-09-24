@@ -5,5 +5,10 @@ go_library(
     srcs = ["import.go"],
     importpath = "go.f110.dev/kubeproto/example/pkg/apis",
     visibility = ["//visibility:public"],
-    deps = ["//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta"],
+    deps = [
+        "//example/vendor/github.com/cert-manager/cert-manager/pkg/apis/acme/v1:acme",
+        "//example/vendor/github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1:certmanager",
+        "//example/vendor/github.com/cert-manager/cert-manager/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+    ],
 )

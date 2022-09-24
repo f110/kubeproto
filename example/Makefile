@@ -42,9 +42,40 @@ crd/github.crd.yaml: pkg/apis/githubv1alpha1/github.proto pkg/apis/githubv1alpha
 	cp ../bazel-bin/example/crd/github.crd.yaml $(@D)
 	@chmod 644 $@
 
+.PHONY: proto/github.com/cert-manager/cert-manager/apis/certmanagerv1/generated.proto
+proto/github.com/cert-manager/cert-manager/apis/certmanagerv1/generated.proto:
+	mkdir -p $(@D)
+	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ \
+		--proto-package github.com.cert_manager.cert_manager.apis.certmanagerv1 \
+		--go-package github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1 \
+		--imports github.com/cert-manager/cert-manager/pkg/apis/meta/v1:github.com.cert_manager.cert_manager.apis.metav1:github.com/cert-manager/cert-manager/apis/metav1 \
+		--imports github.com/cert-manager/cert-manager/pkg/apis/acme/v1:github.com.cert_manager.cert_manager.apis.acmev1:github.com/cert-manager/cert-manager/apis/acmev1 \
+		--all \
+		$(CURDIR)/vendor/github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1
+
+.PHONY: proto/github.com/cert-manager/cert-manager/apis/metav1/generated.proto
+proto/github.com/cert-manager/cert-manager/apis/metav1/generated.proto:
+	mkdir -p $(@D)
+	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ \
+		--proto-package github.com.cert_manager.cert_manager.apis.metav1 \
+		--go-package github.com/cert-manager/cert-manager/pkg/apis/meta/v1 \
+		--all \
+		$(CURDIR)/vendor/github.com/cert-manager/cert-manager/pkg/apis/meta/v1
+
+.PHONY: proto/github.com/cert-manager/cert-manager/apis/acmev1/generated.proto
+proto/github.com/cert-manager/cert-manager/apis/acmev1/generated.proto:
+	mkdir -p $(@D)
+	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ \
+		--proto-package github.com.cert_manager.cert_manager.apis.acmev1 \
+		--go-package github.com/cert-manager/cert-manager/pkg/apis/acme/v1 \
+		--imports github.com/cert-manager/cert-manager/pkg/apis/meta/v1:github.com.cert_manager.cert_manager.apis.metav1:github.com/cert-manager/cert-manager/apis/metav1 \
+		--all \
+		$(CURDIR)/vendor/github.com/cert-manager/cert-manager/pkg/apis/acme/v1
+
 .PHONY: clean
 clean:
 	rm -f pkg/apis/githubv1alpha1/github_proto_kubeproto.generated.object.go
 	rm -f pkg/apis/githubv1alpha2/github_proto_kubeproto.generated.object.go
 	rm -f pkg/apis/miniov1alpha1/minio_proto_kubeproto.generated.object.go
 	rm -f crd/github.crd.yaml
+	rm -f proto/certmanageracmev1.proto proto/certmanagermetav1.proto proto/certmanagerv1.proto
