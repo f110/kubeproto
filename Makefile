@@ -52,3 +52,8 @@ k8s.io/api/apps/v1/generated.proto:
 k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto:
 	mkdir -p $(@D)
 	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1 --go-package $(@D) --api-domain apiextensions --api-version v1 --all $(CURDIR)/vendor/$(@D)
+
+.PHONY: sigs.k8s.io/gateway-api/apis/v1alpha2/generated.proto
+sigs.k8s.io/gateway-api/apis/v1alpha2/generated.proto:
+	mkdir -p $(@D)
+	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package sigs.k8s.io.gatway_api.apis.v1alpha2 --go-package $(@D) --api-domain gateway --api-sub-group networking.k8s.io --api-version v1alpha2 --all $(CURDIR)/vendor/$(@D)
