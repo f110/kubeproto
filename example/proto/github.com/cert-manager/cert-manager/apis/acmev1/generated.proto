@@ -4,7 +4,7 @@ package github.com.cert_manager.cert_manager.apis.acmev1;
 option  go_package = "github.com/cert-manager/cert-manager/pkg/apis/acme/v1";
 
 import "kube.proto";
-import "github.com/cert-manager/cert-manager/apis/metav1/generated.proto";
+import "example/proto/github.com/cert-manager/cert-manager/apis/metav1/generated.proto";
 import "k8s.io/api/core/v1/generated.proto";
 import "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto";
 import "k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto";

@@ -50,6 +50,7 @@ proto/github.com/cert-manager/cert-manager/apis/certmanagerv1/generated.proto:
 		--go-package github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1 \
 		--imports github.com/cert-manager/cert-manager/pkg/apis/meta/v1:github.com.cert_manager.cert_manager.apis.metav1:github.com/cert-manager/cert-manager/apis/metav1 \
 		--imports github.com/cert-manager/cert-manager/pkg/apis/acme/v1:github.com.cert_manager.cert_manager.apis.acmev1:github.com/cert-manager/cert-manager/apis/acmev1 \
+		--import-prefix example/proto \
 		--all \
 		$(CURDIR)/vendor/github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1
 
@@ -69,6 +70,7 @@ proto/github.com/cert-manager/cert-manager/apis/acmev1/generated.proto:
 		--proto-package github.com.cert_manager.cert_manager.apis.acmev1 \
 		--go-package github.com/cert-manager/cert-manager/pkg/apis/acme/v1 \
 		--imports github.com/cert-manager/cert-manager/pkg/apis/meta/v1:github.com.cert_manager.cert_manager.apis.metav1:github.com/cert-manager/cert-manager/apis/metav1 \
+		--import-prefix example/proto \
 		--all \
 		$(CURDIR)/vendor/github.com/cert-manager/cert-manager/pkg/apis/acme/v1
 
