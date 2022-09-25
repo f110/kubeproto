@@ -1,0 +1,21 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+
+proto_library(
+    name = "acmev1",
+    srcs = ["generated.proto"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:k8s_proto",
+        "//:kubeproto",
+        "//example/proto/github.com/cert-manager/cert-manager/apis/metav1"
+    ],
+)
+
+load("//bazel:def.bzl", "kubeproto_go_api")
+
+kubeproto_go_api(
+    name = "acmev1_kubeproto",
+    srcs = [":acmev1"],
+    importpath = "go.f110.dev/kubeproto/example/proto/github.com/cert-manager/cert-manager/apis/acmev1",
+)
