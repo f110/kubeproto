@@ -679,7 +679,7 @@ func (g *Generator) goTypeToProtobufKind(in ast.Expr) string {
 			return "string"
 		}
 		if protobufPackage != "" {
-			return protobufPackage + "." + v.Sel.Name
+			return "." + protobufPackage + "." + v.Sel.Name
 		}
 		return ""
 	case *ast.ArrayType:

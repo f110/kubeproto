@@ -353,7 +353,7 @@ message List {
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   optional ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // List of objects
-  repeated k8s.io.apimachinery.pkg.runtime.RawExtension items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.runtime.RawExtension items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
 
 message ListMeta {
@@ -882,5 +882,5 @@ message WatchEvent {
   //  * If Type is Deleted: the state of the object immediately before deletion.
   //  * If Type is Error: *Status is recommended; other types may make sense
   //    depending on context.
-  k8s.io.apimachinery.pkg.runtime.RawExtension object = 2 [(dev.f110.kubeproto.field) = { go_name: "Object", api_field_name: "object", inline: false }];
+  .k8s.io.apimachinery.pkg.runtime.RawExtension object = 2 [(dev.f110.kubeproto.field) = { go_name: "Object", api_field_name: "object", inline: false }];
 }

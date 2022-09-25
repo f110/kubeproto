@@ -49,15 +49,15 @@ enum GatewayConditionType {
 }
 
 enum HTTPMethod {
-  HTTP_METHOD_G_E_T         = 0;
-  HTTP_METHOD_H_E_A_D       = 1;
-  HTTP_METHOD_P_OS_T        = 2 [(dev.f110.kubeproto.value) = { value: "POST" }];
-  HTTP_METHOD_P_U_T         = 3;
-  HTTP_METHOD_D_E_L_E_T_E   = 4;
-  HTTP_METHOD_C_O_N_N_E_C_T = 5;
-  HTTP_METHOD_O_P_T_IO_N_S  = 6 [(dev.f110.kubeproto.value) = { value: "OPTIONS" }];
-  HTTP_METHOD_T_R_A_C_E     = 7;
-  HTTP_METHOD_P_A_T_C_H     = 8;
+  HTTP_METHOD_GET     = 0 [(dev.f110.kubeproto.value) = { value: "GET" }];
+  HTTP_METHOD_HEAD    = 1 [(dev.f110.kubeproto.value) = { value: "HEAD" }];
+  HTTP_METHOD_POST    = 2 [(dev.f110.kubeproto.value) = { value: "POST" }];
+  HTTP_METHOD_PUT     = 3 [(dev.f110.kubeproto.value) = { value: "PUT" }];
+  HTTP_METHOD_DELETE  = 4 [(dev.f110.kubeproto.value) = { value: "DELETE" }];
+  HTTP_METHOD_CONNECT = 5 [(dev.f110.kubeproto.value) = { value: "CONNECT" }];
+  HTTP_METHOD_OPTIONS = 6 [(dev.f110.kubeproto.value) = { value: "OPTIONS" }];
+  HTTP_METHOD_TRACE   = 7 [(dev.f110.kubeproto.value) = { value: "TRACE" }];
+  HTTP_METHOD_PATCH   = 8 [(dev.f110.kubeproto.value) = { value: "PATCH" }];
 }
 
 enum HTTPPathModifierType {
@@ -249,9 +249,9 @@ message GatewayClass {
 }
 
 message GatewayClassList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta          = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
-  repeated GatewayClass                                  items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta          type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated GatewayClass                                   items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
 
 message GatewayClassSpec {
@@ -280,13 +280,13 @@ message GatewayClassStatus {
   // this GatewayClass.
   // Controllers should prefer to publish conditions using values
   // of GatewayClassConditionType for the type of each Condition.
-  repeated k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 1 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 1 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
 }
 
 message GatewayList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta          = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
-  repeated Gateway                                       items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta          type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated Gateway                                        items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
 
 message GatewaySpec {
@@ -361,7 +361,7 @@ message GatewayStatus {
   // Known condition types are:
   // * "Scheduled"
   // * "Ready"
-  repeated k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 2 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 2 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
   // Listeners provide status for each unique listener port defined in the Spec.
   repeated ListenerStatus listeners = 3 [(dev.f110.kubeproto.field) = { go_name: "Listeners", api_field_name: "listeners", inline: false }];
 }
@@ -694,9 +694,9 @@ message HTTPRouteFilter {
 }
 
 message HTTPRouteList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta          = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
-  repeated HTTPRoute                                     items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta          type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated HTTPRoute                                      items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
 
 message HTTPRouteMatch {
@@ -939,7 +939,7 @@ message ListenerStatus {
   // successfully attached to this Listener.
   int32 attached_routes = 3 [(dev.f110.kubeproto.field) = { go_name: "AttachedRoutes", api_field_name: "attachedRoutes", inline: false }];
   // Conditions describe the current condition of this listener.
-  repeated k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 4 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 4 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
 }
 
 message LocalObjectReference {
@@ -1066,9 +1066,9 @@ message ReferenceGrantFrom {
 }
 
 message ReferenceGrantList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta          = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
-  repeated ReferenceGrant                                items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta          type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated ReferenceGrant                                 items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
 
 message ReferenceGrantSpec {
@@ -1112,9 +1112,9 @@ message ReferencePolicy {
 }
 
 message ReferencePolicyList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta          = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
-  repeated ReferencePolicy                               items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta          type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated ReferencePolicy                                items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
 
 message RouteGroupKind {
@@ -1137,7 +1137,7 @@ message RouteNamespaces {
   // only Routes in Namespaces matching this Selector will be selected by this
   // Gateway. This field is ignored for other values of "From".
   // Support: Core
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector selector = 2 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector selector = 2 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", inline: false }];
 }
 
 message RouteParentStatus {
@@ -1170,7 +1170,7 @@ message RouteParentStatus {
   // * The Route refers to a non-existent parent.
   // * The Route is of a type that the controller does not support.
   // * The Route is in a namespace the controller does not have access to.
-  repeated k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 3 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 3 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
 }
 
 message RouteStatus {
@@ -1218,9 +1218,9 @@ message TCPRoute {
 }
 
 message TCPRouteList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta          = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
-  repeated TCPRoute                                      items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta          type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated TCPRoute                                       items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
 
 message TCPRouteRule {
@@ -1257,9 +1257,9 @@ message TLSRoute {
 }
 
 message TLSRouteList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta          = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
-  repeated TLSRoute                                      items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta          type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated TLSRoute                                       items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
 
 message TLSRouteRule {
@@ -1327,9 +1327,9 @@ message UDPRoute {
 }
 
 message UDPRouteList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta          = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
-  repeated UDPRoute                                      items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta          type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  repeated UDPRoute                                       items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
 
 message UDPRouteRule {

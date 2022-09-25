@@ -44,7 +44,7 @@ message ConversionRequest {
   // desiredAPIVersion is the version to convert given objects to. e.g. "myapi.example.com/v1"
   string desired_api_version = 2 [(dev.f110.kubeproto.field) = { go_name: "DesiredAPIVersion", api_field_name: "desiredAPIVersion", inline: false }];
   // objects is the list of custom resource objects to be converted.
-  repeated k8s.io.apimachinery.pkg.runtime.RawExtension objects = 3 [(dev.f110.kubeproto.field) = { go_name: "Objects", api_field_name: "objects", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.runtime.RawExtension objects = 3 [(dev.f110.kubeproto.field) = { go_name: "Objects", api_field_name: "objects", inline: false }];
 }
 
 message ConversionResponse {
@@ -55,17 +55,17 @@ message ConversionResponse {
   // The webhook is expected to set `apiVersion` of these objects to the `request.desiredAPIVersion`. The list
   // must also have the same size as the input list with the same objects in the same order (equal kind, metadata.uid, metadata.name and metadata.namespace).
   // The webhook is allowed to mutate labels and annotations. Any other change to the metadata is silently ignored.
-  repeated k8s.io.apimachinery.pkg.runtime.RawExtension converted_objects = 2 [(dev.f110.kubeproto.field) = { go_name: "ConvertedObjects", api_field_name: "convertedObjects", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.runtime.RawExtension converted_objects = 2 [(dev.f110.kubeproto.field) = { go_name: "ConvertedObjects", api_field_name: "convertedObjects", inline: false }];
   // result contains the result of conversion with extra details if the conversion failed. `result.status` determines if
   // the conversion failed or succeeded. The `result.status` field is required and represents the success or failure of the
   // conversion. A successful conversion must set `result.status` to `Success`. A failed conversion must set
   // `result.status` to `Failure` and provide more details in `result.message` and return http status 200. The `result.message`
   // will be used to construct an error message for the end user.
-  k8s.io.apimachinery.pkg.apis.meta.v1.Status result = 3 [(dev.f110.kubeproto.field) = { go_name: "Result", api_field_name: "result", inline: false }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.Status result = 3 [(dev.f110.kubeproto.field) = { go_name: "Result", api_field_name: "result", inline: false }];
 }
 
 message ConversionReview {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // request describes the attributes for the conversion request.
   optional ConversionRequest request = 2 [(dev.f110.kubeproto.field) = { go_name: "Request", api_field_name: "request", inline: false }];
   // response describes the attributes for the conversion response.
@@ -120,7 +120,7 @@ message CustomResourceDefinitionCondition {
   // Can be True, False, Unknown.
   ConditionStatus status = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
   // lastTransitionTime last time the condition transitioned from one status to another.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
   // reason is a unique, one-word, CamelCase reason for the condition's last transition.
   optional string reason = 4 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
   // message is a human-readable message indicating details about last transition.
@@ -128,10 +128,10 @@ message CustomResourceDefinitionCondition {
 }
 
 message CustomResourceDefinitionList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard object's metadata
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // items list individual CustomResourceDefinition objects
   repeated CustomResourceDefinition items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }

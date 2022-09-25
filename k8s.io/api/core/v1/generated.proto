@@ -612,10 +612,10 @@ message ComponentStatus {
 }
 
 message ComponentStatusList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // List of ComponentStatus objects.
   repeated ComponentStatus items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
@@ -662,9 +662,9 @@ message ConfigMapKeySelector {
 }
 
 message ConfigMapList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // Items is the list of ConfigMaps.
   repeated ConfigMap items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
@@ -886,7 +886,7 @@ message ContainerState {
 
 message ContainerStateRunning {
   // Time at which the container was last (re-)started
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time started_at = 1 [(dev.f110.kubeproto.field) = { go_name: "StartedAt", api_field_name: "startedAt", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time started_at = 1 [(dev.f110.kubeproto.field) = { go_name: "StartedAt", api_field_name: "startedAt", inline: false }];
 }
 
 message ContainerStateTerminated {
@@ -899,9 +899,9 @@ message ContainerStateTerminated {
   // Message regarding the last termination of the container
   optional string message = 4 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
   // Time at which previous execution of the container started
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time started_at = 5 [(dev.f110.kubeproto.field) = { go_name: "StartedAt", api_field_name: "startedAt", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time started_at = 5 [(dev.f110.kubeproto.field) = { go_name: "StartedAt", api_field_name: "startedAt", inline: false }];
   // Time at which the container last terminated
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time finished_at = 6 [(dev.f110.kubeproto.field) = { go_name: "FinishedAt", api_field_name: "finishedAt", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time finished_at = 6 [(dev.f110.kubeproto.field) = { go_name: "FinishedAt", api_field_name: "finishedAt", inline: false }];
   // Container's ID in the format '<type>://<container_id>'
   optional string container_id = 7 [(dev.f110.kubeproto.field) = { go_name: "ContainerID", api_field_name: "containerID", inline: false }];
 }
@@ -992,7 +992,7 @@ message EmptyDirVolumeSource {
   // the SizeLimit specified here and the sum of memory limits of all containers in a pod.
   // The default is nil which means that the limit is undefined.
   // More info: http://kubernetes.io/docs/user-guide/volumes#emptydir
-  optional k8s.io.apimachinery.pkg.api.resource.Quantity size_limit = 2 [(dev.f110.kubeproto.field) = { go_name: "SizeLimit", api_field_name: "sizeLimit", inline: false }];
+  optional .k8s.io.apimachinery.pkg.api.resource.Quantity size_limit = 2 [(dev.f110.kubeproto.field) = { go_name: "SizeLimit", api_field_name: "sizeLimit", inline: false }];
 }
 
 message EndpointAddress {
@@ -1058,10 +1058,10 @@ message Endpoints {
 }
 
 message EndpointsList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // List of endpoints.
   repeated Endpoints items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
@@ -1252,15 +1252,15 @@ message Event {
   // The component reporting this event. Should be a short machine understandable string.
   optional EventSource source = 6 [(dev.f110.kubeproto.field) = { go_name: "Source", api_field_name: "source", inline: false }];
   // The time at which the event was first recorded. (Time of server receipt is in TypeMeta.)
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time first_timestamp = 7 [(dev.f110.kubeproto.field) = { go_name: "FirstTimestamp", api_field_name: "firstTimestamp", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time first_timestamp = 7 [(dev.f110.kubeproto.field) = { go_name: "FirstTimestamp", api_field_name: "firstTimestamp", inline: false }];
   // The time at which the most recent occurrence of this event was recorded.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time last_timestamp = 8 [(dev.f110.kubeproto.field) = { go_name: "LastTimestamp", api_field_name: "lastTimestamp", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time last_timestamp = 8 [(dev.f110.kubeproto.field) = { go_name: "LastTimestamp", api_field_name: "lastTimestamp", inline: false }];
   // The number of times this event has occurred.
   optional int32 count = 9 [(dev.f110.kubeproto.field) = { go_name: "Count", api_field_name: "count", inline: false }];
   // Type of this event (Normal, Warning), new types could be added in the future
   optional string type = 10 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
   // Time when this Event was first observed.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.MicroTime event_time = 11 [(dev.f110.kubeproto.field) = { go_name: "EventTime", api_field_name: "eventTime", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.MicroTime event_time = 11 [(dev.f110.kubeproto.field) = { go_name: "EventTime", api_field_name: "eventTime", inline: false }];
   // Data about the Event series this event represents or nil if it's a singleton Event.
   optional EventSeries series = 12 [(dev.f110.kubeproto.field) = { go_name: "Series", api_field_name: "series", inline: false }];
   // What action was taken/failed regarding to the Regarding object.
@@ -1277,10 +1277,10 @@ message Event {
 }
 
 message EventList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // List of events
   repeated Event items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
@@ -1289,7 +1289,7 @@ message EventSeries {
   // Number of occurrences in this series up to the last heartbeat time
   optional int32 count = 1 [(dev.f110.kubeproto.field) = { go_name: "Count", api_field_name: "count", inline: false }];
   // Time of the last occurrence observed
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.MicroTime last_observed_time = 2 [(dev.f110.kubeproto.field) = { go_name: "LastObservedTime", api_field_name: "lastObservedTime", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.MicroTime last_observed_time = 2 [(dev.f110.kubeproto.field) = { go_name: "LastObservedTime", api_field_name: "lastObservedTime", inline: false }];
 }
 
 message EventSource {
@@ -1451,7 +1451,7 @@ message HTTPGetAction {
   // Name or number of the port to access on the container.
   // Number must be in the range 1 to 65535.
   // Name must be an IANA_SVC_NAME.
-  k8s.io.apimachinery.pkg.util.intstr.IntOrString port = 2 [(dev.f110.kubeproto.field) = { go_name: "Port", api_field_name: "port", inline: false }];
+  .k8s.io.apimachinery.pkg.util.intstr.IntOrString port = 2 [(dev.f110.kubeproto.field) = { go_name: "Port", api_field_name: "port", inline: false }];
   // Host name to connect to, defaults to the pod IP. You probably want to set
   // "Host" in httpHeaders instead.
   optional string host = 3 [(dev.f110.kubeproto.field) = { go_name: "Host", api_field_name: "host", inline: false }];
@@ -1614,22 +1614,22 @@ message LimitRangeItem {
   // Type of resource that this limit applies to.
   LimitType type = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
   // Max usage constraints on this kind by resource name.
-  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> max = 2 [(dev.f110.kubeproto.field) = { go_name: "Max", api_field_name: "max", inline: false }];
+  map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> max = 2 [(dev.f110.kubeproto.field) = { go_name: "Max", api_field_name: "max", inline: false }];
   // Min usage constraints on this kind by resource name.
-  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> min = 3 [(dev.f110.kubeproto.field) = { go_name: "Min", api_field_name: "min", inline: false }];
+  map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> min = 3 [(dev.f110.kubeproto.field) = { go_name: "Min", api_field_name: "min", inline: false }];
   // Default resource requirement limit value by resource name if resource limit is omitted.
-  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> default = 4 [(dev.f110.kubeproto.field) = { go_name: "Default", api_field_name: "default", inline: false }];
+  map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> default = 4 [(dev.f110.kubeproto.field) = { go_name: "Default", api_field_name: "default", inline: false }];
   // DefaultRequest is the default resource requirement request value by resource name if resource request is omitted.
-  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> default_request = 5 [(dev.f110.kubeproto.field) = { go_name: "DefaultRequest", api_field_name: "defaultRequest", inline: false }];
+  map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> default_request = 5 [(dev.f110.kubeproto.field) = { go_name: "DefaultRequest", api_field_name: "defaultRequest", inline: false }];
   // MaxLimitRequestRatio if specified, the named resource must have a request and limit that are both non-zero where limit divided by request is less than or equal to the enumerated value; this represents the max burst for the named resource.
-  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> max_limit_request_ratio = 6 [(dev.f110.kubeproto.field) = { go_name: "MaxLimitRequestRatio", api_field_name: "maxLimitRequestRatio", inline: false }];
+  map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> max_limit_request_ratio = 6 [(dev.f110.kubeproto.field) = { go_name: "MaxLimitRequestRatio", api_field_name: "maxLimitRequestRatio", inline: false }];
 }
 
 message LimitRangeList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // Items is a list of LimitRange objects.
   // More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
   repeated LimitRange items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
@@ -1704,17 +1704,17 @@ message NamespaceCondition {
   // Type of namespace controller condition.
   NamespaceConditionType type = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
   // Status of the condition, one of True, False, Unknown.
-  ConditionStatus status                                                  = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
-  optional string                                    reason               = 4 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
-  optional string                                    message              = 5 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
+  ConditionStatus                                     status               = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
+  optional string                                     reason               = 4 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
+  optional string                                     message              = 5 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
 }
 
 message NamespaceList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // Items is the list of Namespace objects in the list.
   // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
   repeated Namespace items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
@@ -1780,9 +1780,9 @@ message NodeCondition {
   // Status of the condition, one of True, False, Unknown.
   ConditionStatus status = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
   // Last time we got an update on a given condition.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time last_heartbeat_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastHeartbeatTime", api_field_name: "lastHeartbeatTime", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time last_heartbeat_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastHeartbeatTime", api_field_name: "lastHeartbeatTime", inline: false }];
   // Last time the condition transit from one status to another.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 4 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 4 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
   // (brief) reason for the condition's last transition.
   optional string reason = 5 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
   // Human readable message indicating details about last transition.
@@ -1842,23 +1842,23 @@ message NodeDaemonEndpoints {
 }
 
 message NodeList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // List of nodes
   repeated Node items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
 
 message NodeProxyOptions {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Path is the URL path to use for the current proxy request to node.
   optional string path = 2 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
 }
 
 message NodeResources {
   // Capacity represents the available resources of a node
-  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> capacity = 1 [(dev.f110.kubeproto.field) = { go_name: "Capacity", inline: false }];
+  map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> capacity = 1 [(dev.f110.kubeproto.field) = { go_name: "Capacity", inline: false }];
 }
 
 message NodeSelector {
@@ -1911,10 +1911,10 @@ message NodeSpec {
 message NodeStatus {
   // Capacity represents the total resources of a node.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#capacity
-  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> capacity = 1 [(dev.f110.kubeproto.field) = { go_name: "Capacity", api_field_name: "capacity", inline: false }];
+  map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> capacity = 1 [(dev.f110.kubeproto.field) = { go_name: "Capacity", api_field_name: "capacity", inline: false }];
   // Allocatable represents the resources of a node that are available for scheduling.
   // Defaults to Capacity.
-  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> allocatable = 2 [(dev.f110.kubeproto.field) = { go_name: "Allocatable", api_field_name: "allocatable", inline: false }];
+  map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> allocatable = 2 [(dev.f110.kubeproto.field) = { go_name: "Allocatable", api_field_name: "allocatable", inline: false }];
   // NodePhase is the recently observed lifecycle phase of the node.
   // More info: https://kubernetes.io/docs/concepts/nodes/node/#phase
   // The field is never populated, and now is deprecated.
@@ -2038,9 +2038,9 @@ message PersistentVolumeClaimCondition {
   PersistentVolumeClaimConditionType type   = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
   ConditionStatus                    status = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
   // lastProbeTime is the time we probed the condition.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time last_probe_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastProbeTime", api_field_name: "lastProbeTime", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time last_probe_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastProbeTime", api_field_name: "lastProbeTime", inline: false }];
   // lastTransitionTime is the time the condition transitioned from one status to another.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 4 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 4 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
   // reason is a unique, this should be a short, machine understandable string that gives the reason
   // for condition's last transition. If it reports "ResizeStarted" that means the underlying
   // persistent volume is being resized.
@@ -2050,10 +2050,10 @@ message PersistentVolumeClaimCondition {
 }
 
 message PersistentVolumeClaimList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // items is a list of persistent volume claims.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
   repeated PersistentVolumeClaim items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
@@ -2064,7 +2064,7 @@ message PersistentVolumeClaimSpec {
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1
   repeated PersistentVolumeAccessMode access_modes = 1 [(dev.f110.kubeproto.field) = { go_name: "AccessModes", api_field_name: "accessModes", inline: false }];
   // selector is a label query over volumes to consider for binding.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector selector = 2 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector selector = 2 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", inline: false }];
   // resources represents the minimum resources the volume should have.
   // If RecoverVolumeExpansionFailure feature is enabled users are allowed to specify resource requirements
   // that are lower than previous value but must still be higher than capacity recorded in the
@@ -2114,7 +2114,7 @@ message PersistentVolumeClaimStatus {
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1
   repeated PersistentVolumeAccessMode access_modes = 2 [(dev.f110.kubeproto.field) = { go_name: "AccessModes", api_field_name: "accessModes", inline: false }];
   // capacity represents the actual resources of the underlying volume.
-  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> capacity = 3 [(dev.f110.kubeproto.field) = { go_name: "Capacity", api_field_name: "capacity", inline: false }];
+  map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> capacity = 3 [(dev.f110.kubeproto.field) = { go_name: "Capacity", api_field_name: "capacity", inline: false }];
   // conditions is the current Condition of persistent volume claim. If underlying persistent volume is being
   // resized then the Condition will be set to 'ResizeStarted'.
   repeated PersistentVolumeClaimCondition conditions = 4 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
@@ -2126,7 +2126,7 @@ message PersistentVolumeClaimStatus {
   // lowered if there are no expansion operations in progress and if the actual volume capacity
   // is equal or lower than the requested capacity.
   // This is an alpha field and requires enabling RecoverVolumeExpansionFailure feature.
-  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> allocated_resources = 5 [(dev.f110.kubeproto.field) = { go_name: "AllocatedResources", api_field_name: "allocatedResources", inline: false }];
+  map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> allocated_resources = 5 [(dev.f110.kubeproto.field) = { go_name: "AllocatedResources", api_field_name: "allocatedResources", inline: false }];
   // resizeStatus stores status of resize operation.
   // ResizeStatus is not set by default but when expansion is complete resizeStatus is set to empty
   // string by resize controller or kubelet.
@@ -2138,7 +2138,7 @@ message PersistentVolumeClaimTemplate {
   // May contain labels and annotations that will be copied into the PVC
   // when creating it. No other fields are allowed and will be rejected during
   // validation.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
   // The specification for the PersistentVolumeClaim. The entire content is
   // copied unchanged into the PVC that gets created from this
   // template. The same fields as in a PersistentVolumeClaim
@@ -2156,10 +2156,10 @@ message PersistentVolumeClaimVolumeSource {
 }
 
 message PersistentVolumeList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // items is a list of persistent volumes.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes
   repeated PersistentVolume items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
@@ -2231,7 +2231,7 @@ message PersistentVolumeSource {
 message PersistentVolumeSpec {
   // capacity is the description of the persistent volume's resources and capacity.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#capacity
-  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> capacity = 1 [(dev.f110.kubeproto.field) = { go_name: "Capacity", api_field_name: "capacity", inline: false }];
+  map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> capacity = 1 [(dev.f110.kubeproto.field) = { go_name: "Capacity", api_field_name: "capacity", inline: false }];
   // persistentVolumeSource is the actual volume backing the persistent volume.
   PersistentVolumeSource persistent_volume_source = 2 [(dev.f110.kubeproto.field) = { go_name: "PersistentVolumeSource", inline: true }];
   // accessModes contains all ways the volume can be mounted.
@@ -2321,7 +2321,7 @@ message PodAffinity {
 
 message PodAffinityTerm {
   // A label query over a set of resources, in this case pods.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector label_selector = 1 [(dev.f110.kubeproto.field) = { go_name: "LabelSelector", api_field_name: "labelSelector", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector label_selector = 1 [(dev.f110.kubeproto.field) = { go_name: "LabelSelector", api_field_name: "labelSelector", inline: false }];
   // namespaces specifies a static list of namespace names that the term applies to.
   // The term is applied to the union of the namespaces listed in this field
   // and the ones selected by namespaceSelector.
@@ -2338,7 +2338,7 @@ message PodAffinityTerm {
   // and the ones listed in the namespaces field.
   // null selector and null or empty namespaces list means "this pod's namespace".
   // An empty selector ({}) matches all namespaces.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector namespace_selector = 4 [(dev.f110.kubeproto.field) = { go_name: "NamespaceSelector", api_field_name: "namespaceSelector", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector namespace_selector = 4 [(dev.f110.kubeproto.field) = { go_name: "NamespaceSelector", api_field_name: "namespaceSelector", inline: false }];
 }
 
 message PodAntiAffinity {
@@ -2363,7 +2363,7 @@ message PodAntiAffinity {
 }
 
 message PodAttachOptions {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Stdin if true, redirects the standard input stream of the pod for this call.
   // Defaults to false.
   optional bool stdin = 2 [(dev.f110.kubeproto.field) = { go_name: "Stdin", api_field_name: "stdin", inline: false }];
@@ -2392,9 +2392,9 @@ message PodCondition {
   // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-conditions
   ConditionStatus status = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
   // Last time we probed the condition.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time last_probe_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastProbeTime", api_field_name: "lastProbeTime", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time last_probe_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastProbeTime", api_field_name: "lastProbeTime", inline: false }];
   // Last time the condition transitioned from one status to another.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 4 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 4 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
   // Unique, one-word, CamelCase reason for the condition's last transition.
   optional string reason = 5 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
   // Human-readable message indicating details about last transition.
@@ -2424,7 +2424,7 @@ message PodDNSConfigOption {
 }
 
 message PodExecOptions {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Redirect the standard input stream of the pod for this call.
   // Defaults to false.
   optional bool stdin = 2 [(dev.f110.kubeproto.field) = { go_name: "Stdin", api_field_name: "stdin", inline: false }];
@@ -2448,17 +2448,17 @@ message PodIP {
 }
 
 message PodList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // List of pods.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
   repeated Pod items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
 
 message PodLogOptions {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // The container for which to stream logs. Defaults to only container if there is one container in the pod.
   optional string container = 2 [(dev.f110.kubeproto.field) = { go_name: "Container", api_field_name: "container", inline: false }];
   // Follow the log stream of the pod. Defaults to false.
@@ -2474,7 +2474,7 @@ message PodLogOptions {
   // precedes the time a pod was started, only logs since the pod start will be returned.
   // If this value is in the future, no logs will be returned.
   // Only one of sinceSeconds or sinceTime may be specified.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time since_time = 6 [(dev.f110.kubeproto.field) = { go_name: "SinceTime", api_field_name: "sinceTime", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time since_time = 6 [(dev.f110.kubeproto.field) = { go_name: "SinceTime", api_field_name: "sinceTime", inline: false }];
   // If true, add an RFC3339 or RFC3339Nano timestamp at the beginning of every line
   // of log output. Defaults to false.
   optional bool timestamps = 7 [(dev.f110.kubeproto.field) = { go_name: "Timestamps", api_field_name: "timestamps", inline: false }];
@@ -2503,14 +2503,14 @@ message PodOS {
 }
 
 message PodPortForwardOptions {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // List of ports to forward
   // Required when using WebSockets
   repeated int32 ports = 2 [(dev.f110.kubeproto.field) = { go_name: "Ports", api_field_name: "ports", inline: false }];
 }
 
 message PodProxyOptions {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Path is the URL path to use for the current proxy request to pod.
   optional string path = 2 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
 }
@@ -2587,7 +2587,7 @@ message PodSecurityContext {
 
 message PodSignature {
   // Reference to controller whose pods should avoid this node.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.OwnerReference pod_controller = 1 [(dev.f110.kubeproto.field) = { go_name: "PodController", api_field_name: "podController", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.OwnerReference pod_controller = 1 [(dev.f110.kubeproto.field) = { go_name: "PodController", api_field_name: "podController", inline: false }];
 }
 
 message PodSpec {
@@ -2742,7 +2742,7 @@ message PodSpec {
   // set. If RuntimeClass is configured and selected in the PodSpec, Overhead will be set to the value
   // defined in the corresponding RuntimeClass, otherwise it will remain unset and treated as zero.
   // More info: https://git.k8s.io/enhancements/keps/sig-node/688-pod-overhead/README.md
-  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> overhead = 33 [(dev.f110.kubeproto.field) = { go_name: "Overhead", api_field_name: "overhead", inline: false }];
+  map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> overhead = 33 [(dev.f110.kubeproto.field) = { go_name: "Overhead", api_field_name: "overhead", inline: false }];
   // TopologySpreadConstraints describes how a group of pods ought to spread across topology
   // domains. Scheduler will schedule pods in a way which abides by the constraints.
   // All topologySpreadConstraints are ANDed.
@@ -2827,7 +2827,7 @@ message PodStatus {
   repeated PodIP pod_ips = 8 [(dev.f110.kubeproto.field) = { go_name: "PodIPs", api_field_name: "podIPs", inline: false }];
   // RFC 3339 date and time at which the object was acknowledged by the Kubelet.
   // This is before the Kubelet pulled the container image(s) for the pod.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time start_time = 9 [(dev.f110.kubeproto.field) = { go_name: "StartTime", api_field_name: "startTime", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time start_time = 9 [(dev.f110.kubeproto.field) = { go_name: "StartTime", api_field_name: "startTime", inline: false }];
   // The list has one entry per init container in the manifest. The most recent successful
   // init container will have ready = true, the most recently started container will have
   // startTime set.
@@ -2867,10 +2867,10 @@ message PodTemplate {
 }
 
 message PodTemplateList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // List of pod templates
   repeated PodTemplate items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
@@ -2878,7 +2878,7 @@ message PodTemplateList {
 message PodTemplateSpec {
   // Standard object's metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta object_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "ObjectMeta", api_field_name: "metadata", inline: false }];
   // Specification of the desired behavior of the pod.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   optional PodSpec spec = 2 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
@@ -2922,7 +2922,7 @@ message PreferAvoidPodsEntry {
   // The class of pods.
   PodSignature pod_signature = 1 [(dev.f110.kubeproto.field) = { go_name: "PodSignature", api_field_name: "podSignature", inline: false }];
   // Time at which this entry was added to the list.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time eviction_time = 2 [(dev.f110.kubeproto.field) = { go_name: "EvictionTime", api_field_name: "evictionTime", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time eviction_time = 2 [(dev.f110.kubeproto.field) = { go_name: "EvictionTime", api_field_name: "evictionTime", inline: false }];
   // (brief) reason why this entry was added to the list.
   optional string reason = 3 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
   // Human readable message indicating why this entry was added to the list.
@@ -3114,7 +3114,7 @@ message ReplicationControllerCondition {
   // Status of the condition, one of True, False, Unknown.
   ConditionStatus status = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
   // The last time the condition transitioned from one status to another.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
   // The reason for the condition's last transition.
   optional string reason = 4 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
   // A human readable message indicating details about the transition.
@@ -3122,10 +3122,10 @@ message ReplicationControllerCondition {
 }
 
 message ReplicationControllerList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // List of replication controllers.
   // More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller
   repeated ReplicationController items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
@@ -3175,7 +3175,7 @@ message ResourceFieldSelector {
   // Required: resource to select
   string resource = 2 [(dev.f110.kubeproto.field) = { go_name: "Resource", api_field_name: "resource", inline: false }];
   // Specifies the output format of the exposed resources, defaults to "1"
-  optional k8s.io.apimachinery.pkg.api.resource.Quantity divisor = 3 [(dev.f110.kubeproto.field) = { go_name: "Divisor", api_field_name: "divisor", inline: false }];
+  optional .k8s.io.apimachinery.pkg.api.resource.Quantity divisor = 3 [(dev.f110.kubeproto.field) = { go_name: "Divisor", api_field_name: "divisor", inline: false }];
 }
 
 message ResourceQuota {
@@ -3191,10 +3191,10 @@ message ResourceQuota {
 }
 
 message ResourceQuotaList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // Items is a list of ResourceQuota objects.
   // More info: https://kubernetes.io/docs/concepts/policy/resource-quotas/
   repeated ResourceQuota items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
@@ -3203,7 +3203,7 @@ message ResourceQuotaList {
 message ResourceQuotaSpec {
   // hard is the set of desired hard limits for each named resource.
   // More info: https://kubernetes.io/docs/concepts/policy/resource-quotas/
-  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> hard = 1 [(dev.f110.kubeproto.field) = { go_name: "Hard", api_field_name: "hard", inline: false }];
+  map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> hard = 1 [(dev.f110.kubeproto.field) = { go_name: "Hard", api_field_name: "hard", inline: false }];
   // A collection of filters that must match each object tracked by a quota.
   // If not specified, the quota matches all objects.
   repeated ResourceQuotaScope scopes = 2 [(dev.f110.kubeproto.field) = { go_name: "Scopes", api_field_name: "scopes", inline: false }];
@@ -3216,20 +3216,20 @@ message ResourceQuotaSpec {
 message ResourceQuotaStatus {
   // Hard is the set of enforced hard limits for each named resource.
   // More info: https://kubernetes.io/docs/concepts/policy/resource-quotas/
-  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> hard = 1 [(dev.f110.kubeproto.field) = { go_name: "Hard", api_field_name: "hard", inline: false }];
+  map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> hard = 1 [(dev.f110.kubeproto.field) = { go_name: "Hard", api_field_name: "hard", inline: false }];
   // Used is the current observed total usage of the resource in the namespace.
-  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> used = 2 [(dev.f110.kubeproto.field) = { go_name: "Used", api_field_name: "used", inline: false }];
+  map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> used = 2 [(dev.f110.kubeproto.field) = { go_name: "Used", api_field_name: "used", inline: false }];
 }
 
 message ResourceRequirements {
   // Limits describes the maximum amount of compute resources allowed.
   // More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
-  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> limits = 1 [(dev.f110.kubeproto.field) = { go_name: "Limits", api_field_name: "limits", inline: false }];
+  map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> limits = 1 [(dev.f110.kubeproto.field) = { go_name: "Limits", api_field_name: "limits", inline: false }];
   // Requests describes the minimum amount of compute resources required.
   // If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
   // otherwise to an implementation-defined value.
   // More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
-  map<string, k8s.io.apimachinery.pkg.api.resource.Quantity> requests = 2 [(dev.f110.kubeproto.field) = { go_name: "Requests", api_field_name: "requests", inline: false }];
+  map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> requests = 2 [(dev.f110.kubeproto.field) = { go_name: "Requests", api_field_name: "requests", inline: false }];
 }
 
 message SELinuxOptions {
@@ -3376,10 +3376,10 @@ message SecretKeySelector {
 }
 
 message SecretList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // Items is a list of secret objects.
   // More info: https://kubernetes.io/docs/concepts/configuration/secret
   repeated Secret items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
@@ -3496,7 +3496,7 @@ message SecurityContext {
 }
 
 message SerializedReference {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // The reference to an object in the system.
   optional ObjectReference reference = 2 [(dev.f110.kubeproto.field) = { go_name: "Reference", api_field_name: "reference", inline: false }];
 }
@@ -3536,10 +3536,10 @@ message ServiceAccount {
 }
 
 message ServiceAccountList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // List of ServiceAccounts.
   // More info: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
   repeated ServiceAccount items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
@@ -3564,10 +3564,10 @@ message ServiceAccountTokenProjection {
 }
 
 message ServiceList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // List of services
   repeated Service items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
@@ -3599,7 +3599,7 @@ message ServicePort {
   // This field is ignored for services with clusterIP=None, and should be
   // omitted or set equal to the 'port' field.
   // More info: https://kubernetes.io/docs/concepts/services-networking/service/#defining-a-service
-  optional k8s.io.apimachinery.pkg.util.intstr.IntOrString target_port = 5 [(dev.f110.kubeproto.field) = { go_name: "TargetPort", api_field_name: "targetPort", inline: false }];
+  optional .k8s.io.apimachinery.pkg.util.intstr.IntOrString target_port = 5 [(dev.f110.kubeproto.field) = { go_name: "TargetPort", api_field_name: "targetPort", inline: false }];
   // The port on each node on which this service is exposed when type is
   // NodePort or LoadBalancer.  Usually assigned by the system. If a value is
   // specified, in-range, and not in use it will be used, otherwise the
@@ -3613,7 +3613,7 @@ message ServicePort {
 }
 
 message ServiceProxyOptions {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Path is the part of URLs that include service endpoints, suffixes,
   // and parameters to use for the current proxy request to service.
   // For example, the whole request URL is
@@ -3806,7 +3806,7 @@ message ServiceStatus {
   // if one is present.
   optional LoadBalancerStatus load_balancer = 1 [(dev.f110.kubeproto.field) = { go_name: "LoadBalancer", api_field_name: "loadBalancer", inline: false }];
   // Current service state
-  repeated k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 2 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 2 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
 }
 
 message SessionAffinityConfig {
@@ -3871,7 +3871,7 @@ message TCPSocketAction {
   // Number or name of the port to access on the container.
   // Number must be in the range 1 to 65535.
   // Name must be an IANA_SVC_NAME.
-  k8s.io.apimachinery.pkg.util.intstr.IntOrString port = 1 [(dev.f110.kubeproto.field) = { go_name: "Port", api_field_name: "port", inline: false }];
+  .k8s.io.apimachinery.pkg.util.intstr.IntOrString port = 1 [(dev.f110.kubeproto.field) = { go_name: "Port", api_field_name: "port", inline: false }];
   // Optional: Host name to connect to, defaults to the pod IP.
   optional string host = 2 [(dev.f110.kubeproto.field) = { go_name: "Host", api_field_name: "host", inline: false }];
 }
@@ -3887,7 +3887,7 @@ message Taint {
   TaintEffect effect = 3 [(dev.f110.kubeproto.field) = { go_name: "Effect", api_field_name: "effect", inline: false }];
   // TimeAdded represents the time at which the taint was added.
   // It is only written for NoExecute taints.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time time_added = 4 [(dev.f110.kubeproto.field) = { go_name: "TimeAdded", api_field_name: "timeAdded", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time time_added = 4 [(dev.f110.kubeproto.field) = { go_name: "TimeAdded", api_field_name: "timeAdded", inline: false }];
 }
 
 message Toleration {
@@ -3976,7 +3976,7 @@ message TopologySpreadConstraint {
   // LabelSelector is used to find matching pods.
   // Pods that match this label selector are counted to determine the number of pods
   // in their corresponding topology domain.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector label_selector = 4 [(dev.f110.kubeproto.field) = { go_name: "LabelSelector", api_field_name: "labelSelector", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector label_selector = 4 [(dev.f110.kubeproto.field) = { go_name: "LabelSelector", api_field_name: "labelSelector", inline: false }];
   // MinDomains indicates a minimum number of eligible domains.
   // When the number of eligible domains with matching topology keys is less than minDomains,
   // Pod Topology Spread treats "global minimum" as 0, and then the calculation of Skew is performed.

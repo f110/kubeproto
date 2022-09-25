@@ -50,7 +50,7 @@ enum StatefulSetUpdateStrategyType {
 
 message ControllerRevision {
   // Data is the serialized representation of the state.
-  optional k8s.io.apimachinery.pkg.runtime.RawExtension data = 3 [(dev.f110.kubeproto.field) = { go_name: "Data", api_field_name: "data", inline: false }];
+  optional .k8s.io.apimachinery.pkg.runtime.RawExtension data = 3 [(dev.f110.kubeproto.field) = { go_name: "Data", api_field_name: "data", inline: false }];
   // Revision indicates the revision of the state represented by Data.
   int64 revision = 4 [(dev.f110.kubeproto.field) = { go_name: "Revision", api_field_name: "revision", inline: false }];
 
@@ -59,9 +59,9 @@ message ControllerRevision {
 }
 
 message ControllerRevisionList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // Items is the list of ControllerRevisions
   repeated ControllerRevision items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
@@ -85,9 +85,9 @@ message DaemonSetCondition {
   // Type of DaemonSet condition.
   string type = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
   // Status of the condition, one of True, False, Unknown.
-  k8s.io.api.core.v1.ConditionStatus status = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  .k8s.io.api.core.v1.ConditionStatus status = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
   // Last time the condition transitioned from one status to another.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
   // The reason for the condition's last transition.
   optional string reason = 4 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
   // A human readable message indicating details about the transition.
@@ -95,10 +95,10 @@ message DaemonSetCondition {
 }
 
 message DaemonSetList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // A list of daemon sets.
   repeated DaemonSet items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
@@ -108,13 +108,13 @@ message DaemonSetSpec {
   // Must match in order to be controlled.
   // It must match the pod template's labels.
   // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector selector = 1 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector selector = 1 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", inline: false }];
   // An object that describes the pod that will be created.
   // The DaemonSet will create exactly one copy of this pod on every node
   // that matches the template's node selector (or on every node if no node
   // selector is specified).
   // More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template
-  k8s.io.api.core.v1.PodTemplateSpec template = 2 [(dev.f110.kubeproto.field) = { go_name: "Template", api_field_name: "template", inline: false }];
+  .k8s.io.api.core.v1.PodTemplateSpec template = 2 [(dev.f110.kubeproto.field) = { go_name: "Template", api_field_name: "template", inline: false }];
   // An update strategy to replace existing DaemonSet pods with new pods.
   optional DaemonSetUpdateStrategy update_strategy = 3 [(dev.f110.kubeproto.field) = { go_name: "UpdateStrategy", api_field_name: "updateStrategy", inline: false }];
   // The minimum number of seconds for which a newly created DaemonSet pod should
@@ -188,11 +188,11 @@ message DeploymentCondition {
   // Type of deployment condition.
   DeploymentConditionType type = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
   // Status of the condition, one of True, False, Unknown.
-  k8s.io.api.core.v1.ConditionStatus status = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  .k8s.io.api.core.v1.ConditionStatus status = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
   // The last time this condition was updated.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time last_update_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastUpdateTime", api_field_name: "lastUpdateTime", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time last_update_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastUpdateTime", api_field_name: "lastUpdateTime", inline: false }];
   // Last time the condition transitioned from one status to another.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 4 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 4 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
   // The reason for the condition's last transition.
   optional string reason = 5 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
   // A human readable message indicating details about the transition.
@@ -200,9 +200,9 @@ message DeploymentCondition {
 }
 
 message DeploymentList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // Items is the list of Deployments.
   repeated Deployment items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
@@ -214,9 +214,9 @@ message DeploymentSpec {
   // Label selector for pods. Existing ReplicaSets whose pods are
   // selected by this will be the ones affected by this deployment.
   // It must match the pod template's labels.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector selector = 2 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector selector = 2 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", inline: false }];
   // Template describes the pods that will be created.
-  k8s.io.api.core.v1.PodTemplateSpec template = 3 [(dev.f110.kubeproto.field) = { go_name: "Template", api_field_name: "template", inline: false }];
+  .k8s.io.api.core.v1.PodTemplateSpec template = 3 [(dev.f110.kubeproto.field) = { go_name: "Template", api_field_name: "template", inline: false }];
   // The deployment strategy to use to replace existing pods with new ones.
   optional DeploymentStrategy strategy = 4 [(dev.f110.kubeproto.field) = { go_name: "Strategy", api_field_name: "strategy", inline: false }];
   // Minimum number of seconds for which a newly created pod should be ready
@@ -289,9 +289,9 @@ message ReplicaSetCondition {
   // Type of replica set condition.
   ReplicaSetConditionType type = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
   // Status of the condition, one of True, False, Unknown.
-  k8s.io.api.core.v1.ConditionStatus status = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  .k8s.io.api.core.v1.ConditionStatus status = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
   // The last time the condition transitioned from one status to another.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
   // The reason for the condition's last transition.
   optional string reason = 4 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
   // A human readable message indicating details about the transition.
@@ -299,10 +299,10 @@ message ReplicaSetCondition {
 }
 
 message ReplicaSetList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // List of ReplicaSets.
   // More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller
   repeated ReplicaSet items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
@@ -322,11 +322,11 @@ message ReplicaSetSpec {
   // Label keys and values that must match in order to be controlled by this replica set.
   // It must match the pod template's labels.
   // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector selector = 3 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector selector = 3 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", inline: false }];
   // Template is the object that describes the pod that will be created if
   // insufficient replicas are detected.
   // More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template
-  optional k8s.io.api.core.v1.PodTemplateSpec template = 4 [(dev.f110.kubeproto.field) = { go_name: "Template", api_field_name: "template", inline: false }];
+  optional .k8s.io.api.core.v1.PodTemplateSpec template = 4 [(dev.f110.kubeproto.field) = { go_name: "Template", api_field_name: "template", inline: false }];
 }
 
 message ReplicaSetStatus {
@@ -360,7 +360,7 @@ message RollingUpdateDaemonSet {
   // it then proceeds onto other DaemonSet pods, thus ensuring that at least
   // 70% of original number of DaemonSet pods are available at all times during
   // the update.
-  optional k8s.io.apimachinery.pkg.util.intstr.IntOrString max_unavailable = 1 [(dev.f110.kubeproto.field) = { go_name: "MaxUnavailable", api_field_name: "maxUnavailable", inline: false }];
+  optional .k8s.io.apimachinery.pkg.util.intstr.IntOrString max_unavailable = 1 [(dev.f110.kubeproto.field) = { go_name: "MaxUnavailable", api_field_name: "maxUnavailable", inline: false }];
   // The maximum number of nodes with an existing available DaemonSet pod that
   // can have an updated DaemonSet pod during during an update.
   // Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%).
@@ -380,7 +380,7 @@ message RollingUpdateDaemonSet {
   // so resource intensive daemonsets should take into account that they may
   // cause evictions during disruption.
   // This is beta field and enabled/disabled by DaemonSetUpdateSurge feature gate.
-  optional k8s.io.apimachinery.pkg.util.intstr.IntOrString max_surge = 2 [(dev.f110.kubeproto.field) = { go_name: "MaxSurge", api_field_name: "maxSurge", inline: false }];
+  optional .k8s.io.apimachinery.pkg.util.intstr.IntOrString max_surge = 2 [(dev.f110.kubeproto.field) = { go_name: "MaxSurge", api_field_name: "maxSurge", inline: false }];
 }
 
 message RollingUpdateDeployment {
@@ -394,7 +394,7 @@ message RollingUpdateDeployment {
   // can be scaled down further, followed by scaling up the new ReplicaSet, ensuring
   // that the total number of pods available at all times during the update is at
   // least 70% of desired pods.
-  optional k8s.io.apimachinery.pkg.util.intstr.IntOrString max_unavailable = 1 [(dev.f110.kubeproto.field) = { go_name: "MaxUnavailable", api_field_name: "maxUnavailable", inline: false }];
+  optional .k8s.io.apimachinery.pkg.util.intstr.IntOrString max_unavailable = 1 [(dev.f110.kubeproto.field) = { go_name: "MaxUnavailable", api_field_name: "maxUnavailable", inline: false }];
   // The maximum number of pods that can be scheduled above the desired number of
   // pods.
   // Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%).
@@ -406,7 +406,7 @@ message RollingUpdateDeployment {
   // 130% of desired pods. Once old pods have been killed,
   // new ReplicaSet can be scaled up further, ensuring that total number of pods running
   // at any time during the update is at most 130% of desired pods.
-  optional k8s.io.apimachinery.pkg.util.intstr.IntOrString max_surge = 2 [(dev.f110.kubeproto.field) = { go_name: "MaxSurge", api_field_name: "maxSurge", inline: false }];
+  optional .k8s.io.apimachinery.pkg.util.intstr.IntOrString max_surge = 2 [(dev.f110.kubeproto.field) = { go_name: "MaxSurge", api_field_name: "maxSurge", inline: false }];
 }
 
 message RollingUpdateStatefulSetStrategy {
@@ -422,7 +422,7 @@ message RollingUpdateStatefulSetStrategy {
   // MaxUnavailableStatefulSet feature. The field applies to all pods in the range 0 to
   // Replicas-1. That means if there is any unavailable pod in the range 0 to Replicas-1, it
   // will be counted towards MaxUnavailable.
-  optional k8s.io.apimachinery.pkg.util.intstr.IntOrString max_unavailable = 2 [(dev.f110.kubeproto.field) = { go_name: "MaxUnavailable", api_field_name: "maxUnavailable", inline: false }];
+  optional .k8s.io.apimachinery.pkg.util.intstr.IntOrString max_unavailable = 2 [(dev.f110.kubeproto.field) = { go_name: "MaxUnavailable", api_field_name: "maxUnavailable", inline: false }];
 }
 
 message StatefulSet {
@@ -440,9 +440,9 @@ message StatefulSetCondition {
   // Type of statefulset condition.
   string type = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
   // Status of the condition, one of True, False, Unknown.
-  k8s.io.api.core.v1.ConditionStatus status = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  .k8s.io.api.core.v1.ConditionStatus status = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
   // Last time the condition transitioned from one status to another.
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
   // The reason for the condition's last transition.
   optional string reason = 4 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
   // A human readable message indicating details about the transition.
@@ -450,10 +450,10 @@ message StatefulSetCondition {
 }
 
 message StatefulSetList {
-  k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // Standard list's metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
   // Items is the list of stateful sets.
   repeated StatefulSet items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
@@ -481,19 +481,19 @@ message StatefulSetSpec {
   // selector is a label query over pods that should match the replica count.
   // It must match the pod template's labels.
   // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector selector = 2 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector selector = 2 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", inline: false }];
   // template is the object that describes the pod that will be created if
   // insufficient replicas are detected. Each pod stamped out by the StatefulSet
   // will fulfill this Template, but have a unique identity from the rest
   // of the StatefulSet.
-  k8s.io.api.core.v1.PodTemplateSpec template = 3 [(dev.f110.kubeproto.field) = { go_name: "Template", api_field_name: "template", inline: false }];
+  .k8s.io.api.core.v1.PodTemplateSpec template = 3 [(dev.f110.kubeproto.field) = { go_name: "Template", api_field_name: "template", inline: false }];
   // volumeClaimTemplates is a list of claims that pods are allowed to reference.
   // The StatefulSet controller is responsible for mapping network identities to
   // claims in a way that maintains the identity of a pod. Every claim in
   // this list must have at least one matching (by name) volumeMount in one
   // container in the template. A claim in this list takes precedence over
   // any volumes in the template, with the same name.
-  repeated k8s.io.api.core.v1.PersistentVolumeClaim volume_claim_templates = 4 [(dev.f110.kubeproto.field) = { go_name: "VolumeClaimTemplates", api_field_name: "volumeClaimTemplates", inline: false }];
+  repeated .k8s.io.api.core.v1.PersistentVolumeClaim volume_claim_templates = 4 [(dev.f110.kubeproto.field) = { go_name: "VolumeClaimTemplates", api_field_name: "volumeClaimTemplates", inline: false }];
   // serviceName is the name of the service that governs this StatefulSet.
   // This service must exist before the StatefulSet, and is responsible for
   // the network identity of the set. Pods get DNS/hostnames that follow the
