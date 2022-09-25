@@ -7,9 +7,10 @@ import (
 	"github.com/gertd/go-pluralize"
 )
 
-var word = []string{"UUID", "UID", "WWIDs", "IQN", "ISCSI", "API", "ACME", "CHAP", "CIDRs", "CIDR", "PID", "ID", "DNS", "IPC",
-	"IPs", "IP", "QOS", "OS", "NFS", "FS", "FC", "RBD", "TCP", "UDP", "SCTP", "URI", "URL", "TLS", "HTTPS", "HTTP",
-	"SELinux", "FQDN", "TTY", "WWNs", "GCE", "AWS", "IO", "CSI", "GRPC", "SSL", "GMSA", "HMAC"}
+var word = []string{"UUID", "UID", "WWIDs", "IQN", "ISCSI", "API", "ACME", "CHAP", "CIDRs", "CIDR", "PID", "ID", "DNS",
+	"IPC", "IPs", "IP", "PUT", "POST", "QOS", "OS", "NFS", "FS", "FC", "RBD", "TCP", "UDP", "SCTP", "GET", "URI", "URL",
+	"TLS", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH", "HTTPS", "HTTP", "SELinux", "FQDN", "TTY", "WWNs", "GCE",
+	"AWS", "IO", "CSI", "GRPC", "SSL", "GMSA", "HMAC", "HEAD"}
 
 var wordDic map[string]struct{}
 
@@ -21,7 +22,18 @@ func init() {
 }
 
 func ToUpperCamelCase(in string) string {
-	s := strings.Split(in, "_")
+	var s []string
+	var start, cur int
+	for cur < len(in) {
+		switch in[cur] {
+		case '_', '-', '.':
+			s = append(s, in[start:cur])
+			start = cur + 1
+		}
+		cur++
+	}
+	s = append(s, in[start:])
+
 	var buf strings.Builder
 	for _, v := range s {
 		buf.WriteRune(unicode.ToUpper(rune(v[0])))
@@ -84,6 +96,7 @@ Loop:
 			if unicode.IsUpper(rune(s[i][k])) {
 				s = insert(s, i, s[i][:k])
 				s[i+1] = s[i+1][k:]
+				continue
 			}
 		}
 		i++

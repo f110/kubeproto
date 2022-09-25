@@ -8,6 +8,7 @@ import (
 
 func TestToUpperCamelCase(t *testing.T) {
 	assert.Equal(t, "FooBar", ToUpperCamelCase("foo_bar"))
+	assert.Equal(t, "CertManagerIo", ToUpperCamelCase("cert-manager.io"))
 }
 
 func TestToLowerCamelCase(t *testing.T) {
