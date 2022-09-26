@@ -80,10 +80,21 @@ proto/github.com/cert-manager/cert-manager/apis/acmev1/generated.proto:
 		--all \
 		$(CURDIR)/vendor/github.com/cert-manager/cert-manager/pkg/apis/acme/v1
 
+.PHONY: proto/github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoringv1/generated.proto
+proto/github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoringv1/generated.proto:
+	mkdir -p $(@D)
+	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ \
+		--proto-package github.com.prometheus_operator.prometheus_operator.apis.monitoringv1 \
+		--go-package github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1 \
+		--api-sub-group coreos.com \
+		--api-domain monitor \
+		--api-version v1 \
+		--all \
+		$(CURDIR)/vendor/github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1
+
 .PHONY: clean
 clean:
 	rm -f pkg/apis/githubv1alpha1/github_proto_kubeproto.generated.object.go
 	rm -f pkg/apis/githubv1alpha2/github_proto_kubeproto.generated.object.go
 	rm -f pkg/apis/miniov1alpha1/minio_proto_kubeproto.generated.object.go
 	rm -f crd/github.crd.yaml
-	rm -f proto/certmanageracmev1.proto proto/certmanagermetav1.proto proto/certmanagerv1.proto
