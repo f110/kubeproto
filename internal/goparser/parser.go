@@ -690,6 +690,8 @@ func (g *Generator) goTypeToProtobufKind(in ast.Expr) string {
 			}
 		}
 		return ""
+	case *ast.StarExpr:
+		return g.goTypeToProtobufKind(v.X)
 	default:
 		return ""
 	}
