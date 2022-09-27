@@ -1,6 +1,7 @@
 package miniov1alpha1
 
 import (
+	metav1_1 "github.com/cert-manager/cert-manager/pkg/apis/meta/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -189,6 +190,7 @@ type MinIOBucketSpec struct {
 	CreateIndexFile    bool                      `json:"createIndexFile"`
 	MaxBackups         int                       `json:"maxBackups"`
 	ServiceAccountJSON *corev1.SecretKeySelector `json:"serviceAccountJSON,omitempty"`
+	IssuerRef          metav1_1.ObjectReference  `json:"issuerRef"`
 }
 
 func (in *MinIOBucketSpec) DeepCopyInto(out *MinIOBucketSpec) {
@@ -199,6 +201,7 @@ func (in *MinIOBucketSpec) DeepCopyInto(out *MinIOBucketSpec) {
 		*out = new(corev1.SecretKeySelector)
 		(*in).DeepCopyInto(*out)
 	}
+	in.IssuerRef.DeepCopyInto(&out.IssuerRef)
 }
 
 func (in *MinIOBucketSpec) DeepCopy() *MinIOBucketSpec {

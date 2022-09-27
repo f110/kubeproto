@@ -1,4 +1,3 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
 load("@rules_proto//proto:defs.bzl", "proto_library")
 
 proto_library(
@@ -8,7 +7,7 @@ proto_library(
     deps = [
         "//:k8s_proto",
         "//:kubeproto",
-        "//example/proto/github.com/cert-manager/cert-manager/apis/metav1"
+        "//example/proto/github.com/cert-manager/cert-manager/apis/metav1",
     ],
 )
 

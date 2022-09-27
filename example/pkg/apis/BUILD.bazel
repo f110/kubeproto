@@ -9,6 +9,7 @@ go_library(
         "//example/vendor/github.com/cert-manager/cert-manager/pkg/apis/acme/v1:acme",
         "//example/vendor/github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1:certmanager",
         "//example/vendor/github.com/cert-manager/cert-manager/pkg/apis/meta/v1:meta",
+        "//example/vendor/github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1:monitoring",
         "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
     ],
 )

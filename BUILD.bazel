@@ -21,9 +21,9 @@ proto_library(
     srcs = glob(["sigs.k8s.io/gateway-api/**/*.proto"]),
     visibility = ["//visibility:public"],
     deps = [
-        ":kubeproto",
         "k8s_proto",
-    ]
+        ":kubeproto",
+    ],
 )
 
 proto_library(
