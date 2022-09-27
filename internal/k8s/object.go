@@ -39,9 +39,6 @@ func NewObjectGenerator(fileToGenerate []string, files *protoregistry.Files) (*O
 }
 
 func (g *ObjectGenerator) Generate(out io.Writer) error {
-	w := codegeneration.NewWriter()
-	messages := g.lister.GetMessages()
-
 	importPackages := map[string]string{
 		"k8s.io/apimachinery/pkg/runtime":        "",
 		"k8s.io/apimachinery/pkg/runtime/schema": "",
@@ -50,6 +47,10 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 	for k, v := range importPackages {
 		g.packageNamespaceManager.Add(k, v)
 	}
+
+	w := codegeneration.NewWriter()
+	messages := g.lister.GetMessages()
+
 	defW := codegeneration.NewWriter()
 	fileOpt := g.file.Options().(*descriptorpb.FileOptions)
 	packageName := fileOpt.GetGoPackage()
