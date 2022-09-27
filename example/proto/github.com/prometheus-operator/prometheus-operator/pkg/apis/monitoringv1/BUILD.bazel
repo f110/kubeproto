@@ -1,23 +1,11 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
 load("@rules_proto//proto:defs.bzl", "proto_library")
 
 proto_library(
-    name = "certmanagerv1",
+    name = "monitoringv1",
     srcs = ["generated.proto"],
     visibility = ["//visibility:public"],
     deps = [
         "//:k8s_proto",
         "//:kubeproto",
-        "//:sigs_gateway_api_proto",
-        "//example/proto/github.com/cert-manager/cert-manager/apis/metav1",
-        "//example/proto/github.com/cert-manager/cert-manager/apis/acmev1",
     ],
-)
-
-load("//bazel:def.bzl", "kubeproto_go_api")
-
-kubeproto_go_api(
-    name = "certmanagerv1_kubeproto",
-    srcs = [":certmanagerv1"],
-    importpath = "go.f110.dev/kubeproto/example/proto/github.com/cert-manager/cert-manager/apis/certmanagerv1",
 )
