@@ -1,0 +1,27 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "certmanager",
+    srcs = [
+        "const.go",
+        "doc.go",
+        "generic_issuer.go",
+        "register.go",
+        "types.go",
+        "types_certificate.go",
+        "types_certificaterequest.go",
+        "types_issuer.go",
+        "zz_generated.deepcopy.go",
+    ],
+    importmap = "go.f110.dev/kubeproto/example/vendor/github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1",
+    importpath = "github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/github.com/cert-manager/cert-manager/pkg/apis/acme/v1:acme",
+        "//example/vendor/github.com/cert-manager/cert-manager/pkg/apis/certmanager",
+        "//example/vendor/github.com/cert-manager/cert-manager/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
+    ],
+)

@@ -1,0 +1,16 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "protoiface",
+    srcs = [
+        "legacy.go",
+        "methods.go",
+    ],
+    importmap = "go.f110.dev/kubeproto/example/vendor/google.golang.org/protobuf/runtime/protoiface",
+    importpath = "google.golang.org/protobuf/runtime/protoiface",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/google.golang.org/protobuf/internal/pragma",
+        "//example/vendor/google.golang.org/protobuf/reflect/protoreflect",
+    ],
+)

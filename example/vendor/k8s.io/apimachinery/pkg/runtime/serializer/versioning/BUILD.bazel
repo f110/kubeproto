@@ -1,0 +1,15 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "versioning",
+    srcs = ["versioning.go"],
+    importmap = "go.f110.dev/kubeproto/example/vendor/k8s.io/apimachinery/pkg/runtime/serializer/versioning",
+    importpath = "k8s.io/apimachinery/pkg/runtime/serializer/versioning",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1/unstructured",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
+        "//example/vendor/k8s.io/klog/v2:klog",
+    ],
+)

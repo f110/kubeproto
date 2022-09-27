@@ -1,0 +1,16 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "filetype",
+    srcs = ["build.go"],
+    importmap = "go.f110.dev/kubeproto/example/vendor/google.golang.org/protobuf/internal/filetype",
+    importpath = "google.golang.org/protobuf/internal/filetype",
+    visibility = ["//example/vendor/google.golang.org/protobuf:__subpackages__"],
+    deps = [
+        "//example/vendor/google.golang.org/protobuf/internal/descopts",
+        "//example/vendor/google.golang.org/protobuf/internal/filedesc",
+        "//example/vendor/google.golang.org/protobuf/internal/impl",
+        "//example/vendor/google.golang.org/protobuf/reflect/protoreflect",
+        "//example/vendor/google.golang.org/protobuf/reflect/protoregistry",
+    ],
+)

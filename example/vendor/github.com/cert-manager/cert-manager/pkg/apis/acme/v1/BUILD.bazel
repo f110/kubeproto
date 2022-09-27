@@ -1,0 +1,28 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "acme",
+    srcs = [
+        "const.go",
+        "doc.go",
+        "register.go",
+        "types.go",
+        "types_challenge.go",
+        "types_issuer.go",
+        "types_order.go",
+        "zz_generated.deepcopy.go",
+    ],
+    importmap = "go.f110.dev/kubeproto/example/vendor/github.com/cert-manager/cert-manager/pkg/apis/acme/v1",
+    importpath = "github.com/cert-manager/cert-manager/pkg/apis/acme/v1",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/github.com/cert-manager/cert-manager/pkg/apis/acme",
+        "//example/vendor/github.com/cert-manager/cert-manager/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/api/core/v1:core",
+        "//example/vendor/k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1:apiextensions",
+        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
+        "//example/vendor/sigs.k8s.io/gateway-api/apis/v1alpha2",
+    ],
+)

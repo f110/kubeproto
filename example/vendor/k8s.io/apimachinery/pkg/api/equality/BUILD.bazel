@@ -1,0 +1,16 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "equality",
+    srcs = ["semantic.go"],
+    importmap = "go.f110.dev/kubeproto/example/vendor/k8s.io/apimachinery/pkg/api/equality",
+    importpath = "k8s.io/apimachinery/pkg/api/equality",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/k8s.io/apimachinery/pkg/api/resource",
+        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/conversion",
+        "//example/vendor/k8s.io/apimachinery/pkg/fields",
+        "//example/vendor/k8s.io/apimachinery/pkg/labels",
+    ],
+)
