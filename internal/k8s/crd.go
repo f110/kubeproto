@@ -21,7 +21,7 @@ type CRDGenerator struct {
 	lister *definition.Lister
 }
 
-func NewCRDGenerator(fileToGenerate []string, files *protoregistry.Files) (*CRDGenerator, error) {
+func NewCRDGenerator(fileToGenerate []string, files *protoregistry.Files, nsm *definition.PackageNamespaceManager) (*CRDGenerator, error) {
 	desc, err := files.FindFileByPath(fileToGenerate[0])
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func NewCRDGenerator(fileToGenerate []string, files *protoregistry.Files) (*CRDG
 
 	return &CRDGenerator{
 		files:  desc,
-		lister: definition.NewLister(fileToGenerate, files),
+		lister: definition.NewLister(fileToGenerate, files, nsm),
 	}, nil
 }
 

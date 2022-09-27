@@ -16,14 +16,17 @@ import (
 )
 
 type ClientGenerator struct {
-	files  []*descriptorpb.FileDescriptorProto
-	lister *definition.Lister
+	files                   []*descriptorpb.FileDescriptorProto
+	lister                  *definition.Lister
+	packageNamespaceManager *definition.PackageNamespaceManager
 }
 
 func NewClientGenerator(fileToGenerate []string, files *protoregistry.Files) *ClientGenerator {
+	nsm := definition.NewPackageNamespaceManager()
 	return &ClientGenerator{
-		files:  nil,
-		lister: definition.NewLister(fileToGenerate, files),
+		files:                   nil,
+		lister:                  definition.NewLister(fileToGenerate, files, nsm),
+		packageNamespaceManager: nsm,
 	}
 }
 
@@ -39,6 +42,9 @@ func (g *ClientGenerator) Generate(out io.Writer, packageName, importPath string
 		"k8s.io/apimachinery/pkg/runtime":        "",
 		"k8s.io/apimachinery/pkg/runtime/schema": "",
 		"k8s.io/apimachinery/pkg/runtime/serializer": "",
+	}
+	for k, v := range importPackages {
+		g.packageNamespaceManager.Add(k, v)
 	}
 
 	messages := g.lister.GetMessages()
@@ -214,7 +220,12 @@ func (g *restClientGenerator) Import() map[string]string {
 	}
 	for _, v := range g.groupVersions {
 		for _, m := range v {
-			importPackages[m.Package.Path] = m.Package.Alias
+			_, p := path.Split(m.Package.Path)
+			alias := m.Package.Alias
+			if p == m.Package.Alias {
+				alias = ""
+			}
+			importPackages[m.Package.Path] = alias
 		}
 	}
 
@@ -423,7 +434,12 @@ func (g *informerGenerator) Import() map[string]string {
 	}
 	for _, v := range g.groupVersions {
 		for _, m := range v {
-			importPackages[m.Package.Path] = m.Package.Alias
+			_, p := path.Split(m.Package.Path)
+			alias := m.Package.Alias
+			if p == m.Package.Alias {
+				alias = ""
+			}
+			importPackages[m.Package.Path] = alias
 		}
 	}
 
@@ -600,7 +616,12 @@ func (g *listerGenerator) Import() map[string]string {
 	}
 	for _, v := range g.groupVersions {
 		for _, m := range v {
-			importPackages[m.Package.Path] = m.Package.Alias
+			_, p := path.Split(m.Package.Path)
+			alias := m.Package.Alias
+			if p == m.Package.Alias {
+				alias = ""
+			}
+			importPackages[m.Package.Path] = alias
 		}
 	}
 

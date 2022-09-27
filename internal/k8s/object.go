@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"path"
 	"strings"
 
@@ -18,8 +19,9 @@ import (
 )
 
 type ObjectGenerator struct {
-	file   protoreflect.FileDescriptor
-	lister *definition.Lister
+	file                    protoreflect.FileDescriptor
+	lister                  *definition.Lister
+	packageNamespaceManager *definition.PackageNamespaceManager
 }
 
 func NewObjectGenerator(fileToGenerate []string, files *protoregistry.Files) (*ObjectGenerator, error) {
@@ -27,9 +29,12 @@ func NewObjectGenerator(fileToGenerate []string, files *protoregistry.Files) (*O
 	if err != nil {
 		return nil, err
 	}
+	nsm := definition.NewPackageNamespaceManager()
+
 	return &ObjectGenerator{
-		file:   desc.(protoreflect.FileDescriptor),
-		lister: definition.NewLister(fileToGenerate, files),
+		file:                    desc.(protoreflect.FileDescriptor),
+		lister:                  definition.NewLister(fileToGenerate, files, nsm),
+		packageNamespaceManager: nsm,
 	}, nil
 }
 
@@ -41,6 +46,9 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 		"k8s.io/apimachinery/pkg/runtime":        "",
 		"k8s.io/apimachinery/pkg/runtime/schema": "",
 		"k8s.io/apimachinery/pkg/apis/meta/v1":   "metav1",
+	}
+	for k, v := range importPackages {
+		g.packageNamespaceManager.Add(k, v)
 	}
 	defW := codegeneration.NewWriter()
 	fileOpt := g.file.Options().(*descriptorpb.FileOptions)
@@ -102,9 +110,6 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 				if m == nil {
 					continue
 				}
-				if m.Package.Path != "" && m.Package.Path != packageName {
-					importPackages[m.Package.Path] = m.Package.Alias
-				}
 
 				if _, ok := mark[m.Name]; !ok && !m.Dep {
 					mark[m.Name] = struct{}{}
@@ -115,7 +120,10 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 			if !f.Embed {
 				name = string(f.Name)
 			}
-			typ := g.lister.ResolveGoType(packageName, f)
+			importPath, packageName, typ := g.lister.ResolveGoType(packageName, f)
+			if importPath != "" {
+				importPackages[importPath] = packageName
+			}
 			tag := f.Tag()
 			if f.Description != "" {
 				d := strings.Replace(f.Description, string(f.Name), f.Name.CamelCase(), 1)
@@ -137,7 +145,8 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 			case protoreflect.MessageKind:
 				if f.Repeated {
 					defW.F("if in.%s != nil {", f.Name)
-					defW.F("l := make(%s, len(in.%s))", g.lister.ResolveGoType(packageName, f), f.Name)
+					_, _, typ := g.lister.ResolveGoType(packageName, f)
+					defW.F("l := make(%s, len(in.%s))", typ, f.Name)
 					defW.F("for i := range in.%s {", f.Name)
 					defW.F("in.%s[i].DeepCopyInto(&l[i])", f.Name)
 					defW.F("}")
@@ -149,13 +158,15 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 					defW.F("if in.%s != nil {", f.Name)
 					if f.IsMap() {
 						defW.F("in, out := &in.%s, &out.%s", f.Name, f.Name)
-						defW.F("*out = make(%s, len(*in))", g.lister.ResolveGoType(packageName, f))
+						_, _, typ := g.lister.ResolveGoType(packageName, f)
+						defW.F("*out = make(%s, len(*in))", typ)
 						defW.F("for k, v := range *in {")
 						defW.F("(*out)[k] = v")
 						defW.F("}")
 					} else {
 						defW.F("in, out := &in.%s, &out.%s", f.Name, f.Name)
-						defW.F("*out = new(%s)", g.lister.ResolveGoType(packageName, f)[1:])
+						_, _, typ := g.lister.ResolveGoType(packageName, f)
+						defW.F("*out = new(%s)", typ[1:])
 						defW.F("(*in).DeepCopyInto(*out)")
 					}
 					defW.F("}")
@@ -169,7 +180,8 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 			default:
 				if f.Repeated {
 					defW.F("if in.%s != nil {", f.Name)
-					defW.F("t := make(%s, len(in.%s))", g.lister.ResolveGoType(packageName, f), f.Name)
+					_, _, typ := g.lister.ResolveGoType(packageName, f)
+					defW.F("t := make(%s, len(in.%s))", typ, f.Name)
 					defW.F("copy(t, in.%s)", f.Name)
 					defW.F("out.%s = t", f.Name)
 					defW.F("}")
@@ -198,6 +210,7 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 		objs = objs[1:]
 	}
 
+	log.Println(g.packageNamespaceManager.All())
 	w.F("import (")
 	for p, a := range importPackages {
 		if a != "" {

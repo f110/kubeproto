@@ -9,19 +9,20 @@ import (
 )
 
 type Lister struct {
-	files    map[string]struct{}
-	allFiles *protoregistry.Files
+	files              map[string]struct{}
+	allFiles           *protoregistry.Files
+	packageNameManager *PackageNamespaceManager
 
 	messages Messages
 	enums    Enums
 }
 
-func NewLister(files []string, all *protoregistry.Files) *Lister {
+func NewLister(files []string, all *protoregistry.Files, nsm *PackageNamespaceManager) *Lister {
 	m := make(map[string]struct{})
 	for _, v := range files {
 		m[v] = struct{}{}
 	}
-	return &Lister{files: m, allFiles: all}
+	return &Lister{files: m, allFiles: all, packageNameManager: nsm}
 }
 
 func (l *Lister) GetMessages() Messages {
@@ -42,7 +43,7 @@ func (l *Lister) GetMessages() Messages {
 
 	var msgs Messages
 	addMessage := func(m protoreflect.MessageDescriptor, desc protoreflect.FileDescriptor) bool {
-		msg, err := NewMessageFromMessageDescriptor(m, desc)
+		msg, err := NewMessageFromMessageDescriptor(m, desc, l.packageNameManager)
 		if err != nil {
 			return false
 		}
@@ -134,24 +135,24 @@ func (l *Lister) GetEnums() Enums {
 	return enums
 }
 
-func (l *Lister) ResolveGoType(packageName string, f *Field) string {
+func (l *Lister) ResolveGoType(packageName string, f *Field) (string, string, string) {
 	if f.typeName != "" {
-		return f.typeName
+		return f.importPath, f.packageAlias, f.typeName
 	}
 
 	if f.IsMap() {
 		key, value := f.MapKeyValue()
 		keyTyp := protoreflectKindMap[key.Kind()]
 		valTyp := protoreflectKindMap[value.Kind()]
-		return fmt.Sprintf("map[%s]%s", keyTyp, valTyp)
+		return "", "", fmt.Sprintf("map[%s]%s", keyTyp, valTyp)
 	}
 
-	var typ string
+	var importPath, typ, packageAlias string
 	switch f.Kind {
 	case protoreflect.MessageKind:
 		m := l.GetMessages().Find(f.MessageName)
 		if m == nil {
-			return ""
+			return "", "", ""
 		}
 
 		if m.Package.Path != "" && m.Package.Path != packageName {
@@ -159,6 +160,8 @@ func (l *Lister) ResolveGoType(packageName string, f *Field) string {
 			if alias == "" {
 				alias = filepath.Base(m.Package.Path)
 			}
+			importPath = m.Package.Path
+			packageAlias = alias
 			typ = fmt.Sprintf("%s.%s", alias, m.ShortName)
 		} else {
 			typ = m.ShortName
@@ -177,6 +180,8 @@ func (l *Lister) ResolveGoType(packageName string, f *Field) string {
 		typ = "[]" + typ
 	}
 
+	f.importPath = importPath
+	f.packageAlias = packageAlias
 	f.typeName = typ
-	return typ
+	return importPath, packageAlias, typ
 }

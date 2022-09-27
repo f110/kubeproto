@@ -6,6 +6,7 @@ go_library(
         "enum.go",
         "lister.go",
         "message.go",
+        "nsmanager.go",
     ],
     importpath = "go.f110.dev/kubeproto/internal/definition",
     visibility = ["//:__subpackages__"],

@@ -138,7 +138,7 @@ type Message struct {
 	messageDescriptor protoreflect.MessageDescriptor
 }
 
-func NewMessageFromMessageDescriptor(m protoreflect.MessageDescriptor, f protoreflect.FileDescriptor) (*Message, error) {
+func NewMessageFromMessageDescriptor(m protoreflect.MessageDescriptor, f protoreflect.FileDescriptor, nsm *PackageNamespaceManager) (*Message, error) {
 	var fields []*Field
 	for i := 0; i < m.Fields().Len(); i++ {
 		v := m.Fields().Get(i)
@@ -218,6 +218,7 @@ func NewMessageFromMessageDescriptor(m protoreflect.MessageDescriptor, f protore
 			goPackageAlias = string(f.Package()[i+1:])
 		}
 	}
+	goPackageAlias = nsm.Add(goPackage, goPackageAlias)
 	msg := &Message{
 		Name:                     string(m.FullName()),
 		ShortName:                string(m.Name()),
@@ -311,8 +312,10 @@ type Field struct {
 	// SubResource indicates that this field is the sub resource of Kind
 	SubResource bool
 
-	typeName   string
-	descriptor protoreflect.FieldDescriptor
+	importPath   string
+	packageAlias string
+	typeName     string
+	descriptor   protoreflect.FieldDescriptor
 }
 
 func (f *Field) Tag() string {

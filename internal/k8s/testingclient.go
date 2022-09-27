@@ -14,14 +14,17 @@ import (
 )
 
 type FakeClientGenerator struct {
-	files  []*descriptorpb.FileDescriptorProto
-	lister *definition.Lister
+	files                   []*descriptorpb.FileDescriptorProto
+	lister                  *definition.Lister
+	packageNamespaceManager *definition.PackageNamespaceManager
 }
 
 func NewFakeClientGenerator(fileToGenerate []string, files *protoregistry.Files) *FakeClientGenerator {
+	nsm := definition.NewPackageNamespaceManager()
 	return &FakeClientGenerator{
-		files:  nil,
-		lister: definition.NewLister(fileToGenerate, files),
+		files:                   nil,
+		lister:                  definition.NewLister(fileToGenerate, files, nsm),
+		packageNamespaceManager: nsm,
 	}
 }
 
@@ -32,6 +35,9 @@ func (g *FakeClientGenerator) Generate(out io.Writer, packageName, importPath, c
 	// The key is a package path. The value is an alias.
 	importPackages := map[string]string{
 		"context": "",
+	}
+	for k, v := range importPackages {
+		g.packageNamespaceManager.Add(k, v)
 	}
 
 	messages := g.lister.GetMessages()
