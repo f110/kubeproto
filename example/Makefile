@@ -25,21 +25,28 @@ miniov1alpha1: pkg/apis/miniov1alpha1/minio.proto
 pkg/client/github.generated.client.go: pkg/apis/githubv1alpha1/github.proto pkg/apis/githubv1alpha2/github.proto pkg/apis/miniov1alpha1/minio.proto
 	bazel build //example/pkg/client:github
 	@rm -f $@
-	cp ../bazel-bin/example/pkg/client/github.generated.client.go $(@D)
+	cp ../bazel-bin/example/$@ $(@D)
 	@chmod 644 $@
 
 .PHONY: pkg/client/testingclient/github.generated.testingclient.go
 pkg/client/testingclient/github.generated.testingclient.go: pkg/apis/githubv1alpha1/github.proto pkg/apis/githubv1alpha2/github.proto pkg/apis/miniov1alpha1/minio.proto
 	bazel build //example/pkg/client/testingclient:github
 	@rm -f $@
-	cp ../bazel-bin/example/pkg/client/testingclient/github.generated.testingclient.go $(@D)
+	cp ../bazel-bin/example/$@ $(@D)
 	@chmod 644 $@
 
 .PHONY: crd/github.crd.yaml
 crd/github.crd.yaml: pkg/apis/githubv1alpha1/github.proto pkg/apis/githubv1alpha2/github.proto pkg/apis/miniov1alpha1/minio.proto
 	bazel build //example/crd:github
 	@rm -f $@
-	cp ../bazel-bin/example/crd/github.crd.yaml $(@D)
+	cp ../bazel-bin/example/$@ $(@D)
+	@chmod 644 $@
+
+.PHONY: pkg/thirdpartyclient/thirdpartyclient.generated.client.go
+pkg/thirdpartyclient/thirdpartyclient.generated.client.go:
+	bazel build //example/pkg/thirdpartyclient:thirdpartyclient
+	@rm -f $@
+	cp ../bazel-bin/example/$@ $(@D)
 	@chmod 644 $@
 
 .PHONY: proto/github.com/cert-manager/cert-manager/apis/certmanagerv1/generated.proto

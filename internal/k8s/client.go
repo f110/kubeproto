@@ -66,7 +66,7 @@ func (g *ClientGenerator) Generate(out io.Writer, packageName, importPath string
 	for _, key := range keys(groupVersions) {
 		v := groupVersions[key]
 		m := v[0]
-		writer.F("%s.AddToScheme,", path.Base(m.Package.Path))
+		writer.F("%s.AddToScheme,", path.Base(m.Package.Alias))
 	}
 	writer.F("} {")
 	writer.F("if err := v(Scheme); err != nil {\npanic(err)\n}")
@@ -100,7 +100,7 @@ type Backend interface {
 		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
 		writer.F("{")
 		writer.F("conf := *cfg")
-		writer.F("conf.GroupVersion = &%s.SchemaGroupVersion", m.Package.Name)
+		writer.F("conf.GroupVersion = &%s.SchemaGroupVersion", m.Package.Alias)
 		writer.F("conf.APIPath = \"/apis\"")
 		writer.F("conf.NegotiatedSerializer = Codecs.WithoutConversion()")
 		writer.F("c, err := rest.RESTClientFor(&conf)")
@@ -334,7 +334,7 @@ func (r *restBackend) Watch(ctx context.Context, gvr schema.GroupVersionResource
 		writer.F("")
 
 		for _, m := range v {
-			structNameWithPkg := fmt.Sprintf("%s.%s", m.Package.Name, m.ShortName)
+			structNameWithPkg := fmt.Sprintf("%s.%s", m.Package.Alias, m.ShortName)
 			// GetXXX
 			writer.F("func(c *%s) Get%s(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg)
 			writer.F("result, err := c.backend.Get(ctx, %q, %q, namespace, name, opts, &%s{})", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName, structNameWithPkg)
@@ -384,12 +384,12 @@ func (r *restBackend) Watch(ctx context.Context, gvr schema.GroupVersionResource
 			writer.F("")
 
 			// ListXXX
-			writer.F("func (c *%s) List%s(ctx context.Context, namespace string, opts metav1.ListOptions) (*%s.%sList, error) {", clientName, m.ShortName, m.Package.Name, m.ShortName)
-			writer.F("result, err := c.backend.List(ctx, %q, %q, namespace, opts, &%s.%sList{})", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName, m.Package.Name, m.ShortName)
+			writer.F("func (c *%s) List%s(ctx context.Context, namespace string, opts metav1.ListOptions) (*%s.%sList, error) {", clientName, m.ShortName, m.Package.Alias, m.ShortName)
+			writer.F("result, err := c.backend.List(ctx, %q, %q, namespace, opts, &%s.%sList{})", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName, m.Package.Alias, m.ShortName)
 			writer.F("if err != nil {")
 			writer.F("return nil, err")
 			writer.F("}")
-			writer.F("return result.(*%s.%sList), nil", m.Package.Name, m.ShortName)
+			writer.F("return result.(*%s.%sList), nil", m.Package.Alias, m.ShortName)
 			writer.F("}") // end of ListXXX
 			writer.F("")
 
@@ -493,7 +493,7 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 		v := g.groupVersions[k]
 		for _, m := range v {
 			clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
-			writer.F("case *%s.%s:", m.Package.Name, m.ShortName)
+			writer.F("case *%s.%s:", m.Package.Alias, m.ShortName)
 			writer.F("return New%sInformer(f.cache, f.set.%s, f.namespace, f.resyncPeriod).%sInformer()", clientName, clientName, m.ShortName)
 		}
 	}
@@ -509,7 +509,7 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 		v := g.groupVersions[k]
 		for _, m := range v {
 			clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
-			writer.F("case %s.SchemaGroupVersion.WithResource(%q):", m.Package.Name, strings.ToLower(stringsutil.Plural(m.ShortName)))
+			writer.F("case %s.SchemaGroupVersion.WithResource(%q):", m.Package.Alias, strings.ToLower(stringsutil.Plural(m.ShortName)))
 			writer.F("return New%sInformer(f.cache, f.set.%s, f.namespace, f.resyncPeriod).%sInformer()", clientName, clientName, m.ShortName)
 		}
 	}
@@ -556,7 +556,7 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 				clientName,
 				m.ShortName,
 			)
-			writer.F("return f.cache.Write(&%s.%s{}, func () cache.SharedIndexInformer{", m.Package.Name, m.ShortName)
+			writer.F("return f.cache.Write(&%s.%s{}, func () cache.SharedIndexInformer{", m.Package.Alias, m.ShortName)
 			writer.F("return cache.NewSharedIndexInformer(")
 			writer.F("&cache.ListWatch{")
 			writer.F("ListFunc: func (options metav1.ListOptions) (runtime.Object, error){")
@@ -566,7 +566,7 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 			writer.F("return f.client.Watch%s(context.TODO(), f.namespace, metav1.ListOptions{})", m.ShortName)
 			writer.F("},") // end of WatchFunc
 			writer.F("},")
-			writer.F("&%s.%s{},", m.Package.Name, m.ShortName)
+			writer.F("&%s.%s{},", m.Package.Alias, m.ShortName)
 			writer.F("f.resyncPeriod,")
 			writer.F("f.indexers,")
 			writer.F(")")
@@ -624,25 +624,25 @@ func (g *listerGenerator) WriteTo(writer *codegeneration.Writer) error {
 			writer.F("")
 
 			// ListXXX
-			writer.F("func (x *%s%sLister) List(namespace string, selector labels.Selector) ([]*%s.%s, error) {", clientName, m.ShortName, m.Package.Name, m.ShortName)
-			writer.F("var ret []*%s.%s", m.Package.Name, m.ShortName)
+			writer.F("func (x *%s%sLister) List(namespace string, selector labels.Selector) ([]*%s.%s, error) {", clientName, m.ShortName, m.Package.Alias, m.ShortName)
+			writer.F("var ret []*%s.%s", m.Package.Alias, m.ShortName)
 			writer.F("err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {")
-			writer.F("ret = append(ret, m.(*%s.%s).DeepCopy())", m.Package.Name, m.ShortName)
+			writer.F("ret = append(ret, m.(*%s.%s).DeepCopy())", m.Package.Alias, m.ShortName)
 			writer.F("})")
 			writer.F("return ret, err")
 			writer.F("}") // end of ListXXX
 			writer.F("")
 
 			// GetXXX
-			writer.F("func (x *%s%sLister) Get(namespace, name string) (*%s.%s, error) {", clientName, m.ShortName, m.Package.Name, m.ShortName)
+			writer.F("func (x *%s%sLister) Get(namespace, name string) (*%s.%s, error) {", clientName, m.ShortName, m.Package.Alias, m.ShortName)
 			writer.F("obj, exists, err := x.indexer.GetByKey(namespace + \"/\" + name)")
 			writer.F("if err != nil {")
 			writer.F("return nil, err")
 			writer.F("}")
 			writer.F("if !exists {")
-			writer.F("return nil, k8serrors.NewNotFound(%s.SchemaGroupVersion.WithResource(%q).GroupResource(), name)", m.Package.Name, strings.ToLower(m.ShortName))
+			writer.F("return nil, k8serrors.NewNotFound(%s.SchemaGroupVersion.WithResource(%q).GroupResource(), name)", m.Package.Alias, strings.ToLower(m.ShortName))
 			writer.F("}")
-			writer.F("return obj.(*%s.%s).DeepCopy(), nil", m.Package.Name, m.ShortName)
+			writer.F("return obj.(*%s.%s).DeepCopy(), nil", m.Package.Alias, m.ShortName)
 			writer.F("}")
 			writer.F("")
 		}

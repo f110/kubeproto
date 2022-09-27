@@ -213,6 +213,10 @@ func NewMessageFromMessageDescriptor(m protoreflect.MessageDescriptor, f protore
 	if strings.HasPrefix(goPackage, "k8s.io/apimachinery") || strings.HasPrefix(goPackage, "k8s.io/api") {
 		s := strings.Split(goPackage, "/")
 		goPackageAlias = fmt.Sprintf("%s%s", s[len(s)-2], s[len(s)-1])
+	} else if !strings.HasPrefix(string(f.Package()), "google.protobuf") {
+		if i := strings.LastIndex(string(f.Package()), "."); i > 0 {
+			goPackageAlias = string(f.Package()[i+1:])
+		}
 	}
 	msg := &Message{
 		Name:                     string(m.FullName()),
