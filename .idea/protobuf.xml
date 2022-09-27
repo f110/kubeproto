@@ -3,6 +3,7 @@
   <component name="ProtobufSettings">
     <roots>
       <entry common="false" path="file://$PROJECT_DIR$" />
+      <entry common="false" path="file://$PROJECT_DIR$/example" />
     </roots>
   </component>
 </project>
