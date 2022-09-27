@@ -2,33 +2,11 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 load("//bazel:def.bzl", "go_client")
 
 go_client(
-    name = "github",
+    name = "thirdpartyclient",
     srcs = [
-        "//example/pkg/apis/githubv1alpha1:github_proto",
-        "//example/pkg/apis/githubv1alpha2:github_proto",
-        "//example/pkg/apis/miniov1alpha1:minio_proto",
+        "//example/proto/github.com/cert-manager/cert-manager/apis/certmanagerv1",
+        "//example/proto/github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoringv1",
     ],
-    importpath = "go.f110.dev/kubeproto/example/pkg/client",
+    importpath = "go.f110.dev/kubeproto/example/pkg/thirdpartyclient",
     visibility = ["//visibility:public"],
-)
-
-go_library(
-    name = "client",
-    srcs = ["github.generated.client.go"],
-    importpath = "go.f110.dev/kubeproto/example/pkg/client",
-    visibility = ["//visibility:public"],
-    deps = [
-        "//example/pkg/apis/githubv1alpha1",
-        "//example/pkg/apis/githubv1alpha2",
-        "//example/pkg/apis/miniov1alpha1",
-        "//example/vendor/k8s.io/apimachinery/pkg/api/errors",
-        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
-        "//example/vendor/k8s.io/apimachinery/pkg/labels",
-        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
-        "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
-        "//example/vendor/k8s.io/apimachinery/pkg/runtime/serializer",
-        "//example/vendor/k8s.io/apimachinery/pkg/watch",
-        "//example/vendor/k8s.io/client-go/rest",
-        "//example/vendor/k8s.io/client-go/tools/cache",
-    ],
 )
