@@ -1,0 +1,12 @@
+load("//bazel:def.bzl", "go_testing_client")
+
+go_testing_client(
+    name = "testingthirdpartyclient",
+    srcs = [
+        "//example/proto/github.com/cert-manager/cert-manager/apis/certmanagerv1",
+        "//example/proto/github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoringv1",
+    ],
+    client = "//example/pkg/thirdpartyclient",
+    importpath = "go.f110.dev/kubeproto/example/pkg/thirdpartyclient/testingthirdpartyclient",
+    visibility = ["//visibility:public"],
+)

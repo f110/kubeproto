@@ -49,6 +49,13 @@ pkg/thirdpartyclient/thirdpartyclient.generated.client.go:
 	cp ../bazel-bin/example/$@ $(@D)
 	@chmod 644 $@
 
+.PHONY: pkg/thirdpartyclient/testingthirdpartyclient/testingthirdpartyclient.generated.testingclient.go
+pkg/thirdpartyclient/testingthirdpartyclient/testingthirdpartyclient.generated.testingclient.go:
+	bazel build //example/pkg/thirdpartyclient/testingthirdpartyclient
+	@rm -f $@
+	cp ../bazel-bin/example/$@ $(@D)
+	@chmod 644 $@
+
 .PHONY: proto/github.com/cert-manager/cert-manager/apis/certmanagerv1/generated.proto
 proto/github.com/cert-manager/cert-manager/apis/certmanagerv1/generated.proto:
 	mkdir -p $(@D)
