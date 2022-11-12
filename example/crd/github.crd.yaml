@@ -307,6 +307,20 @@ spec:
                 description: create_index_file is a flag that creates index.html on
                   top of bucket.
                 type: boolean
+              issuerRef:
+                properties:
+                  group:
+                    description: Group of the resource being referred to.
+                    type: string
+                  kind:
+                    description: Kind of the resource being referred to.
+                    type: string
+                  name:
+                    description: Name of the resource being referred to.
+                    type: string
+                required:
+                - name
+                type: object
               maxBackups:
                 type: integer
               policy:
@@ -388,6 +402,7 @@ spec:
             - policy
             - createIndexFile
             - maxBackups
+            - issuerRef
             type: object
           status:
             properties:

@@ -64,8 +64,17 @@ func (g *ClientGenerator) Generate(out io.Writer, packageName, importPath string
 	writer.F("Scheme = runtime.NewScheme()")
 	writer.F("ParameterCodec = runtime.NewParameterCodec(Scheme)")
 	writer.F("Codecs = serializer.NewCodecFactory(Scheme)")
+	writer.F("AddToScheme = localSchemeBuilder.AddToScheme")
 	writer.F(")")
 	writer.F("")
+
+	writer.F("var localSchemeBuilder = runtime.SchemeBuilder{")
+	for _, key := range keys(groupVersions) {
+		v := groupVersions[key]
+		m := v[0]
+		writer.F("%s.AddToScheme,", path.Base(m.Package.Alias))
+	}
+	writer.F("}")
 
 	writer.F("func init() {")
 	writer.F("for _, v := range []func(*runtime.Scheme) error{")

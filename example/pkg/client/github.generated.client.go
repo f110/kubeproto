@@ -26,7 +26,14 @@ var (
 	Scheme         = runtime.NewScheme()
 	ParameterCodec = runtime.NewParameterCodec(Scheme)
 	Codecs         = serializer.NewCodecFactory(Scheme)
+	AddToScheme    = localSchemeBuilder.AddToScheme
 )
+
+var localSchemeBuilder = runtime.SchemeBuilder{
+	githubv1alpha1.AddToScheme,
+	githubv1alpha2.AddToScheme,
+	miniov1alpha1.AddToScheme,
+}
 
 func init() {
 	for _, v := range []func(*runtime.Scheme) error{
