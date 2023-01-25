@@ -146,7 +146,7 @@ func (g *Generator) AddDir(dir string, allStructs bool) error {
 				g.addPackageMap(v)
 			}
 
-			for _, d := range f.Decls {
+			for i, d := range f.Decls {
 				switch {
 				case isConstDeclaration(d):
 					gen := d.(*ast.GenDecl)
@@ -163,8 +163,22 @@ func (g *Generator) AddDir(dir string, allStructs bool) error {
 					// string type is not only used enum but also just type declaration
 					g.typeDeclaration = append(g.typeDeclaration, g.parseTypeDeclaration(gen))
 				case isStructDeclaration(d):
+					commentGroup := &ast.CommentGroup{}
+					if i != 0 {
+						var prevDecl ast.Decl
+						prevDecl = f.Decls[i-1]
+						for _, v := range f.Comments {
+							if v.Pos() > prevDecl.Pos() {
+								commentGroup.List = append(commentGroup.List, v.List...)
+							}
+							if d.Pos() < v.Pos() {
+								break
+							}
+						}
+
+					}
 					gen := d.(*ast.GenDecl)
-					msg := g.structToProtobufMessage(gen, g.allStructs)
+					msg := g.structToProtobufMessage(gen, commentGroup, g.allStructs)
 					if msg == nil {
 						continue
 					}
@@ -422,7 +436,11 @@ func (g *Generator) WriteFile(outputFilePath string) error {
 
 		if m.Option != nil {
 			w.F("")
-			w.F("option (dev.f110.kubeproto.kind) = {};")
+			w.F("option (dev.f110.kubeproto.kind) = {")
+			if m.Option.ClusterScope {
+				w.F("scope: SCOPE_CLUSTER")
+			}
+			w.F("};")
 		}
 		w.F("}")
 		w.F("")
@@ -489,7 +507,7 @@ func (g *Generator) constToEnumValue(v *ast.GenDecl) map[string][]*enumValue {
 	return constDefinitions
 }
 
-func (g *Generator) structToProtobufMessage(v *ast.GenDecl, allStruct bool) *ProtobufMessage {
+func (g *Generator) structToProtobufMessage(v *ast.GenDecl, comment *ast.CommentGroup, allStruct bool) *ProtobufMessage {
 	typeSpec := v.Specs[0].(*ast.TypeSpec)
 	if unicode.IsLower(rune(typeSpec.Name.String()[0])) {
 		// Private struct
@@ -648,6 +666,14 @@ func (g *Generator) structToProtobufMessage(v *ast.GenDecl, allStruct bool) *Pro
 			}
 		}
 		m.Fields = fields
+
+		for _, v := range comment.List {
+			if strings.HasPrefix(v.Text, "// +genclient") {
+				if strings.Contains(v.Text, "nonNamespaced") {
+					m.Option.ClusterScope = true
+				}
+			}
+		}
 	}
 
 	return m

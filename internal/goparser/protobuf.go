@@ -17,7 +17,9 @@ type ProtobufMessage struct {
 	Option      *ProtobufMessageOption
 }
 
-type ProtobufMessageOption struct{}
+type ProtobufMessageOption struct {
+	ClusterScope bool
+}
 
 func (m *ProtobufMessage) IsRuntimeObject() bool {
 	var foundTypeMeta, foundObjectMeta bool
