@@ -88,15 +88,32 @@ Loop:
 				if idx+len(v) < len(str) {
 					s = append(s, str[idx+len(v):])
 				}
-				break
+				continue Loop
 			}
 		}
 
-		for k := 1; k < len(s[i]); k++ {
-			if unicode.IsUpper(rune(s[i][k])) {
+		for k := 0; k < len(s[i]); k++ {
+			if k >= 1 && unicode.IsUpper(rune(s[i][k])) {
 				s = insert(s, i, s[i][:k])
 				s[i+1] = s[i+1][k:]
-				continue
+				i++
+				continue Loop
+			}
+
+			switch s[i][k] {
+			case '-', '_':
+				if k == 0 {
+					if len(s[i]) == 1 {
+						s = remove(s, i)
+					} else {
+						s[i] = s[i][k+1:]
+					}
+				} else {
+					s = insert(s, i, s[i][:k])
+					s[i+1] = s[i+1][k+1:]
+					i++
+				}
+				continue Loop
 			}
 		}
 		i++
@@ -112,6 +129,10 @@ func insert(s []string, i int, v string) []string {
 	s = append(s[:i+1], s[i:]...)
 	s[i] = v
 	return s
+}
+
+func remove(s []string, i int) []string {
+	return append(s[:i], s[i+1:]...)
 }
 
 var pluralizeClient = pluralize.NewClient()
