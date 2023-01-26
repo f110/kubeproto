@@ -18,6 +18,7 @@ func TestToLowerCamelCase(t *testing.T) {
 func TestToUpperSnakeCase(t *testing.T) {
 	assert.Equal(t, "FOO", ToUpperSnakeCase("Foo"))
 	assert.Equal(t, "FOO_BAR", ToUpperSnakeCase("FooBar"))
+	assert.Equal(t, "HTTP_01", ToUpperSnakeCase("HTTP-01"))
 }
 
 func TestToLowerSnakeCase(t *testing.T) {
@@ -30,12 +31,25 @@ func TestToLowerSnakeCase(t *testing.T) {
 }
 
 func TestSplitString(t *testing.T) {
-	assert.Equal(t, []string{"User", "Admin"}, splitString("UserAdmin"))
-	assert.Equal(t, []string{"API", "Group"}, splitString("APIGroup"))
-	assert.Equal(t, []string{"User", "UID", "Group"}, splitString("UserUIDGroup"))
-	assert.Equal(t, []string{"Admin", "User", "UID", "Group"}, splitString("AdminUserUIDGroup"))
-	assert.Equal(t, []string{"Storage", "Version", "Hash"}, splitString("StorageVersionHash"))
-	assert.Equal(t, []string{"Server", "Address", "By", "Client", "CIDRs"}, splitString("ServerAddressByClientCIDRs"))
+	cases := []struct {
+		In    string
+		Split []string
+	}{
+		{In: "UserAdmin", Split: []string{"User", "Admin"}},
+		{In: "APIGroup", Split: []string{"API", "Group"}},
+		{In: "UserUIDGroup", Split: []string{"User", "UID", "Group"}},
+		{In: "AdminUserUIDGroup", Split: []string{"Admin", "User", "UID", "Group"}},
+		{In: "StorageVersionHash", Split: []string{"Storage", "Version", "Hash"}},
+		{In: "ServerAddressByClientCIDRs", Split: []string{"Server", "Address", "By", "Client", "CIDRs"}},
+		{In: "HTTP-01", Split: []string{"HTTP", "01"}},
+		{In: "HTTP_HTTPS", Split: []string{"HTTP", "HTTPS"}},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.In, func(t *testing.T) {
+			assert.Equal(t, tc.Split, splitString(tc.In))
+		})
+	}
 }
 
 func TestInsert(t *testing.T) {
