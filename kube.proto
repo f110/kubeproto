@@ -3,8 +3,14 @@ package dev.f110.kubeproto;
 
 import "google/protobuf/descriptor.proto";
 
+enum Scope {
+  SCOPE_NAMESPACED = 0;
+  SCOPE_CLUSTER = 1;
+}
+
 message Kind {
   repeated PrinterColumn additional_printer_columns = 1;
+  Scope scope = 2;
 }
 
 message Field {
