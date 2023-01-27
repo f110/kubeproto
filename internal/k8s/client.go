@@ -490,7 +490,7 @@ func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVe
 			// UpdateXXX
 			if m.Scope == definition.ScopeTypeCluster {
 				writer.F("func (c *%s) Update%s(ctx context.Context, v *%s, opts metav1.UpdateOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg, structNameWithPkg)
-				writer.F("result, err := c.backend.UpdateClusterSCoped(ctx, %q, %q, v, opts, &%s{})", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName, structNameWithPkg)
+				writer.F("result, err := c.backend.UpdateClusterScoped(ctx, %q, %q, v, opts, &%s{})", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName, structNameWithPkg)
 				writer.F("if err != nil {")
 				writer.F("return nil, err")
 				writer.F("}")
