@@ -105,6 +105,9 @@ func (g *CRDGenerator) Generate(out io.Writer) error {
 				Scope: apiextensionsv1.NamespaceScoped,
 			},
 		}
+		if msgs[0].Scope == definition.ScopeTypeCluster {
+			crd.Spec.Scope = apiextensionsv1.ClusterScoped
+		}
 		for _, m := range msgs {
 			k8sExt, err := m.Kubernetes()
 			if err != nil {

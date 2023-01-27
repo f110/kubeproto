@@ -15,6 +15,7 @@ message Grafana {
   GrafanaStatus status = 2;
 
   option (dev.f110.kubeproto.kind) = {
+    scope: SCOPE_CLUSTER
   };
 }
 
