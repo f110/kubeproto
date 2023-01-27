@@ -113,6 +113,13 @@ func isKind(desc protoreflect.MessageDescriptor) bool {
 	return true
 }
 
+type ScopeType string
+
+const (
+	ScopeTypeNamespaced ScopeType = "namespaced"
+	ScopeTypeCluster    ScopeType = "cluster"
+)
+
 type Message struct {
 	// Dep indicates that this message is dependent
 	Dep bool
@@ -133,6 +140,8 @@ type Message struct {
 	SubGroup string
 	// Version is the api version (e,g, v1alpha1)
 	Version string
+	// Scope is a type of this message.
+	Scope ScopeType
 
 	fileDescriptor    protoreflect.FileDescriptor
 	messageDescriptor protoreflect.MessageDescriptor
@@ -190,10 +199,14 @@ func NewMessageFromMessageDescriptor(m protoreflect.MessageDescriptor, f protore
 	}
 
 	var printerColumns []*kubeproto.PrinterColumn
+	messageScope := ScopeTypeNamespaced
 	e := proto.GetExtension(m.Options(), kubeproto.E_Kind)
 	ext := e.(*kubeproto.Kind)
 	if ext != nil {
 		printerColumns = ext.AdditionalPrinterColumns
+		if ext.Scope == kubeproto.Scope_SCOPE_CLUSTER {
+			messageScope = ScopeTypeCluster
+		}
 	}
 
 	var group, subGroup, version string
@@ -238,6 +251,7 @@ func NewMessageFromMessageDescriptor(m protoreflect.MessageDescriptor, f protore
 
 	if isKind(m) {
 		extendAsKind(msg)
+		msg.Scope = messageScope
 	}
 	return msg, nil
 }
