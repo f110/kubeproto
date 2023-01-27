@@ -1,0 +1,39 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+
+proto_library(
+    name = "blog_proto",
+    srcs = ["blog.proto"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:k8s_proto",
+        "//:kubeproto",
+    ],
+)
+
+load("//bazel:def.bzl", "kubeproto_go_api")
+
+kubeproto_go_api(
+    name = "blog_proto_kubeproto",
+    srcs = [":blog_proto"],
+    importpath = "go.f110.dev/kubeproto/example/pkg/apis/blogv1alpha2",
+)
+
+go_library(
+    name = "blogv1alpha2",
+    srcs = ["blog_proto_kubeproto.generated.object.go"],
+    importpath = "go.f110.dev/kubeproto/example/pkg/apis/blogv1alpha2",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/vendor/k8s.io/api/core/v1:core",
+        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
+        "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
+    ],
+)
+
+go_test(
+    name = "blogv1alpha2_test",
+    srcs = ["test_test.go"],
+    embed = [":blogv1alpha2"],
+)

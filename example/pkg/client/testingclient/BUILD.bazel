@@ -2,20 +2,19 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 load("//bazel:def.bzl", "go_testing_client")
 
 go_testing_client(
-    name = "github",
+    name = "k8s",
     srcs = [
-        "//example/pkg/apis/githubv1alpha1:github_proto",
-        "//example/pkg/apis/githubv1alpha2:github_proto",
-        "//example/pkg/apis/miniov1alpha1:minio_proto",
+        "//example/pkg/apis/blogv1alpha1:blog_proto",
+        "//example/pkg/apis/blogv1alpha2:blog_proto",
     ],
-    client = "//example/pkg/client:github",
+    client = "//example/pkg/client:k8s",
     importpath = "go.f110.dev/kubeproto/example/pkg/client/testingclient",
     visibility = ["//visibility:public"],
 )
 
 go_library(
     name = "testingclient",
-    srcs = ["github.generated.testingclient.go"],
+    srcs = ["k8s.generated.testingclient.go"],
     importpath = "go.f110.dev/kubeproto/example/pkg/client/testingclient",
     visibility = ["//visibility:public"],
     deps = [

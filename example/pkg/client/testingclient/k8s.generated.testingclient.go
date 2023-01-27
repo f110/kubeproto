@@ -38,9 +38,8 @@ func NewSet() *Set {
 		return true, w, nil
 	})
 
-	s.GrafanaV1alpha1 = client.NewGrafanaV1alpha1Client(&fakerBackend{fake: &s.fake})
-	s.GrafanaV1alpha2 = client.NewGrafanaV1alpha2Client(&fakerBackend{fake: &s.fake})
-	s.MinioV1alpha1 = client.NewMinioV1alpha1Client(&fakerBackend{fake: &s.fake})
+	s.BlogV1alpha1 = client.NewBlogV1alpha1Client(&fakerBackend{fake: &s.fake})
+	s.BlogV1alpha2 = client.NewBlogV1alpha2Client(&fakerBackend{fake: &s.fake})
 	return s
 }
 
