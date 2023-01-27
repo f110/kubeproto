@@ -55,6 +55,13 @@ type Backend interface {
 	UpdateStatus(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	Delete(ctx context.Context, gvr schema.GroupVersionResource, namespace, name string, opts metav1.DeleteOptions) error
 	Watch(ctx context.Context, gvr schema.GroupVersionResource, namespace string, opts metav1.ListOptions) (watch.Interface, error)
+	GetClusterScoped(ctx context.Context, resourceName, kindName, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error)
+	ListClusterScoped(ctx context.Context, resourceName, kindName string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error)
+	CreateClusterScoped(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error)
+	UpdateClusterScoped(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
+	UpdateStatusClusterScoped(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
+	DeleteClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, name string, opts metav1.DeleteOptions) error
+	WatchClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, opts metav1.ListOptions) (watch.Interface, error)
 }
 type Set struct {
 	GrafanaV1alpha1 *GrafanaV1alpha1
@@ -198,6 +205,88 @@ func (r *restBackend) Watch(ctx context.Context, gvr schema.GroupVersionResource
 		Watch(ctx)
 }
 
+func (r *restBackend) GetClusterScoped(ctx context.Context, resourceName, kindName, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error) {
+	return result, r.client.Get().
+		Resource(resourceName).
+		Name(name).
+		VersionedParams(&opts, ParameterCodec).
+		Do(ctx).
+		Into(result)
+}
+
+func (r *restBackend) ListClusterScoped(ctx context.Context, resourceName, kindName string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error) {
+	var timeout time.Duration
+	if opts.TimeoutSeconds != nil {
+		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	}
+	return result, r.client.Get().
+		Resource(resourceName).
+		VersionedParams(&opts, ParameterCodec).
+		Timeout(timeout).
+		Do(ctx).
+		Into(result)
+}
+
+func (r *restBackend) CreateClusterScoped(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error) {
+	return result, r.client.Post().
+		Resource(resourceName).
+		VersionedParams(&opts, ParameterCodec).
+		Body(obj).
+		Do(ctx).
+		Into(result)
+}
+
+func (r *restBackend) UpdateClusterScoped(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
+	m := obj.(metav1.Object)
+	if m == nil {
+		return nil, errors.New("obj is not implement metav1.Object")
+	}
+	return result, r.client.Put().
+		Resource(resourceName).
+		Name(m.GetName()).
+		VersionedParams(&opts, ParameterCodec).
+		Body(obj).
+		Do(ctx).
+		Into(result)
+}
+
+func (r *restBackend) UpdateStatusClusterScoped(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
+	m := obj.(metav1.Object)
+	if m == nil {
+		return nil, errors.New("obj is not implement metav1.Object")
+	}
+	return result, r.client.Put().
+		Resource(resourceName).
+		Name(m.GetName()).
+		SubResource("status").
+		VersionedParams(&opts, ParameterCodec).
+		Body(obj).
+		Do(ctx).
+		Into(result)
+}
+
+func (r *restBackend) DeleteClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, name string, opts metav1.DeleteOptions) error {
+	return r.client.Delete().
+		Resource(gvr.Resource).
+		Name(name).
+		Body(&opts).
+		Do(ctx).
+		Error()
+}
+
+func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, opts metav1.ListOptions) (watch.Interface, error) {
+	var timeout time.Duration
+	if opts.TimeoutSeconds != nil {
+		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	}
+	opts.Watch = true
+	return r.client.Get().
+		Resource(gvr.Resource).
+		VersionedParams(&opts, ParameterCodec).
+		Timeout(timeout).
+		Watch(ctx)
+}
+
 type GrafanaV1alpha1 struct {
 	backend Backend
 }
@@ -206,8 +295,8 @@ func NewGrafanaV1alpha1Client(b Backend) *GrafanaV1alpha1 {
 	return &GrafanaV1alpha1{backend: b}
 }
 
-func (c *GrafanaV1alpha1) GetGrafana(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*githubv1alpha1.Grafana, error) {
-	result, err := c.backend.Get(ctx, "grafanas", "Grafana", namespace, name, opts, &githubv1alpha1.Grafana{})
+func (c *GrafanaV1alpha1) GetGrafana(ctx context.Context, name string, opts metav1.GetOptions) (*githubv1alpha1.Grafana, error) {
+	result, err := c.backend.GetClusterScoped(ctx, "grafanas", "Grafana", name, opts, &githubv1alpha1.Grafana{})
 	if err != nil {
 		return nil, err
 	}
@@ -215,7 +304,7 @@ func (c *GrafanaV1alpha1) GetGrafana(ctx context.Context, namespace, name string
 }
 
 func (c *GrafanaV1alpha1) CreateGrafana(ctx context.Context, v *githubv1alpha1.Grafana, opts metav1.CreateOptions) (*githubv1alpha1.Grafana, error) {
-	result, err := c.backend.Create(ctx, "grafanas", "Grafana", v, opts, &githubv1alpha1.Grafana{})
+	result, err := c.backend.CreateClusterScoped(ctx, "grafanas", "Grafana", v, opts, &githubv1alpha1.Grafana{})
 	if err != nil {
 		return nil, err
 	}
@@ -223,27 +312,27 @@ func (c *GrafanaV1alpha1) CreateGrafana(ctx context.Context, v *githubv1alpha1.G
 }
 
 func (c *GrafanaV1alpha1) UpdateGrafana(ctx context.Context, v *githubv1alpha1.Grafana, opts metav1.UpdateOptions) (*githubv1alpha1.Grafana, error) {
-	result, err := c.backend.Update(ctx, "grafanas", "Grafana", v, opts, &githubv1alpha1.Grafana{})
+	result, err := c.backend.UpdateClusterSCoped(ctx, "grafanas", "Grafana", v, opts, &githubv1alpha1.Grafana{})
 	if err != nil {
 		return nil, err
 	}
 	return result.(*githubv1alpha1.Grafana), nil
 }
 
-func (c *GrafanaV1alpha1) DeleteGrafana(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "grafana.f110.dev", Version: "v1alpha1", Resource: "grafanas"}, namespace, name, opts)
+func (c *GrafanaV1alpha1) DeleteGrafana(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "grafana.f110.dev", Version: "v1alpha1", Resource: "grafanas"}, name, opts)
 }
 
-func (c *GrafanaV1alpha1) ListGrafana(ctx context.Context, namespace string, opts metav1.ListOptions) (*githubv1alpha1.GrafanaList, error) {
-	result, err := c.backend.List(ctx, "grafanas", "Grafana", namespace, opts, &githubv1alpha1.GrafanaList{})
+func (c *GrafanaV1alpha1) ListGrafana(ctx context.Context, opts metav1.ListOptions) (*githubv1alpha1.GrafanaList, error) {
+	result, err := c.backend.ListClusterScoped(ctx, "grafanas", "Grafana", opts, &githubv1alpha1.GrafanaList{})
 	if err != nil {
 		return nil, err
 	}
 	return result.(*githubv1alpha1.GrafanaList), nil
 }
 
-func (c *GrafanaV1alpha1) WatchGrafana(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "grafana.f110.dev", Version: "v1alpha1", Resource: "grafanas"}, namespace, opts)
+func (c *GrafanaV1alpha1) WatchGrafana(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "grafana.f110.dev", Version: "v1alpha1", Resource: "grafanas"}, opts)
 }
 
 func (c *GrafanaV1alpha1) GetGrafanaUser(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*githubv1alpha1.GrafanaUser, error) {
@@ -596,10 +685,10 @@ func (f *GrafanaV1alpha1Informer) GrafanaInformer() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListGrafana(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.ListGrafana(context.TODO(), metav1.ListOptions{})
 				},
 				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchGrafana(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.WatchGrafana(context.TODO(), metav1.ListOptions{})
 				},
 			},
 			&githubv1alpha1.Grafana{},
@@ -767,16 +856,16 @@ func NewGrafanaV1alpha1GrafanaLister(indexer cache.Indexer) *GrafanaV1alpha1Graf
 	return &GrafanaV1alpha1GrafanaLister{indexer: indexer}
 }
 
-func (x *GrafanaV1alpha1GrafanaLister) List(namespace string, selector labels.Selector) ([]*githubv1alpha1.Grafana, error) {
+func (x *GrafanaV1alpha1GrafanaLister) List(selector labels.Selector) ([]*githubv1alpha1.Grafana, error) {
 	var ret []*githubv1alpha1.Grafana
-	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
+	err := cache.ListAll(x.indexer, selector, func(m interface{}) {
 		ret = append(ret, m.(*githubv1alpha1.Grafana).DeepCopy())
 	})
 	return ret, err
 }
 
-func (x *GrafanaV1alpha1GrafanaLister) Get(namespace, name string) (*githubv1alpha1.Grafana, error) {
-	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
+func (x *GrafanaV1alpha1GrafanaLister) Get(name string) (*githubv1alpha1.Grafana, error) {
+	obj, exists, err := x.indexer.GetByKey("/" + name)
 	if err != nil {
 		return nil, err
 	}

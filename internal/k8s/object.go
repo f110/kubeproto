@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"log"
 	"path"
 	"strings"
 
@@ -211,7 +210,6 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 		objs = objs[1:]
 	}
 
-	log.Println(g.packageNamespaceManager.All())
 	w.F("import (")
 	for p, a := range importPackages {
 		if a != "" {
