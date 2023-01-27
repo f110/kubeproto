@@ -1,43 +1,41 @@
 .PHONY: build
-build: githubv1alpha1 githubv1alpha2 miniov1alpha1 \
-		pkg/client/github.generated.client.go \
-		crd/github.crd.yaml
+build: pkg/apis/blogv1alpha1/blog_proto_kubeproto.generated.object.go \
+		pkg/apis/blogv1alpha2/blog_proto_kubeproto.generated.object.go \
+		pkg/client/k8s.generated.client.go \
+		pkg/client/testingclient/k8s.generated.testingclient.go \
+		crd/k8s.crd.yaml
 
-.PHONY: githubv1alpha1
-githubv1alpha1: pkg/apis/githubv1alpha1/github.proto
-	bazel build //example/pkg/apis/githubv1alpha1:github_proto_kubeproto
-	@rm -f pkg/apis/$@/github_proto_kubeproto.generated.object.go
-	cp ../bazel-bin/example/pkg/apis/$@/github_proto_kubeproto.generated.object.go pkg/apis/$@
-
-.PHONY: githubv1alpha2
-githubv1alpha2: pkg/apis/githubv1alpha2/github.proto
-	bazel build //example/pkg/apis/githubv1alpha2:github_proto_kubeproto
-	@rm -f pkg/apis/$@/github_proto_kubeproto.generated.object.go
-	cp ../bazel-bin/example/pkg/apis/$@/github_proto_kubeproto.generated.object.go pkg/apis/$@
-
-.PHONY: miniov1alpha1
-miniov1alpha1: pkg/apis/miniov1alpha1/minio.proto
-	bazel build //example/pkg/apis/miniov1alpha1:minio_proto_kubeproto
-	@rm -f pkg/apis/$@/minio_proto_kubeproto.generated.object.go
-	cp ../bazel-bin/example/pkg/apis/$@/minio_proto_kubeproto.generated.object.go pkg/apis/$@
-
-.PHONY: pkg/client/github.generated.client.go
-pkg/client/github.generated.client.go: pkg/apis/githubv1alpha1/github.proto pkg/apis/githubv1alpha2/github.proto pkg/apis/miniov1alpha1/minio.proto
-	bazel build //example/pkg/client:github
+.PHONY: pkg/apis/blogv1alpha1/blog_proto_kubeproto.generated.object.go
+pkg/apis/blogv1alpha1/blog_proto_kubeproto.generated.object.go:
+	bazel build //example/pkg/apis/blogv1alpha1:blog_proto_kubeproto
 	@rm -f $@
 	cp ../bazel-bin/example/$@ $(@D)
 	@chmod 644 $@
 
-.PHONY: pkg/client/testingclient/github.generated.testingclient.go
-pkg/client/testingclient/github.generated.testingclient.go: pkg/apis/githubv1alpha1/github.proto pkg/apis/githubv1alpha2/github.proto pkg/apis/miniov1alpha1/minio.proto
-	bazel build //example/pkg/client/testingclient:github
+.PHONY: pkg/apis/blogv1alpha2/blog_proto_kubeproto.generated.object.go
+pkg/apis/blogv1alpha2/blog_proto_kubeproto.generated.object.go:
+	bazel build //example/pkg/apis/blogv1alpha2:blog_proto_kubeproto
 	@rm -f $@
 	cp ../bazel-bin/example/$@ $(@D)
 	@chmod 644 $@
 
-.PHONY: crd/github.crd.yaml
-crd/github.crd.yaml: pkg/apis/githubv1alpha1/github.proto pkg/apis/githubv1alpha2/github.proto pkg/apis/miniov1alpha1/minio.proto
-	bazel build //example/crd:github
+.PHONY: pkg/client/k8s.generated.client.go
+pkg/client/k8s.generated.client.go: pkg/apis/blogv1alpha1/blog.proto pkg/apis/blogv1alpha2/blog.proto
+	bazel build //example/pkg/client:k8s
+	@rm -f $@
+	cp ../bazel-bin/example/$@ $(@D)
+	@chmod 644 $@
+
+.PHONY: pkg/client/testingclient/k8s.generated.testingclient.go
+pkg/client/testingclient/k8s.generated.testingclient.go: pkg/apis/blogv1alpha1/blog.proto pkg/apis/blogv1alpha2/blog.proto
+	bazel build //example/pkg/client/testingclient:k8s
+	@rm -f $@
+	cp ../bazel-bin/example/$@ $(@D)
+	@chmod 644 $@
+
+.PHONY: crd/blog.crd.yaml
+crd/blog.crd.yaml: pkg/apis/blogv1alpha1/blog.proto pkg/apis/blogv1alpha2/blog.proto
+	bazel build //example/crd:blog
 	@rm -f $@
 	cp ../bazel-bin/example/$@ $(@D)
 	@chmod 644 $@

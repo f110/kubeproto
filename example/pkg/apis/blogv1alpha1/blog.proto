@@ -1,0 +1,43 @@
+syntax = "proto3";
+package example.apis.blogv1alpha1;
+option  go_package              = "go.f110.dev/kubeproto/example/pkg/apis/blogv1alpha1";
+option (dev.f110.kubeproto.k8s) = {
+  domain: "f110.dev"
+  sub_group: "blog"
+  version: "v1alpha1"
+};
+
+import "kube.proto";
+
+message Blog {
+  BlogSpec   spec   = 1;
+  BlogStatus status = 2;
+
+  option (dev.f110.kubeproto.kind) = {
+    scope: SCOPE_CLUSTER
+  };
+}
+
+message BlogSpec {
+  string title = 1;
+}
+
+message BlogStatus {
+  bool ready = 1;
+}
+
+message Post {
+  PostSpec   spec   = 1;
+  PostStatus status = 2;
+
+  option (dev.f110.kubeproto.kind) = {
+  };
+}
+
+message PostSpec {
+  string subject = 1;
+}
+
+message PostStatus {
+  bool ready = 1;
+}

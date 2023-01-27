@@ -2,30 +2,30 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 load("@rules_proto//proto:defs.bzl", "proto_library")
 
 proto_library(
-    name = "github_proto",
-    srcs = ["github.proto"],
+    name = "blog_proto",
+    srcs = ["blog.proto"],
     visibility = ["//visibility:public"],
     deps = [
         "//:kubeproto",
     ],
 )
 
+load("//bazel:def.bzl", "kubeproto_go_api")
+
+kubeproto_go_api(
+    name = "blog_proto_kubeproto",
+    srcs = [":blog_proto"],
+    importpath = "go.f110.dev/kubeproto/example/pkg/apis/blogv1alpha1",
+)
+
 go_library(
-    name = "githubv1alpha2",
-    srcs = ["github_proto_kubeproto.generated.object.go"],
-    importpath = "go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha2",
+    name = "blogv1alpha1",
+    srcs = ["blog_proto_kubeproto.generated.object.go"],
+    importpath = "go.f110.dev/kubeproto/example/pkg/apis/blogv1alpha1",
     visibility = ["//visibility:public"],
     deps = [
         "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
         "//example/vendor/k8s.io/apimachinery/pkg/runtime",
         "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
     ],
-)
-
-load("//bazel:def.bzl", "kubeproto_go_api")
-
-kubeproto_go_api(
-    name = "github_proto_kubeproto",
-    srcs = [":github_proto"],
-    importpath = "go.f110.dev/kubeproto/example/pkg/apis/githubv1alpha2",
 )
