@@ -173,7 +173,11 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 					continue
 				}
 				if f.Inline {
-					defW.F("out.%s = in.%s", f.Name, f.Name)
+					_, alias, typ := g.lister.ResolveGoType(packageName, f)
+					if alias != "" {
+						typ = strings.TrimPrefix(typ, alias+".")
+					}
+					defW.F("out.%s = in.%s", typ, typ)
 				} else {
 					defW.F("in.%s.DeepCopyInto(&out.%s)", f.Name, f.Name)
 				}
