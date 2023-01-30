@@ -3,7 +3,7 @@ build: pkg/apis/blogv1alpha1/blog_proto_kubeproto.generated.object.go \
 		pkg/apis/blogv1alpha2/blog_proto_kubeproto.generated.object.go \
 		pkg/client/k8s.generated.client.go \
 		pkg/client/testingclient/k8s.generated.testingclient.go \
-		crd/k8s.crd.yaml
+		crd/blog.crd.yaml
 
 .PHONY: pkg/apis/blogv1alpha1/blog_proto_kubeproto.generated.object.go
 pkg/apis/blogv1alpha1/blog_proto_kubeproto.generated.object.go:

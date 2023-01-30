@@ -276,6 +276,7 @@ type BlogSpec struct {
 	Tags               []string                  `json:"tags"`
 	Categories         []Category                `json:"categories"`
 	ServiceAccountJSON *corev1.SecretKeySelector `json:"serviceAccountJSON,omitempty"`
+	EditorSelector     LabelSelector             `json:"editorSelector"`
 }
 
 func (in *BlogSpec) DeepCopyInto(out *BlogSpec) {
@@ -298,6 +299,7 @@ func (in *BlogSpec) DeepCopyInto(out *BlogSpec) {
 		*out = new(corev1.SecretKeySelector)
 		(*in).DeepCopyInto(*out)
 	}
+	in.EditorSelector.DeepCopyInto(&out.EditorSelector)
 }
 
 func (in *BlogSpec) DeepCopy() *BlogSpec {
@@ -383,6 +385,25 @@ func (in *Category) DeepCopy() *Category {
 		return nil
 	}
 	out := new(Category)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type LabelSelector struct {
+	metav1.LabelSelector `json:",inline"`
+	Namespace            string `json:"namespace,omitempty"`
+}
+
+func (in *LabelSelector) DeepCopyInto(out *LabelSelector) {
+	*out = *in
+	out.LabelSelector = in.LabelSelector
+}
+
+func (in *LabelSelector) DeepCopy() *LabelSelector {
+	if in == nil {
+		return nil
+	}
+	out := new(LabelSelector)
 	in.DeepCopyInto(out)
 	return out
 }
