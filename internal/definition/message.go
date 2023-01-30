@@ -192,6 +192,7 @@ func NewMessageFromMessageDescriptor(m protoreflect.MessageDescriptor, f protore
 			MessageName: messageName,
 			Description: description,
 			Inline:      inline,
+			Embed:       inline,
 			Optional:    v.HasOptionalKeyword() || v.IsMap(),
 			SubResource: subResource,
 			descriptor:  v,
