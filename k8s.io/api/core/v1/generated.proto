@@ -608,6 +608,7 @@ message ComponentStatus {
   repeated ComponentCondition conditions = 3 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
+    scope: SCOPE_CLUSTER
   };
 }
 
@@ -1697,6 +1698,7 @@ message Namespace {
   optional NamespaceStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
+    scope: SCOPE_CLUSTER
   };
 }
 
@@ -1745,6 +1747,7 @@ message Node {
   optional NodeStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
+    scope: SCOPE_CLUSTER
   };
 }
 
@@ -2018,6 +2021,7 @@ message PersistentVolume {
   optional PersistentVolumeStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
+    scope: SCOPE_CLUSTER
   };
 }
 

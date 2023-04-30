@@ -608,7 +608,7 @@ message ObjectMeta {
   // the system and never used; it will be removed completely in 1.25.
   // The name in the go struct is changed to help clients detect
   // accidental use.
-  optional string z_z_z__deprecated_cluster_name = 15 [(dev.f110.kubeproto.field) = { go_name: "ZZZ_DeprecatedClusterName", api_field_name: "clusterName", inline: false }];
+  optional string z_z_z_deprecated_cluster_name = 15 [(dev.f110.kubeproto.field) = { go_name: "ZZZ_DeprecatedClusterName", api_field_name: "clusterName", inline: false }];
   // ManagedFields maps workflow-id and version to the set of fields
   // that are managed by that workflow. This is mostly for internal
   // housekeeping, and users typically shouldn't need to set or
