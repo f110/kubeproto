@@ -245,6 +245,7 @@ message GatewayClass {
   optional GatewayClassStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
+    scope: SCOPE_CLUSTER
   };
 }
 
