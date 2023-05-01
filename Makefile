@@ -56,6 +56,11 @@ k8s.io/api/apps/v1/generated.proto:
 	mkdir -p $(@D)
 	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.apps.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/apis/appsv1" --api-domain apps --api-version v1 --all $(CURDIR)/vendor/$(@D)
 
+.PHONY: k8s.io/api/batch/v1/generated.proto
+k8s.io/api/batch/v1/generated.proto:
+	mkdir -p $(@D)
+	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.batch.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/apis/batchv1" --api-domain apps --api-version v1 --all $(CURDIR)/vendor/$(@D)
+
 .PHONY: k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto
 k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto:
 	mkdir -p $(@D)
@@ -77,5 +82,12 @@ apis/corev1/corev1_kubeproto.generated.object.go: k8s.io/api/core/v1/generated.p
 apis/appsv1/appsv1_kubeproto.generated.object.go: k8s.io/api/apps/v1/generated.proto
 	@mkdir -p $(@D)
 	bazel build //$(<D):appsv1_kubeproto
+	cp ./bazel-bin/$(<D)/$(@F) $(@D)
+	@chmod 0644 $@
+
+.PHONY: apis/batchv1/batchv1_kubeproto.generated.object.go
+apis/batchv1/batchv1_kubeproto.generated.object.go: k8s.io/api/batch/v1/generated.proto
+	@mkdir -p $(@D)
+	bazel build //$(<D):batchv1_kubeproto
 	cp ./bazel-bin/$(<D)/$(@F) $(@D)
 	@chmod 0644 $@
