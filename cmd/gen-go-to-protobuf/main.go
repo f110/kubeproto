@@ -11,7 +11,7 @@ import (
 )
 
 func genGoToProtobuf(args []string) error {
-	var out, protoPackage, goPackage, apiDomain, apiSubGroup, apiVersion, importPrefix string
+	var out, protoPackage, goPackage, apiDomain, apiSubGroup, apiVersion, importPrefix, kubeprotoPackage string
 	var imports []string
 	var allStructs bool
 	fs := pflag.NewFlagSet("gen-to-to-protobuf", pflag.PanicOnError)
@@ -27,6 +27,8 @@ func genGoToProtobuf(args []string) error {
 		"The second element is the package name in protobuf. "+
 		"The third element is the import path.")
 	fs.StringVar(&importPrefix, "import-prefix", "", "Import path prefix")
+	fs.StringVar(&kubeprotoPackage, "kubeproto-package", "", "")
+	fs.MarkHidden("kubeproto-package")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
@@ -42,6 +44,7 @@ func genGoToProtobuf(args []string) error {
 		g.SetAPIVersion(apiVersion)
 		g.AddImport(imports...)
 		g.SetImportPrefix(importPrefix)
+		g.SetKubeprotoPackage(kubeprotoPackage)
 		if err := g.AddDir(v, allStructs); err != nil {
 			return err
 		}

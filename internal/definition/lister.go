@@ -43,6 +43,9 @@ func (l *Lister) GetMessages() Messages {
 
 	var msgs Messages
 	addMessage := func(m protoreflect.MessageDescriptor, desc protoreflect.FileDescriptor) bool {
+		if m.IsMapEntry() {
+			return true
+		}
 		msg, err := NewMessageFromMessageDescriptor(m, desc, l.packageNameManager)
 		if err != nil {
 			return false
@@ -135,7 +138,7 @@ func (l *Lister) GetEnums() Enums {
 	return enums
 }
 
-func (l *Lister) ResolveGoType(packageName string, f *Field) (string, string, string) {
+func (l *Lister) ResolveGoType(packageName string, f *Field) (importPath string, packageAlias string, typeName string) {
 	if f.typeName != "" {
 		return f.importPath, f.packageAlias, f.typeName
 	}
@@ -143,14 +146,26 @@ func (l *Lister) ResolveGoType(packageName string, f *Field) (string, string, st
 	if f.IsMap() {
 		key, value := f.MapKeyValue()
 		keyTyp := protoreflectKindMap[key.Kind()]
-		valTyp := protoreflectKindMap[value.Kind()]
+		valTyp, ok := protoreflectKindMap[value.Kind()]
+		if !ok {
+			_, _, typ := l.protoreflectKindToGoType(packageName, value.Kind(), string(value.Message().FullName()), false, false)
+			valTyp = typ
+		}
 		return "", "", fmt.Sprintf("map[%s]%s", keyTyp, valTyp)
 	}
 
+	importPath, packageAlias, typ := l.protoreflectKindToGoType(packageName, f.Kind, f.MessageName, f.Optional, f.Repeated)
+	f.importPath = importPath
+	f.packageAlias = packageAlias
+	f.typeName = typ
+	return importPath, packageAlias, typ
+}
+
+func (l *Lister) protoreflectKindToGoType(packageName string, f protoreflect.Kind, messageName string, optional, repeated bool) (string, string, string) {
 	var importPath, typ, packageAlias string
-	switch f.Kind {
+	switch f {
 	case protoreflect.MessageKind:
-		m := l.GetMessages().Find(f.MessageName)
+		m := l.GetMessages().Find(messageName)
 		if m == nil {
 			return "", "", ""
 		}
@@ -166,22 +181,29 @@ func (l *Lister) ResolveGoType(packageName string, f *Field) (string, string, st
 		} else {
 			typ = m.ShortName
 		}
-		if f.Optional {
+		if optional {
 			typ = "*" + typ
 		}
 	case protoreflect.EnumKind:
-		e := l.GetEnums().Find(f.MessageName)
-		typ = e.ShortName
+		e := l.GetEnums().Find(messageName)
+		if e.Package.Path != "" && e.Package.Path != packageName {
+			importPath = e.Package.Path
+			alias := e.Package.Alias
+			if alias == "" {
+				alias = filepath.Base(e.Package.Path)
+			}
+			packageAlias = alias
+			typ = fmt.Sprintf("%s.%s", alias, e.ShortName)
+		} else {
+			typ = e.ShortName
+		}
 	default:
-		typ = protoreflectKindMap[f.Kind]
+		typ = protoreflectKindMap[f]
 	}
 
-	if f.Repeated {
+	if repeated {
 		typ = "[]" + typ
 	}
 
-	f.importPath = importPath
-	f.packageAlias = packageAlias
-	f.typeName = typ
 	return importPath, packageAlias, typ
 }
