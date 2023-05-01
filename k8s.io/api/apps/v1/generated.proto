@@ -20,24 +20,24 @@ enum DaemonSetUpdateStrategyType {
 }
 
 enum DeploymentConditionType {
-  DEPLOYMENT_CONDITION_TYPE_AVAILABLE       = 0;
-  DEPLOYMENT_CONDITION_TYPE_PROGRESSING     = 1;
+  DEPLOYMENT_CONDITION_TYPE_AVAILABLE       = 0 [(dev.f110.kubeproto.value) = { value: "Available" }];
+  DEPLOYMENT_CONDITION_TYPE_PROGRESSING     = 1 [(dev.f110.kubeproto.value) = { value: "Progressing" }];
   DEPLOYMENT_CONDITION_TYPE_REPLICA_FAILURE = 2;
 }
 
 enum DeploymentStrategyType {
-  DEPLOYMENT_STRATEGY_TYPE_RECREATE       = 0;
+  DEPLOYMENT_STRATEGY_TYPE_RECREATE       = 0 [(dev.f110.kubeproto.value) = { value: "Recreate" }];
   DEPLOYMENT_STRATEGY_TYPE_ROLLING_UPDATE = 1;
 }
 
 enum PersistentVolumeClaimRetentionPolicyType {
-  PERSISTENT_VOLUME_CLAIM_RETENTION_POLICY_TYPE_RETAIN = 0;
-  PERSISTENT_VOLUME_CLAIM_RETENTION_POLICY_TYPE_DELETE = 1;
+  PERSISTENT_VOLUME_CLAIM_RETENTION_POLICY_TYPE_RETAIN = 0 [(dev.f110.kubeproto.value) = { value: "Retain" }];
+  PERSISTENT_VOLUME_CLAIM_RETENTION_POLICY_TYPE_DELETE = 1 [(dev.f110.kubeproto.value) = { value: "Delete" }];
 }
 
 enum PodManagementPolicyType {
   POD_MANAGEMENT_POLICY_TYPE_ORDERED_READY = 0;
-  POD_MANAGEMENT_POLICY_TYPE_PARALLEL      = 1;
+  POD_MANAGEMENT_POLICY_TYPE_PARALLEL      = 1 [(dev.f110.kubeproto.value) = { value: "Parallel" }];
 }
 
 enum ReplicaSetConditionType {

@@ -66,8 +66,8 @@ type AzureDataDiskCachingMode string
 
 const (
 	AzureDataDiskCachingModeNone      AzureDataDiskCachingMode = "None"
-	AzureDataDiskCachingModeReadonly  AzureDataDiskCachingMode = "ReadOnly"
-	AzureDataDiskCachingModeReadwrite AzureDataDiskCachingMode = "ReadWrite"
+	AzureDataDiskCachingModeReadOnly  AzureDataDiskCachingMode = "ReadOnly"
+	AzureDataDiskCachingModeReadWrite AzureDataDiskCachingMode = "ReadWrite"
 )
 
 type AzureDataDiskKind string
@@ -95,8 +95,8 @@ const (
 type DNSPolicy string
 
 const (
-	DNSPolicyClusterfirstwithhostnet DNSPolicy = "ClusterFirstWithHostNet"
-	DNSPolicyClusterfirst            DNSPolicy = "ClusterFirst"
+	DNSPolicyClusterFirstWithHostNet DNSPolicy = "ClusterFirstWithHostNet"
+	DNSPolicyClusterFirst            DNSPolicy = "ClusterFirst"
 	DNSPolicyDefault                 DNSPolicy = "Default"
 	DNSPolicyNone                    DNSPolicy = "None"
 )
@@ -110,14 +110,14 @@ const (
 type HostPathType string
 
 const (
-	HostPathTypeHostpathunset     HostPathType = "HostPathUnset"
-	HostPathTypeDirectoryorcreate HostPathType = "DirectoryOrCreate"
+	HostPathTypeHostPathUnset     HostPathType = "HostPathUnset"
+	HostPathTypeDirectoryOrCreate HostPathType = "DirectoryOrCreate"
 	HostPathTypeDirectory         HostPathType = "Directory"
-	HostPathTypeFileorcreate      HostPathType = "FileOrCreate"
+	HostPathTypeFileOrCreate      HostPathType = "FileOrCreate"
 	HostPathTypeFile              HostPathType = "File"
 	HostPathTypeSocket            HostPathType = "Socket"
-	HostPathTypeChardevice        HostPathType = "CharDevice"
-	HostPathTypeBlockdevice       HostPathType = "BlockDevice"
+	HostPathTypeCharDevice        HostPathType = "CharDevice"
+	HostPathTypeBlockDevice       HostPathType = "BlockDevice"
 )
 
 type IPFamily string
@@ -130,9 +130,9 @@ const (
 type IPFamilyPolicyType string
 
 const (
-	IPFamilyPolicyTypeSinglestack      IPFamilyPolicyType = "SingleStack"
-	IPFamilyPolicyTypePreferdualstack  IPFamilyPolicyType = "PreferDualStack"
-	IPFamilyPolicyTypeRequiredualstack IPFamilyPolicyType = "RequireDualStack"
+	IPFamilyPolicyTypeSingleStack      IPFamilyPolicyType = "SingleStack"
+	IPFamilyPolicyTypePreferDualStack  IPFamilyPolicyType = "PreferDualStack"
+	IPFamilyPolicyTypeRequireDualStack IPFamilyPolicyType = "RequireDualStack"
 )
 
 type LimitType string
@@ -140,25 +140,25 @@ type LimitType string
 const (
 	LimitTypePod                   LimitType = "Pod"
 	LimitTypeContainer             LimitType = "Container"
-	LimitTypePersistentvolumeclaim LimitType = "PersistentVolumeClaim"
+	LimitTypePersistentVolumeClaim LimitType = "PersistentVolumeClaim"
 )
 
 type MountPropagationMode string
 
 const (
 	MountPropagationModeNone            MountPropagationMode = "None"
-	MountPropagationModeHosttocontainer MountPropagationMode = "HostToContainer"
+	MountPropagationModeHostToContainer MountPropagationMode = "HostToContainer"
 	MountPropagationModeBidirectional   MountPropagationMode = "Bidirectional"
 )
 
 type NamespaceConditionType string
 
 const (
-	NamespaceConditionTypeNamespacedeletiondiscoveryfailure           NamespaceConditionType = "NamespaceDeletionDiscoveryFailure"
-	NamespaceConditionTypeNamespacedeletioncontentfailure             NamespaceConditionType = "NamespaceDeletionContentFailure"
-	NamespaceConditionTypeNamespacedeletiongroupversionparsingfailure NamespaceConditionType = "NamespaceDeletionGroupVersionParsingFailure"
-	NamespaceConditionTypeNamespacecontentremaining                   NamespaceConditionType = "NamespaceContentRemaining"
-	NamespaceConditionTypeNamespacefinalizersremaining                NamespaceConditionType = "NamespaceFinalizersRemaining"
+	NamespaceConditionTypeNamespaceDeletionDiscoveryFailure           NamespaceConditionType = "NamespaceDeletionDiscoveryFailure"
+	NamespaceConditionTypeNamespaceDeletionContentFailure             NamespaceConditionType = "NamespaceDeletionContentFailure"
+	NamespaceConditionTypeNamespaceDeletionGroupVersionParsingFailure NamespaceConditionType = "NamespaceDeletionGroupVersionParsingFailure"
+	NamespaceConditionTypeNamespaceContentRemaining                   NamespaceConditionType = "NamespaceContentRemaining"
+	NamespaceConditionTypeNamespaceFinalizersRemaining                NamespaceConditionType = "NamespaceFinalizersRemaining"
 )
 
 type NamespacePhase string
@@ -172,20 +172,20 @@ type NodeAddressType string
 
 const (
 	NodeAddressTypeHostname    NodeAddressType = "Hostname"
-	NodeAddressTypeInternalip  NodeAddressType = "InternalIP"
-	NodeAddressTypeExternalip  NodeAddressType = "ExternalIP"
-	NodeAddressTypeInternaldns NodeAddressType = "InternalDNS"
-	NodeAddressTypeExternaldns NodeAddressType = "ExternalDNS"
+	NodeAddressTypeInternalIP  NodeAddressType = "InternalIP"
+	NodeAddressTypeExternalIP  NodeAddressType = "ExternalIP"
+	NodeAddressTypeInternalDNS NodeAddressType = "InternalDNS"
+	NodeAddressTypeExternalDNS NodeAddressType = "ExternalDNS"
 )
 
 type NodeConditionType string
 
 const (
 	NodeConditionTypeReady              NodeConditionType = "Ready"
-	NodeConditionTypeMemorypressure     NodeConditionType = "MemoryPressure"
-	NodeConditionTypeDiskpressure       NodeConditionType = "DiskPressure"
-	NodeConditionTypePidpressure        NodeConditionType = "PIDPressure"
-	NodeConditionTypeNetworkunavailable NodeConditionType = "NetworkUnavailable"
+	NodeConditionTypeMemoryPressure     NodeConditionType = "MemoryPressure"
+	NodeConditionTypeDiskPressure       NodeConditionType = "DiskPressure"
+	NodeConditionTypePIDPressure        NodeConditionType = "PIDPressure"
+	NodeConditionTypeNetworkUnavailable NodeConditionType = "NetworkUnavailable"
 )
 
 type NodePhase string
@@ -200,9 +200,9 @@ type NodeSelectorOperator string
 
 const (
 	NodeSelectorOperatorIn           NodeSelectorOperator = "In"
-	NodeSelectorOperatorNotin        NodeSelectorOperator = "NotIn"
+	NodeSelectorOperatorNotIn        NodeSelectorOperator = "NotIn"
 	NodeSelectorOperatorExists       NodeSelectorOperator = "Exists"
-	NodeSelectorOperatorDoesnotexist NodeSelectorOperator = "DoesNotExist"
+	NodeSelectorOperatorDoesNotExist NodeSelectorOperator = "DoesNotExist"
 	NodeSelectorOperatorGt           NodeSelectorOperator = "Gt"
 	NodeSelectorOperatorLt           NodeSelectorOperator = "Lt"
 )
@@ -217,17 +217,17 @@ const (
 type PersistentVolumeAccessMode string
 
 const (
-	PersistentVolumeAccessModeReadwriteonce    PersistentVolumeAccessMode = "ReadWriteOnce"
-	PersistentVolumeAccessModeReadonlymany     PersistentVolumeAccessMode = "ReadOnlyMany"
-	PersistentVolumeAccessModeReadwritemany    PersistentVolumeAccessMode = "ReadWriteMany"
-	PersistentVolumeAccessModeReadwriteoncepod PersistentVolumeAccessMode = "ReadWriteOncePod"
+	PersistentVolumeAccessModeReadWriteOnce    PersistentVolumeAccessMode = "ReadWriteOnce"
+	PersistentVolumeAccessModeReadOnlyMany     PersistentVolumeAccessMode = "ReadOnlyMany"
+	PersistentVolumeAccessModeReadWriteMany    PersistentVolumeAccessMode = "ReadWriteMany"
+	PersistentVolumeAccessModeReadWriteOncePod PersistentVolumeAccessMode = "ReadWriteOncePod"
 )
 
 type PersistentVolumeClaimConditionType string
 
 const (
 	PersistentVolumeClaimConditionTypeResizing                PersistentVolumeClaimConditionType = "Resizing"
-	PersistentVolumeClaimConditionTypeFilesystemresizepending PersistentVolumeClaimConditionType = "FileSystemResizePending"
+	PersistentVolumeClaimConditionTypeFileSystemResizePending PersistentVolumeClaimConditionType = "FileSystemResizePending"
 )
 
 type PersistentVolumeClaimPhase string
@@ -241,12 +241,12 @@ const (
 type PersistentVolumeClaimResizeStatus string
 
 const (
-	PersistentVolumeClaimResizeStatusPersistentvolumeclaimnoexpansioninprogress PersistentVolumeClaimResizeStatus = "PersistentVolumeClaimNoExpansionInProgress"
-	PersistentVolumeClaimResizeStatusControllerexpansioninprogress              PersistentVolumeClaimResizeStatus = "ControllerExpansionInProgress"
-	PersistentVolumeClaimResizeStatusControllerexpansionfailed                  PersistentVolumeClaimResizeStatus = "ControllerExpansionFailed"
-	PersistentVolumeClaimResizeStatusNodeexpansionpending                       PersistentVolumeClaimResizeStatus = "NodeExpansionPending"
-	PersistentVolumeClaimResizeStatusNodeexpansioninprogress                    PersistentVolumeClaimResizeStatus = "NodeExpansionInProgress"
-	PersistentVolumeClaimResizeStatusNodeexpansionfailed                        PersistentVolumeClaimResizeStatus = "NodeExpansionFailed"
+	PersistentVolumeClaimResizeStatusPersistentVolumeClaimNoExpansionInProgress PersistentVolumeClaimResizeStatus = "PersistentVolumeClaimNoExpansionInProgress"
+	PersistentVolumeClaimResizeStatusControllerExpansionInProgress              PersistentVolumeClaimResizeStatus = "ControllerExpansionInProgress"
+	PersistentVolumeClaimResizeStatusControllerExpansionFailed                  PersistentVolumeClaimResizeStatus = "ControllerExpansionFailed"
+	PersistentVolumeClaimResizeStatusNodeExpansionPending                       PersistentVolumeClaimResizeStatus = "NodeExpansionPending"
+	PersistentVolumeClaimResizeStatusNodeExpansionInProgress                    PersistentVolumeClaimResizeStatus = "NodeExpansionInProgress"
+	PersistentVolumeClaimResizeStatusNodeExpansionFailed                        PersistentVolumeClaimResizeStatus = "NodeExpansionFailed"
 )
 
 type PersistentVolumeMode string
@@ -277,16 +277,16 @@ const (
 type PodConditionType string
 
 const (
-	PodConditionTypeContainersready PodConditionType = "ContainersReady"
+	PodConditionTypeContainersReady PodConditionType = "ContainersReady"
 	PodConditionTypeInitialized     PodConditionType = "Initialized"
 	PodConditionTypeReady           PodConditionType = "Ready"
-	PodConditionTypePodscheduled    PodConditionType = "PodScheduled"
+	PodConditionTypePodScheduled    PodConditionType = "PodScheduled"
 )
 
 type PodFSGroupChangePolicy string
 
 const (
-	PodFSGroupChangePolicyOnrootmismatch PodFSGroupChangePolicy = "OnRootMismatch"
+	PodFSGroupChangePolicyOnRootMismatch PodFSGroupChangePolicy = "OnRootMismatch"
 	PodFSGroupChangePolicyAlways         PodFSGroupChangePolicy = "Always"
 )
 
@@ -305,13 +305,13 @@ type PodQOSClass string
 const (
 	PodQOSClassGuaranteed PodQOSClass = "Guaranteed"
 	PodQOSClassBurstable  PodQOSClass = "Burstable"
-	PodQOSClassBesteffort PodQOSClass = "BestEffort"
+	PodQOSClassBestEffort PodQOSClass = "BestEffort"
 )
 
 type PreemptionPolicy string
 
 const (
-	PreemptionPolicyPreemptlowerpriority PreemptionPolicy = "PreemptLowerPriority"
+	PreemptionPolicyPreemptLowerPriority PreemptionPolicy = "PreemptLowerPriority"
 	PreemptionPolicyNever                PreemptionPolicy = "Never"
 )
 
@@ -325,9 +325,9 @@ const (
 type Protocol string
 
 const (
-	ProtocolTcp  Protocol = "TCP"
-	ProtocolUdp  Protocol = "UDP"
-	ProtocolSctp Protocol = "SCTP"
+	ProtocolTCP  Protocol = "TCP"
+	ProtocolUDP  Protocol = "UDP"
+	ProtocolSCTP Protocol = "SCTP"
 )
 
 type PullPolicy string
@@ -335,13 +335,13 @@ type PullPolicy string
 const (
 	PullPolicyAlways       PullPolicy = "Always"
 	PullPolicyNever        PullPolicy = "Never"
-	PullPolicyIfnotpresent PullPolicy = "IfNotPresent"
+	PullPolicyIfNotPresent PullPolicy = "IfNotPresent"
 )
 
 type ReplicationControllerConditionType string
 
 const (
-	ReplicationControllerConditionTypeReplicafailure ReplicationControllerConditionType = "ReplicaFailure"
+	ReplicationControllerConditionTypeReplicaFailure ReplicationControllerConditionType = "ReplicaFailure"
 )
 
 type ResourceName string
@@ -373,18 +373,18 @@ type ResourceQuotaScope string
 
 const (
 	ResourceQuotaScopeTerminating               ResourceQuotaScope = "Terminating"
-	ResourceQuotaScopeNotterminating            ResourceQuotaScope = "NotTerminating"
-	ResourceQuotaScopeBesteffort                ResourceQuotaScope = "BestEffort"
-	ResourceQuotaScopeNotbesteffort             ResourceQuotaScope = "NotBestEffort"
-	ResourceQuotaScopePriorityclass             ResourceQuotaScope = "PriorityClass"
-	ResourceQuotaScopeCrossnamespacepodaffinity ResourceQuotaScope = "CrossNamespacePodAffinity"
+	ResourceQuotaScopeNotTerminating            ResourceQuotaScope = "NotTerminating"
+	ResourceQuotaScopeBestEffort                ResourceQuotaScope = "BestEffort"
+	ResourceQuotaScopeNotBestEffort             ResourceQuotaScope = "NotBestEffort"
+	ResourceQuotaScopePriorityClass             ResourceQuotaScope = "PriorityClass"
+	ResourceQuotaScopeCrossNamespacePodAffinity ResourceQuotaScope = "CrossNamespacePodAffinity"
 )
 
 type RestartPolicy string
 
 const (
 	RestartPolicyAlways    RestartPolicy = "Always"
-	RestartPolicyOnfailure RestartPolicy = "OnFailure"
+	RestartPolicyOnFailure RestartPolicy = "OnFailure"
 	RestartPolicyNever     RestartPolicy = "Never"
 )
 
@@ -392,16 +392,16 @@ type ScopeSelectorOperator string
 
 const (
 	ScopeSelectorOperatorIn           ScopeSelectorOperator = "In"
-	ScopeSelectorOperatorNotin        ScopeSelectorOperator = "NotIn"
+	ScopeSelectorOperatorNotIn        ScopeSelectorOperator = "NotIn"
 	ScopeSelectorOperatorExists       ScopeSelectorOperator = "Exists"
-	ScopeSelectorOperatorDoesnotexist ScopeSelectorOperator = "DoesNotExist"
+	ScopeSelectorOperatorDoesNotExist ScopeSelectorOperator = "DoesNotExist"
 )
 
 type SeccompProfileType string
 
 const (
 	SeccompProfileTypeUnconfined     SeccompProfileType = "Unconfined"
-	SeccompProfileTypeRuntimedefault SeccompProfileType = "RuntimeDefault"
+	SeccompProfileTypeRuntimeDefault SeccompProfileType = "RuntimeDefault"
 	SeccompProfileTypeLocalhost      SeccompProfileType = "Localhost"
 )
 
@@ -421,7 +421,7 @@ const (
 type ServiceAffinity string
 
 const (
-	ServiceAffinityClientip ServiceAffinity = "ClientIP"
+	ServiceAffinityClientIP ServiceAffinity = "ClientIP"
 	ServiceAffinityNone     ServiceAffinity = "None"
 )
 
@@ -442,33 +442,33 @@ const (
 type ServiceType string
 
 const (
-	ServiceTypeClusterip    ServiceType = "ClusterIP"
-	ServiceTypeNodeport     ServiceType = "NodePort"
-	ServiceTypeLoadbalancer ServiceType = "LoadBalancer"
-	ServiceTypeExternalname ServiceType = "ExternalName"
+	ServiceTypeClusterIP    ServiceType = "ClusterIP"
+	ServiceTypeNodePort     ServiceType = "NodePort"
+	ServiceTypeLoadBalancer ServiceType = "LoadBalancer"
+	ServiceTypeExternalName ServiceType = "ExternalName"
 )
 
 type StorageMedium string
 
 const (
-	StorageMediumDefault   StorageMedium = "Default"
+	StorageMediumDEFAULT   StorageMedium = "DEFAULT"
 	StorageMediumMemory    StorageMedium = "Memory"
-	StorageMediumHugepages StorageMedium = "HugePages"
+	StorageMediumHugePages StorageMedium = "HugePages"
 )
 
 type TaintEffect string
 
 const (
-	TaintEffectNoschedule       TaintEffect = "NoSchedule"
-	TaintEffectPrefernoschedule TaintEffect = "PreferNoSchedule"
-	TaintEffectNoexecute        TaintEffect = "NoExecute"
+	TaintEffectNoSchedule       TaintEffect = "NoSchedule"
+	TaintEffectPreferNoSchedule TaintEffect = "PreferNoSchedule"
+	TaintEffectNoExecute        TaintEffect = "NoExecute"
 )
 
 type TerminationMessagePolicy string
 
 const (
 	TerminationMessagePolicyFile                  TerminationMessagePolicy = "File"
-	TerminationMessagePolicyFallbacktologsonerror TerminationMessagePolicy = "FallbackToLogsOnError"
+	TerminationMessagePolicyFallbackToLogsOnError TerminationMessagePolicy = "FallbackToLogsOnError"
 )
 
 type TolerationOperator string
@@ -481,15 +481,15 @@ const (
 type URIScheme string
 
 const (
-	URISchemeHttp  URIScheme = "HTTP"
-	URISchemeHttps URIScheme = "HTTPS"
+	URISchemeHTTP  URIScheme = "HTTP"
+	URISchemeHTTPS URIScheme = "HTTPS"
 )
 
 type UnsatisfiableConstraintAction string
 
 const (
-	UnsatisfiableConstraintActionDonotschedule  UnsatisfiableConstraintAction = "DoNotSchedule"
-	UnsatisfiableConstraintActionScheduleanyway UnsatisfiableConstraintAction = "ScheduleAnyway"
+	UnsatisfiableConstraintActionDoNotSchedule  UnsatisfiableConstraintAction = "DoNotSchedule"
+	UnsatisfiableConstraintActionScheduleAnyway UnsatisfiableConstraintAction = "ScheduleAnyway"
 )
 
 type Binding struct {
@@ -642,7 +642,7 @@ type ConfigMap struct {
 	// The keys stored in Data must not overlap with the keys in
 	// the BinaryData field, this is enforced during validation process.
 	Data map[string]string `json:"data,omitempty"`
-	// Binarydata contains the binary data.
+	// BinaryData contains the binary data.
 	// Each key must consist of alphanumeric characters, '-', '_' or '.'.
 	// BinaryData can contain byte sequences that are not in the UTF-8 range.
 	// The keys stored in BinaryData must not overlap with the ones in
@@ -1907,12 +1907,12 @@ type ServiceAccount struct {
 	// Instead, tokens can be requested directly using the TokenRequest API, or service account token secrets can be manually created.
 	// More info: https://kubernetes.io/docs/concepts/configuration/secret
 	Secrets []ObjectReference `json:"secrets"`
-	// Imagepullsecrets is a list of references to secrets in the same namespace to use for pulling any images
+	// ImagePullSecrets is a list of references to secrets in the same namespace to use for pulling any images
 	// in pods that reference this ServiceAccount. ImagePullSecrets are distinct from Secrets because Secrets
 	// can be mounted in the pod, but ImagePullSecrets are only accessed by the kubelet.
 	// More info: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
 	ImagePullSecrets []LocalObjectReference `json:"imagePullSecrets"`
-	// Automountserviceaccounttoken indicates whether pods running as this service account should have an API token automatically mounted.
+	// AutomountServiceAccountToken indicates whether pods running as this service account should have an API token automatically mounted.
 	// Can be overridden at the pod level.
 	AutomountServiceAccountToken bool `json:"automountServiceAccountToken,omitempty"`
 }
@@ -2033,7 +2033,7 @@ type ObjectReference struct {
 	// Name of the referent.
 	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
 	Name string `json:"name,omitempty"`
-	// Uid of the referent.
+	// UID of the referent.
 	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids
 	UID string `json:"uid,omitempty"`
 	// API version of the referent.
@@ -2261,7 +2261,7 @@ func (in *NamespaceStatus) DeepCopy() *NamespaceStatus {
 }
 
 type NodeSpec struct {
-	// Podcidr represents the pod IP range assigned to the node.
+	// PodCIDR represents the pod IP range assigned to the node.
 	PodCIDR string `json:"podCIDR,omitempty"`
 	// podCIDRs represents the IP ranges assigned to the node for usage by Pods on that node. If this
 	// field is specified, the 0th entry must match the podCIDR field. It may contain at most 1 value for
@@ -2547,7 +2547,7 @@ type PersistentVolumeClaimSpec struct {
 	// * An existing PVC (PersistentVolumeClaim)
 	// If the provisioner or an external controller can support the specified data source,
 	// it will create a new volume based on the contents of the specified data source.
-	// If the AnyVolumeDatasource feature gate is enabled, this field will always have
+	// If the AnyVolumeDataSource feature gate is enabled, this field will always have
 	// the same contents as the DataSourceRef field.
 	DataSource *TypedLocalObjectReference `json:"dataSource,omitempty"`
 	// dataSourceRef specifies the object from which to populate the volume with data, if a non-empty
@@ -2558,7 +2558,7 @@ type PersistentVolumeClaimSpec struct {
 	// provisioner.
 	// This field will replace the functionality of the DataSource field and as such
 	// if both fields are non-empty, they must have the same value. For backwards
-	// compatibility, both fields (DataSource and Datasourceref) will be set to the same
+	// compatibility, both fields (DataSource and DataSourceRef) will be set to the same
 	// value automatically if one of them is empty and the other is non-empty.
 	// There are two important differences between DataSource and DataSourceRef:
 	// * While DataSource only allows two specific types of objects, DataSourceRef
@@ -2619,7 +2619,7 @@ type PersistentVolumeClaimStatus struct {
 	// conditions is the current Condition of persistent volume claim. If underlying persistent volume is being
 	// resized then the Condition will be set to 'ResizeStarted'.
 	Conditions []PersistentVolumeClaimCondition `json:"conditions"`
-	// allocatedResources is the storage resource within Allocatedresources tracks the capacity allocated to a PVC. It may
+	// allocatedResources is the storage resource within AllocatedResources tracks the capacity allocated to a PVC. It may
 	// be larger than the actual capacity when a volume expansion operation is requested.
 	// For storage quota, the larger value from allocatedResources and PVC.spec.resources is used.
 	// If allocatedResources is not set, PVC.spec.resources alone is used for quota calculation.
@@ -2629,7 +2629,7 @@ type PersistentVolumeClaimStatus struct {
 	// This is an alpha field and requires enabling RecoverVolumeExpansionFailure feature.
 	AllocatedResources map[string]apiresource.Quantity `json:"allocatedResources,omitempty"`
 	// resizeStatus stores status of resize operation.
-	// Resizestatus is not set by default but when expansion is complete resizeStatus is set to empty
+	// ResizeStatus is not set by default but when expansion is complete resizeStatus is set to empty
 	// string by resize controller or kubelet.
 	// This is an alpha field and requires enabling RecoverVolumeExpansionFailure feature.
 	ResizeStatus PersistentVolumeClaimResizeStatus `json:"resizeStatus,omitempty"`
@@ -2701,7 +2701,7 @@ type PodSpec struct {
 	// pod to perform user-initiated actions such as debugging. This list cannot be specified when
 	// creating a pod, and it cannot be modified by updating the pod spec. In order to add an
 	// ephemeral container to an existing pod, use the pod's ephemeralcontainers subresource.
-	// This field is beta-level and available on clusters that haven't disabled the Ephemeralcontainers feature gate.
+	// This field is beta-level and available on clusters that haven't disabled the EphemeralContainers feature gate.
 	EphemeralContainers []EphemeralContainer `json:"ephemeralContainers"`
 	// Restart policy for all containers within the pod.
 	// One of Always, OnFailure, Never.
@@ -2724,23 +2724,23 @@ type PodSpec struct {
 	// Set DNS policy for the pod.
 	// Defaults to "ClusterFirst".
 	// Valid values are 'ClusterFirstWithHostNet', 'ClusterFirst', 'Default' or 'None'.
-	// DNS parameters given in DNSConfig will be merged with the policy selected with Dnspolicy.
+	// DNS parameters given in DNSConfig will be merged with the policy selected with DNSPolicy.
 	// To have DNS options set along with hostNetwork, you have to specify DNS policy
 	// explicitly to 'ClusterFirstWithHostNet'.
 	DNSPolicy DNSPolicy `json:"dnsPolicy,omitempty"`
-	// Nodeselector is a selector which must be true for the pod to fit on a node.
+	// NodeSelector is a selector which must be true for the pod to fit on a node.
 	// Selector which must match a node's labels for the pod to be scheduled on that node.
 	// More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
 	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
-	// Serviceaccountname is the name of the ServiceAccount to use to run this pod.
+	// ServiceAccountName is the name of the ServiceAccount to use to run this pod.
 	// More info: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
 	ServiceAccountName string `json:"serviceAccountName,omitempty"`
-	// Deprecatedserviceaccount is a depreciated alias for ServiceAccountName.
+	// DeprecatedServiceAccount is a depreciated alias for ServiceAccountName.
 	// Deprecated: Use serviceAccountName instead.
 	DeprecatedServiceAccount string `json:"serviceAccount,omitempty"`
-	// Automountserviceaccounttoken indicates whether a service account token should be automatically mounted.
+	// AutomountServiceAccountToken indicates whether a service account token should be automatically mounted.
 	AutomountServiceAccountToken bool `json:"automountServiceAccountToken,omitempty"`
-	// Nodename is a request to schedule this pod onto a specific node. If it is non-empty,
+	// NodeName is a request to schedule this pod onto a specific node. If it is non-empty,
 	// the scheduler simply schedules this pod onto that node, assuming that it fits resource
 	// requirements.
 	NodeName string `json:"nodeName,omitempty"`
@@ -2757,13 +2757,13 @@ type PodSpec struct {
 	// Share a single process namespace between all of the containers in a pod.
 	// When this is set containers will be able to view and signal processes from other containers
 	// in the same pod, and the first process in each container will not be assigned PID 1.
-	// HostPID and Shareprocessnamespace cannot both be set.
+	// HostPID and ShareProcessNamespace cannot both be set.
 	// Optional: Default to false.
 	ShareProcessNamespace bool `json:"shareProcessNamespace,omitempty"`
-	// Securitycontext holds pod-level security attributes and common container settings.
+	// SecurityContext holds pod-level security attributes and common container settings.
 	// Optional: Defaults to empty.  See type description for default values of each field.
 	SecurityContext *PodSecurityContext `json:"securityContext,omitempty"`
-	// Imagepullsecrets is an optional list of references to secrets in the same namespace to use for pulling any of the images used by this PodSpec.
+	// ImagePullSecrets is an optional list of references to secrets in the same namespace to use for pulling any of the images used by this PodSpec.
 	// If specified, these secrets will be passed to individual puller implementations for them to use.
 	// More info: https://kubernetes.io/docs/concepts/containers/images#specifying-imagepullsecrets-on-a-pod
 	ImagePullSecrets []LocalObjectReference `json:"imagePullSecrets"`
@@ -2780,7 +2780,7 @@ type PodSpec struct {
 	SchedulerName string `json:"schedulerName,omitempty"`
 	// If specified, the pod's tolerations.
 	Tolerations []Toleration `json:"tolerations"`
-	// Hostaliases is an optional list of hosts and IPs that will be injected into the pod's hosts
+	// HostAliases is an optional list of hosts and IPs that will be injected into the pod's hosts
 	// file if specified. This is only valid for non-hostNetwork pods.
 	HostAliases []HostAlias `json:"hostAliases"`
 	// If specified, indicates the pod's priority. "system-node-critical" and
@@ -2805,17 +2805,17 @@ type PodSpec struct {
 	// all conditions specified in the readiness gates have status equal to "True"
 	// More info: https://git.k8s.io/enhancements/keps/sig-network/580-pod-readiness-gates
 	ReadinessGates []PodReadinessGate `json:"readinessGates"`
-	// Runtimeclassname refers to a RuntimeClass object in the node.k8s.io group, which should be used
+	// RuntimeClassName refers to a RuntimeClass object in the node.k8s.io group, which should be used
 	// to run this pod.  If no RuntimeClass resource matches the named class, the pod will not be run.
 	// If unset or empty, the "legacy" RuntimeClass will be used, which is an implicit class with an
 	// empty definition that uses the default runtime handler.
 	// More info: https://git.k8s.io/enhancements/keps/sig-node/585-runtime-class
 	RuntimeClassName string `json:"runtimeClassName,omitempty"`
-	// Enableservicelinks indicates whether information about services should be injected into pod's
+	// EnableServiceLinks indicates whether information about services should be injected into pod's
 	// environment variables, matching the syntax of Docker links.
 	// Optional: Defaults to true.
 	EnableServiceLinks bool `json:"enableServiceLinks,omitempty"`
-	// Preemptionpolicy is the Policy for preempting pods with lower priority.
+	// PreemptionPolicy is the Policy for preempting pods with lower priority.
 	// One of Never, PreemptLowerPriority.
 	// Defaults to PreemptLowerPriority if unset.
 	PreemptionPolicy PreemptionPolicy `json:"preemptionPolicy,omitempty"`
@@ -2827,7 +2827,7 @@ type PodSpec struct {
 	// defined in the corresponding RuntimeClass, otherwise it will remain unset and treated as zero.
 	// More info: https://git.k8s.io/enhancements/keps/sig-node/688-pod-overhead/README.md
 	Overhead map[string]apiresource.Quantity `json:"overhead,omitempty"`
-	// Topologyspreadconstraints describes how a group of pods ought to spread across topology
+	// TopologySpreadConstraints describes how a group of pods ought to spread across topology
 	// domains. Scheduler will schedule pods in a way which abides by the constraints.
 	// All topologySpreadConstraints are ANDed.
 	TopologySpreadConstraints []TopologySpreadConstraint `json:"topologySpreadConstraints"`
@@ -2837,7 +2837,7 @@ type PodSpec struct {
 	// If a pod does not have FQDN, this has no effect.
 	// Default to false.
 	SetHostnameAsFQDN bool `json:"setHostnameAsFQDN,omitempty"`
-	// Specifies the Os of the containers in the pod.
+	// Specifies the OS of the containers in the pod.
 	// Some pod and container fields are restricted if this is set.
 	// If the OS field is set to linux, the following fields must be unset:
 	// -securityContext.windowsOptions
@@ -3031,7 +3031,7 @@ type PodStatus struct {
 	// More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
 	ContainerStatuses []ContainerStatus `json:"containerStatuses"`
 	// The Quality of Service (QOS) classification assigned to the pod based on resource requirements
-	// See PodQosclass type for available QOS classes
+	// See PodQOSClass type for available QOS classes
 	// More info: https://git.k8s.io/community/contributors/design-proposals/node/resource-qos.md
 	QOSClass PodQOSClass `json:"qosClass,omitempty"`
 	// Status for any ephemeral containers that have run in this pod.
@@ -3181,7 +3181,7 @@ type ReplicationControllerStatus struct {
 	ReadyReplicas int `json:"readyReplicas,omitempty"`
 	// The number of available replicas (ready for at least minReadySeconds) for this replication controller.
 	AvailableReplicas int `json:"availableReplicas,omitempty"`
-	// Observedgeneration reflects the generation of the most recently observed replication controller.
+	// ObservedGeneration reflects the generation of the most recently observed replication controller.
 	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
 	// Represents the latest available observations of a replication controller's current state.
 	Conditions []ReplicationControllerCondition `json:"conditions"`
@@ -3215,7 +3215,7 @@ type ResourceQuotaSpec struct {
 	// If not specified, the quota matches all objects.
 	Scopes []ResourceQuotaScope `json:"scopes"`
 	// scopeSelector is also a collection of filters like scopes that must match each object tracked by a quota
-	// but expressed using ScopeselectorOperator in combination with possible values.
+	// but expressed using ScopeSelectorOperator in combination with possible values.
 	// For a resource to match, both scopes AND scopeSelector (if specified in spec), must be matched.
 	ScopeSelector *ScopeSelector `json:"scopeSelector,omitempty"`
 }
@@ -3307,12 +3307,12 @@ type ServiceSpec struct {
 	// empty string (""), or a valid IP address. Setting this to "None" makes a
 	// "headless service" (no virtual IP), which is useful when direct endpoint
 	// connections are preferred and proxying is not required.  Only applies to
-	// types Clusterip, NodePort, and LoadBalancer. If this field is specified
+	// types ClusterIP, NodePort, and LoadBalancer. If this field is specified
 	// when creating a Service of type ExternalName, creation will fail. This
 	// field will be wiped when updating a Service to type ExternalName.
 	// More info: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
 	ClusterIP string `json:"clusterIP,omitempty"`
-	// Clusterips is a list of IP addresses assigned to this service, and are
+	// ClusterIPs is a list of IP addresses assigned to this service, and are
 	// usually assigned randomly.  If an address is specified manually, is
 	// in-range (as per system configuration), and is not in use, it will be
 	// allocated to the service; otherwise creation of the service will fail.
@@ -3381,7 +3381,7 @@ type ServiceSpec struct {
 	// externalName is the external reference that discovery mechanisms will
 	// return as an alias for this service (e.g. a DNS CNAME record). No
 	// proxying will be involved.  Must be a lowercase RFC-1123 hostname
-	// (https://tools.ietf.org/html/rfc1123) and requires `type` to be "Externalname".
+	// (https://tools.ietf.org/html/rfc1123) and requires `type` to be "ExternalName".
 	ExternalName string `json:"externalName,omitempty"`
 	// externalTrafficPolicy denotes if this Service desires to route external
 	// traffic to node-local or cluster-wide endpoints. "Local" preserves the
@@ -3411,7 +3411,7 @@ type ServiceSpec struct {
 	PublishNotReadyAddresses bool `json:"publishNotReadyAddresses,omitempty"`
 	// sessionAffinityConfig contains the configurations of session affinity.
 	SessionAffinityConfig *SessionAffinityConfig `json:"sessionAffinityConfig,omitempty"`
-	// Ipfamilies is a list of IP families (e.g. IPv4, IPv6) assigned to this
+	// IPFamilies is a list of IP families (e.g. IPv4, IPv6) assigned to this
 	// service. This field is usually assigned automatically based on cluster
 	// configuration and the ipFamilyPolicy field. If this field is specified
 	// manually, the requested family is available in the cluster,
@@ -3427,7 +3427,7 @@ type ServiceSpec struct {
 	// clusterIPs field, if specified. Both clusterIPs and ipFamilies are
 	// governed by the ipFamilyPolicy field.
 	IPFamilies []IPFamily `json:"ipFamilies"`
-	// Ipfamilypolicy represents the dual-stack-ness requested or required by
+	// IPFamilyPolicy represents the dual-stack-ness requested or required by
 	// this Service. If there is no value provided, then this field will be set
 	// to SingleStack. Services can be "SingleStack" (a single IP family),
 	// "PreferDualStack" (two IP families on dual-stack configured clusters or
@@ -3455,7 +3455,7 @@ type ServiceSpec struct {
 	// This field can only be set when creating or updating a Service to type 'LoadBalancer'.
 	// Once set, it can not be changed. This field will be wiped when a service is updated to a non 'LoadBalancer' type.
 	LoadBalancerClass string `json:"loadBalancerClass,omitempty"`
-	// Internaltrafficpolicy specifies if the cluster internal traffic
+	// InternalTrafficPolicy specifies if the cluster internal traffic
 	// should be routed to all endpoints or node-local endpoints only.
 	// "Cluster" routes internal traffic to a Service to all endpoints.
 	// "Local" routes traffic to node-local endpoints only, traffic is
@@ -3517,7 +3517,7 @@ func (in *ServiceSpec) DeepCopy() *ServiceSpec {
 }
 
 type ServiceStatus struct {
-	// Loadbalancer contains the current status of the load-balancer,
+	// LoadBalancer contains the current status of the load-balancer,
 	// if one is present.
 	LoadBalancer *LoadBalancerStatus `json:"loadBalancer,omitempty"`
 	// Current service state
@@ -3569,7 +3569,7 @@ func (in *LocalObjectReference) DeepCopy() *LocalObjectReference {
 }
 
 type EndpointAddress struct {
-	// The Ip of this endpoint.
+	// The IP of this endpoint.
 	// May not be loopback (127.0.0.0/8), link-local (169.254.0.0/16),
 	// or link-local multicast ((224.0.0.0/24).
 	// IPv6 is also accepted but not fully supported on all platforms. Also, certain
@@ -3644,9 +3644,9 @@ type LimitRangeItem struct {
 	Min map[string]apiresource.Quantity `json:"min,omitempty"`
 	// Default resource requirement limit value by resource name if resource limit is omitted.
 	Default map[string]apiresource.Quantity `json:"default,omitempty"`
-	// Defaultrequest is the default resource requirement request value by resource name if resource request is omitted.
+	// DefaultRequest is the default resource requirement request value by resource name if resource request is omitted.
 	DefaultRequest map[string]apiresource.Quantity `json:"defaultRequest,omitempty"`
-	// Maxlimitrequestratio if specified, the named resource must have a request and limit that are both non-zero where limit divided by request is less than or equal to the enumerated value; this represents the max burst for the named resource.
+	// MaxLimitRequestRatio if specified, the named resource must have a request and limit that are both non-zero where limit divided by request is less than or equal to the enumerated value; this represents the max burst for the named resource.
 	MaxLimitRequestRatio map[string]apiresource.Quantity `json:"maxLimitRequestRatio,omitempty"`
 }
 
@@ -3735,7 +3735,7 @@ type Taint struct {
 	// that do not tolerate the taint.
 	// Valid effects are NoSchedule, PreferNoSchedule and NoExecute.
 	Effect TaintEffect `json:"effect"`
-	// Timeadded represents the time at which the taint was added.
+	// TimeAdded represents the time at which the taint was added.
 	// It is only written for NoExecute taints.
 	TimeAdded *metav1.Time `json:"timeAdded,omitempty"`
 }
@@ -3759,7 +3759,7 @@ func (in *Taint) DeepCopy() *Taint {
 }
 
 type NodeConfigSource struct {
-	// Configmap is a reference to a Node's ConfigMap
+	// ConfigMap is a reference to a Node's ConfigMap
 	ConfigMap *ConfigMapNodeConfigSource `json:"configMap,omitempty"`
 }
 
@@ -3863,11 +3863,11 @@ func (in *NodeDaemonEndpoints) DeepCopy() *NodeDaemonEndpoints {
 }
 
 type NodeSystemInfo struct {
-	// Machineid reported by the node. For unique machine identification
+	// MachineID reported by the node. For unique machine identification
 	// in the cluster this field is preferred. Learn more from man(5)
 	// machine-id: http://man7.org/linux/man-pages/man5/machine-id.5.html
 	MachineID string `json:"machineID"`
-	// Systemuuid reported by the node. For unique machine identification
+	// SystemUUID reported by the node. For unique machine identification
 	// MachineID is preferred. This field is specific to Red Hat hosts
 	// https://access.redhat.com/documentation/en-us/red_hat_subscription_management/1/html/rhsm/uuid
 	SystemUUID string `json:"systemUUID"`
@@ -3931,7 +3931,7 @@ func (in *ContainerImage) DeepCopy() *ContainerImage {
 type AttachedVolume struct {
 	// Name of the attached volume
 	Name string `json:"name"`
-	// Devicepath represents the device path where the volume should be available
+	// DevicePath represents the device path where the volume should be available
 	DevicePath string `json:"devicePath"`
 }
 
@@ -3963,7 +3963,7 @@ type NodeConfigStatus struct {
 	// or the current LastKnownGood config, depending on whether attempting to use the
 	// Assigned config results in an error.
 	Active *NodeConfigSource `json:"active,omitempty"`
-	// Lastknowngood reports the checkpointed config the node will fall back to
+	// LastKnownGood reports the checkpointed config the node will fall back to
 	// when it encounters an error attempting to use the Assigned config.
 	// The Assigned config becomes the LastKnownGood config when the node determines
 	// that the Assigned config is stable and correct.
@@ -4037,13 +4037,13 @@ type PersistentVolumeSource struct {
 	// exposed to the pod. Provisioned by an admin.
 	// More info: https://examples.k8s.io/volumes/glusterfs/README.md
 	Glusterfs *GlusterfsPersistentVolumeSource `json:"glusterfs,omitempty"`
-	// nfs represents an Nfs mount on the host. Provisioned by an admin.
+	// nfs represents an NFS mount on the host. Provisioned by an admin.
 	// More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs
 	NFS *NFSVolumeSource `json:"nfs,omitempty"`
 	// rbd represents a Rados Block Device mount on the host that shares a pod's lifetime.
 	// More info: https://examples.k8s.io/volumes/rbd/README.md
 	RBD *RBDPersistentVolumeSource `json:"rbd,omitempty"`
-	// iscsi represents an Iscsi Disk resource that is attached to a
+	// iscsi represents an ISCSI Disk resource that is attached to a
 	// kubelet's host machine and then exposed to the pod. Provisioned by an admin.
 	ISCSI *ISCSIPersistentVolumeSource `json:"iscsi,omitempty"`
 	// cinder represents a cinder volume attached and mounted on kubelets host machine.
@@ -4070,14 +4070,14 @@ type PersistentVolumeSource struct {
 	PhotonPersistentDisk *PhotonPersistentDiskVolumeSource `json:"photonPersistentDisk,omitempty"`
 	// portworxVolume represents a portworx volume attached and mounted on kubelets host machine
 	PortworxVolume *PortworxVolumeSource `json:"portworxVolume,omitempty"`
-	// scaleIO represents a Scaleio persistent volume attached and mounted on Kubernetes nodes.
+	// scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes.
 	ScaleIO *ScaleIOPersistentVolumeSource `json:"scaleIO,omitempty"`
 	// local represents directly-attached storage with node affinity
 	Local *LocalVolumeSource `json:"local,omitempty"`
-	// storageOS represents a Storageos volume that is attached to the kubelet's host machine and mounted into the pod
+	// storageOS represents a StorageOS volume that is attached to the kubelet's host machine and mounted into the pod
 	// More info: https://examples.k8s.io/volumes/storageos/README.md
 	StorageOS *StorageOSPersistentVolumeSource `json:"storageos,omitempty"`
-	// csi represents storage that is handled by an external Csi driver (Beta feature).
+	// csi represents storage that is handled by an external CSI driver (Beta feature).
 	CSI *CSIPersistentVolumeSource `json:"csi,omitempty"`
 }
 
@@ -4266,7 +4266,7 @@ func (in *ResourceRequirements) DeepCopy() *ResourceRequirements {
 }
 
 type TypedLocalObjectReference struct {
-	// Apigroup is the group for the resource being referenced.
+	// APIGroup is the group for the resource being referenced.
 	// If APIGroup is not specified, the specified Kind must be in the core API group.
 	// For any other third-party types, APIGroup is required.
 	APIGroup string `json:"apiGroup,omitempty"`
@@ -4422,7 +4422,7 @@ type Container struct {
 	// Cannot be updated.
 	// More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
 	ReadinessProbe *Probe `json:"readinessProbe,omitempty"`
-	// Startupprobe indicates that the Pod has successfully initialized.
+	// StartupProbe indicates that the Pod has successfully initialized.
 	// If specified, no other probes are executed until this completes successfully.
 	// If this probe fails, the Pod will be restarted, just as if the livenessProbe failed.
 	// This can be used to provide different probe parameters at the beginning of a Pod's lifecycle,
@@ -4455,7 +4455,7 @@ type Container struct {
 	// Cannot be updated.
 	// More info: https://kubernetes.io/docs/concepts/containers/images#updating-images
 	ImagePullPolicy PullPolicy `json:"imagePullPolicy,omitempty"`
-	// Securitycontext defines the security options the container should be run with.
+	// SecurityContext defines the security options the container should be run with.
 	// If set, the fields of SecurityContext override the equivalent fields of PodSecurityContext.
 	// More info: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
 	SecurityContext *SecurityContext `json:"securityContext,omitempty"`
@@ -4471,7 +4471,7 @@ type Container struct {
 	// flag is false, a container processes that reads from stdin will never receive an EOF.
 	// Default is false
 	StdinOnce bool `json:"stdinOnce,omitempty"`
-	// Whether this container should allocate a Tty for itself, also requires 'stdin' to be true.
+	// Whether this container should allocate a TTY for itself, also requires 'stdin' to be true.
 	// Default is false.
 	TTY bool `json:"tty,omitempty"`
 }
@@ -4634,7 +4634,7 @@ type PodSecurityContext struct {
 	// A special supplemental group that applies to all containers in a pod.
 	// Some volume types allow the Kubelet to change the ownership of that volume
 	// to be owned by the pod:
-	// 1. The owning GID will be the Fsgroup
+	// 1. The owning GID will be the FSGroup
 	// 2. The setgid bit is set (new files created in the volume will be owned by FSGroup)
 	// 3. The permission bits are OR'd with rw-rw----
 	// If unset, the Kubelet will not modify the ownership and permissions of any volume.
@@ -4749,7 +4749,7 @@ type Toleration struct {
 	// Effect indicates the taint effect to match. Empty means match all taint effects.
 	// When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.
 	Effect TaintEffect `json:"effect,omitempty"`
-	// Tolerationseconds represents the period of time the toleration (which must be
+	// TolerationSeconds represents the period of time the toleration (which must be
 	// of effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,
 	// it is not set, which means tolerate the taint forever (do not evict). Zero and
 	// negative values will be treated as 0 (evict immediately) by the system.
@@ -4770,7 +4770,7 @@ func (in *Toleration) DeepCopy() *Toleration {
 }
 
 type HostAlias struct {
-	// Ip address of the host file entry.
+	// IP address of the host file entry.
 	IP string `json:"ip,omitempty"`
 	// Hostnames for the above IP address.
 	Hostnames []string `json:"hostnames"`
@@ -4841,7 +4841,7 @@ func (in *PodDNSConfig) DeepCopy() *PodDNSConfig {
 }
 
 type PodReadinessGate struct {
-	// Conditiontype refers to a condition in the pod's condition list with matching type.
+	// ConditionType refers to a condition in the pod's condition list with matching type.
 	ConditionType PodConditionType `json:"conditionType"`
 }
 
@@ -4859,7 +4859,7 @@ func (in *PodReadinessGate) DeepCopy() *PodReadinessGate {
 }
 
 type TopologySpreadConstraint struct {
-	// Maxskew describes the degree to which pods may be unevenly distributed.
+	// MaxSkew describes the degree to which pods may be unevenly distributed.
 	// When `whenUnsatisfiable=DoNotSchedule`, it is the maximum permitted difference
 	// between the number of matching pods in the target topology and the global minimum.
 	// The global minimum is the minimum number of matching pods in an eligible domain
@@ -4877,7 +4877,7 @@ type TopologySpreadConstraint struct {
 	// to topologies that satisfy it.
 	// It's a required field. Default value is 1 and 0 is not allowed.
 	MaxSkew int `json:"maxSkew"`
-	// Topologykey is the key of node labels. Nodes that have a label with this key
+	// TopologyKey is the key of node labels. Nodes that have a label with this key
 	// and identical values are considered to be in the same topology.
 	// We consider each <key, value> as a "bucket", and try to put balanced number
 	// of pods into each bucket.
@@ -4887,7 +4887,7 @@ type TopologySpreadConstraint struct {
 	// And, if TopologyKey is "topology.kubernetes.io/zone", each zone is a domain of that topology.
 	// It's a required field.
 	TopologyKey string `json:"topologyKey"`
-	// Whenunsatisfiable indicates how to deal with a pod if it doesn't satisfy
+	// WhenUnsatisfiable indicates how to deal with a pod if it doesn't satisfy
 	// the spread constraint.
 	// - DoNotSchedule (default) tells the scheduler not to schedule it.
 	// - ScheduleAnyway tells the scheduler to schedule the pod in any location,
@@ -4906,11 +4906,11 @@ type TopologySpreadConstraint struct {
 	// won't make it *more* imbalanced.
 	// It's a required field.
 	WhenUnsatisfiable UnsatisfiableConstraintAction `json:"whenUnsatisfiable"`
-	// Labelselector is used to find matching pods.
+	// LabelSelector is used to find matching pods.
 	// Pods that match this label selector are counted to determine the number of pods
 	// in their corresponding topology domain.
 	LabelSelector *metav1.LabelSelector `json:"labelSelector,omitempty"`
-	// Mindomains indicates a minimum number of eligible domains.
+	// MinDomains indicates a minimum number of eligible domains.
 	// When the number of eligible domains with matching topology keys is less than minDomains,
 	// Pod Topology Spread treats "global minimum" as 0, and then the calculation of Skew is performed.
 	// And when the number of eligible domains with matching topology keys equals or greater than minDomains,
@@ -5013,7 +5013,7 @@ func (in *PodCondition) DeepCopy() *PodCondition {
 }
 
 type PodIP struct {
-	// ip is an Ip address (IPv4 or IPv6) assigned to the pod
+	// ip is an IP address (IPv4 or IPv6) assigned to the pod
 	IP string `json:"ip,omitempty"`
 }
 
@@ -5045,7 +5045,7 @@ type ContainerStatus struct {
 	// The image the container is running.
 	// More info: https://kubernetes.io/docs/concepts/containers/images.
 	Image string `json:"image"`
-	// Imageid of the container's image.
+	// ImageID of the container's image.
 	ImageID string `json:"imageID"`
 	// Container's ID in the format '<type>://<container_id>'.
 	ContainerID string `json:"containerID,omitempty"`
@@ -5164,7 +5164,7 @@ type ServicePort struct {
 	// More info: https://kubernetes.io/docs/concepts/services-networking/service/#defining-a-service
 	TargetPort *utilintstr.IntOrString `json:"targetPort,omitempty"`
 	// The port on each node on which this service is exposed when type is
-	// Nodeport or LoadBalancer.  Usually assigned by the system. If a value is
+	// NodePort or LoadBalancer.  Usually assigned by the system. If a value is
 	// specified, in-range, and not in use it will be used, otherwise the
 	// operation will fail.  If not specified, a port will be allocated if this
 	// Service requires one.  If this field is specified when creating a
@@ -5249,13 +5249,13 @@ type ConfigMapNodeConfigSource struct {
 	// Name is the metadata.name of the referenced ConfigMap.
 	// This field is required in all cases.
 	Name string `json:"name"`
-	// Uid is the metadata.UID of the referenced ConfigMap.
+	// UID is the metadata.UID of the referenced ConfigMap.
 	// This field is forbidden in Node.Spec, and required in Node.Status.
 	UID string `json:"uid,omitempty"`
-	// Resourceversion is the metadata.ResourceVersion of the referenced ConfigMap.
+	// ResourceVersion is the metadata.ResourceVersion of the referenced ConfigMap.
 	// This field is forbidden in Node.Spec, and required in Node.Status.
 	ResourceVersion string `json:"resourceVersion,omitempty"`
-	// Kubeletconfigkey declares which key of the referenced ConfigMap corresponds to the KubeletConfiguration structure
+	// KubeletConfigKey declares which key of the referenced ConfigMap corresponds to the KubeletConfiguration structure
 	// This field is required in all cases.
 	KubeletConfigKey string `json:"kubeletConfigKey"`
 }
@@ -5306,7 +5306,7 @@ type GCEPersistentDiskVolumeSource struct {
 	// Similarly, the volume partition for /dev/sda is "0" (or you can leave the property empty).
 	// More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
 	Partition int `json:"partition,omitempty"`
-	// readOnly here will force the Readonly setting in VolumeMounts.
+	// readOnly here will force the ReadOnly setting in VolumeMounts.
 	// Defaults to false.
 	// More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
 	ReadOnly bool `json:"readOnly,omitempty"`
@@ -5466,7 +5466,7 @@ type RBDPersistentVolumeSource struct {
 	// Default is nil.
 	// More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
 	SecretRef *SecretReference `json:"secretRef,omitempty"`
-	// readOnly here will force the Readonly setting in VolumeMounts.
+	// readOnly here will force the ReadOnly setting in VolumeMounts.
 	// Defaults to false.
 	// More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
 	ReadOnly bool `json:"readOnly,omitempty"`
@@ -5511,7 +5511,7 @@ type ISCSIPersistentVolumeSource struct {
 	// Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
 	// More info: https://kubernetes.io/docs/concepts/storage/volumes#iscsi
 	FSType string `json:"fsType,omitempty"`
-	// readOnly here will force the Readonly setting in VolumeMounts.
+	// readOnly here will force the ReadOnly setting in VolumeMounts.
 	// Defaults to false.
 	ReadOnly bool `json:"readOnly,omitempty"`
 	// portals is the iSCSI Target Portal List. The Portal is either an IP or ip_addr:port if the port
@@ -5561,7 +5561,7 @@ type CinderPersistentVolumeSource struct {
 	// Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
 	// More info: https://examples.k8s.io/mysql-cinder-pd/README.md
 	FSType string `json:"fsType,omitempty"`
-	// readOnly is Optional: Defaults to false (read/write). Readonly here will force
+	// readOnly is Optional: Defaults to false (read/write). ReadOnly here will force
 	// the ReadOnly setting in VolumeMounts.
 	// More info: https://examples.k8s.io/mysql-cinder-pd/README.md
 	ReadOnly bool `json:"readOnly,omitempty"`
@@ -5597,13 +5597,13 @@ type CephFSPersistentVolumeSource struct {
 	// user is Optional: User is the rados user name, default is admin
 	// More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
 	User string `json:"user,omitempty"`
-	// secretFile is Optional: Secretfile is the path to key ring for User, default is /etc/ceph/user.secret
+	// secretFile is Optional: SecretFile is the path to key ring for User, default is /etc/ceph/user.secret
 	// More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
 	SecretFile string `json:"secretFile,omitempty"`
-	// secretRef is Optional: Secretref is reference to the authentication secret for User, default is empty.
+	// secretRef is Optional: SecretRef is reference to the authentication secret for User, default is empty.
 	// More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
 	SecretRef *SecretReference `json:"secretRef,omitempty"`
-	// readOnly is Optional: Defaults to false (read/write). Readonly here will force
+	// readOnly is Optional: Defaults to false (read/write). ReadOnly here will force
 	// the ReadOnly setting in VolumeMounts.
 	// More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
 	ReadOnly bool `json:"readOnly,omitempty"`
@@ -5641,7 +5641,7 @@ type FCVolumeSource struct {
 	// Must be a filesystem type supported by the host operating system.
 	// Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
 	FSType string `json:"fsType,omitempty"`
-	// readOnly is Optional: Defaults to false (read/write). Readonly here will force
+	// readOnly is Optional: Defaults to false (read/write). ReadOnly here will force
 	// the ReadOnly setting in VolumeMounts.
 	ReadOnly bool `json:"readOnly,omitempty"`
 	// wwids Optional: FC volume world wide identifiers (wwids)
@@ -5700,13 +5700,13 @@ type FlexPersistentVolumeSource struct {
 	// Must be a filesystem type supported by the host operating system.
 	// Ex. "ext4", "xfs", "ntfs". The default filesystem depends on FlexVolume script.
 	FSType string `json:"fsType,omitempty"`
-	// secretRef is Optional: Secretref is reference to the secret object containing
+	// secretRef is Optional: SecretRef is reference to the secret object containing
 	// sensitive information to pass to the plugin scripts. This may be
 	// empty if no secret object is specified. If the secret object
 	// contains more than one secret, all secrets are passed to the plugin
 	// scripts.
 	SecretRef *SecretReference `json:"secretRef,omitempty"`
-	// readOnly is Optional: defaults to false (read/write). Readonly here will force
+	// readOnly is Optional: defaults to false (read/write). ReadOnly here will force
 	// the ReadOnly setting in VolumeMounts.
 	ReadOnly bool `json:"readOnly,omitempty"`
 	// options is Optional: this field holds extra command options if any.
@@ -5743,7 +5743,7 @@ type AzureFilePersistentVolumeSource struct {
 	SecretName string `json:"secretName"`
 	// shareName is the azure Share Name
 	ShareName string `json:"shareName"`
-	// readOnly defaults to false (read/write). Readonly here will force
+	// readOnly defaults to false (read/write). ReadOnly here will force
 	// the ReadOnly setting in VolumeMounts.
 	ReadOnly bool `json:"readOnly,omitempty"`
 	// secretNamespace is the namespace of the secret that contains Azure Storage Account Name and Key
@@ -5835,7 +5835,7 @@ type AzureDiskVolumeSource struct {
 	// Must be a filesystem type supported by the host operating system.
 	// Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
 	FSType string `json:"fsType,omitempty"`
-	// readOnly Defaults to false (read/write). Readonly here will force
+	// readOnly Defaults to false (read/write). ReadOnly here will force
 	// the ReadOnly setting in VolumeMounts.
 	ReadOnly bool `json:"readOnly,omitempty"`
 	// kind expected values are Shared: multiple blob disks per storage account  Dedicated: single blob disk per storage account  Managed: azure managed data disk (only in managed availability set). defaults to shared
@@ -5884,7 +5884,7 @@ type PortworxVolumeSource struct {
 	// Must be a filesystem type supported by the host operating system.
 	// Ex. "ext4", "xfs". Implicitly inferred to be "ext4" if unspecified.
 	FSType string `json:"fsType,omitempty"`
-	// readOnly defaults to false (read/write). Readonly here will force
+	// readOnly defaults to false (read/write). ReadOnly here will force
 	// the ReadOnly setting in VolumeMounts.
 	ReadOnly bool `json:"readOnly,omitempty"`
 }
@@ -5927,7 +5927,7 @@ type ScaleIOPersistentVolumeSource struct {
 	// Ex. "ext4", "xfs", "ntfs".
 	// Default is "xfs"
 	FSType string `json:"fsType,omitempty"`
-	// readOnly defaults to false (read/write). Readonly here will force
+	// readOnly defaults to false (read/write). ReadOnly here will force
 	// the ReadOnly setting in VolumeMounts.
 	ReadOnly bool `json:"readOnly,omitempty"`
 }
@@ -5989,7 +5989,7 @@ type StorageOSPersistentVolumeSource struct {
 	// Must be a filesystem type supported by the host operating system.
 	// Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
 	FSType string `json:"fsType,omitempty"`
-	// readOnly defaults to false (read/write). Readonly here will force
+	// readOnly defaults to false (read/write). ReadOnly here will force
 	// the ReadOnly setting in VolumeMounts.
 	ReadOnly bool `json:"readOnly,omitempty"`
 	// secretRef specifies the secret to use for obtaining the StorageOS API
@@ -6145,17 +6145,17 @@ type VolumeSource struct {
 	// More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
 	AWSElasticBlockStore *AWSElasticBlockStoreVolumeSource `json:"awsElasticBlockStore,omitempty"`
 	// gitRepo represents a git repository at a particular revision.
-	// DEPRECATED: Gitrepo is deprecated. To provision a container with a git repo, mount an
+	// DEPRECATED: GitRepo is deprecated. To provision a container with a git repo, mount an
 	// EmptyDir into an InitContainer that clones the repo using git, then mount the EmptyDir
 	// into the Pod's container.
 	GitRepo *GitRepoVolumeSource `json:"gitRepo,omitempty"`
 	// secret represents a secret that should populate this volume.
 	// More info: https://kubernetes.io/docs/concepts/storage/volumes#secret
 	Secret *SecretVolumeSource `json:"secret,omitempty"`
-	// nfs represents an Nfs mount on the host that shares a pod's lifetime
+	// nfs represents an NFS mount on the host that shares a pod's lifetime
 	// More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs
 	NFS *NFSVolumeSource `json:"nfs,omitempty"`
-	// iscsi represents an Iscsi Disk resource that is attached to a
+	// iscsi represents an ISCSI Disk resource that is attached to a
 	// kubelet's host machine and then exposed to the pod.
 	// More info: https://examples.k8s.io/volumes/iscsi/README.md
 	ISCSI *ISCSIVolumeSource `json:"iscsi,omitempty"`
@@ -6163,7 +6163,7 @@ type VolumeSource struct {
 	// More info: https://examples.k8s.io/volumes/glusterfs/README.md
 	Glusterfs *GlusterfsVolumeSource `json:"glusterfs,omitempty"`
 	// persistentVolumeClaimVolumeSource represents a reference to a
-	// Persistentvolumeclaim in the same namespace.
+	// PersistentVolumeClaim in the same namespace.
 	// More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
 	PersistentVolumeClaim *PersistentVolumeClaimVolumeSource `json:"persistentVolumeClaim,omitempty"`
 	// rbd represents a Rados Block Device mount on the host that shares a pod's lifetime.
@@ -6199,11 +6199,11 @@ type VolumeSource struct {
 	Projected *ProjectedVolumeSource `json:"projected,omitempty"`
 	// portworxVolume represents a portworx volume attached and mounted on kubelets host machine
 	PortworxVolume *PortworxVolumeSource `json:"portworxVolume,omitempty"`
-	// scaleIO represents a Scaleio persistent volume attached and mounted on Kubernetes nodes.
+	// scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes.
 	ScaleIO *ScaleIOVolumeSource `json:"scaleIO,omitempty"`
-	// storageOS represents a Storageos volume attached and mounted on Kubernetes nodes.
+	// storageOS represents a StorageOS volume attached and mounted on Kubernetes nodes.
 	StorageOS *StorageOSVolumeSource `json:"storageos,omitempty"`
-	// csi (Container Storage Interface) represents ephemeral storage that is handled by certain external Csi drivers (Beta feature).
+	// csi (Container Storage Interface) represents ephemeral storage that is handled by certain external CSI drivers (Beta feature).
 	CSI *CSIVolumeSource `json:"csi,omitempty"`
 	// ephemeral represents a volume that is handled by a cluster storage driver.
 	// The volume's lifecycle is tied to the pod that defines it - it will be created before the pod starts,
@@ -6500,13 +6500,13 @@ type VolumeMount struct {
 	SubPath string `json:"subPath,omitempty"`
 	// mountPropagation determines how mounts are propagated from the host
 	// to container and the other way around.
-	// When not set, MountpropagationNone is used.
+	// When not set, MountPropagationNone is used.
 	// This field is beta in 1.10.
 	MountPropagation MountPropagationMode `json:"mountPropagation,omitempty"`
 	// Expanded path within the volume from which the container's volume should be mounted.
 	// Behaves similarly to SubPath but environment variable references $(VAR_NAME) are expanded using the container's environment.
 	// Defaults to "" (volume's root).
-	// Subpathexpr and SubPath are mutually exclusive.
+	// SubPathExpr and SubPath are mutually exclusive.
 	SubPathExpr string `json:"subPathExpr,omitempty"`
 }
 
@@ -6590,12 +6590,12 @@ func (in *Probe) DeepCopy() *Probe {
 }
 
 type Lifecycle struct {
-	// Poststart is called immediately after a container is created. If the handler fails,
+	// PostStart is called immediately after a container is created. If the handler fails,
 	// the container is terminated and restarted according to its restart policy.
 	// Other management of the container blocks until the hook completes.
 	// More info: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#container-hooks
 	PostStart *LifecycleHandler `json:"postStart,omitempty"`
-	// Prestop is called immediately before a container is terminated due to an
+	// PreStop is called immediately before a container is terminated due to an
 	// API request or management event such as liveness/startup probe failure,
 	// preemption, resource contention, etc. The handler is not called if the
 	// container crashes or exits. The Pod's termination grace period countdown begins before the
@@ -6674,7 +6674,7 @@ type SecurityContext struct {
 	// Default is false.
 	// Note that this field cannot be set when spec.os.name is windows.
 	ReadOnlyRootFilesystem bool `json:"readOnlyRootFilesystem,omitempty"`
-	// Allowprivilegeescalation controls whether a process can gain more
+	// AllowPrivilegeEscalation controls whether a process can gain more
 	// privileges than its parent process. This bool directly controls if
 	// the no_new_privs flag will be set on the container process.
 	// AllowPrivilegeEscalation is true always when the container is:
@@ -6683,7 +6683,7 @@ type SecurityContext struct {
 	// Note that this field cannot be set when spec.os.name is windows.
 	AllowPrivilegeEscalation bool `json:"allowPrivilegeEscalation,omitempty"`
 	// procMount denotes the type of proc mount to use for the containers.
-	// The default is DefaultProcmount which uses the container runtime defaults for
+	// The default is DefaultProcMount which uses the container runtime defaults for
 	// readonly paths and masked paths.
 	// This requires the ProcMountType feature flag to be enabled.
 	// Note that this field cannot be set when spec.os.name is windows.
@@ -6808,7 +6808,7 @@ type EphemeralContainerCommon struct {
 	// Cannot be updated.
 	// More info: https://kubernetes.io/docs/concepts/containers/images#updating-images
 	ImagePullPolicy PullPolicy `json:"imagePullPolicy,omitempty"`
-	// Optional: Securitycontext defines the security options the ephemeral container should be run with.
+	// Optional: SecurityContext defines the security options the ephemeral container should be run with.
 	// If set, the fields of SecurityContext override the equivalent fields of PodSecurityContext.
 	SecurityContext *SecurityContext `json:"securityContext,omitempty"`
 	// Whether this container should allocate a buffer for stdin in the container runtime. If this
@@ -6823,7 +6823,7 @@ type EphemeralContainerCommon struct {
 	// flag is false, a container processes that reads from stdin will never receive an EOF.
 	// Default is false
 	StdinOnce bool `json:"stdinOnce,omitempty"`
-	// Whether this container should allocate a Tty for itself, also requires 'stdin' to be true.
+	// Whether this container should allocate a TTY for itself, also requires 'stdin' to be true.
 	// Default is false.
 	TTY bool `json:"tty,omitempty"`
 }
@@ -6941,9 +6941,9 @@ func (in *SELinuxOptions) DeepCopy() *SELinuxOptions {
 }
 
 type WindowsSecurityContextOptions struct {
-	// Gmsacredentialspecname is the name of the GMSA credential spec to use.
+	// GMSACredentialSpecName is the name of the GMSA credential spec to use.
 	GMSACredentialSpecName string `json:"gmsaCredentialSpecName,omitempty"`
-	// Gmsacredentialspec is where the GMSA admission webhook
+	// GMSACredentialSpec is where the GMSA admission webhook
 	// (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the
 	// GMSA credential spec named by the GMSACredentialSpecName field.
 	GMSACredentialSpec string `json:"gmsaCredentialSpec,omitempty"`
@@ -6952,7 +6952,7 @@ type WindowsSecurityContextOptions struct {
 	// May also be set in PodSecurityContext. If set in both SecurityContext and
 	// PodSecurityContext, the value specified in SecurityContext takes precedence.
 	RunAsUserName string `json:"runAsUserName,omitempty"`
-	// Hostprocess determines if a container should be run as a 'Host Process' container.
+	// HostProcess determines if a container should be run as a 'Host Process' container.
 	// This field is alpha-level and will only be honored by components that enable the
 	// WindowsHostProcessContainers feature flag. Setting this field without the feature
 	// flag will result in errors when validating the Pod. All of a Pod's containers must
@@ -7270,7 +7270,7 @@ func (in *ClientIPConfig) DeepCopy() *ClientIPConfig {
 }
 
 type LoadBalancerIngress struct {
-	// Ip is set for load-balancer ingress points that are IP based
+	// IP is set for load-balancer ingress points that are IP based
 	// (typically GCE or OpenStack load-balancers)
 	IP string `json:"ip,omitempty"`
 	// Hostname is set for load-balancer ingress points that are DNS based
@@ -7364,7 +7364,7 @@ type EmptyDirVolumeSource struct {
 	// sizeLimit is the total amount of local storage required for this EmptyDir volume.
 	// The size limit is also applicable for memory medium.
 	// The maximum usage on memory medium EmptyDir would be the minimum value between
-	// the Sizelimit specified here and the sum of memory limits of all containers in a pod.
+	// the SizeLimit specified here and the sum of memory limits of all containers in a pod.
 	// The default is nil which means that the limit is undefined.
 	// More info: http://kubernetes.io/docs/user-guide/volumes#emptydir
 	SizeLimit *apiresource.Quantity `json:"sizeLimit,omitempty"`
@@ -7473,7 +7473,7 @@ type ISCSIVolumeSource struct {
 	// Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
 	// More info: https://kubernetes.io/docs/concepts/storage/volumes#iscsi
 	FSType string `json:"fsType,omitempty"`
-	// readOnly here will force the Readonly setting in VolumeMounts.
+	// readOnly here will force the ReadOnly setting in VolumeMounts.
 	// Defaults to false.
 	ReadOnly bool `json:"readOnly,omitempty"`
 	// portals is the iSCSI Target Portal List. The portal is either an IP or ip_addr:port if the port
@@ -7544,7 +7544,7 @@ type PersistentVolumeClaimVolumeSource struct {
 	// claimName is the name of a PersistentVolumeClaim in the same namespace as the pod using this volume.
 	// More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
 	ClaimName string `json:"claimName"`
-	// readOnly Will force the Readonly setting in VolumeMounts.
+	// readOnly Will force the ReadOnly setting in VolumeMounts.
 	// Default false.
 	ReadOnly bool `json:"readOnly,omitempty"`
 }
@@ -7591,7 +7591,7 @@ type RBDVolumeSource struct {
 	// Default is nil.
 	// More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
 	SecretRef *LocalObjectReference `json:"secretRef,omitempty"`
-	// readOnly here will force the Readonly setting in VolumeMounts.
+	// readOnly here will force the ReadOnly setting in VolumeMounts.
 	// Defaults to false.
 	// More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
 	ReadOnly bool `json:"readOnly,omitempty"`
@@ -7633,7 +7633,7 @@ type FlexVolumeSource struct {
 	// contains more than one secret, all secrets are passed to the plugin
 	// scripts.
 	SecretRef *LocalObjectReference `json:"secretRef,omitempty"`
-	// readOnly is Optional: defaults to false (read/write). Readonly here will force
+	// readOnly is Optional: defaults to false (read/write). ReadOnly here will force
 	// the ReadOnly setting in VolumeMounts.
 	ReadOnly bool `json:"readOnly,omitempty"`
 	// options is Optional: this field holds extra command options if any.
@@ -7674,7 +7674,7 @@ type CinderVolumeSource struct {
 	// Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
 	// More info: https://examples.k8s.io/mysql-cinder-pd/README.md
 	FSType string `json:"fsType,omitempty"`
-	// readOnly defaults to false (read/write). Readonly here will force
+	// readOnly defaults to false (read/write). ReadOnly here will force
 	// the ReadOnly setting in VolumeMounts.
 	// More info: https://examples.k8s.io/mysql-cinder-pd/README.md
 	ReadOnly bool `json:"readOnly,omitempty"`
@@ -7710,13 +7710,13 @@ type CephFSVolumeSource struct {
 	// user is optional: User is the rados user name, default is admin
 	// More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
 	User string `json:"user,omitempty"`
-	// secretFile is Optional: Secretfile is the path to key ring for User, default is /etc/ceph/user.secret
+	// secretFile is Optional: SecretFile is the path to key ring for User, default is /etc/ceph/user.secret
 	// More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
 	SecretFile string `json:"secretFile,omitempty"`
-	// secretRef is Optional: Secretref is reference to the authentication secret for User, default is empty.
+	// secretRef is Optional: SecretRef is reference to the authentication secret for User, default is empty.
 	// More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
 	SecretRef *LocalObjectReference `json:"secretRef,omitempty"`
-	// readOnly is Optional: Defaults to false (read/write). Readonly here will force
+	// readOnly is Optional: Defaults to false (read/write). ReadOnly here will force
 	// the ReadOnly setting in VolumeMounts.
 	// More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
 	ReadOnly bool `json:"readOnly,omitempty"`
@@ -7784,7 +7784,7 @@ type AzureFileVolumeSource struct {
 	SecretName string `json:"secretName"`
 	// shareName is the azure share Name
 	ShareName string `json:"shareName"`
-	// readOnly defaults to false (read/write). Readonly here will force
+	// readOnly defaults to false (read/write). ReadOnly here will force
 	// the ReadOnly setting in VolumeMounts.
 	ReadOnly bool `json:"readOnly,omitempty"`
 }
@@ -7902,7 +7902,7 @@ type ScaleIOVolumeSource struct {
 	// Ex. "ext4", "xfs", "ntfs".
 	// Default is "xfs".
 	FSType string `json:"fsType,omitempty"`
-	// readOnly Defaults to false (read/write). Readonly here will force
+	// readOnly Defaults to false (read/write). ReadOnly here will force
 	// the ReadOnly setting in VolumeMounts.
 	ReadOnly bool `json:"readOnly,omitempty"`
 }
@@ -7940,7 +7940,7 @@ type StorageOSVolumeSource struct {
 	// Must be a filesystem type supported by the host operating system.
 	// Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
 	FSType string `json:"fsType,omitempty"`
-	// readOnly defaults to false (read/write). Readonly here will force
+	// readOnly defaults to false (read/write). ReadOnly here will force
 	// the ReadOnly setting in VolumeMounts.
 	ReadOnly bool `json:"readOnly,omitempty"`
 	// secretRef specifies the secret to use for obtaining the StorageOS API
@@ -8144,11 +8144,11 @@ func (in *EnvVarSource) DeepCopy() *EnvVarSource {
 type ProbeHandler struct {
 	// Exec specifies the action to take.
 	Exec *ExecAction `json:"exec,omitempty"`
-	// Httpget specifies the http request to perform.
+	// HTTPGet specifies the http request to perform.
 	HTTPGet *HTTPGetAction `json:"httpGet,omitempty"`
-	// Tcpsocket specifies an action involving a TCP port.
+	// TCPSocket specifies an action involving a TCP port.
 	TCPSocket *TCPSocketAction `json:"tcpSocket,omitempty"`
-	// Grpc specifies an action involving a GRPC port.
+	// GRPC specifies an action involving a GRPC port.
 	// This is a beta field and requires enabling GRPCContainerProbe feature gate.
 	GRPC *GRPCAction `json:"grpc,omitempty"`
 }
@@ -8189,9 +8189,9 @@ func (in *ProbeHandler) DeepCopy() *ProbeHandler {
 type LifecycleHandler struct {
 	// Exec specifies the action to take.
 	Exec *ExecAction `json:"exec,omitempty"`
-	// Httpget specifies the http request to perform.
+	// HTTPGet specifies the http request to perform.
 	HTTPGet *HTTPGetAction `json:"httpGet,omitempty"`
-	// Deprecated. Tcpsocket is NOT supported as a LifecycleHandler and kept
+	// Deprecated. TCPSocket is NOT supported as a LifecycleHandler and kept
 	// for the backward compatibility. There are no validation of this field and
 	// lifecycle hooks will fail in runtime when tcp handler is specified.
 	TCPSocket *TCPSocketAction `json:"tcpSocket,omitempty"`

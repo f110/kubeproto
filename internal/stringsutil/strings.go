@@ -21,7 +21,32 @@ func init() {
 	}
 }
 
+func IsSnakeCase(in string) bool {
+	return strings.IndexRune(in, '_') != -1
+}
+
+func IsCamelCase(in string) bool {
+	upper := false
+	for i := 0; i < len(in); i++ {
+		if !unicode.IsLetter(rune(in[i])) {
+			return false
+		}
+		if !upper && unicode.IsUpper(rune(in[i])) {
+			upper = true
+		}
+	}
+	if !upper {
+		return false
+	}
+
+	return true
+}
+
 func ToUpperCamelCase(in string) string {
+	if IsCamelCase(in) {
+		return in
+	}
+
 	var s []string
 	var start, cur int
 	for cur < len(in) {
@@ -101,7 +126,7 @@ Loop:
 			}
 
 			switch s[i][k] {
-			case '-', '_':
+			case '.', '-', '_', '/':
 				if k == 0 {
 					if len(s[i]) == 1 {
 						s = remove(s, i)
