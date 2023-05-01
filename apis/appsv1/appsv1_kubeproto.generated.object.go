@@ -37,8 +37,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 type DaemonSetUpdateStrategyType string
 
 const (
-	DaemonSetUpdateStrategyTypeRollingupdate DaemonSetUpdateStrategyType = "RollingUpdate"
-	DaemonSetUpdateStrategyTypeOndelete      DaemonSetUpdateStrategyType = "OnDelete"
+	DaemonSetUpdateStrategyTypeRollingUpdate DaemonSetUpdateStrategyType = "RollingUpdate"
+	DaemonSetUpdateStrategyTypeOnDelete      DaemonSetUpdateStrategyType = "OnDelete"
 )
 
 type DeploymentConditionType string
@@ -46,14 +46,14 @@ type DeploymentConditionType string
 const (
 	DeploymentConditionTypeAvailable      DeploymentConditionType = "Available"
 	DeploymentConditionTypeProgressing    DeploymentConditionType = "Progressing"
-	DeploymentConditionTypeReplicafailure DeploymentConditionType = "ReplicaFailure"
+	DeploymentConditionTypeReplicaFailure DeploymentConditionType = "ReplicaFailure"
 )
 
 type DeploymentStrategyType string
 
 const (
 	DeploymentStrategyTypeRecreate      DeploymentStrategyType = "Recreate"
-	DeploymentStrategyTypeRollingupdate DeploymentStrategyType = "RollingUpdate"
+	DeploymentStrategyTypeRollingUpdate DeploymentStrategyType = "RollingUpdate"
 )
 
 type PersistentVolumeClaimRetentionPolicyType string
@@ -66,21 +66,21 @@ const (
 type PodManagementPolicyType string
 
 const (
-	PodManagementPolicyTypeOrderedready PodManagementPolicyType = "OrderedReady"
+	PodManagementPolicyTypeOrderedReady PodManagementPolicyType = "OrderedReady"
 	PodManagementPolicyTypeParallel     PodManagementPolicyType = "Parallel"
 )
 
 type ReplicaSetConditionType string
 
 const (
-	ReplicaSetConditionTypeReplicafailure ReplicaSetConditionType = "ReplicaFailure"
+	ReplicaSetConditionTypeReplicaFailure ReplicaSetConditionType = "ReplicaFailure"
 )
 
 type StatefulSetUpdateStrategyType string
 
 const (
-	StatefulSetUpdateStrategyTypeRollingupdate StatefulSetUpdateStrategyType = "RollingUpdate"
-	StatefulSetUpdateStrategyTypeOndelete      StatefulSetUpdateStrategyType = "OnDelete"
+	StatefulSetUpdateStrategyTypeRollingUpdate StatefulSetUpdateStrategyType = "RollingUpdate"
+	StatefulSetUpdateStrategyTypeOnDelete      StatefulSetUpdateStrategyType = "OnDelete"
 )
 
 type ControllerRevision struct {
@@ -725,7 +725,7 @@ type ReplicaSetStatus struct {
 	ReadyReplicas int `json:"readyReplicas,omitempty"`
 	// The number of available replicas (ready for at least minReadySeconds) for this replica set.
 	AvailableReplicas int `json:"availableReplicas,omitempty"`
-	// Observedgeneration reflects the generation of the most recently observed ReplicaSet.
+	// ObservedGeneration reflects the generation of the most recently observed ReplicaSet.
 	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
 	// Represents the latest available observations of a replica set's current state.
 	Conditions []ReplicaSetCondition `json:"conditions"`
@@ -788,7 +788,7 @@ type StatefulSetSpec struct {
 	// to match the desired scale without waiting, and on scale down will delete
 	// all pods at once.
 	PodManagementPolicy PodManagementPolicyType `json:"podManagementPolicy,omitempty"`
-	// updateStrategy indicates the StatefulSetUpdatestrategy that will be
+	// updateStrategy indicates the StatefulSetUpdateStrategy that will be
 	// employed to update Pods in the StatefulSet when a revision is made to
 	// Template.
 	UpdateStrategy *StatefulSetUpdateStrategy `json:"updateStrategy,omitempty"`
@@ -800,7 +800,7 @@ type StatefulSetSpec struct {
 	// Minimum number of seconds for which a newly created pod should be ready
 	// without any of its container crashing for it to be considered available.
 	// Defaults to 0 (pod will be considered available as soon as it is ready)
-	// This is an alpha field and requires enabling StatefulSetMinreadyseconds feature gate.
+	// This is an alpha field and requires enabling StatefulSetMinReadySeconds feature gate.
 	MinReadySeconds int `json:"minReadySeconds,omitempty"`
 	// persistentVolumeClaimRetentionPolicy describes the lifecycle of persistent
 	// volume claims created from volumeClaimTemplates. By default, all persistent
@@ -902,7 +902,7 @@ func (in *StatefulSetStatus) DeepCopy() *StatefulSetStatus {
 type DaemonSetUpdateStrategy struct {
 	// Type of daemon set update. Can be "RollingUpdate" or "OnDelete". Default is RollingUpdate.
 	Type DaemonSetUpdateStrategyType `json:"type,omitempty"`
-	// Rolling update config params. Present only if type = "Rollingupdate".
+	// Rolling update config params. Present only if type = "RollingUpdate".
 	// ---
 	// to be. Same as Deployment `strategy.rollingUpdate`.
 	// See https://github.com/kubernetes/kubernetes/issues/35345
@@ -962,7 +962,7 @@ type DeploymentStrategy struct {
 	// Type of deployment. Can be "Recreate" or "RollingUpdate". Default is RollingUpdate.
 	Type DeploymentStrategyType `json:"type,omitempty"`
 	// Rolling update config params. Present only if DeploymentStrategyType =
-	// Rollingupdate.
+	// RollingUpdate.
 	// ---
 	// to be.
 	RollingUpdate *RollingUpdateDeployment `json:"rollingUpdate,omitempty"`
@@ -1059,7 +1059,7 @@ type StatefulSetUpdateStrategy struct {
 	// Type indicates the type of the StatefulSetUpdateStrategy.
 	// Default is RollingUpdate.
 	Type StatefulSetUpdateStrategyType `json:"type,omitempty"`
-	// Rollingupdate is used to communicate parameters when Type is RollingUpdateStatefulSetStrategyType.
+	// RollingUpdate is used to communicate parameters when Type is RollingUpdateStatefulSetStrategyType.
 	RollingUpdate *RollingUpdateStatefulSetStrategy `json:"rollingUpdate,omitempty"`
 }
 
@@ -1082,12 +1082,12 @@ func (in *StatefulSetUpdateStrategy) DeepCopy() *StatefulSetUpdateStrategy {
 }
 
 type StatefulSetPersistentVolumeClaimRetentionPolicy struct {
-	// Whendeleted specifies what happens to PVCs created from StatefulSet
+	// WhenDeleted specifies what happens to PVCs created from StatefulSet
 	// VolumeClaimTemplates when the StatefulSet is deleted. The default policy
 	// of `Retain` causes PVCs to not be affected by StatefulSet deletion. The
 	// `Delete` policy causes those PVCs to be deleted.
 	WhenDeleted PersistentVolumeClaimRetentionPolicyType `json:"whenDeleted,omitempty"`
-	// Whenscaled specifies what happens to PVCs created from StatefulSet
+	// WhenScaled specifies what happens to PVCs created from StatefulSet
 	// VolumeClaimTemplates when the StatefulSet is scaled down. The default
 	// policy of `Retain` causes PVCs to not be affected by a scaledown. The
 	// `Delete` policy causes the associated PVCs for any excess pods above
@@ -1259,7 +1259,7 @@ type RollingUpdateStatefulSetStrategy struct {
 	// Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%).
 	// Absolute number is calculated from percentage by rounding up. This can not be 0.
 	// Defaults to 1. This field is alpha-level and is only honored by servers that enable the
-	// MaxunavailableStatefulSet feature. The field applies to all pods in the range 0 to
+	// MaxUnavailableStatefulSet feature. The field applies to all pods in the range 0 to
 	// Replicas-1. That means if there is any unavailable pod in the range 0 to Replicas-1, it
 	// will be counted towards MaxUnavailable.
 	MaxUnavailable *utilintstr.IntOrString `json:"maxUnavailable,omitempty"`

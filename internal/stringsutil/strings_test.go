@@ -9,6 +9,8 @@ import (
 func TestToUpperCamelCase(t *testing.T) {
 	assert.Equal(t, "FooBar", ToUpperCamelCase("foo_bar"))
 	assert.Equal(t, "CertManagerIo", ToUpperCamelCase("cert-manager.io"))
+	assert.Equal(t, "FooBar", ToUpperCamelCase("FooBar"))
+	assert.Equal(t, "Kubernetes", ToUpperCamelCase("kubernetes"))
 }
 
 func TestToLowerCamelCase(t *testing.T) {
@@ -55,4 +57,17 @@ func TestSplitString(t *testing.T) {
 func TestInsert(t *testing.T) {
 	assert.Equal(t, []string{"UserAdmin", "Admin"}, insert([]string{"UserAdmin"}, 1, "Admin"))
 	assert.Equal(t, []string{"User", "Full", "FullName"}, insert([]string{"User", "FullName"}, 1, "Full"))
+}
+
+func TestIsSnakeCase(t *testing.T) {
+	assert.True(t, IsSnakeCase("foo_bar"))
+	assert.False(t, IsSnakeCase("FooBar"))
+	assert.False(t, IsSnakeCase("cert-manager.io"))
+}
+
+func TestIsCamelCase(t *testing.T) {
+	assert.True(t, IsCamelCase("FooBar"))
+	assert.False(t, IsCamelCase("foo_bar"))
+	assert.False(t, IsCamelCase("cert-manager.io"))
+	assert.False(t, IsCamelCase("kubernetes"))
 }
