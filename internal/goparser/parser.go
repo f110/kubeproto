@@ -119,6 +119,9 @@ type Generator struct {
 	importedPackages []*packageInformation
 	importPrefix     string
 
+	// kubeprotoGoPackage is a package name that used to used instead of go_package.
+	kubeprotoGoPackage string
+
 	typeDeclaration []*typeDeclaration
 }
 
@@ -293,6 +296,10 @@ func (g *Generator) SetImportPrefix(v string) {
 	g.importPrefix = v
 }
 
+func (g *Generator) SetKubeprotoPackage(v string) {
+	g.kubeprotoGoPackage = v
+}
+
 func (g *Generator) WriteFile(outputFilePath string) error {
 	if g.protobufFile == nil {
 		return errors.New("not loaded any files. please call AddDir first")
@@ -338,6 +345,9 @@ func (g *Generator) WriteFile(outputFilePath string) error {
 			w.F("version: %q,", g.apiVersion)
 		}
 		w.F("};")
+	}
+	if g.kubeprotoGoPackage != "" {
+		w.F("option (dev.f110.kubeproto.kubeproto_go_package) = %q;", g.kubeprotoGoPackage)
 	}
 	w.F("")
 	w.F("import \"kube.proto\";")

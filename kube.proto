@@ -54,7 +54,8 @@ extend google.protobuf.FieldOptions {
 }
 
 extend google.protobuf.FileOptions {
-  Kubernetes k8s = 60010;
+  Kubernetes k8s                  = 60010;
+  string     kubeproto_go_package = 60011;
 }
 
 extend google.protobuf.EnumValueOptions {

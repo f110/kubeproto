@@ -19,6 +19,7 @@ var protoreflectKindMap = map[protoreflect.Kind]string{
 	protoreflect.Int64Kind:  "int64",
 	protoreflect.Int32Kind:  "int",
 	protoreflect.BoolKind:   "bool",
+	protoreflect.BytesKind:  "[]byte",
 }
 
 var ProtoreflectKindToJSONSchemaType = map[protoreflect.Kind]string{
@@ -224,10 +225,15 @@ func NewMessageFromMessageDescriptor(m protoreflect.MessageDescriptor, f protore
 	if v, ok := fileOpt.(*descriptorpb.FileOptions); ok {
 		goPackage = v.GetGoPackage()
 	}
+	if v := proto.GetExtension(fileOpt, kubeproto.E_KubeprotoGoPackage); v != nil {
+		if v, ok := v.(string); ok && v != "" {
+			goPackage = v
+		}
+	}
 	if strings.HasPrefix(goPackage, "k8s.io/apimachinery") || strings.HasPrefix(goPackage, "k8s.io/api") {
 		s := strings.Split(goPackage, "/")
 		goPackageAlias = fmt.Sprintf("%s%s", s[len(s)-2], s[len(s)-1])
-	} else if !strings.HasPrefix(string(f.Package()), "google.protobuf") {
+	} else if !strings.HasPrefix(string(f.Package()), "google.protobuf") && !strings.HasPrefix(string(f.Package()), "k8s.io.api") {
 		if i := strings.LastIndex(string(f.Package()), "."); i > 0 {
 			goPackageAlias = string(f.Package()[i+1:])
 		}

@@ -2,7 +2,6 @@ package k8s
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"path"
 	"strings"
@@ -15,6 +14,7 @@ import (
 	"go.f110.dev/kubeproto"
 	"go.f110.dev/kubeproto/internal/codegeneration"
 	"go.f110.dev/kubeproto/internal/definition"
+	"go.f110.dev/kubeproto/internal/stringsutil"
 )
 
 type ObjectGenerator struct {
@@ -52,23 +52,30 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 
 	defW := codegeneration.NewWriter()
 	fileOpt := g.file.Options().(*descriptorpb.FileOptions)
+	e := proto.GetExtension(g.file.Options(), kubeproto.E_K8S)
+	ext, hasRuntimeObject := e.(*kubeproto.Kubernetes)
+
 	packageName := fileOpt.GetGoPackage()
+	kubeprotoGoPackage := proto.GetExtension(g.file.Options(), kubeproto.E_KubeprotoGoPackage)
+	if kubeprotoGoPackage != nil {
+		packageName = kubeprotoGoPackage.(string)
+	}
 	w.F("package %s", path.Base(packageName))
 
-	e := proto.GetExtension(g.file.Options(), kubeproto.E_K8S)
-	ext := e.(*kubeproto.Kubernetes)
-	if ext == nil {
-		return fmt.Errorf("%s is not extended by kubeproto.Kubernetes", g.file.Name())
+	if hasRuntimeObject {
+		if ext.SubGroup != "" {
+			defW.F("const GroupName = \"%s.%s\"", ext.SubGroup, ext.Domain)
+		} else {
+			defW.F("const GroupName = \"%s\"", ext.Domain)
+		}
+		defW.F("")
+		defW.F("var (")
+		defW.F("GroupVersion = metav1.GroupVersion{Group: GroupName, Version: %q}", ext.Version)
+		defW.F("SchemeBuilder = runtime.NewSchemeBuilder(addKnownTypes)")
+		defW.F("AddToScheme = SchemeBuilder.AddToScheme")
+		defW.F("SchemaGroupVersion = schema.GroupVersion{Group: GroupName, Version: %q}", ext.Version)
+		defW.F(")")
 	}
-
-	defW.F("const GroupName = \"%s.%s\"", ext.SubGroup, ext.Domain)
-	defW.F("")
-	defW.F("var (")
-	defW.F("GroupVersion = metav1.GroupVersion{Group: GroupName, Version: %q}", ext.Version)
-	defW.F("SchemeBuilder = runtime.NewSchemeBuilder(addKnownTypes)")
-	defW.F("AddToScheme = SchemeBuilder.AddToScheme")
-	defW.F("SchemaGroupVersion = schema.GroupVersion{Group: \"%s.%s\", Version: %q}", ext.SubGroup, ext.Domain, ext.Version)
-	defW.F(")")
 
 	defW.F("func addKnownTypes(scheme *runtime.Scheme) error {")
 	defW.F("scheme.AddKnownTypes(SchemaGroupVersion,")
@@ -90,7 +97,7 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 		defW.F("type %s string", enum.ShortName)
 		defW.F("const (")
 		for _, v := range enum.Values {
-			defW.F("%s%s %s = %q", enum.ShortName, v, enum.ShortName, v)
+			defW.F("%s%s %s = %q", enum.ShortName, stringsutil.ToUpperCamelCase(v), enum.ShortName, v)
 		}
 		defW.F(")")
 	}
@@ -107,15 +114,14 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 			switch f.Kind {
 			case protoreflect.MessageKind:
 				m := messages.Find(f.MessageName)
-				if m == nil {
-					continue
-				}
-
-				if _, ok := mark[m.Name]; !ok && !m.Dep {
-					mark[m.Name] = struct{}{}
-					objs = append(objs, m)
+				if m != nil {
+					if _, ok := mark[m.Name]; !ok && !m.Dep {
+						mark[m.Name] = struct{}{}
+						objs = append(objs, m)
+					}
 				}
 			}
+
 			var name string
 			if !f.Embed {
 				name = string(f.Name)
@@ -129,7 +135,9 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 				d := strings.Replace(f.Description, string(f.Name), f.Name.CamelCase(), 1)
 				scanner := bufio.NewScanner(strings.NewReader(d))
 				for scanner.Scan() {
-					defW.F("// %s", scanner.Text())
+					line := scanner.Text()
+					line = strings.TrimSpace(line)
+					defW.F("// %s", line)
 				}
 			}
 			defW.F("%s %s %s", name, typ, tag)
@@ -165,9 +173,14 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 						defW.F("}")
 					} else {
 						defW.F("in, out := &in.%s, &out.%s", f.Name, f.Name)
-						_, _, typ := g.lister.ResolveGoType(packageName, f)
+						importPath, _, typ := g.lister.ResolveGoType(packageName, f)
 						defW.F("*out = new(%s)", typ[1:])
-						defW.F("(*in).DeepCopyInto(*out)")
+						switch importPath {
+						case "k8s.io/apimachinery/pkg/util/intstr":
+							defW.F("*out = *in")
+						default:
+							defW.F("(*in).DeepCopyInto(*out)")
+						}
 					}
 					defW.F("}")
 					continue
@@ -179,7 +192,13 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 					}
 					defW.F("out.%s = in.%s", typ, typ)
 				} else {
-					defW.F("in.%s.DeepCopyInto(&out.%s)", f.Name, f.Name)
+					importPath, _, _ := g.lister.ResolveGoType(packageName, f)
+					switch importPath {
+					case "k8s.io/apimachinery/pkg/util/intstr":
+						defW.F("in = out")
+					default:
+						defW.F("in.%s.DeepCopyInto(&out.%s)", f.Name, f.Name)
+					}
 				}
 			default:
 				if f.Repeated {

@@ -54,7 +54,7 @@ func NewEnumFromEnumDescriptor(e protoreflect.EnumDescriptor, f protoreflect.Fil
 	for i := 0; i < e.Values().Len(); i++ {
 		v := e.Values().Get(i)
 		e := proto.GetExtension(v.Options(), kubeproto.E_Value)
-		if ext := e.(*kubeproto.EnumValue); ext != nil {
+		if ext := e.(*kubeproto.EnumValue); ext != nil && ext.Value != "" {
 			values = append(values, ext.Value)
 		} else {
 			values = append(values, stringsutil.ToUpperCamelCase(strings.TrimPrefix(string(v.Name()), prefix)))
@@ -65,6 +65,11 @@ func NewEnumFromEnumDescriptor(e protoreflect.EnumDescriptor, f protoreflect.Fil
 	var goPackage string
 	if v, ok := fileOpt.(*descriptorpb.FileOptions); ok {
 		goPackage = v.GetGoPackage()
+	}
+	if v := proto.GetExtension(fileOpt, kubeproto.E_KubeprotoGoPackage); v != nil {
+		if v, ok := v.(string); ok && v != "" {
+			goPackage = v
+		}
 	}
 	return &Enum{
 		Name:      string(e.FullName()),

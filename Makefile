@@ -9,6 +9,9 @@ kube.pb.go: kube.proto
 	@cp bazel-bin/kubeproto_go_proto_/go.f110.dev/kubeproto/kube.pb.go ./
 	@chmod 644 $@
 
+.PHONY: gen
+gen: kube.pb.go gen-proto gen-go
+
 .PHONY: gen-proto
 gen-proto: k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto \
 	k8s.io/apimachinery/pkg/api/resource/generated.proto \
@@ -18,6 +21,10 @@ gen-proto: k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto \
 	sigs.k8s.io/gateway-api/apis/v1alpha2/generated.proto \
 	k8s.io/api/apps/v1/generated.proto \
 	k8s.io/api/core/v1/generated.proto
+
+.PHONY: gen-go
+gen-go: apis/corev1/corev1_kubeproto.generated.object.go \
+	apis/appsv1/appsv1_kubeproto.generated.object.go
 
 .PHONY: k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto
 k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto:
@@ -42,12 +49,12 @@ k8s.io/apimachinery/pkg/runtime/generated.proto:
 .PHONY: k8s.io/api/core/v1/generated.proto
 k8s.io/api/core/v1/generated.proto:
 	mkdir -p $(@D)
-	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.core.v1 --go-package $(@D) --api-version v1 --all $(CURDIR)/vendor/$(@D)
+	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.core.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/apis/corev1" --api-version v1 --all $(CURDIR)/vendor/$(@D)
 
 .PHONY: k8s.io/api/apps/v1/generated.proto
 k8s.io/api/apps/v1/generated.proto:
 	mkdir -p $(@D)
-	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.apps.v1 --go-package $(@D) --api-domain apps --api-version v1 --all $(CURDIR)/vendor/$(@D)
+	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.apps.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/apis/appsv1" --api-domain apps --api-version v1 --all $(CURDIR)/vendor/$(@D)
 
 .PHONY: k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto
 k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto:
@@ -58,3 +65,17 @@ k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto:
 sigs.k8s.io/gateway-api/apis/v1alpha2/generated.proto:
 	mkdir -p $(@D)
 	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package sigs.k8s.io.gateway_api.apis.v1alpha2 --go-package $(@D) --api-domain gateway --api-sub-group networking.k8s.io --api-version v1alpha2 --all $(CURDIR)/vendor/$(@D)
+
+.PHONY: apis/corev1/corev1_kubeproto.generated.object.go
+apis/corev1/corev1_kubeproto.generated.object.go: k8s.io/api/core/v1/generated.proto
+	@mkdir -p $(@D)
+	bazel build //k8s.io/api/core/v1:corev1_kubeproto
+	cp ./bazel-bin/$(<D)/$(@F) $(@D)
+	@chmod 0644 $@
+
+.PHONY: apis/appsv1/appsv1_kubeproto.generated.object.go
+apis/appsv1/appsv1_kubeproto.generated.object.go: k8s.io/api/apps/v1/generated.proto
+	@mkdir -p $(@D)
+	bazel build //$(<D):appsv1_kubeproto
+	cp ./bazel-bin/$(<D)/$(@F) $(@D)
+	@chmod 0644 $@
