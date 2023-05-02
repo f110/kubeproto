@@ -15,5 +15,5 @@ load("//bazel:def.bzl", "kubeproto_go_api")
 kubeproto_go_api(
     name = "corev1_kubeproto",
     srcs = [":corev1_proto"],
-    importpath = "go.f110.dev/kubeproto/apis/corev1",
+    importpath = "go.f110.dev/kubeproto/go/apis/corev1",
 )
