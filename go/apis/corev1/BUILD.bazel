@@ -1,12 +1,12 @@
 load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
-    name = "appsv1",
-    srcs = ["appsv1_kubeproto.generated.object.go"],
-    importpath = "go.f110.dev/kubeproto/apis/appsv1",
+    name = "corev1",
+    srcs = ["corev1_kubeproto.generated.object.go"],
+    importpath = "go.f110.dev/kubeproto/go/apis/corev1",
     visibility = ["//visibility:public"],
     deps = [
-        "//apis/corev1",
+        "//vendor/k8s.io/apimachinery/pkg/api/resource",
         "//vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
         "//vendor/k8s.io/apimachinery/pkg/runtime",
         "//vendor/k8s.io/apimachinery/pkg/runtime/schema",

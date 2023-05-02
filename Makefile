@@ -23,8 +23,9 @@ gen-proto: k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto \
 	k8s.io/api/core/v1/generated.proto
 
 .PHONY: gen-go
-gen-go: apis/corev1/corev1_kubeproto.generated.object.go \
-	apis/appsv1/appsv1_kubeproto.generated.object.go
+gen-go: go/apis/corev1/corev1_kubeproto.generated.object.go \
+	go/apis/appsv1/appsv1_kubeproto.generated.object.go \
+	go/apis/batchv1/batchv1_kubeproto.generated.object.go
 
 .PHONY: k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto
 k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto:
@@ -72,21 +73,21 @@ sigs.k8s.io/gateway-api/apis/v1alpha2/generated.proto:
 	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package sigs.k8s.io.gateway_api.apis.v1alpha2 --go-package $(@D) --api-domain gateway --api-sub-group networking.k8s.io --api-version v1alpha2 --all $(CURDIR)/vendor/$(@D)
 
 .PHONY: apis/corev1/corev1_kubeproto.generated.object.go
-apis/corev1/corev1_kubeproto.generated.object.go: k8s.io/api/core/v1/generated.proto
+go/apis/corev1/corev1_kubeproto.generated.object.go: k8s.io/api/core/v1/generated.proto
 	@mkdir -p $(@D)
 	bazel build //k8s.io/api/core/v1:corev1_kubeproto
 	cp ./bazel-bin/$(<D)/$(@F) $(@D)
 	@chmod 0644 $@
 
 .PHONY: apis/appsv1/appsv1_kubeproto.generated.object.go
-apis/appsv1/appsv1_kubeproto.generated.object.go: k8s.io/api/apps/v1/generated.proto
+go/apis/appsv1/appsv1_kubeproto.generated.object.go: k8s.io/api/apps/v1/generated.proto
 	@mkdir -p $(@D)
 	bazel build //$(<D):appsv1_kubeproto
 	cp ./bazel-bin/$(<D)/$(@F) $(@D)
 	@chmod 0644 $@
 
 .PHONY: apis/batchv1/batchv1_kubeproto.generated.object.go
-apis/batchv1/batchv1_kubeproto.generated.object.go: k8s.io/api/batch/v1/generated.proto
+go/apis/batchv1/batchv1_kubeproto.generated.object.go: k8s.io/api/batch/v1/generated.proto
 	@mkdir -p $(@D)
 	bazel build //$(<D):batchv1_kubeproto
 	cp ./bazel-bin/$(<D)/$(@F) $(@D)
