@@ -51,30 +51,30 @@ var (
 				Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values.",
 			},
 		},
-		Package: ImportPackage{Path: "k8s.io/apimachinery/pkg/apis/meta/v1", Alias: "metav1"},
+		Package: ImportPackage{Path: "go.f110.dev/kubeproto/go/apis/metav1"},
 	}
 	MessageObjectMeta = &Message{
 		Dep:       true,
 		Virtual:   true,
 		Name:      ".k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta",
 		ShortName: "ObjectMeta",
-		Package:   ImportPackage{Path: "k8s.io/apimachinery/pkg/apis/meta/v1", Alias: "metav1"},
+		Package:   ImportPackage{Path: "go.f110.dev/kubeproto/go/apis/metav1"},
 	}
 	MessageListMeta = &Message{
 		Dep:       true,
 		Virtual:   true,
 		Name:      ".k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta",
 		ShortName: "ListMeta",
-		Package:   ImportPackage{Path: "k8s.io/apimachinery/pkg/apis/meta/v1", Alias: "metav1"},
+		Package:   ImportPackage{Path: "go.f110.dev/kubeproto/go/apis/metav1"},
 	}
 )
 
 type Messages []*Message
 
-func (m *Messages) FilterKind() Messages {
+func (m Messages) FilterKind() Messages {
 	kindMap := make(map[string]*Message)
 	var kinds []*Message
-	for _, v := range *m {
+	for _, v := range m {
 		if v.Dep {
 			continue
 		}
@@ -128,7 +128,7 @@ type Message struct {
 	Name string
 	// ShortName is a name of message (e,g, TypeMeta)
 	ShortName string
-	// Kind indicates has this message is runtime.Object.
+	// Kind indicates this message is runtime.Object.
 	Kind bool
 	// Fields has all fields of the message.
 	Fields Fields
@@ -143,6 +143,8 @@ type Message struct {
 	Version string
 	// Scope is a type of this message.
 	Scope ScopeType
+	// HasTypeMeta indicates this message contains TypeMeta
+	HasTypeMeta bool
 
 	fileDescriptor    protoreflect.FileDescriptor
 	messageDescriptor protoreflect.MessageDescriptor
@@ -259,6 +261,12 @@ func NewMessageFromMessageDescriptor(m protoreflect.MessageDescriptor, f protore
 	if isKind(m) {
 		extendAsKind(msg)
 		msg.Scope = messageScope
+	}
+	for _, v := range msg.Fields {
+		if strings.HasSuffix(v.MessageName, MessageTypeMeta.Name[1:]) {
+			msg.HasTypeMeta = true
+			break
+		}
 	}
 	return msg, nil
 }

@@ -171,6 +171,7 @@ def _execute_protoc(ctx, compiler, compiler_name, suffix, srcs, opts = ""):
         ),
         outputs = [out],
         arguments = [args],
+        use_default_shell_env = True,
     )
 
     return out

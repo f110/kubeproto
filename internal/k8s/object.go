@@ -3,7 +3,9 @@ package k8s
 import (
 	"bufio"
 	"io"
+	"os"
 	"path"
+	"sort"
 	"strings"
 
 	"google.golang.org/protobuf/proto"
@@ -39,9 +41,7 @@ func NewObjectGenerator(fileToGenerate []string, files *protoregistry.Files) (*O
 
 func (g *ObjectGenerator) Generate(out io.Writer) error {
 	importPackages := map[string]string{
-		"k8s.io/apimachinery/pkg/runtime":        "",
-		"k8s.io/apimachinery/pkg/runtime/schema": "",
-		"k8s.io/apimachinery/pkg/apis/meta/v1":   "metav1",
+		"k8s.io/apimachinery/pkg/runtime": "",
 	}
 	for k, v := range importPackages {
 		g.packageNamespaceManager.Add(k, v)
@@ -53,7 +53,8 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 	defW := codegeneration.NewWriter()
 	fileOpt := g.file.Options().(*descriptorpb.FileOptions)
 	e := proto.GetExtension(g.file.Options(), kubeproto.E_K8S)
-	ext, hasRuntimeObject := e.(*kubeproto.Kubernetes)
+	ext := e.(*kubeproto.Kubernetes)
+	hasRuntimeObject := ext != nil
 
 	packageName := fileOpt.GetGoPackage()
 	kubeprotoGoPackage := proto.GetExtension(g.file.Options(), kubeproto.E_KubeprotoGoPackage)
@@ -63,6 +64,8 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 	w.F("package %s", path.Base(packageName))
 
 	if hasRuntimeObject {
+		importPackages["k8s.io/apimachinery/pkg/runtime/schema"] = ""
+
 		if ext.SubGroup != "" {
 			defW.F("const GroupName = \"%s.%s\"", ext.SubGroup, ext.Domain)
 		} else {
@@ -75,17 +78,17 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 		defW.F("AddToScheme = SchemeBuilder.AddToScheme")
 		defW.F("SchemaGroupVersion = schema.GroupVersion{Group: GroupName, Version: %q}", ext.Version)
 		defW.F(")")
-	}
 
-	defW.F("func addKnownTypes(scheme *runtime.Scheme) error {")
-	defW.F("scheme.AddKnownTypes(SchemaGroupVersion,")
-	for _, m := range messages.FilterKind() {
-		defW.F("&%s{},", m.ShortName)
+		defW.F("func addKnownTypes(scheme *runtime.Scheme) error {")
+		defW.F("scheme.AddKnownTypes(SchemaGroupVersion,")
+		for _, m := range messages.FilterKind() {
+			defW.F("&%s{},", m.ShortName)
+		}
+		defW.F(")")
+		defW.F("metav1.AddToGroupVersion(scheme, SchemaGroupVersion)")
+		defW.F("return nil")
+		defW.F("}")
 	}
-	defW.F(")")
-	defW.F("metav1.AddToGroupVersion(scheme, SchemaGroupVersion)")
-	defW.F("return nil")
-	defW.F("}")
 
 	enums := g.lister.GetEnums()
 	for _, enum := range enums.Own() {
@@ -103,9 +106,29 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 	}
 
 	mark := make(map[string]struct{})
-	objs := messages.FilterKind()
+	var objs definition.Messages
+	if os.Getenv("KUBEPROTO_OPTS") == "all" {
+		objMap := make(map[string]*definition.Message)
+		for _, v := range messages {
+			if !v.Dep {
+				objMap[v.ShortName] = v
+			}
+		}
+		for _, v := range objMap {
+			objs = append(objs, v)
+		}
+		sort.Slice(objs, func(i, j int) bool {
+			return objs[i].ShortName < objs[j].ShortName
+		})
+	} else {
+		objs = messages.FilterKind()
+	}
 	for len(objs) > 0 {
 		obj := objs[0]
+		if _, ok := mark[obj.Name]; ok {
+			objs = objs[1:]
+			continue
+		}
 		mark[obj.Name] = struct{}{}
 
 		// Struct definition
@@ -116,7 +139,6 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 				m := messages.Find(f.MessageName)
 				if m != nil {
 					if _, ok := mark[m.Name]; !ok && !m.Dep {
-						mark[m.Name] = struct{}{}
 						objs = append(objs, m)
 					}
 				}
@@ -220,8 +242,8 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 		defW.F("return out")
 		defW.F("}")
 		defW.F("")
-		// DeepCopyObject should generate only top level object.
-		if obj.Kind {
+		// TypeMeta partially implements runtime.Object.
+		if obj.HasTypeMeta {
 			defW.F("func (in *%s) DeepCopyObject() runtime.Object {", obj.ShortName)
 			defW.F("if c := in.DeepCopy(); c != nil {")
 			defW.F("return c")
