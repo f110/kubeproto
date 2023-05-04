@@ -8876,31 +8876,7 @@ func (in *SecretProjection) DeepCopy() *SecretProjection {
 	return out
 }
 
-type DownwardAPIProjection struct {
-	// Items is a list of DownwardAPIVolume file
-	Items []DownwardAPIVolumeFile `json:"items"`
-}
-
-func (in *DownwardAPIProjection) DeepCopyInto(out *DownwardAPIProjection) {
-	*out = *in
-	if in.Items != nil {
-		l := make([]DownwardAPIVolumeFile, len(in.Items))
-		for i := range in.Items {
-			in.Items[i].DeepCopyInto(&l[i])
-		}
-		out.Items = l
-	}
-}
-
-func (in *DownwardAPIProjection) DeepCopy() *DownwardAPIProjection {
-	if in == nil {
-		return nil
-	}
-	out := new(DownwardAPIProjection)
-	in.DeepCopyInto(out)
-	return out
-}
-
+type DownwardAPIProjection []DownwardAPIVolumeFile
 type ConfigMapProjection struct {
 	LocalObjectReference `json:",inline"`
 	// items if unspecified, each key-value pair in the Data field of the referenced

@@ -6,6 +6,7 @@ go_library(
     importpath = "go.f110.dev/kubeproto/internal",
     visibility = ["//:__subpackages__"],
     deps = [
+        "//vendor/k8s.io/api/admission/v1:admission",
         "//vendor/k8s.io/api/apps/v1:apps",
         "//vendor/k8s.io/api/batch/v1:batch",
         "//vendor/k8s.io/api/core/v1:core",

@@ -1760,28 +1760,7 @@ func (in *UpdateOptions) DeepCopyObject() runtime.Object {
 	return nil
 }
 
-type Verbs struct {
-	Items []string `json:"items"`
-}
-
-func (in *Verbs) DeepCopyInto(out *Verbs) {
-	*out = *in
-	if in.Items != nil {
-		t := make([]string, len(in.Items))
-		copy(t, in.Items)
-		out.Items = t
-	}
-}
-
-func (in *Verbs) DeepCopy() *Verbs {
-	if in == nil {
-		return nil
-	}
-	out := new(Verbs)
-	in.DeepCopyInto(out)
-	return out
-}
-
+type Verbs []string
 type WatchEvent struct {
 	Type string `json:"type"`
 	// Object is:
