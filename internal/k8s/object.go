@@ -65,6 +65,7 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 
 	if hasRuntimeObject {
 		importPackages["k8s.io/apimachinery/pkg/runtime/schema"] = ""
+		importPackages["go.f110.dev/kubeproto/go/apis/metav1"] = ""
 
 		if ext.SubGroup != "" {
 			defW.F("const GroupName = \"%s.%s\"", ext.SubGroup, ext.Domain)
@@ -131,125 +132,153 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 		}
 		mark[obj.Name] = struct{}{}
 
-		// Struct definition
-		defW.F("type %s struct {", obj.ShortName)
-		for _, f := range obj.Fields {
-			switch f.Kind {
-			case protoreflect.MessageKind:
-				m := messages.Find(f.MessageName)
-				if m != nil {
-					if _, ok := mark[m.Name]; !ok && !m.Dep {
-						objs = append(objs, m)
-					}
-				}
-			}
-
-			var name string
-			if !f.Embed {
-				name = string(f.Name)
-			}
-			importPath, packageName, typ := g.lister.ResolveGoType(packageName, f)
+		if obj.IsList() {
+			importPath, packageAlias, typ := g.lister.ResolveGoType(packageName, obj.Fields[0])
 			if importPath != "" {
-				importPackages[importPath] = packageName
+				importPackages[importPath] = packageAlias
 			}
-			tag := f.Tag()
-			if f.Description != "" {
-				d := strings.Replace(f.Description, string(f.Name), f.Name.CamelCase(), 1)
-				scanner := bufio.NewScanner(strings.NewReader(d))
-				for scanner.Scan() {
-					line := scanner.Text()
-					line = strings.TrimSpace(line)
-					defW.F("// %s", line)
-				}
-			}
-			defW.F("%s %s %s", name, typ, tag)
-		}
-		defW.F("}")
-		defW.F("")
-
-		// DeepCopy functions (DeepCopyInto / DeepCopy / DeepCopyObject)
-		defW.F("func (in *%s) DeepCopyInto(out *%s) {", obj.ShortName, obj.ShortName)
-		defW.F("*out = *in")
-		for _, f := range obj.Fields {
-			switch f.Kind {
-			case protoreflect.MessageKind:
-				if f.Repeated {
-					defW.F("if in.%s != nil {", f.Name)
-					_, _, typ := g.lister.ResolveGoType(packageName, f)
-					defW.F("l := make(%s, len(in.%s))", typ, f.Name)
-					defW.F("for i := range in.%s {", f.Name)
-					defW.F("in.%s[i].DeepCopyInto(&l[i])", f.Name)
-					defW.F("}")
-					defW.F("out.%s = l", f.Name)
-					defW.F("}")
-					continue
-				}
-				if f.Optional {
-					defW.F("if in.%s != nil {", f.Name)
-					if f.IsMap() {
-						defW.F("in, out := &in.%s, &out.%s", f.Name, f.Name)
-						_, _, typ := g.lister.ResolveGoType(packageName, f)
-						defW.F("*out = make(%s, len(*in))", typ)
-						defW.F("for k, v := range *in {")
-						defW.F("(*out)[k] = v")
-						defW.F("}")
-					} else {
-						defW.F("in, out := &in.%s, &out.%s", f.Name, f.Name)
-						importPath, _, typ := g.lister.ResolveGoType(packageName, f)
-						defW.F("*out = new(%s)", typ[1:])
-						switch importPath {
-						case "k8s.io/apimachinery/pkg/util/intstr":
-							defW.F("*out = *in")
-						default:
-							defW.F("(*in).DeepCopyInto(*out)")
+			defW.F("type %s %s", obj.ShortName, typ)
+		} else {
+			// Struct definition
+			defW.F("type %s struct {", obj.ShortName)
+			for _, f := range obj.Fields {
+				switch f.Kind {
+				case protoreflect.MessageKind:
+					m := messages.Find(f.MessageName)
+					if m != nil {
+						if _, ok := mark[m.Name]; !ok && !m.Dep {
+							objs = append(objs, m)
 						}
 					}
-					defW.F("}")
-					continue
-				}
-				if f.Inline {
-					_, alias, typ := g.lister.ResolveGoType(packageName, f)
-					if alias != "" {
-						typ = strings.TrimPrefix(typ, alias+".")
+
+					if f.IsMap() {
+						key, value := f.MapKeyValue()
+						if key.Kind() == protoreflect.MessageKind {
+							m := messages.Find(string(key.Message().FullName()))
+							if m != nil {
+								if _, ok := mark[m.Name]; !ok && !m.Dep {
+									objs = append(objs, m)
+								}
+							}
+						}
+						if value.Kind() == protoreflect.MessageKind {
+							m := messages.Find(string(value.Message().FullName()))
+							if m != nil {
+								if _, ok := mark[m.Name]; !ok && !m.Dep {
+									objs = append(objs, m)
+								}
+							}
+						}
 					}
-					defW.F("out.%s = in.%s", typ, typ)
-				} else {
-					importPath, _, _ := g.lister.ResolveGoType(packageName, f)
-					switch importPath {
-					case "k8s.io/apimachinery/pkg/util/intstr":
-						defW.F("in = out")
-					default:
-						defW.F("in.%s.DeepCopyInto(&out.%s)", f.Name, f.Name)
+				}
+
+				var name string
+				if !f.Embed {
+					name = string(f.Name)
+				}
+				importPath, packageName, typ := g.lister.ResolveGoType(packageName, f)
+				if importPath != "" {
+					importPackages[importPath] = packageName
+				}
+				tag := f.Tag()
+				if f.Description != "" {
+					d := strings.Replace(f.Description, string(f.Name), f.Name.CamelCase(), 1)
+					scanner := bufio.NewScanner(strings.NewReader(d))
+					for scanner.Scan() {
+						line := scanner.Text()
+						line = strings.TrimSpace(line)
+						defW.F("// %s", line)
 					}
 				}
-			default:
-				if f.Repeated {
-					defW.F("if in.%s != nil {", f.Name)
-					_, _, typ := g.lister.ResolveGoType(packageName, f)
-					defW.F("t := make(%s, len(in.%s))", typ, f.Name)
-					defW.F("copy(t, in.%s)", f.Name)
-					defW.F("out.%s = t", f.Name)
-					defW.F("}")
+				defW.F("%s %s %s", name, typ, tag)
+			}
+			defW.F("}")
+			defW.F("")
+
+			// DeepCopy functions (DeepCopyInto / DeepCopy / DeepCopyObject)
+			defW.F("func (in *%s) DeepCopyInto(out *%s) {", obj.ShortName, obj.ShortName)
+			defW.F("*out = *in")
+			for _, f := range obj.Fields {
+				switch f.Kind {
+				case protoreflect.MessageKind:
+					if f.Repeated {
+						defW.F("if in.%s != nil {", f.Name)
+						_, _, typ := g.lister.ResolveGoType(packageName, f)
+						defW.F("l := make(%s, len(in.%s))", typ, f.Name)
+						defW.F("for i := range in.%s {", f.Name)
+						defW.F("in.%s[i].DeepCopyInto(&l[i])", f.Name)
+						defW.F("}")
+						defW.F("out.%s = l", f.Name)
+						defW.F("}")
+						continue
+					}
+					if f.Optional {
+						defW.F("if in.%s != nil {", f.Name)
+						if f.IsMap() {
+							defW.F("in, out := &in.%s, &out.%s", f.Name, f.Name)
+							_, _, typ := g.lister.ResolveGoType(packageName, f)
+							defW.F("*out = make(%s, len(*in))", typ)
+							defW.F("for k, v := range *in {")
+							defW.F("(*out)[k] = v")
+							defW.F("}")
+						} else {
+							defW.F("in, out := &in.%s, &out.%s", f.Name, f.Name)
+							importPath, _, typ := g.lister.ResolveGoType(packageName, f)
+							defW.F("*out = new(%s)", typ[1:])
+							switch importPath {
+							case "k8s.io/apimachinery/pkg/util/intstr":
+								defW.F("*out = *in")
+							default:
+								defW.F("(*in).DeepCopyInto(*out)")
+							}
+						}
+						defW.F("}")
+						continue
+					}
+					if f.Inline {
+						_, alias, typ := g.lister.ResolveGoType(packageName, f)
+						if alias != "" {
+							typ = strings.TrimPrefix(typ, alias+".")
+						}
+						defW.F("out.%s = in.%s", typ, typ)
+					} else {
+						importPath, _, _ := g.lister.ResolveGoType(packageName, f)
+						switch importPath {
+						case "k8s.io/apimachinery/pkg/util/intstr":
+							defW.F("in = out")
+						default:
+							defW.F("in.%s.DeepCopyInto(&out.%s)", f.Name, f.Name)
+						}
+					}
+				default:
+					if f.Repeated {
+						defW.F("if in.%s != nil {", f.Name)
+						_, _, typ := g.lister.ResolveGoType(packageName, f)
+						defW.F("t := make(%s, len(in.%s))", typ, f.Name)
+						defW.F("copy(t, in.%s)", f.Name)
+						defW.F("out.%s = t", f.Name)
+						defW.F("}")
+					}
 				}
 			}
-		}
-		defW.F("}")
-		defW.F("")
-		defW.F("func (in *%s) DeepCopy() *%s {", obj.ShortName, obj.ShortName)
-		defW.F("if in == nil {\nreturn nil\n}")
-		defW.F("out := new(%s)", obj.ShortName)
-		defW.F("in.DeepCopyInto(out)")
-		defW.F("return out")
-		defW.F("}")
-		defW.F("")
-		// TypeMeta partially implements runtime.Object.
-		if obj.HasTypeMeta {
-			defW.F("func (in *%s) DeepCopyObject() runtime.Object {", obj.ShortName)
-			defW.F("if c := in.DeepCopy(); c != nil {")
-			defW.F("return c")
 			defW.F("}")
-			defW.F("return nil")
+			defW.F("")
+			defW.F("func (in *%s) DeepCopy() *%s {", obj.ShortName, obj.ShortName)
+			defW.F("if in == nil {\nreturn nil\n}")
+			defW.F("out := new(%s)", obj.ShortName)
+			defW.F("in.DeepCopyInto(out)")
+			defW.F("return out")
 			defW.F("}")
+			defW.F("")
+			// TypeMeta partially implements runtime.Object.
+			if obj.HasTypeMeta {
+				defW.F("func (in *%s) DeepCopyObject() runtime.Object {", obj.ShortName)
+				defW.F("if c := in.DeepCopy(); c != nil {")
+				defW.F("return c")
+				defW.F("}")
+				defW.F("return nil")
+				defW.F("}")
+			}
 		}
 
 		objs = objs[1:]

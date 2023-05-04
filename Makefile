@@ -20,13 +20,18 @@ gen-proto: k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto \
 	k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto \
 	sigs.k8s.io/gateway-api/apis/v1alpha2/generated.proto \
 	k8s.io/api/apps/v1/generated.proto \
-	k8s.io/api/core/v1/generated.proto
+	k8s.io/api/core/v1/generated.proto \
+	k8s.io/api/batch/v1/generated.proto \
+	k8s.io/api/admission/v1/generated.proto \
+	k8s.io/api/authentication/v1/generated.proto
 
 .PHONY: gen-go
 gen-go: go/apis/metav1/metav1_kubeproto.generated.object.go \
 	go/apis/corev1/corev1_kubeproto.generated.object.go \
 	go/apis/appsv1/appsv1_kubeproto.generated.object.go \
-	go/apis/batchv1/batchv1_kubeproto.generated.object.go
+	go/apis/batchv1/batchv1_kubeproto.generated.object.go \
+	go/apis/authenticationv1/authenticationv1_kubeproto.generated.object.go \
+	go/apis/admissionv1/admissionv1_kubeproto.generated.object.go
 
 .PHONY: k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto
 k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto:
@@ -63,6 +68,16 @@ k8s.io/api/batch/v1/generated.proto:
 	mkdir -p $(@D)
 	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.batch.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/batchv1" --api-domain apps --api-version v1 --all $(CURDIR)/vendor/$(@D)
 
+.PHONY: k8s.io/api/authentication/v1/generated.proto
+k8s.io/api/authentication/v1/generated.proto:
+	mkdir -p $(@D)
+	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.authentication.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/authenticationv1" --api-domain authentication.k8s.io --api-version v1 --all $(CURDIR)/vendor/$(@D)
+
+.PHONY: k8s.io/api/admission/v1/generated.proto
+k8s.io/api/admission/v1/generated.proto:
+	mkdir -p $(@D)
+	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.admission.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/admissionv1" --api-domain admission.k8s.io --api-version v1 --all $(CURDIR)/vendor/$(@D)
+
 .PHONY: k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto
 k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto:
 	mkdir -p $(@D)
@@ -98,5 +113,19 @@ go/apis/appsv1/appsv1_kubeproto.generated.object.go: k8s.io/api/apps/v1/generate
 go/apis/batchv1/batchv1_kubeproto.generated.object.go: k8s.io/api/batch/v1/generated.proto
 	@mkdir -p $(@D)
 	bazel build //$(<D):batchv1_kubeproto
+	cp ./bazel-bin/$(<D)/$(@F) $(@D)
+	@chmod 0644 $@
+
+.PHONY: apis/authenticationv1/authenticationv1_kubeproto.generated.object.go
+go/apis/authenticationv1/authenticationv1_kubeproto.generated.object.go: k8s.io/api/authentication/v1/generated.proto
+	@mkdir -p $(@D)
+	bazel build //$(<D):authenticationv1_kubeproto
+	cp ./bazel-bin/$(<D)/$(@F) $(@D)
+	@chmod 0644 $@
+
+.PHONY: apis/admissionv1/admissionv1_kubeproto.generated.object.go
+go/apis/admissionv1/admissionv1_kubeproto.generated.object.go: k8s.io/api/admission/v1/generated.proto
+	@mkdir -p $(@D)
+	bazel build //$(<D):admissionv1_kubeproto
 	cp ./bazel-bin/$(<D)/$(@F) $(@D)
 	@chmod 0644 $@

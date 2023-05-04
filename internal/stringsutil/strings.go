@@ -7,10 +7,13 @@ import (
 	"github.com/gertd/go-pluralize"
 )
 
+// word is a list of proper noun used to divide words.
+// The word at the top of the list is given priority.
+// Therefore, words with fewer letters should be placed at the end of the list.
 var word = []string{"UUID", "UID", "WWIDs", "IQN", "ISCSI", "API", "ACME", "CHAP", "CIDRs", "CIDR", "PID", "ID", "DNS",
 	"IPC", "IPs", "IP", "PUT", "POST", "QOS", "OS", "NFS", "FS", "FC", "RBD", "TCP", "UDP", "SCTP", "GET", "URI", "URL",
-	"TLS", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH", "HTTPS", "HTTP", "SELinux", "FQDN", "TTY", "WWNs", "GCE",
-	"AWS", "IO", "CSI", "GRPC", "SSL", "GMSA", "HMAC", "HEAD"}
+	"TLS", "CREATE", "UPDATE", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH", "HTTPS", "HTTP", "SELinux", "FQDN", "TTY",
+	"WWNs", "GCE", "AWS", "IO", "CSI", "GRPC", "SSL", "GMSA", "HMAC", "HEAD", "JSON"}
 
 var wordDic map[string]struct{}
 

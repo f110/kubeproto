@@ -69,6 +69,21 @@ var preDefinedPackages = []packageInformation{
 		ImportPath:      "k8s.io/api/apps/v1",
 	},
 	{
+		GoPackage:       "k8s.io/api/batch/v1",
+		ProtobufPackage: "k8s.io.api.batch.v1",
+		ImportPath:      "k8s.io/api/batch/v1",
+	},
+	{
+		GoPackage:       "k8s.io/api/authentication/v1",
+		ProtobufPackage: "k8s.io.api.authentication.v1",
+		ImportPath:      "k8s.io/api/authentication/v1",
+	},
+	{
+		GoPackage:       "k8s.io/api/admission/v1",
+		ProtobufPackage: "k8s.io.api.admission.v1",
+		ImportPath:      "k8s.io/api/admission/v1",
+	},
+	{
 		GoPackage:       "sigs.k8s.io/gateway-api/apis/v1alpha2",
 		ProtobufPackage: "sigs.k8s.io.gateway_api.apis.v1alpha2",
 		ImportPath:      "sigs.k8s.io/gateway-api/apis/v1alpha2",

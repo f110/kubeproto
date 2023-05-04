@@ -291,6 +291,13 @@ func (m *Message) IsDefinedSubResource() bool {
 	return false
 }
 
+func (m *Message) IsList() bool {
+	if len(m.Fields) == 1 && m.Fields[0].Name == "Items" && m.Fields[0].Repeated {
+		return true
+	}
+	return false
+}
+
 func extendAsKind(m *Message) {
 	m.Kind = true
 	found := false
