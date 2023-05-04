@@ -6,7 +6,7 @@ option (dev.f110.kubeproto.k8s) = {
   domain: "apps",
   version: "v1",
 };
-option (dev.f110.kubeproto.kubeproto_go_package) = "go.f110.dev/kubeproto/apis/appsv1";
+option (dev.f110.kubeproto.kubeproto_go_package) = "go.f110.dev/kubeproto/go/apis/appsv1";
 
 import "kube.proto";
 import "k8s.io/api/core/v1/generated.proto";

@@ -85,9 +85,10 @@ func (l *Lister) GetMessages() Messages {
 						MessageName: msg.Name,
 					},
 				},
-				Kind:    true,
-				Virtual: true,
-				Dep:     msg.Dep,
+				Kind:        true,
+				Virtual:     true,
+				Dep:         msg.Dep,
+				HasTypeMeta: true,
 			}
 			msgs = append(msgs, listMessage)
 		}

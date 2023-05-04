@@ -1,20 +1,19 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
 
 proto_library(
-    name = "corev1_proto",
+    name = "metav1_proto",
     srcs = ["generated.proto"],
     visibility = ["//visibility:public"],
     deps = [
         "//:kubeproto",
         "//k8s.io/apimachinery:apimachinery_proto",
-        "//k8s.io/apimachinery/pkg/apis/meta/v1:metav1_proto",
     ],
 )
 
 load("//bazel:def.bzl", "kubeproto_go_api")
 
 kubeproto_go_api(
-    name = "corev1_kubeproto",
-    srcs = [":corev1_proto"],
-    importpath = "go.f110.dev/kubeproto/go/apis/corev1",
+    name = "metav1_kubeproto",
+    srcs = [":metav1_proto"],
+    importpath = "go.f110.dev/kubeproto/go/apis/metav1",
 )

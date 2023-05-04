@@ -1,8 +1,8 @@
 package appsv1
 
 import (
-	corev1 "go.f110.dev/kubeproto/apis/corev1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "go.f110.dev/kubeproto/go/apis/corev1"
+	metav1 "go.f110.dev/kubeproto/go/apis/metav1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilintstr "k8s.io/apimachinery/pkg/util/intstr"
