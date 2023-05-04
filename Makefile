@@ -78,6 +78,11 @@ k8s.io/api/admission/v1/generated.proto:
 	mkdir -p $(@D)
 	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.admission.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/admissionv1" --api-domain admission.k8s.io --api-version v1 --all $(CURDIR)/vendor/$(@D)
 
+.PHONY: k8s.io/api/policy/v1/generated.proto
+k8s.io/api/policy/v1/generated.proto:
+	mkdir -p $(@D)
+	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.policy.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/policyv1" --api-domain policy --api-version v1 --all $(CURDIR)/vendor/$(@D)
+
 .PHONY: k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto
 k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto:
 	mkdir -p $(@D)
@@ -102,30 +107,37 @@ go/apis/corev1/corev1_kubeproto.generated.object.go: k8s.io/api/core/v1/generate
 	cp ./bazel-bin/$(<D)/$(@F) $(@D)
 	@chmod 0644 $@
 
-.PHONY: apis/appsv1/appsv1_kubeproto.generated.object.go
+.PHONY: go/apis/appsv1/appsv1_kubeproto.generated.object.go
 go/apis/appsv1/appsv1_kubeproto.generated.object.go: k8s.io/api/apps/v1/generated.proto
 	@mkdir -p $(@D)
 	bazel build //$(<D):appsv1_kubeproto
 	cp ./bazel-bin/$(<D)/$(@F) $(@D)
 	@chmod 0644 $@
 
-.PHONY: apis/batchv1/batchv1_kubeproto.generated.object.go
+.PHONY: go/apis/batchv1/batchv1_kubeproto.generated.object.go
 go/apis/batchv1/batchv1_kubeproto.generated.object.go: k8s.io/api/batch/v1/generated.proto
 	@mkdir -p $(@D)
 	bazel build //$(<D):batchv1_kubeproto
 	cp ./bazel-bin/$(<D)/$(@F) $(@D)
 	@chmod 0644 $@
 
-.PHONY: apis/authenticationv1/authenticationv1_kubeproto.generated.object.go
+.PHONY: go/apis/authenticationv1/authenticationv1_kubeproto.generated.object.go
 go/apis/authenticationv1/authenticationv1_kubeproto.generated.object.go: k8s.io/api/authentication/v1/generated.proto
 	@mkdir -p $(@D)
 	bazel build //$(<D):authenticationv1_kubeproto
 	cp ./bazel-bin/$(<D)/$(@F) $(@D)
 	@chmod 0644 $@
 
-.PHONY: apis/admissionv1/admissionv1_kubeproto.generated.object.go
+.PHONY: go/apis/admissionv1/admissionv1_kubeproto.generated.object.go
 go/apis/admissionv1/admissionv1_kubeproto.generated.object.go: k8s.io/api/admission/v1/generated.proto
 	@mkdir -p $(@D)
 	bazel build //$(<D):admissionv1_kubeproto
+	cp ./bazel-bin/$(<D)/$(@F) $(@D)
+	@chmod 0644 $@
+
+.PHONY: go/apis/policyv1/policyv1_kubeproto.generated.object.go
+go/apis/policyv1/policyv1_kubeproto.generated.object.go: k8s.io/api/policy/v1/generated.proto
+	@mkdir -p $(@D)
+	bazel build //$(<D):policyv1_kubeproto
 	cp ./bazel-bin/$(<D)/$(@F) $(@D)
 	@chmod 0644 $@
