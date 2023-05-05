@@ -79,6 +79,11 @@ var preDefinedPackages = []packageInformation{
 		ImportPath:      "k8s.io/api/policy/v1",
 	},
 	{
+		GoPackage:       "k8s.io/api/networking/v1",
+		ProtobufPackage: "k8s.io.api.networking.v1",
+		ImportPath:      "k8s.io/api/networking/v1",
+	},
+	{
 		GoPackage:       "k8s.io/api/authentication/v1",
 		ProtobufPackage: "k8s.io.api.authentication.v1",
 		ImportPath:      "k8s.io/api/authentication/v1",
