@@ -83,6 +83,11 @@ k8s.io/api/policy/v1/generated.proto:
 	mkdir -p $(@D)
 	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.policy.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/policyv1" --api-domain policy --api-version v1 --all $(CURDIR)/vendor/$(@D)
 
+.PHONY: k8s.io/api/networking/v1/generated.proto
+k8s.io/api/networking/v1/generated.proto:
+	mkdir -p $(@D)
+	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.networking.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/networkingv1" --api-domain networking.k8s.io --api-version v1 --all $(CURDIR)/vendor/$(@D)
+
 .PHONY: k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto
 k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto:
 	mkdir -p $(@D)
@@ -139,5 +144,12 @@ go/apis/admissionv1/admissionv1_kubeproto.generated.object.go: k8s.io/api/admiss
 go/apis/policyv1/policyv1_kubeproto.generated.object.go: k8s.io/api/policy/v1/generated.proto
 	@mkdir -p $(@D)
 	bazel build //$(<D):policyv1_kubeproto
+	cp ./bazel-bin/$(<D)/$(@F) $(@D)
+	@chmod 0644 $@
+
+.PHONY: go/apis/networkingv1/networkingv1_kubeproto.generated.object.go
+go/apis/networkingv1/networkingv1_kubeproto.generated.object.go: k8s.io/api/networking/v1/generated.proto
+	@mkdir -p $(@D)
+	bazel build //$(<D):networkingv1_kubeproto
 	cp ./bazel-bin/$(<D)/$(@F) $(@D)
 	@chmod 0644 $@
