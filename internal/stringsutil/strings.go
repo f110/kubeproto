@@ -172,3 +172,14 @@ func Plural(word string) string {
 func Singular(word string) string {
 	return pluralizeClient.Singular(word)
 }
+
+var symbolWord = map[string]string{
+	"*": "ASTERISK",
+}
+
+func Letterize(in string) string {
+	if v := symbolWord[in]; v != "" {
+		return v
+	}
+	return in
+}
