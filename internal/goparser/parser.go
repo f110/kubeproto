@@ -399,7 +399,7 @@ func (g *Generator) WriteFile(outputFilePath string) error {
 			if enumName == "" {
 				enumName = strings.TrimPrefix(values[i].Name, name)
 			}
-			enumName = stringsutil.ToUpperSnakeCase(enumName)
+			enumName = stringsutil.Letterize(stringsutil.ToUpperSnakeCase(enumName))
 			if stringsutil.ToUpperCamelCase(enumName) == values[i].Value {
 				w.F("%s_%s = %d;", stringsutil.ToUpperSnakeCase(name), enumName, i)
 			} else {
