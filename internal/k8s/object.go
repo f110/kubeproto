@@ -101,7 +101,7 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 		defW.F("type %s string", enum.ShortName)
 		defW.F("const (")
 		for _, v := range enum.Values {
-			defW.F("%s%s %s = %q", enum.ShortName, stringsutil.ToUpperCamelCase(v), enum.ShortName, v)
+			defW.F("%s%s %s = %q", enum.ShortName, stringsutil.Letterize(stringsutil.ToUpperCamelCase(v)), enum.ShortName, v)
 		}
 		defW.F(")")
 	}

@@ -43,11 +43,11 @@ const (
 type OperationType string
 
 const (
-	OperationType        *OperationType = "*"
-	OperationTypeCREATE  OperationType  = "CREATE"
-	OperationTypeUPDATE  OperationType  = "UPDATE"
-	OperationTypeDELETE  OperationType  = "DELETE"
-	OperationTypeCONNECT OperationType  = "CONNECT"
+	OperationTypeASTERISK OperationType = "*"
+	OperationTypeCREATE   OperationType = "CREATE"
+	OperationTypeUPDATE   OperationType = "UPDATE"
+	OperationTypeDELETE   OperationType = "DELETE"
+	OperationTypeCONNECT  OperationType = "CONNECT"
 )
 
 type ReinvocationPolicyType string
@@ -60,9 +60,9 @@ const (
 type ScopeType string
 
 const (
-	ScopeTypeCluster    ScopeType  = "Cluster"
-	ScopeTypeNamespaced ScopeType  = "Namespaced"
-	ScopeType           *ScopeType = "*"
+	ScopeTypeCluster    ScopeType = "Cluster"
+	ScopeTypeNamespaced ScopeType = "Namespaced"
+	ScopeTypeASTERISK   ScopeType = "*"
 )
 
 type SideEffectClass string
