@@ -1,7 +1,7 @@
 package metav1
 
 import (
-	runtime "k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
 type CauseType string
@@ -223,7 +223,7 @@ type APIResource struct {
 
 func (in *APIResource) DeepCopyInto(out *APIResource) {
 	*out = *in
-	in.Verbs.DeepCopyInto(&out.Verbs)
+	copy(out.Verbs, in.Verbs)
 	if in.ShortNames != nil {
 		t := make([]string, len(in.ShortNames))
 		copy(t, in.ShortNames)
@@ -1761,6 +1761,7 @@ func (in *UpdateOptions) DeepCopyObject() runtime.Object {
 }
 
 type Verbs []string
+
 type WatchEvent struct {
 	Type string `json:"type"`
 	// Object is:

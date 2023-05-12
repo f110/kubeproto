@@ -8584,7 +8584,7 @@ func (in *VolumeProjection) DeepCopyInto(out *VolumeProjection) {
 	if in.DownwardAPI != nil {
 		in, out := &in.DownwardAPI, &out.DownwardAPI
 		*out = new(DownwardAPIProjection)
-		(*in).DeepCopyInto(*out)
+		copy(**out, **in)
 	}
 	if in.ConfigMap != nil {
 		in, out := &in.ConfigMap, &out.ConfigMap
@@ -8877,6 +8877,7 @@ func (in *SecretProjection) DeepCopy() *SecretProjection {
 }
 
 type DownwardAPIProjection []DownwardAPIVolumeFile
+
 type ConfigMapProjection struct {
 	LocalObjectReference `json:",inline"`
 	// items if unspecified, each key-value pair in the Data field of the referenced
