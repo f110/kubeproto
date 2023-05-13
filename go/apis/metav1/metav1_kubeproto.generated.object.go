@@ -1,7 +1,7 @@
 package metav1
 
 import (
-	"k8s.io/apimachinery/pkg/runtime"
+	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 type CauseType string
