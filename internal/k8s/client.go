@@ -110,7 +110,7 @@ type Backend interface {
 	writer.F("type Set struct {")
 	for _, key := range keys(groupVersions) {
 		m := groupVersions[key][0]
-		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
+		clientName := m.ClientName()
 		writer.F("%s *%s", clientName, clientName)
 	}
 	writer.F("}")
@@ -119,7 +119,7 @@ type Backend interface {
 	writer.F("s := &Set{}")
 	for _, key := range keys(groupVersions) {
 		m := groupVersions[key][0]
-		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
+		clientName := m.ClientName()
 		writer.F("{")
 		writer.F("conf := *cfg")
 		writer.F("conf.GroupVersion = &%s.SchemaGroupVersion", m.Package.Alias)
@@ -432,7 +432,7 @@ func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVe
 	for _, k := range keys(g.groupVersions) {
 		v := g.groupVersions[k]
 		m := v[0]
-		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
+		clientName := m.ClientName()
 		writer.F(`type %s struct {
 	backend Backend
 }`, clientName)
@@ -676,7 +676,7 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 	for _, k := range keys(g.groupVersions) {
 		v := g.groupVersions[k]
 		for _, m := range v {
-			clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
+			clientName := m.ClientName()
 			writer.F("case *%s.%s:", m.Package.Alias, m.ShortName)
 			writer.F("return New%sInformer(f.cache, f.set.%s, f.namespace, f.resyncPeriod).%sInformer()", clientName, clientName, m.ShortName)
 		}
@@ -692,7 +692,7 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 	for _, k := range keys(g.groupVersions) {
 		v := g.groupVersions[k]
 		for _, m := range v {
-			clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
+			clientName := m.ClientName()
 			writer.F("case %s.SchemaGroupVersion.WithResource(%q):", m.Package.Alias, strings.ToLower(stringsutil.Plural(m.ShortName)))
 			writer.F("return New%sInformer(f.cache, f.set.%s, f.namespace, f.resyncPeriod).%sInformer()", clientName, clientName, m.ShortName)
 		}
@@ -713,7 +713,7 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 	for _, k := range keys(g.groupVersions) {
 		v := g.groupVersions[k]
 		m := v[0]
-		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
+		clientName := m.ClientName()
 
 		writer.F("type %sInformer struct {", clientName)
 		writer.F("cache *InformerCache")
@@ -816,7 +816,7 @@ func (g *listerGenerator) WriteTo(writer *codegeneration.Writer) error {
 	for _, k := range keys(g.groupVersions) {
 		v := g.groupVersions[k]
 		m := v[0]
-		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
+		clientName := m.ClientName()
 
 		for _, m := range v {
 			writer.F("type %s%sLister struct {", clientName, m.ShortName)

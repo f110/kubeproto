@@ -50,6 +50,10 @@ func ToUpperCamelCase(in string) string {
 		return in
 	}
 
+	if in[0] == '.' {
+		in = in[1:]
+	}
+
 	var s []string
 	var start, cur int
 	for cur < len(in) {
