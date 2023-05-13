@@ -38,7 +38,9 @@ gen-go: go/apis/metav1/metav1_kubeproto.generated.object.go \
 	go/apis/admissionv1/admissionv1_kubeproto.generated.object.go \
 	go/apis/policyv1/policyv1_kubeproto.generated.object.go \
 	go/apis/networkingv1/networkingv1_kubeproto.generated.object.go \
-	go/apis/rbacv1/rbacv1_kubeproto.generated.object.go
+	go/apis/rbacv1/rbacv1_kubeproto.generated.object.go \
+	go/k8sclient/go_client.generated.client.go \
+	go/k8stestingclient/go_testingclient.generated.testingclient.go
 
 .PHONY: k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto
 k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto:

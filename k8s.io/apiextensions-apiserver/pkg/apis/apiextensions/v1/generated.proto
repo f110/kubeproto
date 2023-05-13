@@ -12,27 +12,27 @@ import "k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto";
 import "k8s.io/apimachinery/pkg/runtime/generated.proto";
 
 enum ConditionStatus {
-  CONDITION_STATUS_TRUE    = 0;
-  CONDITION_STATUS_FALSE   = 1;
-  CONDITION_STATUS_UNKNOWN = 2;
+  CONDITION_STATUS_TRUE    = 0 [(dev.f110.kubeproto.value) = { value: "True" }];
+  CONDITION_STATUS_FALSE   = 1 [(dev.f110.kubeproto.value) = { value: "False" }];
+  CONDITION_STATUS_UNKNOWN = 2 [(dev.f110.kubeproto.value) = { value: "Unknown" }];
 }
 
 enum ConversionStrategyType {
-  CONVERSION_STRATEGY_TYPE_NONE    = 0;
-  CONVERSION_STRATEGY_TYPE_WEBHOOK = 1;
+  CONVERSION_STRATEGY_TYPE_NONE    = 0 [(dev.f110.kubeproto.value) = { value: "None" }];
+  CONVERSION_STRATEGY_TYPE_WEBHOOK = 1 [(dev.f110.kubeproto.value) = { value: "Webhook" }];
 }
 
 enum CustomResourceDefinitionConditionType {
-  CUSTOM_RESOURCE_DEFINITION_CONDITION_TYPE_ESTABLISHED                               = 0;
+  CUSTOM_RESOURCE_DEFINITION_CONDITION_TYPE_ESTABLISHED                               = 0 [(dev.f110.kubeproto.value) = { value: "Established" }];
   CUSTOM_RESOURCE_DEFINITION_CONDITION_TYPE_NAMES_ACCEPTED                            = 1;
   CUSTOM_RESOURCE_DEFINITION_CONDITION_TYPE_NON_STRUCTURAL_SCHEMA                     = 2;
-  CUSTOM_RESOURCE_DEFINITION_CONDITION_TYPE_TERMINATING                               = 3;
+  CUSTOM_RESOURCE_DEFINITION_CONDITION_TYPE_TERMINATING                               = 3 [(dev.f110.kubeproto.value) = { value: "Terminating" }];
   CUSTOM_RESOURCE_DEFINITION_CONDITION_TYPE_KUBERNETES_API_APPROVAL_POLICY_CONFORMANT = 4 [(dev.f110.kubeproto.value) = { value: "KubernetesAPIApprovalPolicyConformant" }];
 }
 
 enum ResourceScope {
-  RESOURCE_SCOPE_CLUSTER    = 0;
-  RESOURCE_SCOPE_NAMESPACED = 1;
+  RESOURCE_SCOPE_CLUSTER    = 0 [(dev.f110.kubeproto.value) = { value: "Cluster" }];
+  RESOURCE_SCOPE_NAMESPACED = 1 [(dev.f110.kubeproto.value) = { value: "Namespaced" }];
 }
 
 message ConversionRequest {
@@ -90,7 +90,7 @@ message CustomResourceColumnDefinition {
   optional int32 priority = 5 [(dev.f110.kubeproto.field) = { go_name: "Priority", api_field_name: "priority", inline: false }];
   // jsonPath is a simple JSON path (i.e. with array notation) which is evaluated against
   // each custom resource to produce the value for this column.
-  string j_s_o_n_path = 6 [(dev.f110.kubeproto.field) = { go_name: "JSONPath", api_field_name: "jsonPath", inline: false }];
+  string json_path = 6 [(dev.f110.kubeproto.field) = { go_name: "JSONPath", api_field_name: "jsonPath", inline: false }];
 }
 
 message CustomResourceConversion {
@@ -415,8 +415,8 @@ message JSONSchemaProps {
 }
 
 message JSONSchemaPropsOrArray {
-  optional JSONSchemaProps schema          = 1 [(dev.f110.kubeproto.field) = { go_name: "Schema", inline: false }];
-  repeated JSONSchemaProps j_s_o_n_schemas = 2 [(dev.f110.kubeproto.field) = { go_name: "JSONSchemas", inline: false }];
+  optional JSONSchemaProps schema       = 1 [(dev.f110.kubeproto.field) = { go_name: "Schema", inline: false }];
+  repeated JSONSchemaProps json_schemas = 2 [(dev.f110.kubeproto.field) = { go_name: "JSONSchemas", inline: false }];
 }
 
 message JSONSchemaPropsOrBool {
