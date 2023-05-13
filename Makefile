@@ -199,3 +199,18 @@ go/k8sclient/go_client.generated.client.go: k8s.io/api/core/v1/generated.proto \
 	bazel build //$(@D):go_client
 	cp ./bazel-bin/$(@D)/$(@F) $(@D)
 	@chmod 0644 $@
+
+.PHONY: go/k8stestingclient/go_testingclient.generated.testingclient.go
+go/k8stestingclient/go_testingclient.generated.testingclient.go: k8s.io/api/core/v1/generated.proto \
+		k8s.io/api/admission/v1/generated.proto \
+		k8s.io/api/admissionregistration/v1/generated.proto \
+		k8s.io/api/apps/v1/generated.proto \
+		k8s.io/api/authentication/v1/generated.proto \
+		k8s.io/api/batch/v1/generated.proto \
+		k8s.io/api/networking/v1/generated.proto \
+		k8s.io/api/policy/v1/generated.proto \
+		k8s.io/api/rbac/v1/generated.proto
+	@mkdir -p $(@D)
+	bazel build //$(@D):go_testingclient
+	cp ./bazel-bin/$(@D)/$(@F) $(@D)
+	@chmod 0644 $@
