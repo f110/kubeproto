@@ -10,7 +10,6 @@ import (
 
 	"go.f110.dev/kubeproto/internal/codegeneration"
 	"go.f110.dev/kubeproto/internal/definition"
-	"go.f110.dev/kubeproto/internal/stringsutil"
 )
 
 type FakeClientGenerator struct {
@@ -141,7 +140,7 @@ func (g *restFakeClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 	writer.F("")
 	for _, k := range keys(g.groupVersions) {
 		m := g.groupVersions[k][0]
-		clientName := fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
+		clientName := m.ClientName()
 		writer.F("s.%s = %s.New%sClient(&fakerBackend{fake: &s.fake})", clientName, clientPackageName, clientName)
 	}
 	writer.F("return s")
