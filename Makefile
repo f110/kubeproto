@@ -125,7 +125,7 @@ go/apis/metav1/metav1_kubeproto.generated.object.go: k8s.io/apimachinery/pkg/api
 .PHONY: go/apis/corev1/corev1_kubeproto.generated.object.go
 go/apis/corev1/corev1_kubeproto.generated.object.go: k8s.io/api/core/v1/generated.proto
 	@mkdir -p $(@D)
-	bazel build //k8s.io/api/core/v1:corev1_kubeproto
+	bazel build //$(<D):corev1_kubeproto
 	cp ./bazel-bin/$(<D)/$(@F) $(@D)
 	@chmod 0644 $@
 

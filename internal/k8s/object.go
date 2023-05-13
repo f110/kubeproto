@@ -138,6 +138,7 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 				importPackages[importPath] = packageAlias
 			}
 			defW.F("type %s %s", obj.ShortName, typ)
+			defW.F("")
 		} else {
 			// Struct definition
 			defW.F("type %s struct {", obj.ShortName)
@@ -199,6 +200,8 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 			defW.F("func (in *%s) DeepCopyInto(out *%s) {", obj.ShortName, obj.ShortName)
 			defW.F("*out = *in")
 			for _, f := range obj.Fields {
+				m := messages.Find(f.MessageName)
+
 				switch f.Kind {
 				case protoreflect.MessageKind:
 					if f.Repeated {
@@ -229,7 +232,11 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 							case "k8s.io/apimachinery/pkg/util/intstr":
 								defW.F("*out = *in")
 							default:
-								defW.F("(*in).DeepCopyInto(*out)")
+								if m != nil && m.IsList() {
+									defW.F("copy(**out, **in)")
+								} else {
+									defW.F("(*in).DeepCopyInto(*out)")
+								}
 							}
 						}
 						defW.F("}")
@@ -247,7 +254,11 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 						case "k8s.io/apimachinery/pkg/util/intstr":
 							defW.F("in = out")
 						default:
-							defW.F("in.%s.DeepCopyInto(&out.%s)", f.Name, f.Name)
+							if m != nil && m.IsList() {
+								defW.F("copy(out.%s, in.%s)", f.Name, f.Name)
+							} else {
+								defW.F("in.%s.DeepCopyInto(&out.%s)", f.Name, f.Name)
+							}
 						}
 					}
 				default:
