@@ -62,7 +62,7 @@ message PolicyRule {
   // Verbs is a list of Verbs that apply to ALL the ResourceKinds contained in this rule. '*' represents all verbs.
   repeated string verbs = 1 [(dev.f110.kubeproto.field) = { go_name: "Verbs", api_field_name: "verbs", inline: false }];
   // APIGroups is the name of the APIGroup that contains the resources.  If multiple API groups are specified, any action requested against one of
-  // the enumerated resources in any API group will be allowed.
+  // the enumerated resources in any API group will be allowed. "" represents the core API group and "*" represents all API groups.
   repeated string api_groups = 2 [(dev.f110.kubeproto.field) = { go_name: "APIGroups", api_field_name: "apiGroups", inline: false }];
   // Resources is a list of resources this rule applies to. '*' represents all resources.
   repeated string resources = 3 [(dev.f110.kubeproto.field) = { go_name: "Resources", api_field_name: "resources", inline: false }];

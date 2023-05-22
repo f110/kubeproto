@@ -58,7 +58,7 @@ func ToUpperCamelCase(in string) string {
 	var start, cur int
 	for cur < len(in) {
 		switch in[cur] {
-		case '_', '-', '.', '/':
+		case '_', '-', '.', '/', ' ':
 			s = append(s, in[start:cur])
 			start = cur + 1
 		}

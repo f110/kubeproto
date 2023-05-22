@@ -12,6 +12,11 @@ import "kube.proto";
 import "k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto";
 import "k8s.io/apimachinery/pkg/util/intstr/generated.proto";
 
+enum UnhealthyPodEvictionPolicyType {
+  UNHEALTHY_POD_EVICTION_POLICY_TYPE_IF_HEALTHY_BUDGET = 0;
+  UNHEALTHY_POD_EVICTION_POLICY_TYPE_ALWAYS_ALLOW      = 1;
+}
+
 message Eviction {
   // DeleteOptions may be provided
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.DeleteOptions delete_options = 3 [(dev.f110.kubeproto.field) = { go_name: "DeleteOptions", api_field_name: "deleteOptions", inline: false }];
@@ -55,6 +60,27 @@ message PodDisruptionBudgetSpec {
   // the evicted pod. For example, one can prevent all voluntary evictions
   // by specifying 0. This is a mutually exclusive setting with "minAvailable".
   optional .k8s.io.apimachinery.pkg.util.intstr.IntOrString max_unavailable = 3 [(dev.f110.kubeproto.field) = { go_name: "MaxUnavailable", api_field_name: "maxUnavailable", inline: false }];
+  // UnhealthyPodEvictionPolicy defines the criteria for when unhealthy pods
+  // should be considered for eviction. Current implementation considers healthy pods,
+  // as pods that have status.conditions item with type="Ready",status="True".
+  // Valid policies are IfHealthyBudget and AlwaysAllow.
+  // If no policy is specified, the default behavior will be used,
+  // which corresponds to the IfHealthyBudget policy.
+  // IfHealthyBudget policy means that running pods (status.phase="Running"),
+  // but not yet healthy can be evicted only if the guarded application is not
+  // disrupted (status.currentHealthy is at least equal to status.desiredHealthy).
+  // Healthy pods will be subject to the PDB for eviction.
+  // AlwaysAllow policy means that all running pods (status.phase="Running"),
+  // but not yet healthy are considered disrupted and can be evicted regardless
+  // of whether the criteria in a PDB is met. This means perspective running
+  // pods of a disrupted application might not get a chance to become healthy.
+  // Healthy pods will be subject to the PDB for eviction.
+  // Additional policies may be added in the future.
+  // Clients making eviction decisions should disallow eviction of unhealthy pods
+  // if they encounter an unrecognized policy in this field.
+  // This field is beta-level. The eviction API uses this field when
+  // the feature gate PDBUnhealthyPodEvictionPolicy is enabled (enabled by default).
+  optional UnhealthyPodEvictionPolicyType unhealthy_pod_eviction_policy = 4 [(dev.f110.kubeproto.field) = { go_name: "UnhealthyPodEvictionPolicy", api_field_name: "unhealthyPodEvictionPolicy", inline: false }];
 }
 
 message PodDisruptionBudgetStatus {
