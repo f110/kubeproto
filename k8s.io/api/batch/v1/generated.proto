@@ -24,9 +24,21 @@ enum ConcurrencyPolicy {
 }
 
 enum JobConditionType {
-  JOB_CONDITION_TYPE_SUSPENDED = 0 [(dev.f110.kubeproto.value) = { value: "Suspended" }];
-  JOB_CONDITION_TYPE_COMPLETE  = 1 [(dev.f110.kubeproto.value) = { value: "Complete" }];
-  JOB_CONDITION_TYPE_FAILED    = 2 [(dev.f110.kubeproto.value) = { value: "Failed" }];
+  JOB_CONDITION_TYPE_SUSPENDED      = 0 [(dev.f110.kubeproto.value) = { value: "Suspended" }];
+  JOB_CONDITION_TYPE_COMPLETE       = 1 [(dev.f110.kubeproto.value) = { value: "Complete" }];
+  JOB_CONDITION_TYPE_FAILED         = 2 [(dev.f110.kubeproto.value) = { value: "Failed" }];
+  JOB_CONDITION_TYPE_FAILURE_TARGET = 3;
+}
+
+enum PodFailurePolicyAction {
+  POD_FAILURE_POLICY_ACTION_FAIL_JOB = 0;
+  POD_FAILURE_POLICY_ACTION_IGNORE   = 1 [(dev.f110.kubeproto.value) = { value: "Ignore" }];
+  POD_FAILURE_POLICY_ACTION_COUNT    = 2 [(dev.f110.kubeproto.value) = { value: "Count" }];
+}
+
+enum PodFailurePolicyOnExitCodesOperator {
+  POD_FAILURE_POLICY_ON_EXIT_CODES_OPERATOR_IN     = 0 [(dev.f110.kubeproto.value) = { value: "In" }];
+  POD_FAILURE_POLICY_ON_EXIT_CODES_OPERATOR_NOT_IN = 1;
 }
 
 message CronJob {
@@ -53,9 +65,15 @@ message CronJobList {
 message CronJobSpec {
   // The schedule in Cron format, see https://en.wikipedia.org/wiki/Cron.
   string schedule = 1 [(dev.f110.kubeproto.field) = { go_name: "Schedule", api_field_name: "schedule", inline: false }];
-  // The time zone for the given schedule, see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones.
-  // If not specified, this will rely on the time zone of the kube-controller-manager process.
-  // ALPHA: This field is in alpha and must be enabled via the `CronJobTimeZone` feature gate.
+  // The time zone name for the given schedule, see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones.
+  // If not specified, this will default to the time zone of the kube-controller-manager process.
+  // The set of valid time zone names and the time zone offset is loaded from the system-wide time zone
+  // database by the API server during CronJob validation and the controller manager during execution.
+  // If no system-wide time zone database can be found a bundled version of the database is used instead.
+  // If the time zone name becomes invalid during the lifetime of a CronJob or due to a change in host
+  // configuration, the controller will stop creating new new Jobs and will create a system event with the
+  // reason UnknownTimeZone.
+  // More information can be found in https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#time-zones
   optional string time_zone = 2 [(dev.f110.kubeproto.field) = { go_name: "TimeZone", api_field_name: "timeZone", inline: false }];
   // Optional deadline in seconds for starting the job if it misses scheduled
   // time for any reason.  Missed jobs executions will be counted as failed ones.
@@ -132,7 +150,7 @@ message JobSpec {
   // More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/
   optional int32 parallelism = 1 [(dev.f110.kubeproto.field) = { go_name: "Parallelism", api_field_name: "parallelism", inline: false }];
   // Specifies the desired number of successfully finished pods the
-  // job should be run with.  Setting to nil means that the success of any
+  // job should be run with.  Setting to null means that the success of any
   // pod signals the success of all pods, and allows parallelism to have any positive
   // value.  Setting to 1 means that parallelism is limited to 1 and the success of that
   // pod signals the success of the job.
@@ -144,13 +162,23 @@ message JobSpec {
   // update), this timer will effectively be stopped and reset when the Job is
   // resumed again.
   optional int64 active_deadline_seconds = 3 [(dev.f110.kubeproto.field) = { go_name: "ActiveDeadlineSeconds", api_field_name: "activeDeadlineSeconds", inline: false }];
+  // Specifies the policy of handling failed pods. In particular, it allows to
+  // specify the set of actions and conditions which need to be
+  // satisfied to take the associated action.
+  // If empty, the default behaviour applies - the counter of failed pods,
+  // represented by the jobs's .status.failed field, is incremented and it is
+  // checked against the backoffLimit. This field cannot be used in combination
+  // with restartPolicy=OnFailure.
+  // This field is alpha-level. To use this field, you must enable the
+  // `JobPodFailurePolicy` feature gate (disabled by default).
+  optional PodFailurePolicy pod_failure_policy = 4 [(dev.f110.kubeproto.field) = { go_name: "PodFailurePolicy", api_field_name: "podFailurePolicy", inline: false }];
   // Specifies the number of retries before marking this job failed.
   // Defaults to 6
-  optional int32 backoff_limit = 4 [(dev.f110.kubeproto.field) = { go_name: "BackoffLimit", api_field_name: "backoffLimit", inline: false }];
+  optional int32 backoff_limit = 5 [(dev.f110.kubeproto.field) = { go_name: "BackoffLimit", api_field_name: "backoffLimit", inline: false }];
   // A label query over pods that should match the pod count.
   // Normally, the system sets this field for you.
   // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
-  optional .k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector selector = 5 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector selector = 6 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", inline: false }];
   // manualSelector controls generation of pod labels and pod selectors.
   // Leave `manualSelector` unset unless you are certain what you are doing.
   // When false or unset, the system pick labels unique to this job
@@ -161,10 +189,11 @@ message JobSpec {
   // `manualSelector=true` in jobs that were created with the old `extensions/v1beta1`
   // API.
   // More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/#specifying-your-own-pod-selector
-  optional bool manual_selector = 6 [(dev.f110.kubeproto.field) = { go_name: "ManualSelector", api_field_name: "manualSelector", inline: false }];
+  optional bool manual_selector = 7 [(dev.f110.kubeproto.field) = { go_name: "ManualSelector", api_field_name: "manualSelector", inline: false }];
   // Describes the pod that will be created when executing a job.
+  // The only allowed template.spec.restartPolicy values are "Never" or "OnFailure".
   // More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/
-  .k8s.io.api.core.v1.PodTemplateSpec template = 7 [(dev.f110.kubeproto.field) = { go_name: "Template", api_field_name: "template", inline: false }];
+  .k8s.io.api.core.v1.PodTemplateSpec template = 8 [(dev.f110.kubeproto.field) = { go_name: "Template", api_field_name: "template", inline: false }];
   // ttlSecondsAfterFinished limits the lifetime of a Job that has finished
   // execution (either Complete or Failed). If this field is set,
   // ttlSecondsAfterFinished after the Job finishes, it is eligible to be
@@ -172,8 +201,8 @@ message JobSpec {
   // guarantees (e.g. finalizers) will be honored. If this field is unset,
   // the Job won't be automatically deleted. If this field is set to zero,
   // the Job becomes eligible to be deleted immediately after it finishes.
-  optional int32 t_tls_econds_after_finished = 8 [(dev.f110.kubeproto.field) = { go_name: "TTLSecondsAfterFinished", api_field_name: "ttlSecondsAfterFinished", inline: false }];
-  // CompletionMode specifies how Pod completions are tracked. It can be
+  optional int32 t_tls_econds_after_finished = 9 [(dev.f110.kubeproto.field) = { go_name: "TTLSecondsAfterFinished", api_field_name: "ttlSecondsAfterFinished", inline: false }];
+  // completionMode specifies how Pod completions are tracked. It can be
   // `NonIndexed` (default) or `Indexed`.
   // `NonIndexed` means that the Job is considered complete when there have
   // been .spec.completions successfully completed Pods. Each Pod completion is
@@ -192,15 +221,15 @@ message JobSpec {
   // If the Job controller observes a mode that it doesn't recognize, which
   // is possible during upgrades due to version skew, the controller
   // skips updates for the Job.
-  optional CompletionMode completion_mode = 9 [(dev.f110.kubeproto.field) = { go_name: "CompletionMode", api_field_name: "completionMode", inline: false }];
-  // Suspend specifies whether the Job controller should create Pods or not. If
+  optional CompletionMode completion_mode = 10 [(dev.f110.kubeproto.field) = { go_name: "CompletionMode", api_field_name: "completionMode", inline: false }];
+  // suspend specifies whether the Job controller should create Pods or not. If
   // a Job is created with suspend set to true, no Pods are created by the Job
   // controller. If a Job is suspended after creation (i.e. the flag goes from
   // false to true), the Job controller will delete all active Pods associated
   // with this Job. Users must design their workload to gracefully handle this.
   // Suspending a Job will reset the StartTime field of the Job, effectively
   // resetting the ActiveDeadlineSeconds timer too. Defaults to false.
-  optional bool suspend = 10 [(dev.f110.kubeproto.field) = { go_name: "Suspend", api_field_name: "suspend", inline: false }];
+  optional bool suspend = 11 [(dev.f110.kubeproto.field) = { go_name: "Suspend", api_field_name: "suspend", inline: false }];
 }
 
 message JobStatus {
@@ -228,7 +257,7 @@ message JobStatus {
   optional int32 succeeded = 5 [(dev.f110.kubeproto.field) = { go_name: "Succeeded", api_field_name: "succeeded", inline: false }];
   // The number of pods which reached phase Failed.
   optional int32 failed = 6 [(dev.f110.kubeproto.field) = { go_name: "Failed", api_field_name: "failed", inline: false }];
-  // CompletedIndexes holds the completed indexes when .spec.completionMode =
+  // completedIndexes holds the completed indexes when .spec.completionMode =
   // "Indexed" in a text format. The indexes are represented as decimal integers
   // separated by commas. The numbers are listed in increasing order. Three or
   // more consecutive numbers are compressed and represented by the first and
@@ -236,18 +265,15 @@ message JobStatus {
   // For example, if the completed indexes are 1, 3, 4, 5 and 7, they are
   // represented as "1,3-5,7".
   optional string completed_indexes = 7 [(dev.f110.kubeproto.field) = { go_name: "CompletedIndexes", api_field_name: "completedIndexes", inline: false }];
-  // UncountedTerminatedPods holds the UIDs of Pods that have terminated but
+  // uncountedTerminatedPods holds the UIDs of Pods that have terminated but
   // the job controller hasn't yet accounted for in the status counters.
   // The job controller creates pods with a finalizer. When a pod terminates
   // (succeeded or failed), the controller does three steps to account for it
   // in the job status:
-  // (1) Add the pod UID to the arrays in this field.
-  // (2) Remove the pod finalizer.
-  // (3) Remove the pod UID from the arrays while increasing the corresponding
+  // 1. Add the pod UID to the arrays in this field.
+  // 2. Remove the pod finalizer.
+  // 3. Remove the pod UID from the arrays while increasing the corresponding
   //     counter.
-  // This field is beta-level. The job controller only makes use of this field
-  // when the feature gate JobTrackingWithFinalizers is enabled (enabled
-  // by default).
   // Old jobs might not be tracked using this field, in which case the field
   // remains null.
   optional UncountedTerminatedPods uncounted_terminated_pods = 8 [(dev.f110.kubeproto.field) = { go_name: "UncountedTerminatedPods", api_field_name: "uncountedTerminatedPods", inline: false }];
@@ -266,9 +292,74 @@ message JobTemplateSpec {
   optional JobSpec spec = 2 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
 }
 
+message PodFailurePolicy {
+  // A list of pod failure policy rules. The rules are evaluated in order.
+  // Once a rule matches a Pod failure, the remaining of the rules are ignored.
+  // When no rule matches the Pod failure, the default handling applies - the
+  // counter of pod failures is incremented and it is checked against
+  // the backoffLimit. At most 20 elements are allowed.
+  repeated PodFailurePolicyRule rules = 1 [(dev.f110.kubeproto.field) = { go_name: "Rules", api_field_name: "rules", inline: false }];
+}
+
+message PodFailurePolicyOnExitCodesRequirement {
+  // Restricts the check for exit codes to the container with the
+  // specified name. When null, the rule applies to all containers.
+  // When specified, it should match one the container or initContainer
+  // names in the pod template.
+  optional string container_name = 1 [(dev.f110.kubeproto.field) = { go_name: "ContainerName", api_field_name: "containerName", inline: false }];
+  // Represents the relationship between the container exit code(s) and the
+  // specified values. Containers completed with success (exit code 0) are
+  // excluded from the requirement check. Possible values are:
+  // - In: the requirement is satisfied if at least one container exit code
+  //   (might be multiple if there are multiple containers not restricted
+  //   by the 'containerName' field) is in the set of specified values.
+  // - NotIn: the requirement is satisfied if at least one container exit code
+  //   (might be multiple if there are multiple containers not restricted
+  //   by the 'containerName' field) is not in the set of specified values.
+  // Additional values are considered to be added in the future. Clients should
+  // react to an unknown operator by assuming the requirement is not satisfied.
+  PodFailurePolicyOnExitCodesOperator operator = 2 [(dev.f110.kubeproto.field) = { go_name: "Operator", api_field_name: "operator", inline: false }];
+  // Specifies the set of values. Each returned container exit code (might be
+  // multiple in case of multiple containers) is checked against this set of
+  // values with respect to the operator. The list of values must be ordered
+  // and must not contain duplicates. Value '0' cannot be used for the In operator.
+  // At least one element is required. At most 255 elements are allowed.
+  repeated int32 values = 3 [(dev.f110.kubeproto.field) = { go_name: "Values", api_field_name: "values", inline: false }];
+}
+
+message PodFailurePolicyOnPodConditionsPattern {
+  // Specifies the required Pod condition type. To match a pod condition
+  // it is required that specified type equals the pod condition type.
+  .k8s.io.api.core.v1.PodConditionType type = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
+  // Specifies the required Pod condition status. To match a pod condition
+  // it is required that the specified status equals the pod condition status.
+  // Defaults to True.
+  .k8s.io.api.core.v1.ConditionStatus status = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+}
+
+message PodFailurePolicyRule {
+  // Specifies the action taken on a pod failure when the requirements are satisfied.
+  // Possible values are:
+  // - FailJob: indicates that the pod's job is marked as Failed and all
+  //   running pods are terminated.
+  // - Ignore: indicates that the counter towards the .backoffLimit is not
+  //   incremented and a replacement pod is created.
+  // - Count: indicates that the pod is handled in the default way - the
+  //   counter towards the .backoffLimit is incremented.
+  // Additional values are considered to be added in the future. Clients should
+  // react to an unknown action by skipping the rule.
+  PodFailurePolicyAction action = 1 [(dev.f110.kubeproto.field) = { go_name: "Action", api_field_name: "action", inline: false }];
+  // Represents the requirement on the container exit codes.
+  optional PodFailurePolicyOnExitCodesRequirement on_exit_codes = 2 [(dev.f110.kubeproto.field) = { go_name: "OnExitCodes", api_field_name: "onExitCodes", inline: false }];
+  // Represents the requirement on the pod conditions. The requirement is represented
+  // as a list of pod condition patterns. The requirement is satisfied if at
+  // least one pattern matches an actual pod condition. At most 20 elements are allowed.
+  repeated PodFailurePolicyOnPodConditionsPattern on_pod_conditions = 3 [(dev.f110.kubeproto.field) = { go_name: "OnPodConditions", api_field_name: "onPodConditions", inline: false }];
+}
+
 message UncountedTerminatedPods {
-  // Succeeded holds UIDs of succeeded Pods.
+  // succeeded holds UIDs of succeeded Pods.
   repeated string succeeded = 1 [(dev.f110.kubeproto.field) = { go_name: "Succeeded", api_field_name: "succeeded", inline: false }];
-  // Failed holds UIDs of failed Pods.
+  // failed holds UIDs of failed Pods.
   repeated string failed = 2 [(dev.f110.kubeproto.field) = { go_name: "Failed", api_field_name: "failed", inline: false }];
 }

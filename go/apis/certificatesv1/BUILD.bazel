@@ -1,0 +1,14 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "certificatesv1",
+    srcs = ["certificatesv1_kubeproto.generated.object.go"],
+    importpath = "go.f110.dev/kubeproto/go/apis/certificatesv1",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//go/apis/corev1",
+        "//go/apis/metav1",
+        "//vendor/k8s.io/apimachinery/pkg/runtime",
+        "//vendor/k8s.io/apimachinery/pkg/runtime/schema",
+    ],
+)

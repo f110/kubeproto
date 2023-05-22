@@ -21,6 +21,7 @@ import (
 	"go.f110.dev/kubeproto/go/apis/appsv1"
 	"go.f110.dev/kubeproto/go/apis/authenticationv1"
 	"go.f110.dev/kubeproto/go/apis/batchv1"
+	"go.f110.dev/kubeproto/go/apis/certificatesv1"
 	"go.f110.dev/kubeproto/go/apis/corev1"
 	"go.f110.dev/kubeproto/go/apis/networkingv1"
 	"go.f110.dev/kubeproto/go/apis/policyv1"
@@ -39,6 +40,7 @@ var localSchemeBuilder = runtime.SchemeBuilder{
 	admissionregistrationv1.AddToScheme,
 	appsv1.AddToScheme,
 	authenticationv1.AddToScheme,
+	certificatesv1.AddToScheme,
 	networkingv1.AddToScheme,
 	policyv1.AddToScheme,
 	rbacv1.AddToScheme,
@@ -50,6 +52,7 @@ func init() {
 		admissionregistrationv1.AddToScheme,
 		appsv1.AddToScheme,
 		authenticationv1.AddToScheme,
+		certificatesv1.AddToScheme,
 		networkingv1.AddToScheme,
 		policyv1.AddToScheme,
 		rbacv1.AddToScheme,
@@ -76,11 +79,13 @@ type Backend interface {
 	DeleteClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, name string, opts metav1.DeleteOptions) error
 	WatchClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, opts metav1.ListOptions) (watch.Interface, error)
 }
+
 type Set struct {
 	CoreV1                       *CoreV1
 	AdmissionregistrationK8sIoV1 *AdmissionregistrationK8sIoV1
 	AppsV1                       *AppsV1
 	AuthenticationK8sIoV1        *AuthenticationK8sIoV1
+	CertificatesK8sIoV1          *CertificatesK8sIoV1
 	NetworkingK8sIoV1            *NetworkingK8sIoV1
 	PolicyV1                     *PolicyV1
 	RbacAuthorizationK8sIoV1     *RbacAuthorizationK8sIoV1
@@ -131,6 +136,17 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 			return nil, err
 		}
 		s.AuthenticationK8sIoV1 = NewAuthenticationK8sIoV1Client(&restBackend{client: c})
+	}
+	{
+		conf := *cfg
+		conf.GroupVersion = &certificatesv1.SchemaGroupVersion
+		conf.APIPath = "/apis"
+		conf.NegotiatedSerializer = Codecs.WithoutConversion()
+		c, err := rest.RESTClientFor(&conf)
+		if err != nil {
+			return nil, err
+		}
+		s.CertificatesK8sIoV1 = NewCertificatesK8sIoV1Client(&restBackend{client: c})
 	}
 	{
 		conf := *cfg
@@ -1580,6 +1596,54 @@ func (c *AuthenticationK8sIoV1) WatchTokenReview(ctx context.Context, opts metav
 	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".authentication.k8s.io", Version: "v1", Resource: "tokenreviews"}, opts)
 }
 
+type CertificatesK8sIoV1 struct {
+	backend Backend
+}
+
+func NewCertificatesK8sIoV1Client(b Backend) *CertificatesK8sIoV1 {
+	return &CertificatesK8sIoV1{backend: b}
+}
+
+func (c *CertificatesK8sIoV1) GetCertificateSigningRequest(ctx context.Context, name string, opts metav1.GetOptions) (*certificatesv1.CertificateSigningRequest, error) {
+	result, err := c.backend.GetClusterScoped(ctx, "certificatesigningrequests", "CertificateSigningRequest", name, opts, &certificatesv1.CertificateSigningRequest{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*certificatesv1.CertificateSigningRequest), nil
+}
+
+func (c *CertificatesK8sIoV1) CreateCertificateSigningRequest(ctx context.Context, v *certificatesv1.CertificateSigningRequest, opts metav1.CreateOptions) (*certificatesv1.CertificateSigningRequest, error) {
+	result, err := c.backend.CreateClusterScoped(ctx, "certificatesigningrequests", "CertificateSigningRequest", v, opts, &certificatesv1.CertificateSigningRequest{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*certificatesv1.CertificateSigningRequest), nil
+}
+
+func (c *CertificatesK8sIoV1) UpdateCertificateSigningRequest(ctx context.Context, v *certificatesv1.CertificateSigningRequest, opts metav1.UpdateOptions) (*certificatesv1.CertificateSigningRequest, error) {
+	result, err := c.backend.UpdateClusterScoped(ctx, "certificatesigningrequests", "CertificateSigningRequest", v, opts, &certificatesv1.CertificateSigningRequest{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*certificatesv1.CertificateSigningRequest), nil
+}
+
+func (c *CertificatesK8sIoV1) DeleteCertificateSigningRequest(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".certificates.k8s.io", Version: "v1", Resource: "certificatesigningrequests"}, name, opts)
+}
+
+func (c *CertificatesK8sIoV1) ListCertificateSigningRequest(ctx context.Context, opts metav1.ListOptions) (*certificatesv1.CertificateSigningRequestList, error) {
+	result, err := c.backend.ListClusterScoped(ctx, "certificatesigningrequests", "CertificateSigningRequest", opts, &certificatesv1.CertificateSigningRequestList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*certificatesv1.CertificateSigningRequestList), nil
+}
+
+func (c *CertificatesK8sIoV1) WatchCertificateSigningRequest(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".certificates.k8s.io", Version: "v1", Resource: "certificatesigningrequests"}, opts)
+}
+
 type NetworkingK8sIoV1 struct {
 	backend Backend
 }
@@ -2077,6 +2141,8 @@ func (f *InformerFactory) InformerFor(obj runtime.Object) cache.SharedIndexInfor
 		return NewAuthenticationK8sIoV1Informer(f.cache, f.set.AuthenticationK8sIoV1, f.namespace, f.resyncPeriod).TokenRequestInformer()
 	case *authenticationv1.TokenReview:
 		return NewAuthenticationK8sIoV1Informer(f.cache, f.set.AuthenticationK8sIoV1, f.namespace, f.resyncPeriod).TokenReviewInformer()
+	case *certificatesv1.CertificateSigningRequest:
+		return NewCertificatesK8sIoV1Informer(f.cache, f.set.CertificatesK8sIoV1, f.namespace, f.resyncPeriod).CertificateSigningRequestInformer()
 	case *networkingv1.Ingress:
 		return NewNetworkingK8sIoV1Informer(f.cache, f.set.NetworkingK8sIoV1, f.namespace, f.resyncPeriod).IngressInformer()
 	case *networkingv1.IngressClass:
@@ -2162,6 +2228,8 @@ func (f *InformerFactory) InformerForResource(gvr schema.GroupVersionResource) c
 		return NewAuthenticationK8sIoV1Informer(f.cache, f.set.AuthenticationK8sIoV1, f.namespace, f.resyncPeriod).TokenRequestInformer()
 	case authenticationv1.SchemaGroupVersion.WithResource("tokenreviews"):
 		return NewAuthenticationK8sIoV1Informer(f.cache, f.set.AuthenticationK8sIoV1, f.namespace, f.resyncPeriod).TokenReviewInformer()
+	case certificatesv1.SchemaGroupVersion.WithResource("certificatesigningrequests"):
+		return NewCertificatesK8sIoV1Informer(f.cache, f.set.CertificatesK8sIoV1, f.namespace, f.resyncPeriod).CertificateSigningRequestInformer()
 	case networkingv1.SchemaGroupVersion.WithResource("ingresses"):
 		return NewNetworkingK8sIoV1Informer(f.cache, f.set.NetworkingK8sIoV1, f.namespace, f.resyncPeriod).IngressInformer()
 	case networkingv1.SchemaGroupVersion.WithResource("ingressclasses"):
@@ -2921,6 +2989,46 @@ func (f *AuthenticationK8sIoV1Informer) TokenReviewInformer() cache.SharedIndexI
 
 func (f *AuthenticationK8sIoV1Informer) TokenReviewLister() *AuthenticationK8sIoV1TokenReviewLister {
 	return NewAuthenticationK8sIoV1TokenReviewLister(f.TokenReviewInformer().GetIndexer())
+}
+
+type CertificatesK8sIoV1Informer struct {
+	cache        *InformerCache
+	client       *CertificatesK8sIoV1
+	namespace    string
+	resyncPeriod time.Duration
+	indexers     cache.Indexers
+}
+
+func NewCertificatesK8sIoV1Informer(c *InformerCache, client *CertificatesK8sIoV1, namespace string, resyncPeriod time.Duration) *CertificatesK8sIoV1Informer {
+	return &CertificatesK8sIoV1Informer{
+		cache:        c,
+		client:       client,
+		namespace:    namespace,
+		resyncPeriod: resyncPeriod,
+		indexers:     cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
+	}
+}
+
+func (f *CertificatesK8sIoV1Informer) CertificateSigningRequestInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&certificatesv1.CertificateSigningRequest{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListCertificateSigningRequest(context.TODO(), metav1.ListOptions{})
+				},
+				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchCertificateSigningRequest(context.TODO(), metav1.ListOptions{})
+				},
+			},
+			&certificatesv1.CertificateSigningRequest{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *CertificatesK8sIoV1Informer) CertificateSigningRequestLister() *CertificatesK8sIoV1CertificateSigningRequestLister {
+	return NewCertificatesK8sIoV1CertificateSigningRequestLister(f.CertificateSigningRequestInformer().GetIndexer())
 }
 
 type NetworkingK8sIoV1Informer struct {
@@ -3983,6 +4091,33 @@ func (x *AuthenticationK8sIoV1TokenReviewLister) Get(name string) (*authenticati
 		return nil, k8serrors.NewNotFound(authenticationv1.SchemaGroupVersion.WithResource("tokenreview").GroupResource(), name)
 	}
 	return obj.(*authenticationv1.TokenReview).DeepCopy(), nil
+}
+
+type CertificatesK8sIoV1CertificateSigningRequestLister struct {
+	indexer cache.Indexer
+}
+
+func NewCertificatesK8sIoV1CertificateSigningRequestLister(indexer cache.Indexer) *CertificatesK8sIoV1CertificateSigningRequestLister {
+	return &CertificatesK8sIoV1CertificateSigningRequestLister{indexer: indexer}
+}
+
+func (x *CertificatesK8sIoV1CertificateSigningRequestLister) List(selector labels.Selector) ([]*certificatesv1.CertificateSigningRequest, error) {
+	var ret []*certificatesv1.CertificateSigningRequest
+	err := cache.ListAll(x.indexer, selector, func(m interface{}) {
+		ret = append(ret, m.(*certificatesv1.CertificateSigningRequest).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *CertificatesK8sIoV1CertificateSigningRequestLister) Get(name string) (*certificatesv1.CertificateSigningRequest, error) {
+	obj, exists, err := x.indexer.GetByKey("/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(certificatesv1.SchemaGroupVersion.WithResource("certificatesigningrequest").GroupResource(), name)
+	}
+	return obj.(*certificatesv1.CertificateSigningRequest).DeepCopy(), nil
 }
 
 type NetworkingK8sIoV1IngressLister struct {
