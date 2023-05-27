@@ -45,9 +45,25 @@ const (
 type JobConditionType string
 
 const (
-	JobConditionTypeSuspended JobConditionType = "Suspended"
-	JobConditionTypeComplete  JobConditionType = "Complete"
-	JobConditionTypeFailed    JobConditionType = "Failed"
+	JobConditionTypeSuspended     JobConditionType = "Suspended"
+	JobConditionTypeComplete      JobConditionType = "Complete"
+	JobConditionTypeFailed        JobConditionType = "Failed"
+	JobConditionTypeFailureTarget JobConditionType = "FailureTarget"
+)
+
+type PodFailurePolicyAction string
+
+const (
+	PodFailurePolicyActionFailJob PodFailurePolicyAction = "FailJob"
+	PodFailurePolicyActionIgnore  PodFailurePolicyAction = "Ignore"
+	PodFailurePolicyActionCount   PodFailurePolicyAction = "Count"
+)
+
+type PodFailurePolicyOnExitCodesOperator string
+
+const (
+	PodFailurePolicyOnExitCodesOperatorIn    PodFailurePolicyOnExitCodesOperator = "In"
+	PodFailurePolicyOnExitCodesOperatorNotIn PodFailurePolicyOnExitCodesOperator = "NotIn"
 )
 
 type CronJob struct {
@@ -209,9 +225,15 @@ func (in *JobList) DeepCopyObject() runtime.Object {
 type CronJobSpec struct {
 	// The schedule in Cron format, see https://en.wikipedia.org/wiki/Cron.
 	Schedule string `json:"schedule"`
-	// The time zone for the given schedule, see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones.
-	// If not specified, this will rely on the time zone of the kube-controller-manager process.
-	// ALPHA: This field is in alpha and must be enabled via the `CronJobTimeZone` feature gate.
+	// The time zone name for the given schedule, see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones.
+	// If not specified, this will default to the time zone of the kube-controller-manager process.
+	// The set of valid time zone names and the time zone offset is loaded from the system-wide time zone
+	// database by the API server during CronJob validation and the controller manager during execution.
+	// If no system-wide time zone database can be found a bundled version of the database is used instead.
+	// If the time zone name becomes invalid during the lifetime of a CronJob or due to a change in host
+	// configuration, the controller will stop creating new new Jobs and will create a system event with the
+	// reason UnknownTimeZone.
+	// More information can be found in https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#time-zones
 	TimeZone string `json:"timeZone,omitempty"`
 	// Optional deadline in seconds for starting the job if it misses scheduled
 	// time for any reason.  Missed jobs executions will be counted as failed ones.
@@ -296,7 +318,7 @@ type JobSpec struct {
 	// More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/
 	Parallelism int `json:"parallelism,omitempty"`
 	// Specifies the desired number of successfully finished pods the
-	// job should be run with.  Setting to nil means that the success of any
+	// job should be run with.  Setting to null means that the success of any
 	// pod signals the success of all pods, and allows parallelism to have any positive
 	// value.  Setting to 1 means that parallelism is limited to 1 and the success of that
 	// pod signals the success of the job.
@@ -308,6 +330,16 @@ type JobSpec struct {
 	// update), this timer will effectively be stopped and reset when the Job is
 	// resumed again.
 	ActiveDeadlineSeconds int64 `json:"activeDeadlineSeconds,omitempty"`
+	// Specifies the policy of handling failed pods. In particular, it allows to
+	// specify the set of actions and conditions which need to be
+	// satisfied to take the associated action.
+	// If empty, the default behaviour applies - the counter of failed pods,
+	// represented by the jobs's .status.failed field, is incremented and it is
+	// checked against the backoffLimit. This field cannot be used in combination
+	// with restartPolicy=OnFailure.
+	// This field is alpha-level. To use this field, you must enable the
+	// `JobPodFailurePolicy` feature gate (disabled by default).
+	PodFailurePolicy *PodFailurePolicy `json:"podFailurePolicy,omitempty"`
 	// Specifies the number of retries before marking this job failed.
 	// Defaults to 6
 	BackoffLimit int `json:"backoffLimit,omitempty"`
@@ -327,6 +359,7 @@ type JobSpec struct {
 	// More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/#specifying-your-own-pod-selector
 	ManualSelector bool `json:"manualSelector,omitempty"`
 	// Describes the pod that will be created when executing a job.
+	// The only allowed template.spec.restartPolicy values are "Never" or "OnFailure".
 	// More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/
 	Template corev1.PodTemplateSpec `json:"template"`
 	// ttlSecondsAfterFinished limits the lifetime of a Job that has finished
@@ -337,7 +370,7 @@ type JobSpec struct {
 	// the Job won't be automatically deleted. If this field is set to zero,
 	// the Job becomes eligible to be deleted immediately after it finishes.
 	TTLSecondsAfterFinished int `json:"ttlSecondsAfterFinished,omitempty"`
-	// CompletionMode specifies how Pod completions are tracked. It can be
+	// completionMode specifies how Pod completions are tracked. It can be
 	// `NonIndexed` (default) or `Indexed`.
 	// `NonIndexed` means that the Job is considered complete when there have
 	// been .spec.completions successfully completed Pods. Each Pod completion is
@@ -357,7 +390,7 @@ type JobSpec struct {
 	// is possible during upgrades due to version skew, the controller
 	// skips updates for the Job.
 	CompletionMode CompletionMode `json:"completionMode,omitempty"`
-	// Suspend specifies whether the Job controller should create Pods or not. If
+	// suspend specifies whether the Job controller should create Pods or not. If
 	// a Job is created with suspend set to true, no Pods are created by the Job
 	// controller. If a Job is suspended after creation (i.e. the flag goes from
 	// false to true), the Job controller will delete all active Pods associated
@@ -369,6 +402,11 @@ type JobSpec struct {
 
 func (in *JobSpec) DeepCopyInto(out *JobSpec) {
 	*out = *in
+	if in.PodFailurePolicy != nil {
+		in, out := &in.PodFailurePolicy, &out.PodFailurePolicy
+		*out = new(PodFailurePolicy)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.Selector != nil {
 		in, out := &in.Selector, &out.Selector
 		*out = new(metav1.LabelSelector)
@@ -411,7 +449,7 @@ type JobStatus struct {
 	Succeeded int `json:"succeeded,omitempty"`
 	// The number of pods which reached phase Failed.
 	Failed int `json:"failed,omitempty"`
-	// CompletedIndexes holds the completed indexes when .spec.completionMode =
+	// completedIndexes holds the completed indexes when .spec.completionMode =
 	// "Indexed" in a text format. The indexes are represented as decimal integers
 	// separated by commas. The numbers are listed in increasing order. Three or
 	// more consecutive numbers are compressed and represented by the first and
@@ -419,18 +457,15 @@ type JobStatus struct {
 	// For example, if the completed indexes are 1, 3, 4, 5 and 7, they are
 	// represented as "1,3-5,7".
 	CompletedIndexes string `json:"completedIndexes,omitempty"`
-	// UncountedTerminatedPods holds the UIDs of Pods that have terminated but
+	// uncountedTerminatedPods holds the UIDs of Pods that have terminated but
 	// the job controller hasn't yet accounted for in the status counters.
 	// The job controller creates pods with a finalizer. When a pod terminates
 	// (succeeded or failed), the controller does three steps to account for it
 	// in the job status:
-	// (1) Add the pod UID to the arrays in this field.
-	// (2) Remove the pod finalizer.
-	// (3) Remove the pod UID from the arrays while increasing the corresponding
+	// 1. Add the pod UID to the arrays in this field.
+	// 2. Remove the pod finalizer.
+	// 3. Remove the pod UID from the arrays while increasing the corresponding
 	// counter.
-	// This field is beta-level. The job controller only makes use of this field
-	// when the feature gate JobTrackingWithFinalizers is enabled (enabled
-	// by default).
 	// Old jobs might not be tracked using this field, in which case the field
 	// remains null.
 	UncountedTerminatedPods *UncountedTerminatedPods `json:"uncountedTerminatedPods,omitempty"`
@@ -507,6 +542,35 @@ func (in *JobTemplateSpec) DeepCopy() *JobTemplateSpec {
 	return out
 }
 
+type PodFailurePolicy struct {
+	// A list of pod failure policy rules. The rules are evaluated in order.
+	// Once a rule matches a Pod failure, the remaining of the rules are ignored.
+	// When no rule matches the Pod failure, the default handling applies - the
+	// counter of pod failures is incremented and it is checked against
+	// the backoffLimit. At most 20 elements are allowed.
+	Rules []PodFailurePolicyRule `json:"rules"`
+}
+
+func (in *PodFailurePolicy) DeepCopyInto(out *PodFailurePolicy) {
+	*out = *in
+	if in.Rules != nil {
+		l := make([]PodFailurePolicyRule, len(in.Rules))
+		for i := range in.Rules {
+			in.Rules[i].DeepCopyInto(&l[i])
+		}
+		out.Rules = l
+	}
+}
+
+func (in *PodFailurePolicy) DeepCopy() *PodFailurePolicy {
+	if in == nil {
+		return nil
+	}
+	out := new(PodFailurePolicy)
+	in.DeepCopyInto(out)
+	return out
+}
+
 type JobCondition struct {
 	// Type of job condition, Complete or Failed.
 	Type JobConditionType `json:"type"`
@@ -546,9 +610,9 @@ func (in *JobCondition) DeepCopy() *JobCondition {
 }
 
 type UncountedTerminatedPods struct {
-	// Succeeded holds UIDs of succeeded Pods.
+	// succeeded holds UIDs of succeeded Pods.
 	Succeeded []string `json:"succeeded"`
-	// Failed holds UIDs of failed Pods.
+	// failed holds UIDs of failed Pods.
 	Failed []string `json:"failed"`
 }
 
@@ -571,6 +635,118 @@ func (in *UncountedTerminatedPods) DeepCopy() *UncountedTerminatedPods {
 		return nil
 	}
 	out := new(UncountedTerminatedPods)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type PodFailurePolicyRule struct {
+	// Specifies the action taken on a pod failure when the requirements are satisfied.
+	// Possible values are:
+	// - FailJob: indicates that the pod's job is marked as Failed and all
+	// running pods are terminated.
+	// - Ignore: indicates that the counter towards the .backoffLimit is not
+	// incremented and a replacement pod is created.
+	// - Count: indicates that the pod is handled in the default way - the
+	// counter towards the .backoffLimit is incremented.
+	// Additional values are considered to be added in the future. Clients should
+	// react to an unknown action by skipping the rule.
+	Action PodFailurePolicyAction `json:"action"`
+	// Represents the requirement on the container exit codes.
+	OnExitCodes *PodFailurePolicyOnExitCodesRequirement `json:"onExitCodes,omitempty"`
+	// Represents the requirement on the pod conditions. The requirement is represented
+	// as a list of pod condition patterns. The requirement is satisfied if at
+	// least one pattern matches an actual pod condition. At most 20 elements are allowed.
+	OnPodConditions []PodFailurePolicyOnPodConditionsPattern `json:"onPodConditions"`
+}
+
+func (in *PodFailurePolicyRule) DeepCopyInto(out *PodFailurePolicyRule) {
+	*out = *in
+	if in.OnExitCodes != nil {
+		in, out := &in.OnExitCodes, &out.OnExitCodes
+		*out = new(PodFailurePolicyOnExitCodesRequirement)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.OnPodConditions != nil {
+		l := make([]PodFailurePolicyOnPodConditionsPattern, len(in.OnPodConditions))
+		for i := range in.OnPodConditions {
+			in.OnPodConditions[i].DeepCopyInto(&l[i])
+		}
+		out.OnPodConditions = l
+	}
+}
+
+func (in *PodFailurePolicyRule) DeepCopy() *PodFailurePolicyRule {
+	if in == nil {
+		return nil
+	}
+	out := new(PodFailurePolicyRule)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type PodFailurePolicyOnExitCodesRequirement struct {
+	// Restricts the check for exit codes to the container with the
+	// specified name. When null, the rule applies to all containers.
+	// When specified, it should match one the container or initContainer
+	// names in the pod template.
+	ContainerName string `json:"containerName,omitempty"`
+	// Represents the relationship between the container exit code(s) and the
+	// specified values. Containers completed with success (exit code 0) are
+	// excluded from the requirement check. Possible values are:
+	// - In: the requirement is satisfied if at least one container exit code
+	// (might be multiple if there are multiple containers not restricted
+	// by the 'containerName' field) is in the set of specified values.
+	// - NotIn: the requirement is satisfied if at least one container exit code
+	// (might be multiple if there are multiple containers not restricted
+	// by the 'containerName' field) is not in the set of specified values.
+	// Additional values are considered to be added in the future. Clients should
+	// react to an unknown operator by assuming the requirement is not satisfied.
+	Operator PodFailurePolicyOnExitCodesOperator `json:"operator"`
+	// Specifies the set of values. Each returned container exit code (might be
+	// multiple in case of multiple containers) is checked against this set of
+	// values with respect to the operator. The list of values must be ordered
+	// and must not contain duplicates. Value '0' cannot be used for the In operator.
+	// At least one element is required. At most 255 elements are allowed.
+	Values []int `json:"values"`
+}
+
+func (in *PodFailurePolicyOnExitCodesRequirement) DeepCopyInto(out *PodFailurePolicyOnExitCodesRequirement) {
+	*out = *in
+	if in.Values != nil {
+		t := make([]int, len(in.Values))
+		copy(t, in.Values)
+		out.Values = t
+	}
+}
+
+func (in *PodFailurePolicyOnExitCodesRequirement) DeepCopy() *PodFailurePolicyOnExitCodesRequirement {
+	if in == nil {
+		return nil
+	}
+	out := new(PodFailurePolicyOnExitCodesRequirement)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type PodFailurePolicyOnPodConditionsPattern struct {
+	// Specifies the required Pod condition type. To match a pod condition
+	// it is required that specified type equals the pod condition type.
+	Type corev1.PodConditionType `json:"type"`
+	// Specifies the required Pod condition status. To match a pod condition
+	// it is required that the specified status equals the pod condition status.
+	// Defaults to True.
+	Status corev1.ConditionStatus `json:"status"`
+}
+
+func (in *PodFailurePolicyOnPodConditionsPattern) DeepCopyInto(out *PodFailurePolicyOnPodConditionsPattern) {
+	*out = *in
+}
+
+func (in *PodFailurePolicyOnPodConditionsPattern) DeepCopy() *PodFailurePolicyOnPodConditionsPattern {
+	if in == nil {
+		return nil
+	}
+	out := new(PodFailurePolicyOnPodConditionsPattern)
 	in.DeepCopyInto(out)
 	return out
 }

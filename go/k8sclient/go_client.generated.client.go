@@ -24,6 +24,7 @@ import (
 	"go.f110.dev/kubeproto/go/apis/batchv1"
 	"go.f110.dev/kubeproto/go/apis/certificatesv1"
 	"go.f110.dev/kubeproto/go/apis/corev1"
+	"go.f110.dev/kubeproto/go/apis/discoveryv1"
 	"go.f110.dev/kubeproto/go/apis/networkingv1"
 	"go.f110.dev/kubeproto/go/apis/policyv1"
 	"go.f110.dev/kubeproto/go/apis/rbacv1"
@@ -43,6 +44,7 @@ var localSchemeBuilder = runtime.SchemeBuilder{
 	authenticationv1.AddToScheme,
 	authorizationv1.AddToScheme,
 	certificatesv1.AddToScheme,
+	discoveryv1.AddToScheme,
 	networkingv1.AddToScheme,
 	policyv1.AddToScheme,
 	rbacv1.AddToScheme,
@@ -56,6 +58,7 @@ func init() {
 		authenticationv1.AddToScheme,
 		authorizationv1.AddToScheme,
 		certificatesv1.AddToScheme,
+		discoveryv1.AddToScheme,
 		networkingv1.AddToScheme,
 		policyv1.AddToScheme,
 		rbacv1.AddToScheme,
@@ -90,6 +93,7 @@ type Set struct {
 	AuthenticationK8sIoV1        *AuthenticationK8sIoV1
 	AuthorizationK8sIoV1         *AuthorizationK8sIoV1
 	CertificatesK8sIoV1          *CertificatesK8sIoV1
+	DiscoveryK8sIoV1             *DiscoveryK8sIoV1
 	NetworkingK8sIoV1            *NetworkingK8sIoV1
 	PolicyV1                     *PolicyV1
 	RbacAuthorizationK8sIoV1     *RbacAuthorizationK8sIoV1
@@ -162,6 +166,17 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 			return nil, err
 		}
 		s.CertificatesK8sIoV1 = NewCertificatesK8sIoV1Client(&restBackend{client: c})
+	}
+	{
+		conf := *cfg
+		conf.GroupVersion = &discoveryv1.SchemaGroupVersion
+		conf.APIPath = "/apis"
+		conf.NegotiatedSerializer = Codecs.WithoutConversion()
+		c, err := rest.RESTClientFor(&conf)
+		if err != nil {
+			return nil, err
+		}
+		s.DiscoveryK8sIoV1 = NewDiscoveryK8sIoV1Client(&restBackend{client: c})
 	}
 	{
 		conf := *cfg
@@ -1827,6 +1842,54 @@ func (c *CertificatesK8sIoV1) WatchCertificateSigningRequest(ctx context.Context
 	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".certificates.k8s.io", Version: "v1", Resource: "certificatesigningrequests"}, opts)
 }
 
+type DiscoveryK8sIoV1 struct {
+	backend Backend
+}
+
+func NewDiscoveryK8sIoV1Client(b Backend) *DiscoveryK8sIoV1 {
+	return &DiscoveryK8sIoV1{backend: b}
+}
+
+func (c *DiscoveryK8sIoV1) GetEndpointSlice(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*discoveryv1.EndpointSlice, error) {
+	result, err := c.backend.Get(ctx, "endpointslices", "EndpointSlice", namespace, name, opts, &discoveryv1.EndpointSlice{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*discoveryv1.EndpointSlice), nil
+}
+
+func (c *DiscoveryK8sIoV1) CreateEndpointSlice(ctx context.Context, v *discoveryv1.EndpointSlice, opts metav1.CreateOptions) (*discoveryv1.EndpointSlice, error) {
+	result, err := c.backend.Create(ctx, "endpointslices", "EndpointSlice", v, opts, &discoveryv1.EndpointSlice{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*discoveryv1.EndpointSlice), nil
+}
+
+func (c *DiscoveryK8sIoV1) UpdateEndpointSlice(ctx context.Context, v *discoveryv1.EndpointSlice, opts metav1.UpdateOptions) (*discoveryv1.EndpointSlice, error) {
+	result, err := c.backend.Update(ctx, "endpointslices", "EndpointSlice", v, opts, &discoveryv1.EndpointSlice{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*discoveryv1.EndpointSlice), nil
+}
+
+func (c *DiscoveryK8sIoV1) DeleteEndpointSlice(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".discovery.k8s.io", Version: "v1", Resource: "endpointslices"}, namespace, name, opts)
+}
+
+func (c *DiscoveryK8sIoV1) ListEndpointSlice(ctx context.Context, namespace string, opts metav1.ListOptions) (*discoveryv1.EndpointSliceList, error) {
+	result, err := c.backend.List(ctx, "endpointslices", "EndpointSlice", namespace, opts, &discoveryv1.EndpointSliceList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*discoveryv1.EndpointSliceList), nil
+}
+
+func (c *DiscoveryK8sIoV1) WatchEndpointSlice(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".discovery.k8s.io", Version: "v1", Resource: "endpointslices"}, namespace, opts)
+}
+
 type NetworkingK8sIoV1 struct {
 	backend Backend
 }
@@ -2334,6 +2397,8 @@ func (f *InformerFactory) InformerFor(obj runtime.Object) cache.SharedIndexInfor
 		return NewAuthorizationK8sIoV1Informer(f.cache, f.set.AuthorizationK8sIoV1, f.namespace, f.resyncPeriod).SubjectAccessReviewInformer()
 	case *certificatesv1.CertificateSigningRequest:
 		return NewCertificatesK8sIoV1Informer(f.cache, f.set.CertificatesK8sIoV1, f.namespace, f.resyncPeriod).CertificateSigningRequestInformer()
+	case *discoveryv1.EndpointSlice:
+		return NewDiscoveryK8sIoV1Informer(f.cache, f.set.DiscoveryK8sIoV1, f.namespace, f.resyncPeriod).EndpointSliceInformer()
 	case *networkingv1.Ingress:
 		return NewNetworkingK8sIoV1Informer(f.cache, f.set.NetworkingK8sIoV1, f.namespace, f.resyncPeriod).IngressInformer()
 	case *networkingv1.IngressClass:
@@ -2429,6 +2494,8 @@ func (f *InformerFactory) InformerForResource(gvr schema.GroupVersionResource) c
 		return NewAuthorizationK8sIoV1Informer(f.cache, f.set.AuthorizationK8sIoV1, f.namespace, f.resyncPeriod).SubjectAccessReviewInformer()
 	case certificatesv1.SchemaGroupVersion.WithResource("certificatesigningrequests"):
 		return NewCertificatesK8sIoV1Informer(f.cache, f.set.CertificatesK8sIoV1, f.namespace, f.resyncPeriod).CertificateSigningRequestInformer()
+	case discoveryv1.SchemaGroupVersion.WithResource("endpointslices"):
+		return NewDiscoveryK8sIoV1Informer(f.cache, f.set.DiscoveryK8sIoV1, f.namespace, f.resyncPeriod).EndpointSliceInformer()
 	case networkingv1.SchemaGroupVersion.WithResource("ingresses"):
 		return NewNetworkingK8sIoV1Informer(f.cache, f.set.NetworkingK8sIoV1, f.namespace, f.resyncPeriod).IngressInformer()
 	case networkingv1.SchemaGroupVersion.WithResource("ingressclasses"):
@@ -3334,6 +3401,46 @@ func (f *CertificatesK8sIoV1Informer) CertificateSigningRequestInformer() cache.
 
 func (f *CertificatesK8sIoV1Informer) CertificateSigningRequestLister() *CertificatesK8sIoV1CertificateSigningRequestLister {
 	return NewCertificatesK8sIoV1CertificateSigningRequestLister(f.CertificateSigningRequestInformer().GetIndexer())
+}
+
+type DiscoveryK8sIoV1Informer struct {
+	cache        *InformerCache
+	client       *DiscoveryK8sIoV1
+	namespace    string
+	resyncPeriod time.Duration
+	indexers     cache.Indexers
+}
+
+func NewDiscoveryK8sIoV1Informer(c *InformerCache, client *DiscoveryK8sIoV1, namespace string, resyncPeriod time.Duration) *DiscoveryK8sIoV1Informer {
+	return &DiscoveryK8sIoV1Informer{
+		cache:        c,
+		client:       client,
+		namespace:    namespace,
+		resyncPeriod: resyncPeriod,
+		indexers:     cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
+	}
+}
+
+func (f *DiscoveryK8sIoV1Informer) EndpointSliceInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&discoveryv1.EndpointSlice{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListEndpointSlice(context.TODO(), f.namespace, metav1.ListOptions{})
+				},
+				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchEndpointSlice(context.TODO(), f.namespace, metav1.ListOptions{})
+				},
+			},
+			&discoveryv1.EndpointSlice{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *DiscoveryK8sIoV1Informer) EndpointSliceLister() *DiscoveryK8sIoV1EndpointSliceLister {
+	return NewDiscoveryK8sIoV1EndpointSliceLister(f.EndpointSliceInformer().GetIndexer())
 }
 
 type NetworkingK8sIoV1Informer struct {
@@ -4531,6 +4638,33 @@ func (x *CertificatesK8sIoV1CertificateSigningRequestLister) Get(name string) (*
 		return nil, k8serrors.NewNotFound(certificatesv1.SchemaGroupVersion.WithResource("certificatesigningrequest").GroupResource(), name)
 	}
 	return obj.(*certificatesv1.CertificateSigningRequest).DeepCopy(), nil
+}
+
+type DiscoveryK8sIoV1EndpointSliceLister struct {
+	indexer cache.Indexer
+}
+
+func NewDiscoveryK8sIoV1EndpointSliceLister(indexer cache.Indexer) *DiscoveryK8sIoV1EndpointSliceLister {
+	return &DiscoveryK8sIoV1EndpointSliceLister{indexer: indexer}
+}
+
+func (x *DiscoveryK8sIoV1EndpointSliceLister) List(namespace string, selector labels.Selector) ([]*discoveryv1.EndpointSlice, error) {
+	var ret []*discoveryv1.EndpointSlice
+	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
+		ret = append(ret, m.(*discoveryv1.EndpointSlice).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *DiscoveryK8sIoV1EndpointSliceLister) Get(namespace, name string) (*discoveryv1.EndpointSlice, error) {
+	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(discoveryv1.SchemaGroupVersion.WithResource("endpointslice").GroupResource(), name)
+	}
+	return obj.(*discoveryv1.EndpointSlice).DeepCopy(), nil
 }
 
 type NetworkingK8sIoV1IngressLister struct {

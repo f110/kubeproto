@@ -127,12 +127,12 @@ const (
 	IPFamilyIpv6 IPFamily = "IPv6"
 )
 
-type IPFamilyPolicyType string
+type IPFamilyPolicy string
 
 const (
-	IPFamilyPolicyTypeSingleStack      IPFamilyPolicyType = "SingleStack"
-	IPFamilyPolicyTypePreferDualStack  IPFamilyPolicyType = "PreferDualStack"
-	IPFamilyPolicyTypeRequireDualStack IPFamilyPolicyType = "RequireDualStack"
+	IPFamilyPolicySingleStack      IPFamilyPolicy = "SingleStack"
+	IPFamilyPolicyPreferDualStack  IPFamilyPolicy = "PreferDualStack"
+	IPFamilyPolicyRequireDualStack IPFamilyPolicy = "RequireDualStack"
 )
 
 type LimitType string
@@ -186,6 +186,13 @@ const (
 	NodeConditionTypeDiskPressure       NodeConditionType = "DiskPressure"
 	NodeConditionTypePIDPressure        NodeConditionType = "PIDPressure"
 	NodeConditionTypeNetworkUnavailable NodeConditionType = "NetworkUnavailable"
+)
+
+type NodeInclusionPolicy string
+
+const (
+	NodeInclusionPolicyIgnore NodeInclusionPolicy = "Ignore"
+	NodeInclusionPolicyHonor  NodeInclusionPolicy = "Honor"
 )
 
 type NodePhase string
@@ -277,10 +284,11 @@ const (
 type PodConditionType string
 
 const (
-	PodConditionTypeContainersReady PodConditionType = "ContainersReady"
-	PodConditionTypeInitialized     PodConditionType = "Initialized"
-	PodConditionTypeReady           PodConditionType = "Ready"
-	PodConditionTypePodScheduled    PodConditionType = "PodScheduled"
+	PodConditionTypeContainersReady  PodConditionType = "ContainersReady"
+	PodConditionTypeInitialized      PodConditionType = "Initialized"
+	PodConditionTypeReady            PodConditionType = "Ready"
+	PodConditionTypePodScheduled     PodConditionType = "PodScheduled"
+	PodConditionTypeDisruptionTarget PodConditionType = "DisruptionTarget"
 )
 
 type PodFSGroupChangePolicy string
@@ -306,6 +314,15 @@ const (
 	PodQOSClassGuaranteed PodQOSClass = "Guaranteed"
 	PodQOSClassBurstable  PodQOSClass = "Burstable"
 	PodQOSClassBestEffort PodQOSClass = "BestEffort"
+)
+
+type PodResizeStatus string
+
+const (
+	PodResizeStatusProposed   PodResizeStatus = "Proposed"
+	PodResizeStatusInProgress PodResizeStatus = "InProgress"
+	PodResizeStatusDeferred   PodResizeStatus = "Deferred"
+	PodResizeStatusInfeasible PodResizeStatus = "Infeasible"
 )
 
 type PreemptionPolicy string
@@ -380,6 +397,13 @@ const (
 	ResourceQuotaScopeCrossNamespacePodAffinity ResourceQuotaScope = "CrossNamespacePodAffinity"
 )
 
+type ResourceResizeRestartPolicy string
+
+const (
+	ResourceResizeRestartPolicyNotRequired      ResourceResizeRestartPolicy = "NotRequired"
+	ResourceResizeRestartPolicyRestartContainer ResourceResizeRestartPolicy = "RestartContainer"
+)
+
 type RestartPolicy string
 
 const (
@@ -425,18 +449,18 @@ const (
 	ServiceAffinityNone     ServiceAffinity = "None"
 )
 
-type ServiceExternalTrafficPolicyType string
+type ServiceExternalTrafficPolicy string
 
 const (
-	ServiceExternalTrafficPolicyTypeLocal   ServiceExternalTrafficPolicyType = "Local"
-	ServiceExternalTrafficPolicyTypeCluster ServiceExternalTrafficPolicyType = "Cluster"
+	ServiceExternalTrafficPolicyCluster ServiceExternalTrafficPolicy = "Cluster"
+	ServiceExternalTrafficPolicyLocal   ServiceExternalTrafficPolicy = "Local"
 )
 
-type ServiceInternalTrafficPolicyType string
+type ServiceInternalTrafficPolicy string
 
 const (
-	ServiceInternalTrafficPolicyTypeCluster ServiceInternalTrafficPolicyType = "Cluster"
-	ServiceInternalTrafficPolicyTypeLocal   ServiceInternalTrafficPolicyType = "Local"
+	ServiceInternalTrafficPolicyCluster ServiceInternalTrafficPolicy = "Cluster"
+	ServiceInternalTrafficPolicyLocal   ServiceInternalTrafficPolicy = "Local"
 )
 
 type ServiceType string
@@ -2274,7 +2298,7 @@ type NodeSpec struct {
 	Unschedulable bool `json:"unschedulable,omitempty"`
 	// If specified, the node's taints.
 	Taints []Taint `json:"taints"`
-	// Deprecated: Previously used to specify the source of the node's configuration for the DynamicKubeletConfig feature. This feature is removed from Kubelets as of 1.24 and will be fully removed in 1.26.
+	// Deprecated: Previously used to specify the source of the node's configuration for the DynamicKubeletConfig feature. This feature is removed.
 	ConfigSource *NodeConfigSource `json:"configSource,omitempty"`
 	// Deprecated. Not all kubelets will set this field. Remove field after 1.13.
 	// see: https://issues.k8s.io/61966
@@ -2330,7 +2354,11 @@ type NodeStatus struct {
 	// More info: https://kubernetes.io/docs/concepts/nodes/node/#addresses
 	// Note: This field is declared as mergeable, but the merge key is not sufficiently
 	// unique, which can cause data corruption when it is merged. Callers should instead
-	// use a full-replacement patch. See http://pr.k8s.io/79391 for an example.
+	// use a full-replacement patch. See https://pr.k8s.io/79391 for an example.
+	// Consumers should assume that addresses can change during the
+	// lifetime of a Node. However, there are some exceptions where this may not
+	// be possible, such as Pods that inherit a Node's address in its own status or
+	// consumers of the downward API (status.hostIP).
 	Addresses []NodeAddress `json:"addresses"`
 	// Endpoints of daemons running on the Node.
 	DaemonEndpoints *NodeDaemonEndpoints `json:"daemonEndpoints,omitempty"`
@@ -2547,27 +2575,34 @@ type PersistentVolumeClaimSpec struct {
 	// * An existing PVC (PersistentVolumeClaim)
 	// If the provisioner or an external controller can support the specified data source,
 	// it will create a new volume based on the contents of the specified data source.
-	// If the AnyVolumeDataSource feature gate is enabled, this field will always have
-	// the same contents as the DataSourceRef field.
+	// When the AnyVolumeDataSource feature gate is enabled, dataSource contents will be copied to dataSourceRef,
+	// and dataSourceRef contents will be copied to dataSource when dataSourceRef.namespace is not specified.
+	// If the namespace is specified, then dataSourceRef will not be copied to dataSource.
 	DataSource *TypedLocalObjectReference `json:"dataSource,omitempty"`
 	// dataSourceRef specifies the object from which to populate the volume with data, if a non-empty
-	// volume is desired. This may be any local object from a non-empty API group (non
+	// volume is desired. This may be any object from a non-empty API group (non
 	// core object) or a PersistentVolumeClaim object.
 	// When this field is specified, volume binding will only succeed if the type of
 	// the specified object matches some installed volume populator or dynamic
 	// provisioner.
-	// This field will replace the functionality of the DataSource field and as such
+	// This field will replace the functionality of the dataSource field and as such
 	// if both fields are non-empty, they must have the same value. For backwards
-	// compatibility, both fields (DataSource and DataSourceRef) will be set to the same
+	// compatibility, when namespace isn't specified in dataSourceRef,
+	// both fields (dataSource and dataSourceRef) will be set to the same
 	// value automatically if one of them is empty and the other is non-empty.
-	// There are two important differences between DataSource and DataSourceRef:
-	// * While DataSource only allows two specific types of objects, DataSourceRef
+	// When namespace is specified in dataSourceRef,
+	// dataSource isn't set to the same value and must be empty.
+	// There are three important differences between dataSource and dataSourceRef:
+	// * While dataSource only allows two specific types of objects, dataSourceRef
 	// allows any non-core object, as well as PersistentVolumeClaim objects.
-	// * While DataSource ignores disallowed values (dropping them), DataSourceRef
+	// * While dataSource ignores disallowed values (dropping them), dataSourceRef
 	// preserves all values, and generates an error if a disallowed value is
 	// specified.
+	// * While dataSource only allows local objects, dataSourceRef allows objects
+	// in any namespaces.
 	// (Beta) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
-	DataSourceRef *TypedLocalObjectReference `json:"dataSourceRef,omitempty"`
+	// (Alpha) Using the namespace field of dataSourceRef requires the CrossNamespaceVolumeDataSource feature gate to be enabled.
+	DataSourceRef *TypedObjectReference `json:"dataSourceRef,omitempty"`
 }
 
 func (in *PersistentVolumeClaimSpec) DeepCopyInto(out *PersistentVolumeClaimSpec) {
@@ -2594,7 +2629,7 @@ func (in *PersistentVolumeClaimSpec) DeepCopyInto(out *PersistentVolumeClaimSpec
 	}
 	if in.DataSourceRef != nil {
 		in, out := &in.DataSourceRef, &out.DataSourceRef
-		*out = new(TypedLocalObjectReference)
+		*out = new(TypedObjectReference)
 		(*in).DeepCopyInto(*out)
 	}
 }
@@ -2701,10 +2736,9 @@ type PodSpec struct {
 	// pod to perform user-initiated actions such as debugging. This list cannot be specified when
 	// creating a pod, and it cannot be modified by updating the pod spec. In order to add an
 	// ephemeral container to an existing pod, use the pod's ephemeralcontainers subresource.
-	// This field is beta-level and available on clusters that haven't disabled the EphemeralContainers feature gate.
 	EphemeralContainers []EphemeralContainer `json:"ephemeralContainers"`
 	// Restart policy for all containers within the pod.
-	// One of Always, OnFailure, Never.
+	// One of Always, OnFailure, Never. In some contexts, only a subset of those values may be permitted.
 	// Default to Always.
 	// More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy
 	RestartPolicy RestartPolicy `json:"restartPolicy,omitempty"`
@@ -2844,6 +2878,7 @@ type PodSpec struct {
 	// If the OS field is set to windows, following fields must be unset:
 	// - spec.hostPID
 	// - spec.hostIPC
+	// - spec.hostUsers
 	// - spec.securityContext.seLinuxOptions
 	// - spec.securityContext.seccompProfile
 	// - spec.securityContext.fsGroup
@@ -2862,8 +2897,31 @@ type PodSpec struct {
 	// - spec.containers[*].securityContext.procMount
 	// - spec.containers[*].securityContext.runAsUser
 	// - spec.containers[*].securityContext.runAsGroup
-	// This is a beta field and requires the IdentifyPodOS feature
 	OS *PodOS `json:"os,omitempty"`
+	// Use the host's user namespace.
+	// Optional: Default to true.
+	// If set to true or not present, the pod will be run in the host user namespace, useful
+	// for when the pod needs a feature only available to the host user namespace, such as
+	// loading a kernel module with CAP_SYS_MODULE.
+	// When set to false, a new userns is created for the pod. Setting false is useful for
+	// mitigating container breakout vulnerabilities even allowing users to run their
+	// containers as root without actually having root privileges on the host.
+	// This field is alpha-level and is only honored by servers that enable the UserNamespacesSupport feature.
+	HostUsers bool `json:"hostUsers,omitempty"`
+	// SchedulingGates is an opaque list of values that if specified will block scheduling the pod.
+	// If schedulingGates is not empty, the pod will stay in the SchedulingGated state and the
+	// scheduler will not attempt to schedule the pod.
+	// SchedulingGates can only be set at pod creation time, and be removed only afterwards.
+	// This is a beta feature enabled by the PodSchedulingReadiness feature gate.
+	SchedulingGates []PodSchedulingGate `json:"schedulingGates"`
+	// ResourceClaims defines which ResourceClaims must be allocated
+	// and reserved before the Pod is allowed to start. The resources
+	// will be made available to those containers which consume them
+	// by name.
+	// This is an alpha field and requires enabling the
+	// DynamicResourceAllocation feature gate.
+	// This field is immutable.
+	ResourceClaims []PodResourceClaim `json:"resourceClaims"`
 }
 
 func (in *PodSpec) DeepCopyInto(out *PodSpec) {
@@ -2965,6 +3023,20 @@ func (in *PodSpec) DeepCopyInto(out *PodSpec) {
 		*out = new(PodOS)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.SchedulingGates != nil {
+		l := make([]PodSchedulingGate, len(in.SchedulingGates))
+		for i := range in.SchedulingGates {
+			in.SchedulingGates[i].DeepCopyInto(&l[i])
+		}
+		out.SchedulingGates = l
+	}
+	if in.ResourceClaims != nil {
+		l := make([]PodResourceClaim, len(in.ResourceClaims))
+		for i := range in.ResourceClaims {
+			in.ResourceClaims[i].DeepCopyInto(&l[i])
+		}
+		out.ResourceClaims = l
+	}
 }
 
 func (in *PodSpec) DeepCopy() *PodSpec {
@@ -3032,11 +3104,14 @@ type PodStatus struct {
 	ContainerStatuses []ContainerStatus `json:"containerStatuses"`
 	// The Quality of Service (QOS) classification assigned to the pod based on resource requirements
 	// See PodQOSClass type for available QOS classes
-	// More info: https://git.k8s.io/community/contributors/design-proposals/node/resource-qos.md
+	// More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-qos/#quality-of-service-classes
 	QOSClass PodQOSClass `json:"qosClass,omitempty"`
 	// Status for any ephemeral containers that have run in this pod.
-	// This field is beta-level and available on clusters that haven't disabled the EphemeralContainers feature gate.
 	EphemeralContainerStatuses []ContainerStatus `json:"ephemeralContainerStatuses"`
+	// Status of resources resize desired for pod's containers.
+	// It is empty if no resources resize is pending.
+	// Any changes to container resources will automatically set this to "Proposed"
+	Resize PodResizeStatus `json:"resize,omitempty"`
 }
 
 func (in *PodStatus) DeepCopyInto(out *PodStatus) {
@@ -3142,6 +3217,7 @@ type ReplicationControllerSpec struct {
 	Selector map[string]string `json:"selector,omitempty"`
 	// Template is the object that describes the pod that will be created if
 	// insufficient replicas are detected. This takes precedence over a TemplateRef.
+	// The only allowed template.spec.restartPolicy value is "Always".
 	// More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template
 	Template *PodTemplateSpec `json:"template,omitempty"`
 }
@@ -3172,7 +3248,7 @@ func (in *ReplicationControllerSpec) DeepCopy() *ReplicationControllerSpec {
 }
 
 type ReplicationControllerStatus struct {
-	// Replicas is the most recently oberved number of replicas.
+	// Replicas is the most recently observed number of replicas.
 	// More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#what-is-a-replicationcontroller
 	Replicas int `json:"replicas"`
 	// The number of pods that have labels matching the labels of the pod template of the replication controller.
@@ -3383,13 +3459,20 @@ type ServiceSpec struct {
 	// proxying will be involved.  Must be a lowercase RFC-1123 hostname
 	// (https://tools.ietf.org/html/rfc1123) and requires `type` to be "ExternalName".
 	ExternalName string `json:"externalName,omitempty"`
-	// externalTrafficPolicy denotes if this Service desires to route external
-	// traffic to node-local or cluster-wide endpoints. "Local" preserves the
-	// client source IP and avoids a second hop for LoadBalancer and Nodeport
-	// type services, but risks potentially imbalanced traffic spreading.
-	// "Cluster" obscures the client source IP and may cause a second hop to
-	// another node, but should have good overall load-spreading.
-	ExternalTrafficPolicy ServiceExternalTrafficPolicyType `json:"externalTrafficPolicy,omitempty"`
+	// externalTrafficPolicy describes how nodes distribute service traffic they
+	// receive on one of the Service's "externally-facing" addresses (NodePorts,
+	// ExternalIPs, and LoadBalancer IPs). If set to "Local", the proxy will configure
+	// the service in a way that assumes that external load balancers will take care
+	// of balancing the service traffic between nodes, and so each node will deliver
+	// traffic only to the node-local endpoints of the service, without masquerading
+	// the client source IP. (Traffic mistakenly sent to a node with no endpoints will
+	// be dropped.) The default value, "Cluster", uses the standard behavior of
+	// routing to all endpoints evenly (possibly modified by topology and other
+	// features). Note that traffic sent to an External IP or LoadBalancer IP from
+	// within the cluster will always get "Cluster" semantics, but clients sending to
+	// a NodePort from within the cluster may need to take traffic policy into account
+	// when picking a node.
+	ExternalTrafficPolicy ServiceExternalTrafficPolicy `json:"externalTrafficPolicy,omitempty"`
 	// healthCheckNodePort specifies the healthcheck nodePort for the service.
 	// This only applies when type is set to LoadBalancer and
 	// externalTrafficPolicy is set to Local. If a value is specified, is
@@ -3399,6 +3482,7 @@ type ServiceSpec struct {
 	// service or not.  If this field is specified when creating a Service
 	// which does not need it, creation will fail. This field will be wiped
 	// when updating a Service to no longer need it (e.g. changing type).
+	// This field cannot be updated once set.
 	HealthCheckNodePort int `json:"healthCheckNodePort,omitempty"`
 	// publishNotReadyAddresses indicates that any agent which deals with endpoints for this
 	// Service should disregard any indications of ready/not-ready.
@@ -3435,7 +3519,7 @@ type ServiceSpec struct {
 	// (two IP families on dual-stack configured clusters, otherwise fail). The
 	// ipFamilies and clusterIPs fields depend on the value of this field. This
 	// field will be wiped when updating a service to type ExternalName.
-	IPFamilyPolicy IPFamilyPolicyType `json:"ipFamilyPolicy,omitempty"`
+	IPFamilyPolicy IPFamilyPolicy `json:"ipFamilyPolicy,omitempty"`
 	// allocateLoadBalancerNodePorts defines if NodePorts will be automatically
 	// allocated for services with type LoadBalancer.  Default is "true". It
 	// may be set to "false" if the cluster load-balancer does not rely on
@@ -3455,13 +3539,13 @@ type ServiceSpec struct {
 	// This field can only be set when creating or updating a Service to type 'LoadBalancer'.
 	// Once set, it can not be changed. This field will be wiped when a service is updated to a non 'LoadBalancer' type.
 	LoadBalancerClass string `json:"loadBalancerClass,omitempty"`
-	// InternalTrafficPolicy specifies if the cluster internal traffic
-	// should be routed to all endpoints or node-local endpoints only.
-	// "Cluster" routes internal traffic to a Service to all endpoints.
-	// "Local" routes traffic to node-local endpoints only, traffic is
-	// dropped if no node-local endpoints are ready.
-	// The default value is "Cluster".
-	InternalTrafficPolicy ServiceInternalTrafficPolicyType `json:"internalTrafficPolicy,omitempty"`
+	// InternalTrafficPolicy describes how nodes distribute service traffic they
+	// receive on the ClusterIP. If set to "Local", the proxy will assume that pods
+	// only want to talk to endpoints of the service on the same node as the pod,
+	// dropping the traffic if there are no local endpoints. The default value,
+	// "Cluster", uses the standard behavior of routing to all endpoints evenly
+	// (possibly modified by topology and other features).
+	InternalTrafficPolicy ServiceInternalTrafficPolicy `json:"internalTrafficPolicy,omitempty"`
 }
 
 func (in *ServiceSpec) DeepCopyInto(out *ServiceSpec) {
@@ -3570,10 +3654,8 @@ func (in *LocalObjectReference) DeepCopy() *LocalObjectReference {
 
 type EndpointAddress struct {
 	// The IP of this endpoint.
-	// May not be loopback (127.0.0.0/8), link-local (169.254.0.0/16),
-	// or link-local multicast ((224.0.0.0/24).
-	// IPv6 is also accepted but not fully supported on all platforms. Also, certain
-	// kubernetes components, like kube-proxy, are not IPv6 ready.
+	// May not be loopback (127.0.0.0/8 or ::1), link-local (169.254.0.0/16 or fe80::/10),
+	// or link-local multicast (224.0.0.0/24 or ff02::/16).
 	IP string `json:"ip"`
 	// The Hostname of this endpoint
 	Hostname string `json:"hostname,omitempty"`
@@ -3614,10 +3696,14 @@ type EndpointPort struct {
 	// Default is TCP.
 	Protocol Protocol `json:"protocol,omitempty"`
 	// The application protocol for this port.
+	// This is used as a hint for implementations to offer richer behavior for protocols that they understand.
 	// This field follows standard Kubernetes label syntax.
-	// Un-prefixed names are reserved for IANA standard service names (as per
+	// Valid values are either:
+	// * Un-prefixed protocol names - reserved for IANA standard service names (as per
 	// RFC-6335 and https://www.iana.org/assignments/service-names).
-	// Non-standard protocols should use prefixed names such as
+	// * Kubernetes-defined prefixed names:
+	// * 'kubernetes.io/h2c' - HTTP/2 over cleartext as described in https://www.rfc-editor.org/rfc/rfc7540
+	// * Other protocols should use implementation-defined prefixed names such as
 	// mycompany.com/my-custom-protocol.
 	AppProtocol string `json:"appProtocol,omitempty"`
 }
@@ -3904,7 +3990,7 @@ func (in *NodeSystemInfo) DeepCopy() *NodeSystemInfo {
 
 type ContainerImage struct {
 	// Names by which this image is known.
-	// e.g. ["k8s.gcr.io/hyperkube:v1.0.7", "dockerhub.io/google_containers/hyperkube:v1.0.7"]
+	// e.g. ["kubernetes.example/hyperkube:v1.0.7", "cloud-vendor.registry.example/cloud-vendor/hyperkube:v1.0.7"]
 	Names []string `json:"names"`
 	// The size of the image in bytes.
 	SizeBytes int64 `json:"sizeBytes,omitempty"`
@@ -4233,9 +4319,15 @@ type ResourceRequirements struct {
 	Limits map[string]apiresource.Quantity `json:"limits,omitempty"`
 	// Requests describes the minimum amount of compute resources required.
 	// If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
-	// otherwise to an implementation-defined value.
+	// otherwise to an implementation-defined value. Requests cannot exceed Limits.
 	// More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
 	Requests map[string]apiresource.Quantity `json:"requests,omitempty"`
+	// Claims lists the names of resources, defined in spec.resourceClaims,
+	// that are used by this container.
+	// This is an alpha field and requires enabling the
+	// DynamicResourceAllocation feature gate.
+	// This field is immutable. It can only be set for containers.
+	Claims []ResourceClaim `json:"claims"`
 }
 
 func (in *ResourceRequirements) DeepCopyInto(out *ResourceRequirements) {
@@ -4253,6 +4345,13 @@ func (in *ResourceRequirements) DeepCopyInto(out *ResourceRequirements) {
 		for k, v := range *in {
 			(*out)[k] = v
 		}
+	}
+	if in.Claims != nil {
+		l := make([]ResourceClaim, len(in.Claims))
+		for i := range in.Claims {
+			in.Claims[i].DeepCopyInto(&l[i])
+		}
+		out.Claims = l
 	}
 }
 
@@ -4285,6 +4384,34 @@ func (in *TypedLocalObjectReference) DeepCopy() *TypedLocalObjectReference {
 		return nil
 	}
 	out := new(TypedLocalObjectReference)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type TypedObjectReference struct {
+	// APIGroup is the group for the resource being referenced.
+	// If APIGroup is not specified, the specified Kind must be in the core API group.
+	// For any other third-party types, APIGroup is required.
+	APIGroup string `json:"apiGroup,omitempty"`
+	// Kind is the type of resource being referenced
+	Kind string `json:"kind"`
+	// Name is the name of resource being referenced
+	Name string `json:"name"`
+	// Namespace is the namespace of resource being referenced
+	// Note that when a namespace is specified, a gateway.networking.k8s.io/ReferenceGrant object is required in the referent namespace to allow that namespace's owner to accept the reference. See the ReferenceGrant documentation for details.
+	// (Alpha) This field requires the CrossNamespaceVolumeDataSource feature gate to be enabled.
+	Namespace string `json:"namespace,omitempty"`
+}
+
+func (in *TypedObjectReference) DeepCopyInto(out *TypedObjectReference) {
+	*out = *in
+}
+
+func (in *TypedObjectReference) DeepCopy() *TypedObjectReference {
+	if in == nil {
+		return nil
+	}
+	out := new(TypedObjectReference)
 	in.DeepCopyInto(out)
 	return out
 }
@@ -4385,12 +4512,12 @@ type Container struct {
 	// might be configured in the container image.
 	// Cannot be updated.
 	WorkingDir string `json:"workingDir,omitempty"`
-	// List of ports to expose from the container. Exposing a port here gives
-	// the system additional information about the network connections a
-	// container uses, but is primarily informational. Not specifying a port here
+	// List of ports to expose from the container. Not specifying a port here
 	// DOES NOT prevent that port from being exposed. Any port which is
 	// listening on the default "0.0.0.0" address inside a container will be
 	// accessible from the network.
+	// Modifying this array with strategic merge patch may corrupt the data.
+	// For more information See https://github.com/kubernetes/kubernetes/issues/108255.
 	// Cannot be updated.
 	Ports []ContainerPort `json:"ports"`
 	// List of sources to populate environment variables in the container.
@@ -4407,6 +4534,8 @@ type Container struct {
 	// Cannot be updated.
 	// More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
 	Resources *ResourceRequirements `json:"resources,omitempty"`
+	// Resources resize policy for the container.
+	ResizePolicy []ContainerResizePolicy `json:"resizePolicy"`
 	// Pod volumes to mount into the container's filesystem.
 	// Cannot be updated.
 	VolumeMounts []VolumeMount `json:"volumeMounts"`
@@ -4513,6 +4642,13 @@ func (in *Container) DeepCopyInto(out *Container) {
 		in, out := &in.Resources, &out.Resources
 		*out = new(ResourceRequirements)
 		(*in).DeepCopyInto(*out)
+	}
+	if in.ResizePolicy != nil {
+		l := make([]ContainerResizePolicy, len(in.ResizePolicy))
+		for i := range in.ResizePolicy {
+			in.ResizePolicy[i].DeepCopyInto(&l[i])
+		}
+		out.ResizePolicy = l
 	}
 	if in.VolumeMounts != nil {
 		l := make([]VolumeMount, len(in.VolumeMounts))
@@ -4627,8 +4763,11 @@ type PodSecurityContext struct {
 	// PodSecurityContext, the value specified in SecurityContext takes precedence.
 	RunAsNonRoot bool `json:"runAsNonRoot,omitempty"`
 	// A list of groups applied to the first process run in each container, in addition
-	// to the container's primary GID.  If unspecified, no groups will be added to
-	// any container.
+	// to the container's primary GID, the fsGroup (if specified), and group memberships
+	// defined in the container image for the uid of the container process. If unspecified,
+	// no additional groups are added to any container. Note that group memberships
+	// defined in the container image for the uid of the container process are still effective,
+	// even if they are not included in this list.
 	// Note that this field cannot be set when spec.os.name is windows.
 	SupplementalGroups []int64 `json:"supplementalGroups"`
 	// A special supplemental group that applies to all containers in a pod.
@@ -4882,7 +5021,8 @@ type TopologySpreadConstraint struct {
 	// We consider each <key, value> as a "bucket", and try to put balanced number
 	// of pods into each bucket.
 	// We define a domain as a particular instance of a topology.
-	// Also, we define an eligible domain as a domain whose nodes match the node selector.
+	// Also, we define an eligible domain as a domain whose nodes meet the requirements of
+	// nodeAffinityPolicy and nodeTaintsPolicy.
 	// e.g. If TopologyKey is "kubernetes.io/hostname", each Node is a domain of that topology.
 	// And, if TopologyKey is "topology.kubernetes.io/zone", each zone is a domain of that topology.
 	// It's a required field.
@@ -4928,8 +5068,33 @@ type TopologySpreadConstraint struct {
 	// In this situation, new pod with the same labelSelector cannot be scheduled,
 	// because computed skew will be 3(3 - 0) if new Pod is scheduled to any of the three zones,
 	// it will violate MaxSkew.
-	// This is an alpha field and requires enabling MinDomainsInPodTopologySpread feature gate.
+	// This is a beta field and requires the MinDomainsInPodTopologySpread feature gate to be enabled (enabled by default).
 	MinDomains int `json:"minDomains,omitempty"`
+	// NodeAffinityPolicy indicates how we will treat Pod's nodeAffinity/nodeSelector
+	// when calculating pod topology spread skew. Options are:
+	// - Honor: only nodes matching nodeAffinity/nodeSelector are included in the calculations.
+	// - Ignore: nodeAffinity/nodeSelector are ignored. All nodes are included in the calculations.
+	// If this value is nil, the behavior is equivalent to the Honor policy.
+	// This is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.
+	NodeAffinityPolicy NodeInclusionPolicy `json:"nodeAffinityPolicy,omitempty"`
+	// NodeTaintsPolicy indicates how we will treat node taints when calculating
+	// pod topology spread skew. Options are:
+	// - Honor: nodes without taints, along with tainted nodes for which the incoming pod
+	// has a toleration, are included.
+	// - Ignore: node taints are ignored. All nodes are included.
+	// If this value is nil, the behavior is equivalent to the Ignore policy.
+	// This is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.
+	NodeTaintsPolicy NodeInclusionPolicy `json:"nodeTaintsPolicy,omitempty"`
+	// MatchLabelKeys is a set of pod label keys to select the pods over which
+	// spreading will be calculated. The keys are used to lookup values from the
+	// incoming pod labels, those key-value labels are ANDed with labelSelector
+	// to select the group of existing pods over which spreading will be calculated
+	// for the incoming pod. The same key is forbidden to exist in both MatchLabelKeys and LabelSelector.
+	// MatchLabelKeys cannot be set when LabelSelector isn't set.
+	// Keys that don't exist in the incoming pod labels will
+	// be ignored. A null or empty list means only match against labelSelector.
+	// This is a beta field and requires the MatchLabelKeysInPodTopologySpread feature gate to be enabled (enabled by default).
+	MatchLabelKeys []string `json:"matchLabelKeys"`
 }
 
 func (in *TopologySpreadConstraint) DeepCopyInto(out *TopologySpreadConstraint) {
@@ -4938,6 +5103,11 @@ func (in *TopologySpreadConstraint) DeepCopyInto(out *TopologySpreadConstraint) 
 		in, out := &in.LabelSelector, &out.LabelSelector
 		*out = new(metav1.LabelSelector)
 		(*in).DeepCopyInto(*out)
+	}
+	if in.MatchLabelKeys != nil {
+		t := make([]string, len(in.MatchLabelKeys))
+		copy(t, in.MatchLabelKeys)
+		out.MatchLabelKeys = t
 	}
 }
 
@@ -4967,6 +5137,51 @@ func (in *PodOS) DeepCopy() *PodOS {
 		return nil
 	}
 	out := new(PodOS)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type PodSchedulingGate struct {
+	// Name of the scheduling gate.
+	// Each scheduling gate must have a unique name field.
+	Name string `json:"name"`
+}
+
+func (in *PodSchedulingGate) DeepCopyInto(out *PodSchedulingGate) {
+	*out = *in
+}
+
+func (in *PodSchedulingGate) DeepCopy() *PodSchedulingGate {
+	if in == nil {
+		return nil
+	}
+	out := new(PodSchedulingGate)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type PodResourceClaim struct {
+	// Name uniquely identifies this resource claim inside the pod.
+	// This must be a DNS_LABEL.
+	Name string `json:"name"`
+	// Source describes where to find the ResourceClaim.
+	Source *ClaimSource `json:"source,omitempty"`
+}
+
+func (in *PodResourceClaim) DeepCopyInto(out *PodResourceClaim) {
+	*out = *in
+	if in.Source != nil {
+		in, out := &in.Source, &out.Source
+		*out = new(ClaimSource)
+		(*in).DeepCopyInto(*out)
+	}
+}
+
+func (in *PodResourceClaim) DeepCopy() *PodResourceClaim {
+	if in == nil {
+		return nil
+	}
+	out := new(PodResourceClaim)
 	in.DeepCopyInto(out)
 	return out
 }
@@ -5031,29 +5246,57 @@ func (in *PodIP) DeepCopy() *PodIP {
 }
 
 type ContainerStatus struct {
-	// This must be a DNS_LABEL. Each container in a pod must have a unique name.
+	// Name is a DNS_LABEL representing the unique name of the container.
+	// Each container in a pod must have a unique name across all container types.
 	// Cannot be updated.
 	Name string `json:"name"`
-	// Details about the container's current condition.
+	// State holds details about the container's current condition.
 	State *ContainerState `json:"state,omitempty"`
-	// Details about the container's last termination condition.
+	// LastTerminationState holds the last termination state of the container to
+	// help debug container crashes and restarts. This field is not
+	// populated if the container is still running and RestartCount is 0.
 	LastTerminationState *ContainerState `json:"lastState,omitempty"`
-	// Specifies whether the container has passed its readiness probe.
+	// Ready specifies whether the container is currently passing its readiness check.
+	// The value will change as readiness probes keep executing. If no readiness
+	// probes are specified, this field defaults to true once the container is
+	// fully started (see Started field).
+	// The value is typically used to determine whether a container is ready to
+	// accept traffic.
 	Ready bool `json:"ready"`
-	// The number of times the container has been restarted.
+	// RestartCount holds the number of times the container has been restarted.
+	// Kubelet makes an effort to always increment the value, but there
+	// are cases when the state may be lost due to node restarts and then the value
+	// may be reset to 0. The value is never negative.
 	RestartCount int `json:"restartCount"`
-	// The image the container is running.
+	// Image is the name of container image that the container is running.
+	// The container image may not match the image used in the PodSpec,
+	// as it may have been resolved by the runtime.
 	// More info: https://kubernetes.io/docs/concepts/containers/images.
 	Image string `json:"image"`
-	// ImageID of the container's image.
+	// ImageID is the image ID of the container's image. The image ID may not
+	// match the image ID of the image used in the PodSpec, as it may have been
+	// resolved by the runtime.
 	ImageID string `json:"imageID"`
-	// Container's ID in the format '<type>://<container_id>'.
+	// ContainerID is the ID of the container in the format '<type>://<container_id>'.
+	// Where type is a container runtime identifier, returned from Version call of CRI API
+	// (for example "containerd").
 	ContainerID string `json:"containerID,omitempty"`
-	// Specifies whether the container has passed its startup probe.
-	// Initialized as false, becomes true after startupProbe is considered successful.
-	// Resets to false when the container is restarted, or if kubelet loses state temporarily.
-	// Is always true when no startupProbe is defined.
+	// Started indicates whether the container has finished its postStart lifecycle hook
+	// and passed its startup probe.
+	// Initialized as false, becomes true after startupProbe is considered
+	// successful. Resets to false when the container is restarted, or if kubelet
+	// loses state temporarily. In both cases, startup probes will run again.
+	// Is always true when no startupProbe is defined and container is running and
+	// has passed the postStart lifecycle hook. The null value must be treated the
+	// same as false.
 	Started bool `json:"started,omitempty"`
+	// AllocatedResources represents the compute resources allocated for this container by the
+	// node. Kubelet sets this value to Container.Resources.Requests upon successful pod admission
+	// and after successfully admitting desired pod resize.
+	AllocatedResources map[string]apiresource.Quantity `json:"allocatedResources,omitempty"`
+	// Resources represents the compute resource requests and limits that have been successfully
+	// enacted on the running container after it has been started or has been successfully resized.
+	Resources *ResourceRequirements `json:"resources,omitempty"`
 }
 
 func (in *ContainerStatus) DeepCopyInto(out *ContainerStatus) {
@@ -5066,6 +5309,18 @@ func (in *ContainerStatus) DeepCopyInto(out *ContainerStatus) {
 	if in.LastTerminationState != nil {
 		in, out := &in.LastTerminationState, &out.LastTerminationState
 		*out = new(ContainerState)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.AllocatedResources != nil {
+		in, out := &in.AllocatedResources, &out.AllocatedResources
+		*out = make(map[string]apiresource.Quantity, len(*in))
+		for k, v := range *in {
+			(*out)[k] = v
+		}
+	}
+	if in.Resources != nil {
+		in, out := &in.Resources, &out.Resources
+		*out = new(ResourceRequirements)
 		(*in).DeepCopyInto(*out)
 	}
 }
@@ -6052,10 +6307,16 @@ type CSIPersistentVolumeSource struct {
 	// controllerExpandSecretRef is a reference to the secret object containing
 	// sensitive information to pass to the CSI driver to complete the CSI
 	// ControllerExpandVolume call.
-	// This is an alpha field and requires enabling ExpandCSIVolumes feature gate.
 	// This field is optional, and may be empty if no secret is required. If the
 	// secret object contains more than one secret, all secrets are passed.
 	ControllerExpandSecretRef *SecretReference `json:"controllerExpandSecretRef,omitempty"`
+	// nodeExpandSecretRef is a reference to the secret object containing
+	// sensitive information to pass to the CSI driver to complete the CSI
+	// NodeExpandVolume call.
+	// This is a beta field which is enabled default by CSINodeExpandSecret feature gate.
+	// This field is optional, may be omitted if no secret is required. If the
+	// secret object contains more than one secret, all secrets are passed.
+	NodeExpandSecretRef *SecretReference `json:"nodeExpandSecretRef,omitempty"`
 }
 
 func (in *CSIPersistentVolumeSource) DeepCopyInto(out *CSIPersistentVolumeSource) {
@@ -6084,6 +6345,11 @@ func (in *CSIPersistentVolumeSource) DeepCopyInto(out *CSIPersistentVolumeSource
 	}
 	if in.ControllerExpandSecretRef != nil {
 		in, out := &in.ControllerExpandSecretRef, &out.ControllerExpandSecretRef
+		*out = new(SecretReference)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.NodeExpandSecretRef != nil {
+		in, out := &in.NodeExpandSecretRef, &out.NodeExpandSecretRef
 		*out = new(SecretReference)
 		(*in).DeepCopyInto(*out)
 	}
@@ -6119,6 +6385,26 @@ func (in *NodeSelector) DeepCopy() *NodeSelector {
 		return nil
 	}
 	out := new(NodeSelector)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type ResourceClaim struct {
+	// Name must match the name of one entry in pod.spec.resourceClaims of
+	// the Pod where this field is used. It makes that resource available
+	// inside a container.
+	Name string `json:"name"`
+}
+
+func (in *ResourceClaim) DeepCopyInto(out *ResourceClaim) {
+	*out = *in
+}
+
+func (in *ResourceClaim) DeepCopy() *ResourceClaim {
+	if in == nil {
+		return nil
+	}
+	out := new(ResourceClaim)
 	in.DeepCopyInto(out)
 	return out
 }
@@ -6486,6 +6772,28 @@ func (in *EnvVar) DeepCopy() *EnvVar {
 	return out
 }
 
+type ContainerResizePolicy struct {
+	// Name of the resource to which this resource resize policy applies.
+	// Supported values: cpu, memory.
+	ResourceName ResourceName `json:"resourceName"`
+	// Restart policy to apply when specified resource is resized.
+	// If not specified, it defaults to NotRequired.
+	RestartPolicy ResourceResizeRestartPolicy `json:"restartPolicy"`
+}
+
+func (in *ContainerResizePolicy) DeepCopyInto(out *ContainerResizePolicy) {
+	*out = *in
+}
+
+func (in *ContainerResizePolicy) DeepCopy() *ContainerResizePolicy {
+	if in == nil {
+		return nil
+	}
+	out := new(ContainerResizePolicy)
+	in.DeepCopyInto(out)
+	return out
+}
+
 type VolumeMount struct {
 	// This must match the Name of a Volume.
 	Name string `json:"name"`
@@ -6773,6 +7081,8 @@ type EphemeralContainerCommon struct {
 	// Resources are not allowed for ephemeral containers. Ephemeral containers use spare resources
 	// already allocated to the pod.
 	Resources *ResourceRequirements `json:"resources,omitempty"`
+	// Resources resize policy for the container.
+	ResizePolicy []ContainerResizePolicy `json:"resizePolicy"`
 	// Pod volumes to mount into the container's filesystem. Subpath mounts are not allowed for ephemeral containers.
 	// Cannot be updated.
 	VolumeMounts []VolumeMount `json:"volumeMounts"`
@@ -6865,6 +7175,13 @@ func (in *EphemeralContainerCommon) DeepCopyInto(out *EphemeralContainerCommon) 
 		in, out := &in.Resources, &out.Resources
 		*out = new(ResourceRequirements)
 		(*in).DeepCopyInto(*out)
+	}
+	if in.ResizePolicy != nil {
+		l := make([]ContainerResizePolicy, len(in.ResizePolicy))
+		for i := range in.ResizePolicy {
+			in.ResizePolicy[i].DeepCopyInto(&l[i])
+		}
+		out.ResizePolicy = l
 	}
 	if in.VolumeMounts != nil {
 		l := make([]VolumeMount, len(in.VolumeMounts))
@@ -7181,6 +7498,41 @@ func (in *PodDNSConfigOption) DeepCopy() *PodDNSConfigOption {
 	return out
 }
 
+type ClaimSource struct {
+	// ResourceClaimName is the name of a ResourceClaim object in the same
+	// namespace as this pod.
+	ResourceClaimName string `json:"resourceClaimName,omitempty"`
+	// ResourceClaimTemplateName is the name of a ResourceClaimTemplate
+	// object in the same namespace as this pod.
+	// The template will be used to create a new ResourceClaim, which will
+	// be bound to this pod. When this pod is deleted, the ResourceClaim
+	// will also be deleted. The name of the ResourceClaim will be <pod
+	// name>-<resource name>, where <resource name> is the
+	// PodResourceClaim.Name. Pod validation will reject the pod if the
+	// concatenated name is not valid for a ResourceClaim (e.g. too long).
+	// An existing ResourceClaim with that name that is not owned by the
+	// pod will not be used for the pod to avoid using an unrelated
+	// resource by mistake. Scheduling and pod startup are then blocked
+	// until the unrelated ResourceClaim is removed.
+	// This field is immutable and no changes will be made to the
+	// corresponding ResourceClaim by the control plane after creating the
+	// ResourceClaim.
+	ResourceClaimTemplateName string `json:"resourceClaimTemplateName,omitempty"`
+}
+
+func (in *ClaimSource) DeepCopyInto(out *ClaimSource) {
+	*out = *in
+}
+
+func (in *ClaimSource) DeepCopy() *ClaimSource {
+	if in == nil {
+		return nil
+	}
+	out := new(ClaimSource)
+	in.DeepCopyInto(out)
+	return out
+}
+
 type ContainerState struct {
 	// Details about a waiting container
 	Waiting *ContainerStateWaiting `json:"waiting,omitempty"`
@@ -7366,7 +7718,7 @@ type EmptyDirVolumeSource struct {
 	// The maximum usage on memory medium EmptyDir would be the minimum value between
 	// the SizeLimit specified here and the sum of memory limits of all containers in a pod.
 	// The default is nil which means that the limit is undefined.
-	// More info: http://kubernetes.io/docs/user-guide/volumes#emptydir
+	// More info: https://kubernetes.io/docs/concepts/storage/volumes#emptydir
 	SizeLimit *apiresource.Quantity `json:"sizeLimit,omitempty"`
 }
 
@@ -8149,7 +8501,6 @@ type ProbeHandler struct {
 	// TCPSocket specifies an action involving a TCP port.
 	TCPSocket *TCPSocketAction `json:"tcpSocket,omitempty"`
 	// GRPC specifies an action involving a GRPC port.
-	// This is a beta field and requires enabling GRPCContainerProbe feature gate.
 	GRPC *GRPCAction `json:"grpc,omitempty"`
 }
 

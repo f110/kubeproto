@@ -429,19 +429,16 @@ type CreateOptions struct {
 	FieldManager string `json:"fieldManager,omitempty"`
 	// fieldValidation instructs the server on how to handle
 	// objects in the request (POST/PUT/PATCH) containing unknown
-	// or duplicate fields, provided that the `ServerSideFieldValidation`
-	// feature gate is also enabled. Valid values are:
+	// or duplicate fields. Valid values are:
 	// - Ignore: This will ignore any unknown fields that are silently
 	// dropped from the object, and will ignore all but the last duplicate
 	// field that the decoder encounters. This is the default behavior
-	// prior to v1.23 and is the default behavior when the
-	// `ServerSideFieldValidation` feature gate is disabled.
+	// prior to v1.23.
 	// - Warn: This will send a warning via the standard warning response
 	// header for each unknown field that is dropped from the object, and
 	// for each duplicate field that is encountered. The request will
 	// still succeed if there are no other errors, and will only persist
-	// the last of any duplicate fields. This is the default when the
-	// `ServerSideFieldValidation` feature gate is enabled.
+	// the last of any duplicate fields. This is the default in v1.23+
 	// - Strict: This will fail the request with a BadRequest error if
 	// any unknown fields would be dropped from the object, or if any
 	// duplicate fields are present. The error returned from the server
@@ -931,6 +928,28 @@ type ListOptions struct {
 	// This field is not supported when watch is true. Clients may start a watch from the last
 	// resourceVersion value returned by the server and not miss any modifications.
 	Continue string `json:"continue,omitempty"`
+	// `sendInitialEvents=true` may be set together with `watch=true`.
+	// In that case, the watch stream will begin with synthetic events to
+	// produce the current state of objects in the collection. Once all such
+	// events have been sent, a synthetic "Bookmark" event  will be sent.
+	// The bookmark will report the ResourceVersion (RV) corresponding to the
+	// set of objects, and be marked with `"k8s.io/initial-events-end": "true"` annotation.
+	// Afterwards, the watch stream will proceed as usual, sending watch events
+	// corresponding to changes (subsequent to the RV) to objects watched.
+	// When `sendInitialEvents` option is set, we require `resourceVersionMatch`
+	// option to also be set. The semantic of the watch request is as following:
+	// - `resourceVersionMatch` = NotOlderThan
+	// is interpreted as "data at least as new as the provided `resourceVersion`"
+	// and the bookmark event is send when the state is synced
+	// to a `resourceVersion` at least as fresh as the one provided by the ListOptions.
+	// If `resourceVersion` is unset, this is interpreted as "consistent read" and the
+	// bookmark event is send when the state is synced at least to the moment
+	// when request started being processed.
+	// - `resourceVersionMatch` set to any other value or unset
+	// Invalid error is returned.
+	// Defaults to true if `resourceVersion=""` or `resourceVersion="0"` (for backward
+	// compatibility reasons) and to false otherwise.
+	SendInitialEvents bool `json:"sendInitialEvents,omitempty"`
 }
 
 func (in *ListOptions) DeepCopyInto(out *ListOptions) {
@@ -1040,7 +1059,7 @@ type ObjectMeta struct {
 	// automatically. Name is primarily intended for creation idempotence and configuration
 	// definition.
 	// Cannot be updated.
-	// More info: http://kubernetes.io/docs/user-guide/identifiers#names
+	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
 	Name string `json:"name,omitempty"`
 	// GenerateName is an optional prefix, used by the server, to generate a unique
 	// name ONLY IF the Name field has not been provided.
@@ -1059,7 +1078,7 @@ type ObjectMeta struct {
 	// those objects will be empty.
 	// Must be a DNS_LABEL.
 	// Cannot be updated.
-	// More info: http://kubernetes.io/docs/user-guide/namespaces
+	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces
 	Namespace string `json:"namespace,omitempty"`
 	// Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
 	SelfLink string `json:"selfLink,omitempty"`
@@ -1068,7 +1087,7 @@ type ObjectMeta struct {
 	// operations.
 	// Populated by the system.
 	// Read-only.
-	// More info: http://kubernetes.io/docs/user-guide/identifiers#uids
+	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
 	UID string `json:"uid,omitempty"`
 	// An opaque value that represents the internal version of this object that can
 	// be used by clients to determine when objects have changed. May be used for optimistic
@@ -1117,12 +1136,12 @@ type ObjectMeta struct {
 	// Map of string keys and values that can be used to organize and categorize
 	// (scope and select) objects. May match selectors of replication controllers
 	// and services.
-	// More info: http://kubernetes.io/docs/user-guide/labels
+	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels
 	Labels map[string]string `json:"labels,omitempty"`
 	// Annotations is an unstructured key value map stored with a resource that may be
 	// set by external tools to store and retrieve arbitrary metadata. They are not
 	// queryable and should be preserved when modifying objects.
-	// More info: http://kubernetes.io/docs/user-guide/annotations
+	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations
 	Annotations map[string]string `json:"annotations,omitempty"`
 	// List of objects depended by this object. If ALL objects in the list have
 	// been deleted, this object will be garbage collected. If this object is managed by a controller,
@@ -1143,11 +1162,6 @@ type ObjectMeta struct {
 	// Without enforced ordering finalizers are free to order amongst themselves and
 	// are not vulnerable to ordering changes in the list.
 	Finalizers []string `json:"finalizers"`
-	// Deprecated: ClusterName is a legacy field that was always cleared by
-	// the system and never used; it will be removed completely in 1.25.
-	// The name in the go struct is changed to help clients detect
-	// accidental use.
-	ZZZ_DeprecatedClusterName string `json:"clusterName,omitempty"`
 	// ManagedFields maps workflow-id and version to the set of fields
 	// that are managed by that workflow. This is mostly for internal
 	// housekeeping, and users typically shouldn't need to set or
@@ -1221,10 +1235,10 @@ type OwnerReference struct {
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	Kind string `json:"kind"`
 	// Name of the referent.
-	// More info: http://kubernetes.io/docs/user-guide/identifiers#names
+	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
 	Name string `json:"name"`
 	// UID of the referent.
-	// More info: http://kubernetes.io/docs/user-guide/identifiers#uids
+	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
 	UID string `json:"uid"`
 	// If true, this reference points to the managing controller.
 	Controller bool `json:"controller,omitempty"`
@@ -1352,19 +1366,16 @@ type PatchOptions struct {
 	FieldManager string `json:"fieldManager,omitempty"`
 	// fieldValidation instructs the server on how to handle
 	// objects in the request (POST/PUT/PATCH) containing unknown
-	// or duplicate fields, provided that the `ServerSideFieldValidation`
-	// feature gate is also enabled. Valid values are:
+	// or duplicate fields. Valid values are:
 	// - Ignore: This will ignore any unknown fields that are silently
 	// dropped from the object, and will ignore all but the last duplicate
 	// field that the decoder encounters. This is the default behavior
-	// prior to v1.23 and is the default behavior when the
-	// `ServerSideFieldValidation` feature gate is disabled.
+	// prior to v1.23.
 	// - Warn: This will send a warning via the standard warning response
 	// header for each unknown field that is dropped from the object, and
 	// for each duplicate field that is encountered. The request will
 	// still succeed if there are no other errors, and will only persist
-	// the last of any duplicate fields. This is the default when the
-	// `ServerSideFieldValidation` feature gate is enabled.
+	// the last of any duplicate fields. This is the default in v1.23+
 	// - Strict: This will fail the request with a BadRequest error if
 	// any unknown fields would be dropped from the object, or if any
 	// duplicate fields are present. The error returned from the server
@@ -1561,7 +1572,7 @@ type StatusDetails struct {
 	Kind string `json:"kind,omitempty"`
 	// UID of the resource.
 	// (when there is a single resource which can be described).
-	// More info: http://kubernetes.io/docs/user-guide/identifiers#uids
+	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
 	UID string `json:"uid,omitempty"`
 	// The Causes array includes more details associated with the StatusReason
 	// failure. Not all StatusReasons may provide detailed causes.
@@ -1714,19 +1725,16 @@ type UpdateOptions struct {
 	FieldManager string `json:"fieldManager,omitempty"`
 	// fieldValidation instructs the server on how to handle
 	// objects in the request (POST/PUT/PATCH) containing unknown
-	// or duplicate fields, provided that the `ServerSideFieldValidation`
-	// feature gate is also enabled. Valid values are:
+	// or duplicate fields. Valid values are:
 	// - Ignore: This will ignore any unknown fields that are silently
 	// dropped from the object, and will ignore all but the last duplicate
 	// field that the decoder encounters. This is the default behavior
-	// prior to v1.23 and is the default behavior when the
-	// `ServerSideFieldValidation` feature gate is disabled.
+	// prior to v1.23.
 	// - Warn: This will send a warning via the standard warning response
 	// header for each unknown field that is dropped from the object, and
 	// for each duplicate field that is encountered. The request will
 	// still succeed if there are no other errors, and will only persist
-	// the last of any duplicate fields. This is the default when the
-	// `ServerSideFieldValidation` feature gate is enabled.
+	// the last of any duplicate fields. This is the default in v1.23+
 	// - Strict: This will fail the request with a BadRequest error if
 	// any unknown fields would be dropped from the object, or if any
 	// duplicate fields are present. The error returned from the server

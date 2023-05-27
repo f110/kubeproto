@@ -335,7 +335,7 @@ type PolicyRule struct {
 	// Verbs is a list of Verbs that apply to ALL the ResourceKinds contained in this rule. '*' represents all verbs.
 	Verbs []string `json:"verbs"`
 	// APIGroups is the name of the APIGroup that contains the resources.  If multiple API groups are specified, any action requested against one of
-	// the enumerated resources in any API group will be allowed.
+	// the enumerated resources in any API group will be allowed. "" represents the core API group and "*" represents all API groups.
 	APIGroups []string `json:"apiGroups"`
 	// Resources is a list of resources this rule applies to. '*' represents all resources.
 	Resources []string `json:"resources"`
