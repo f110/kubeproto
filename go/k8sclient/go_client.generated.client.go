@@ -22,6 +22,7 @@ import (
 	"go.f110.dev/kubeproto/go/apis/authenticationv1"
 	"go.f110.dev/kubeproto/go/apis/authorizationv1"
 	"go.f110.dev/kubeproto/go/apis/autoscalingv1"
+	"go.f110.dev/kubeproto/go/apis/autoscalingv2"
 	"go.f110.dev/kubeproto/go/apis/batchv1"
 	"go.f110.dev/kubeproto/go/apis/certificatesv1"
 	"go.f110.dev/kubeproto/go/apis/corev1"
@@ -45,6 +46,7 @@ var localSchemeBuilder = runtime.SchemeBuilder{
 	authenticationv1.AddToScheme,
 	authorizationv1.AddToScheme,
 	autoscalingv1.AddToScheme,
+	autoscalingv2.AddToScheme,
 	certificatesv1.AddToScheme,
 	discoveryv1.AddToScheme,
 	networkingv1.AddToScheme,
@@ -60,6 +62,7 @@ func init() {
 		authenticationv1.AddToScheme,
 		authorizationv1.AddToScheme,
 		autoscalingv1.AddToScheme,
+		autoscalingv2.AddToScheme,
 		certificatesv1.AddToScheme,
 		discoveryv1.AddToScheme,
 		networkingv1.AddToScheme,
@@ -96,6 +99,7 @@ type Set struct {
 	AuthenticationK8sIoV1        *AuthenticationK8sIoV1
 	AuthorizationK8sIoV1         *AuthorizationK8sIoV1
 	AutoscalingV1                *AutoscalingV1
+	AutoscalingV2                *AutoscalingV2
 	CertificatesK8sIoV1          *CertificatesK8sIoV1
 	DiscoveryK8sIoV1             *DiscoveryK8sIoV1
 	NetworkingK8sIoV1            *NetworkingK8sIoV1
@@ -170,6 +174,17 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 			return nil, err
 		}
 		s.AutoscalingV1 = NewAutoscalingV1Client(&restBackend{client: c})
+	}
+	{
+		conf := *cfg
+		conf.GroupVersion = &autoscalingv2.SchemaGroupVersion
+		conf.APIPath = "/apis"
+		conf.NegotiatedSerializer = Codecs.WithoutConversion()
+		c, err := rest.RESTClientFor(&conf)
+		if err != nil {
+			return nil, err
+		}
+		s.AutoscalingV2 = NewAutoscalingV2Client(&restBackend{client: c})
 	}
 	{
 		conf := *cfg
@@ -1897,6 +1912,54 @@ func (c *AutoscalingV1) WatchScale(ctx context.Context, namespace string, opts m
 	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".autoscaling", Version: "v1", Resource: "scales"}, namespace, opts)
 }
 
+type AutoscalingV2 struct {
+	backend Backend
+}
+
+func NewAutoscalingV2Client(b Backend) *AutoscalingV2 {
+	return &AutoscalingV2{backend: b}
+}
+
+func (c *AutoscalingV2) GetHorizontalPodAutoscaler(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*autoscalingv2.HorizontalPodAutoscaler, error) {
+	result, err := c.backend.Get(ctx, "horizontalpodautoscalers", "HorizontalPodAutoscaler", namespace, name, opts, &autoscalingv2.HorizontalPodAutoscaler{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*autoscalingv2.HorizontalPodAutoscaler), nil
+}
+
+func (c *AutoscalingV2) CreateHorizontalPodAutoscaler(ctx context.Context, v *autoscalingv2.HorizontalPodAutoscaler, opts metav1.CreateOptions) (*autoscalingv2.HorizontalPodAutoscaler, error) {
+	result, err := c.backend.Create(ctx, "horizontalpodautoscalers", "HorizontalPodAutoscaler", v, opts, &autoscalingv2.HorizontalPodAutoscaler{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*autoscalingv2.HorizontalPodAutoscaler), nil
+}
+
+func (c *AutoscalingV2) UpdateHorizontalPodAutoscaler(ctx context.Context, v *autoscalingv2.HorizontalPodAutoscaler, opts metav1.UpdateOptions) (*autoscalingv2.HorizontalPodAutoscaler, error) {
+	result, err := c.backend.Update(ctx, "horizontalpodautoscalers", "HorizontalPodAutoscaler", v, opts, &autoscalingv2.HorizontalPodAutoscaler{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*autoscalingv2.HorizontalPodAutoscaler), nil
+}
+
+func (c *AutoscalingV2) DeleteHorizontalPodAutoscaler(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".autoscaling", Version: "v2", Resource: "horizontalpodautoscalers"}, namespace, name, opts)
+}
+
+func (c *AutoscalingV2) ListHorizontalPodAutoscaler(ctx context.Context, namespace string, opts metav1.ListOptions) (*autoscalingv2.HorizontalPodAutoscalerList, error) {
+	result, err := c.backend.List(ctx, "horizontalpodautoscalers", "HorizontalPodAutoscaler", namespace, opts, &autoscalingv2.HorizontalPodAutoscalerList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*autoscalingv2.HorizontalPodAutoscalerList), nil
+}
+
+func (c *AutoscalingV2) WatchHorizontalPodAutoscaler(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".autoscaling", Version: "v2", Resource: "horizontalpodautoscalers"}, namespace, opts)
+}
+
 type CertificatesK8sIoV1 struct {
 	backend Backend
 }
@@ -2502,6 +2565,8 @@ func (f *InformerFactory) InformerFor(obj runtime.Object) cache.SharedIndexInfor
 		return NewAutoscalingV1Informer(f.cache, f.set.AutoscalingV1, f.namespace, f.resyncPeriod).HorizontalPodAutoscalerInformer()
 	case *autoscalingv1.Scale:
 		return NewAutoscalingV1Informer(f.cache, f.set.AutoscalingV1, f.namespace, f.resyncPeriod).ScaleInformer()
+	case *autoscalingv2.HorizontalPodAutoscaler:
+		return NewAutoscalingV2Informer(f.cache, f.set.AutoscalingV2, f.namespace, f.resyncPeriod).HorizontalPodAutoscalerInformer()
 	case *certificatesv1.CertificateSigningRequest:
 		return NewCertificatesK8sIoV1Informer(f.cache, f.set.CertificatesK8sIoV1, f.namespace, f.resyncPeriod).CertificateSigningRequestInformer()
 	case *discoveryv1.EndpointSlice:
@@ -2603,6 +2668,8 @@ func (f *InformerFactory) InformerForResource(gvr schema.GroupVersionResource) c
 		return NewAutoscalingV1Informer(f.cache, f.set.AutoscalingV1, f.namespace, f.resyncPeriod).HorizontalPodAutoscalerInformer()
 	case autoscalingv1.SchemaGroupVersion.WithResource("scales"):
 		return NewAutoscalingV1Informer(f.cache, f.set.AutoscalingV1, f.namespace, f.resyncPeriod).ScaleInformer()
+	case autoscalingv2.SchemaGroupVersion.WithResource("horizontalpodautoscalers"):
+		return NewAutoscalingV2Informer(f.cache, f.set.AutoscalingV2, f.namespace, f.resyncPeriod).HorizontalPodAutoscalerInformer()
 	case certificatesv1.SchemaGroupVersion.WithResource("certificatesigningrequests"):
 		return NewCertificatesK8sIoV1Informer(f.cache, f.set.CertificatesK8sIoV1, f.namespace, f.resyncPeriod).CertificateSigningRequestInformer()
 	case discoveryv1.SchemaGroupVersion.WithResource("endpointslices"):
@@ -3534,6 +3601,46 @@ func (f *AutoscalingV1Informer) ScaleInformer() cache.SharedIndexInformer {
 
 func (f *AutoscalingV1Informer) ScaleLister() *AutoscalingV1ScaleLister {
 	return NewAutoscalingV1ScaleLister(f.ScaleInformer().GetIndexer())
+}
+
+type AutoscalingV2Informer struct {
+	cache        *InformerCache
+	client       *AutoscalingV2
+	namespace    string
+	resyncPeriod time.Duration
+	indexers     cache.Indexers
+}
+
+func NewAutoscalingV2Informer(c *InformerCache, client *AutoscalingV2, namespace string, resyncPeriod time.Duration) *AutoscalingV2Informer {
+	return &AutoscalingV2Informer{
+		cache:        c,
+		client:       client,
+		namespace:    namespace,
+		resyncPeriod: resyncPeriod,
+		indexers:     cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
+	}
+}
+
+func (f *AutoscalingV2Informer) HorizontalPodAutoscalerInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&autoscalingv2.HorizontalPodAutoscaler{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListHorizontalPodAutoscaler(context.TODO(), f.namespace, metav1.ListOptions{})
+				},
+				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchHorizontalPodAutoscaler(context.TODO(), f.namespace, metav1.ListOptions{})
+				},
+			},
+			&autoscalingv2.HorizontalPodAutoscaler{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *AutoscalingV2Informer) HorizontalPodAutoscalerLister() *AutoscalingV2HorizontalPodAutoscalerLister {
+	return NewAutoscalingV2HorizontalPodAutoscalerLister(f.HorizontalPodAutoscalerInformer().GetIndexer())
 }
 
 type CertificatesK8sIoV1Informer struct {
@@ -4838,6 +4945,33 @@ func (x *AutoscalingV1ScaleLister) Get(namespace, name string) (*autoscalingv1.S
 		return nil, k8serrors.NewNotFound(autoscalingv1.SchemaGroupVersion.WithResource("scale").GroupResource(), name)
 	}
 	return obj.(*autoscalingv1.Scale).DeepCopy(), nil
+}
+
+type AutoscalingV2HorizontalPodAutoscalerLister struct {
+	indexer cache.Indexer
+}
+
+func NewAutoscalingV2HorizontalPodAutoscalerLister(indexer cache.Indexer) *AutoscalingV2HorizontalPodAutoscalerLister {
+	return &AutoscalingV2HorizontalPodAutoscalerLister{indexer: indexer}
+}
+
+func (x *AutoscalingV2HorizontalPodAutoscalerLister) List(namespace string, selector labels.Selector) ([]*autoscalingv2.HorizontalPodAutoscaler, error) {
+	var ret []*autoscalingv2.HorizontalPodAutoscaler
+	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
+		ret = append(ret, m.(*autoscalingv2.HorizontalPodAutoscaler).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *AutoscalingV2HorizontalPodAutoscalerLister) Get(namespace, name string) (*autoscalingv2.HorizontalPodAutoscaler, error) {
+	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(autoscalingv2.SchemaGroupVersion.WithResource("horizontalpodautoscaler").GroupResource(), name)
+	}
+	return obj.(*autoscalingv2.HorizontalPodAutoscaler).DeepCopy(), nil
 }
 
 type CertificatesK8sIoV1CertificateSigningRequestLister struct {

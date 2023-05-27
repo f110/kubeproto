@@ -11,7 +11,7 @@ import (
 // The word at the top of the list is given priority.
 // Therefore, words with fewer letters should be placed at the end of the list.
 var word = []string{"UUID", "UID", "WWIDs", "IQN", "ISCSI", "API", "ACME", "CHAP", "CIDRs", "CIDR", "PID", "ID", "DNS",
-	"IPC", "IPs", "IP", "PUT", "POST", "QOS", "OS", "NFS", "FS", "FC", "RBD", "TCP", "UDP", "SCTP", "GET", "URI", "URL",
+	"IPC", "IPs", "IP", "PUT", "POST", "QOS", "OS", "NFS", "FS", "FC", "RBD", "HPA", "TCP", "UDP", "SCTP", "GET", "URI", "URL",
 	"TLS", "CREATE", "UPDATE", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH", "HTTPS", "HTTP", "SELinux", "FQDN", "TTY",
 	"WWNs", "GCE", "AWS", "IO", "CSI", "GRPC", "SSL", "GMSA", "HMAC", "HEAD", "JSON"}
 

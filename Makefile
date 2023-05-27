@@ -47,6 +47,7 @@ gen-go: go/apis/metav1/metav1_kubeproto.generated.object.go \
 	go/apis/authorizationv1/authorizationv1_kubeproto.generated.object.go \
 	go/apis/discoveryv1/discoveryv1_kubeproto.generated.object.go \
 	go/apis/autoscalingv1/autoscalingv1_kubeproto.generated.object.go \
+	go/apis/autoscalingv2/autoscalingv2_kubeproto.generated.object.go \
 	go/k8sclient/go_client.generated.client.go \
 	go/k8stestingclient/go_testingclient.generated.testingclient.go
 
@@ -63,7 +64,8 @@ go/k8sclient/go_client.generated.client.go: k8s.io/api/core/v1/generated.proto \
 		k8s.io/api/certificates/v1/generated.proto \
 		k8s.io/api/authorization/v1/generated.proto \
 		k8s.io/api/discovery/v1/generated.proto \
-		k8s.io/api/autoscaling/v1/generated.proto
+		k8s.io/api/autoscaling/v1/generated.proto \
+		k8s.io/api/autoscaling/v2/generated.proto
 	@mkdir -p $(@D)
 	bazel build //$(@D):go_client
 	cp ./bazel-bin/$(@D)/$(@F) $(@D)
@@ -82,7 +84,8 @@ go/k8stestingclient/go_testingclient.generated.testingclient.go: k8s.io/api/core
 		k8s.io/api/certificates/v1/generated.proto \
 		k8s.io/api/authorization/v1/generated.proto \
 		k8s.io/api/discovery/v1/generated.proto \
-		k8s.io/api/autoscaling/v1/generated.proto
+		k8s.io/api/autoscaling/v1/generated.proto \
+		k8s.io/api/autoscaling/v2/generated.proto
 	@mkdir -p $(@D)
 	bazel build //$(@D):go_testingclient
 	cp ./bazel-bin/$(@D)/$(@F) $(@D)
@@ -173,6 +176,10 @@ k8s.io/api/autoscaling/v1/generated.proto:
 	mkdir -p $(@D)
 	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.autoscaling.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/autoscalingv1" --api-domain autoscaling --api-version v1 --all $(CURDIR)/vendor/$(@D)
 
+.PHONY: k8s.io/api/autoscaling/v2/generated.proto
+k8s.io/api/autoscaling/v2/generated.proto:
+	mkdir -p $(@D)
+	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.autoscaling.v2 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/autoscalingv2" --api-domain autoscaling --api-version v2 --all $(CURDIR)/vendor/$(@D)
 
 .PHONY: k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto
 k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto:
@@ -279,5 +286,12 @@ go/apis/discoveryv1/discoveryv1_kubeproto.generated.object.go: k8s.io/api/discov
 go/apis/autoscalingv1/autoscalingv1_kubeproto.generated.object.go: k8s.io/api/autoscaling/v1/generated.proto
 	@mkdir -p $(@D)
 	bazel build //$(<D):autoscalingv1_kubeproto
+	cp ./bazel-bin/$(<D)/$(@F) $(@D)
+	@chmod 0644 $@
+
+.PHONY: go/apis/autoscalingv2/autoscalingv2_kubeproto.generated.object.go
+go/apis/autoscalingv2/autoscalingv2_kubeproto.generated.object.go: k8s.io/api/autoscaling/v2/generated.proto
+	@mkdir -p $(@D)
+	bazel build //$(<D):autoscalingv2_kubeproto
 	cp ./bazel-bin/$(<D)/$(@F) $(@D)
 	@chmod 0644 $@
