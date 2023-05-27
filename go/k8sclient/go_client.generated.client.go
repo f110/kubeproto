@@ -25,6 +25,7 @@ import (
 	"go.f110.dev/kubeproto/go/apis/autoscalingv2"
 	"go.f110.dev/kubeproto/go/apis/batchv1"
 	"go.f110.dev/kubeproto/go/apis/certificatesv1"
+	"go.f110.dev/kubeproto/go/apis/coordinationv1"
 	"go.f110.dev/kubeproto/go/apis/corev1"
 	"go.f110.dev/kubeproto/go/apis/discoveryv1"
 	"go.f110.dev/kubeproto/go/apis/networkingv1"
@@ -48,6 +49,7 @@ var localSchemeBuilder = runtime.SchemeBuilder{
 	autoscalingv1.AddToScheme,
 	autoscalingv2.AddToScheme,
 	certificatesv1.AddToScheme,
+	coordinationv1.AddToScheme,
 	discoveryv1.AddToScheme,
 	networkingv1.AddToScheme,
 	policyv1.AddToScheme,
@@ -64,6 +66,7 @@ func init() {
 		autoscalingv1.AddToScheme,
 		autoscalingv2.AddToScheme,
 		certificatesv1.AddToScheme,
+		coordinationv1.AddToScheme,
 		discoveryv1.AddToScheme,
 		networkingv1.AddToScheme,
 		policyv1.AddToScheme,
@@ -101,6 +104,7 @@ type Set struct {
 	AutoscalingV1                *AutoscalingV1
 	AutoscalingV2                *AutoscalingV2
 	CertificatesK8sIoV1          *CertificatesK8sIoV1
+	CoordinationK8sIoV1          *CoordinationK8sIoV1
 	DiscoveryK8sIoV1             *DiscoveryK8sIoV1
 	NetworkingK8sIoV1            *NetworkingK8sIoV1
 	PolicyV1                     *PolicyV1
@@ -196,6 +200,17 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 			return nil, err
 		}
 		s.CertificatesK8sIoV1 = NewCertificatesK8sIoV1Client(&restBackend{client: c})
+	}
+	{
+		conf := *cfg
+		conf.GroupVersion = &coordinationv1.SchemaGroupVersion
+		conf.APIPath = "/apis"
+		conf.NegotiatedSerializer = Codecs.WithoutConversion()
+		c, err := rest.RESTClientFor(&conf)
+		if err != nil {
+			return nil, err
+		}
+		s.CoordinationK8sIoV1 = NewCoordinationK8sIoV1Client(&restBackend{client: c})
 	}
 	{
 		conf := *cfg
@@ -2008,6 +2023,54 @@ func (c *CertificatesK8sIoV1) WatchCertificateSigningRequest(ctx context.Context
 	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".certificates.k8s.io", Version: "v1", Resource: "certificatesigningrequests"}, opts)
 }
 
+type CoordinationK8sIoV1 struct {
+	backend Backend
+}
+
+func NewCoordinationK8sIoV1Client(b Backend) *CoordinationK8sIoV1 {
+	return &CoordinationK8sIoV1{backend: b}
+}
+
+func (c *CoordinationK8sIoV1) GetLease(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*coordinationv1.Lease, error) {
+	result, err := c.backend.Get(ctx, "leases", "Lease", namespace, name, opts, &coordinationv1.Lease{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*coordinationv1.Lease), nil
+}
+
+func (c *CoordinationK8sIoV1) CreateLease(ctx context.Context, v *coordinationv1.Lease, opts metav1.CreateOptions) (*coordinationv1.Lease, error) {
+	result, err := c.backend.Create(ctx, "leases", "Lease", v, opts, &coordinationv1.Lease{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*coordinationv1.Lease), nil
+}
+
+func (c *CoordinationK8sIoV1) UpdateLease(ctx context.Context, v *coordinationv1.Lease, opts metav1.UpdateOptions) (*coordinationv1.Lease, error) {
+	result, err := c.backend.Update(ctx, "leases", "Lease", v, opts, &coordinationv1.Lease{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*coordinationv1.Lease), nil
+}
+
+func (c *CoordinationK8sIoV1) DeleteLease(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".coordination.k8s.io", Version: "v1", Resource: "leases"}, namespace, name, opts)
+}
+
+func (c *CoordinationK8sIoV1) ListLease(ctx context.Context, namespace string, opts metav1.ListOptions) (*coordinationv1.LeaseList, error) {
+	result, err := c.backend.List(ctx, "leases", "Lease", namespace, opts, &coordinationv1.LeaseList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*coordinationv1.LeaseList), nil
+}
+
+func (c *CoordinationK8sIoV1) WatchLease(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".coordination.k8s.io", Version: "v1", Resource: "leases"}, namespace, opts)
+}
+
 type DiscoveryK8sIoV1 struct {
 	backend Backend
 }
@@ -2569,6 +2632,8 @@ func (f *InformerFactory) InformerFor(obj runtime.Object) cache.SharedIndexInfor
 		return NewAutoscalingV2Informer(f.cache, f.set.AutoscalingV2, f.namespace, f.resyncPeriod).HorizontalPodAutoscalerInformer()
 	case *certificatesv1.CertificateSigningRequest:
 		return NewCertificatesK8sIoV1Informer(f.cache, f.set.CertificatesK8sIoV1, f.namespace, f.resyncPeriod).CertificateSigningRequestInformer()
+	case *coordinationv1.Lease:
+		return NewCoordinationK8sIoV1Informer(f.cache, f.set.CoordinationK8sIoV1, f.namespace, f.resyncPeriod).LeaseInformer()
 	case *discoveryv1.EndpointSlice:
 		return NewDiscoveryK8sIoV1Informer(f.cache, f.set.DiscoveryK8sIoV1, f.namespace, f.resyncPeriod).EndpointSliceInformer()
 	case *networkingv1.Ingress:
@@ -2672,6 +2737,8 @@ func (f *InformerFactory) InformerForResource(gvr schema.GroupVersionResource) c
 		return NewAutoscalingV2Informer(f.cache, f.set.AutoscalingV2, f.namespace, f.resyncPeriod).HorizontalPodAutoscalerInformer()
 	case certificatesv1.SchemaGroupVersion.WithResource("certificatesigningrequests"):
 		return NewCertificatesK8sIoV1Informer(f.cache, f.set.CertificatesK8sIoV1, f.namespace, f.resyncPeriod).CertificateSigningRequestInformer()
+	case coordinationv1.SchemaGroupVersion.WithResource("leases"):
+		return NewCoordinationK8sIoV1Informer(f.cache, f.set.CoordinationK8sIoV1, f.namespace, f.resyncPeriod).LeaseInformer()
 	case discoveryv1.SchemaGroupVersion.WithResource("endpointslices"):
 		return NewDiscoveryK8sIoV1Informer(f.cache, f.set.DiscoveryK8sIoV1, f.namespace, f.resyncPeriod).EndpointSliceInformer()
 	case networkingv1.SchemaGroupVersion.WithResource("ingresses"):
@@ -3681,6 +3748,46 @@ func (f *CertificatesK8sIoV1Informer) CertificateSigningRequestInformer() cache.
 
 func (f *CertificatesK8sIoV1Informer) CertificateSigningRequestLister() *CertificatesK8sIoV1CertificateSigningRequestLister {
 	return NewCertificatesK8sIoV1CertificateSigningRequestLister(f.CertificateSigningRequestInformer().GetIndexer())
+}
+
+type CoordinationK8sIoV1Informer struct {
+	cache        *InformerCache
+	client       *CoordinationK8sIoV1
+	namespace    string
+	resyncPeriod time.Duration
+	indexers     cache.Indexers
+}
+
+func NewCoordinationK8sIoV1Informer(c *InformerCache, client *CoordinationK8sIoV1, namespace string, resyncPeriod time.Duration) *CoordinationK8sIoV1Informer {
+	return &CoordinationK8sIoV1Informer{
+		cache:        c,
+		client:       client,
+		namespace:    namespace,
+		resyncPeriod: resyncPeriod,
+		indexers:     cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
+	}
+}
+
+func (f *CoordinationK8sIoV1Informer) LeaseInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&coordinationv1.Lease{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListLease(context.TODO(), f.namespace, metav1.ListOptions{})
+				},
+				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchLease(context.TODO(), f.namespace, metav1.ListOptions{})
+				},
+			},
+			&coordinationv1.Lease{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *CoordinationK8sIoV1Informer) LeaseLister() *CoordinationK8sIoV1LeaseLister {
+	return NewCoordinationK8sIoV1LeaseLister(f.LeaseInformer().GetIndexer())
 }
 
 type DiscoveryK8sIoV1Informer struct {
@@ -4999,6 +5106,33 @@ func (x *CertificatesK8sIoV1CertificateSigningRequestLister) Get(name string) (*
 		return nil, k8serrors.NewNotFound(certificatesv1.SchemaGroupVersion.WithResource("certificatesigningrequest").GroupResource(), name)
 	}
 	return obj.(*certificatesv1.CertificateSigningRequest).DeepCopy(), nil
+}
+
+type CoordinationK8sIoV1LeaseLister struct {
+	indexer cache.Indexer
+}
+
+func NewCoordinationK8sIoV1LeaseLister(indexer cache.Indexer) *CoordinationK8sIoV1LeaseLister {
+	return &CoordinationK8sIoV1LeaseLister{indexer: indexer}
+}
+
+func (x *CoordinationK8sIoV1LeaseLister) List(namespace string, selector labels.Selector) ([]*coordinationv1.Lease, error) {
+	var ret []*coordinationv1.Lease
+	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
+		ret = append(ret, m.(*coordinationv1.Lease).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *CoordinationK8sIoV1LeaseLister) Get(namespace, name string) (*coordinationv1.Lease, error) {
+	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(coordinationv1.SchemaGroupVersion.WithResource("lease").GroupResource(), name)
+	}
+	return obj.(*coordinationv1.Lease).DeepCopy(), nil
 }
 
 type DiscoveryK8sIoV1EndpointSliceLister struct {
