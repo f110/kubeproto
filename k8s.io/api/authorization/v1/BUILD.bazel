@@ -1,0 +1,18 @@
+load("@rules_proto//proto:defs.bzl", "proto_library")
+
+proto_library(
+    name = "authorizationv1_proto",
+    srcs = ["generated.proto"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:kubeproto",
+    ],
+)
+
+load("//bazel:def.bzl", "kubeproto_go_api")
+
+kubeproto_go_api(
+    name = "authorizationv1_kubeproto",
+    srcs = [":authorizationv1_proto"],
+    importpath = "go.f110.dev/kubeproto/go/apis/authorizationv1",
+)
