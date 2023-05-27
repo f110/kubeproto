@@ -14,6 +14,7 @@ go_library(
         "//vendor/k8s.io/api/autoscaling/v2:autoscaling",
         "//vendor/k8s.io/api/batch/v1:batch",
         "//vendor/k8s.io/api/certificates/v1:certificates",
+        "//vendor/k8s.io/api/coordination/v1:coordination",
         "//vendor/k8s.io/api/core/v1:core",
         "//vendor/k8s.io/api/discovery/v1:discovery",
         "//vendor/k8s.io/api/networking/v1:networking",

@@ -9,6 +9,7 @@ import (
 	_ "k8s.io/api/autoscaling/v2"
 	_ "k8s.io/api/batch/v1"
 	_ "k8s.io/api/certificates/v1"
+	_ "k8s.io/api/coordination/v1"
 	_ "k8s.io/api/core/v1"
 	_ "k8s.io/api/discovery/v1"
 	_ "k8s.io/api/networking/v1"
