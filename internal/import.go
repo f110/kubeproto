@@ -5,6 +5,7 @@ import (
 	_ "k8s.io/api/admissionregistration/v1"
 	_ "k8s.io/api/apps/v1"
 	_ "k8s.io/api/authorization/v1"
+	_ "k8s.io/api/autoscaling/v1"
 	_ "k8s.io/api/batch/v1"
 	_ "k8s.io/api/certificates/v1"
 	_ "k8s.io/api/core/v1"

@@ -10,6 +10,7 @@ go_library(
         "//vendor/k8s.io/api/admissionregistration/v1:admissionregistration",
         "//vendor/k8s.io/api/apps/v1:apps",
         "//vendor/k8s.io/api/authorization/v1:authorization",
+        "//vendor/k8s.io/api/autoscaling/v1:autoscaling",
         "//vendor/k8s.io/api/batch/v1:batch",
         "//vendor/k8s.io/api/certificates/v1:certificates",
         "//vendor/k8s.io/api/core/v1:core",
