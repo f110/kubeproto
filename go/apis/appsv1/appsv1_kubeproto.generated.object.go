@@ -479,6 +479,7 @@ type DaemonSetSpec struct {
 	// The DaemonSet will create exactly one copy of this pod on every node
 	// that matches the template's node selector (or on every node if no node
 	// selector is specified).
+	// The only allowed template.spec.restartPolicy value is "Always".
 	// More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template
 	Template corev1.PodTemplateSpec `json:"template"`
 	// An update strategy to replace existing DaemonSet pods with new pods.
@@ -583,6 +584,7 @@ type DeploymentSpec struct {
 	// It must match the pod template's labels.
 	Selector *metav1.LabelSelector `json:"selector,omitempty"`
 	// Template describes the pods that will be created.
+	// The only allowed template.spec.restartPolicy value is "Always".
 	Template corev1.PodTemplateSpec `json:"template"`
 	// The deployment strategy to use to replace existing pods with new ones.
 	Strategy *DeploymentStrategy `json:"strategy,omitempty"`
@@ -716,7 +718,7 @@ func (in *ReplicaSetSpec) DeepCopy() *ReplicaSetSpec {
 }
 
 type ReplicaSetStatus struct {
-	// Replicas is the most recently oberved number of replicas.
+	// Replicas is the most recently observed number of replicas.
 	// More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/#what-is-a-replicationcontroller
 	Replicas int `json:"replicas"`
 	// The number of pods that have labels matching the labels of the pod template of the replicaset.
@@ -764,7 +766,10 @@ type StatefulSetSpec struct {
 	// template is the object that describes the pod that will be created if
 	// insufficient replicas are detected. Each pod stamped out by the StatefulSet
 	// will fulfill this Template, but have a unique identity from the rest
-	// of the StatefulSet.
+	// of the StatefulSet. Each pod will be named with the format
+	// <statefulsetname>-<podindex>. For example, a pod in a StatefulSet named
+	// "web" with index number "3" would be named "web-3".
+	// The only allowed template.spec.restartPolicy value is "Always".
 	Template corev1.PodTemplateSpec `json:"template"`
 	// volumeClaimTemplates is a list of claims that pods are allowed to reference.
 	// The StatefulSet controller is responsible for mapping network identities to
@@ -800,7 +805,6 @@ type StatefulSetSpec struct {
 	// Minimum number of seconds for which a newly created pod should be ready
 	// without any of its container crashing for it to be considered available.
 	// Defaults to 0 (pod will be considered available as soon as it is ready)
-	// This is an alpha field and requires enabling StatefulSetMinReadySeconds feature gate.
 	MinReadySeconds int `json:"minReadySeconds,omitempty"`
 	// persistentVolumeClaimRetentionPolicy describes the lifecycle of persistent
 	// volume claims created from volumeClaimTemplates. By default, all persistent
@@ -810,6 +814,12 @@ type StatefulSetSpec struct {
 	// down. This requires the StatefulSetAutoDeletePVC feature gate to be enabled,
 	// which is alpha.  +optional
 	PersistentVolumeClaimRetentionPolicy *StatefulSetPersistentVolumeClaimRetentionPolicy `json:"persistentVolumeClaimRetentionPolicy,omitempty"`
+	// ordinals controls the numbering of replica indices in a StatefulSet. The
+	// default ordinals behavior assigns a "0" index to the first replica and
+	// increments the index by one for each additional replica requested. Using
+	// the ordinals field requires the StatefulSetStartOrdinal feature gate to be
+	// enabled, which is beta.
+	Ordinals *StatefulSetOrdinals `json:"ordinals,omitempty"`
 }
 
 func (in *StatefulSetSpec) DeepCopyInto(out *StatefulSetSpec) {
@@ -835,6 +845,11 @@ func (in *StatefulSetSpec) DeepCopyInto(out *StatefulSetSpec) {
 	if in.PersistentVolumeClaimRetentionPolicy != nil {
 		in, out := &in.PersistentVolumeClaimRetentionPolicy, &out.PersistentVolumeClaimRetentionPolicy
 		*out = new(StatefulSetPersistentVolumeClaimRetentionPolicy)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.Ordinals != nil {
+		in, out := &in.Ordinals, &out.Ordinals
+		*out = new(StatefulSetOrdinals)
 		(*in).DeepCopyInto(*out)
 	}
 }
@@ -875,7 +890,6 @@ type StatefulSetStatus struct {
 	// Represents the latest available observations of a statefulset's current state.
 	Conditions []StatefulSetCondition `json:"conditions"`
 	// Total number of available pods (ready for at least minReadySeconds) targeted by this statefulset.
-	// This is a beta field and enabled/disabled by StatefulSetMinReadySeconds feature gate.
 	AvailableReplicas int `json:"availableReplicas"`
 }
 
@@ -1108,6 +1122,31 @@ func (in *StatefulSetPersistentVolumeClaimRetentionPolicy) DeepCopy() *StatefulS
 	return out
 }
 
+type StatefulSetOrdinals struct {
+	// start is the number representing the first replica's index. It may be used
+	// to number replicas from an alternate index (eg: 1-indexed) over the default
+	// 0-indexed names, or to orchestrate progressive movement of replicas from
+	// one StatefulSet to another.
+	// If set, replica indices will be in the range:
+	// [.spec.ordinals.start, .spec.ordinals.start + .spec.replicas).
+	// If unset, defaults to 0. Replica indices will be in the range:
+	// [0, .spec.replicas).
+	Start int `json:"start"`
+}
+
+func (in *StatefulSetOrdinals) DeepCopyInto(out *StatefulSetOrdinals) {
+	*out = *in
+}
+
+func (in *StatefulSetOrdinals) DeepCopy() *StatefulSetOrdinals {
+	if in == nil {
+		return nil
+	}
+	out := new(StatefulSetOrdinals)
+	in.DeepCopyInto(out)
+	return out
+}
+
 type StatefulSetCondition struct {
 	// Type of statefulset condition.
 	Type string `json:"type"`
@@ -1173,7 +1212,6 @@ type RollingUpdateDaemonSet struct {
 	// daemonset on any given node can double if the readiness check fails, and
 	// so resource intensive daemonsets should take into account that they may
 	// cause evictions during disruption.
-	// This is beta field and enabled/disabled by DaemonSetUpdateSurge feature gate.
 	MaxSurge *utilintstr.IntOrString `json:"maxSurge,omitempty"`
 }
 

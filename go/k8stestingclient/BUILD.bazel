@@ -12,6 +12,7 @@ go_testing_client(
         "//k8s.io/api/batch/v1:batchv1_proto",
         "//k8s.io/api/certificates/v1:certificatesv1_proto",
         "//k8s.io/api/core/v1:corev1_proto",
+        "//k8s.io/api/discovery/v1:discoveryv1_proto",
         "//k8s.io/api/networking/v1:networkingv1_proto",
         "//k8s.io/api/policy/v1:policyv1_proto",
         "//k8s.io/api/rbac/v1:rbacv1_proto",
