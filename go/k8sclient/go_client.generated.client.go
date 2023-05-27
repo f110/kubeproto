@@ -20,6 +20,7 @@ import (
 	"go.f110.dev/kubeproto/go/apis/admissionregistrationv1"
 	"go.f110.dev/kubeproto/go/apis/appsv1"
 	"go.f110.dev/kubeproto/go/apis/authenticationv1"
+	"go.f110.dev/kubeproto/go/apis/authorizationv1"
 	"go.f110.dev/kubeproto/go/apis/batchv1"
 	"go.f110.dev/kubeproto/go/apis/certificatesv1"
 	"go.f110.dev/kubeproto/go/apis/corev1"
@@ -40,6 +41,7 @@ var localSchemeBuilder = runtime.SchemeBuilder{
 	admissionregistrationv1.AddToScheme,
 	appsv1.AddToScheme,
 	authenticationv1.AddToScheme,
+	authorizationv1.AddToScheme,
 	certificatesv1.AddToScheme,
 	networkingv1.AddToScheme,
 	policyv1.AddToScheme,
@@ -52,6 +54,7 @@ func init() {
 		admissionregistrationv1.AddToScheme,
 		appsv1.AddToScheme,
 		authenticationv1.AddToScheme,
+		authorizationv1.AddToScheme,
 		certificatesv1.AddToScheme,
 		networkingv1.AddToScheme,
 		policyv1.AddToScheme,
@@ -85,6 +88,7 @@ type Set struct {
 	AdmissionregistrationK8sIoV1 *AdmissionregistrationK8sIoV1
 	AppsV1                       *AppsV1
 	AuthenticationK8sIoV1        *AuthenticationK8sIoV1
+	AuthorizationK8sIoV1         *AuthorizationK8sIoV1
 	CertificatesK8sIoV1          *CertificatesK8sIoV1
 	NetworkingK8sIoV1            *NetworkingK8sIoV1
 	PolicyV1                     *PolicyV1
@@ -136,6 +140,17 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 			return nil, err
 		}
 		s.AuthenticationK8sIoV1 = NewAuthenticationK8sIoV1Client(&restBackend{client: c})
+	}
+	{
+		conf := *cfg
+		conf.GroupVersion = &authorizationv1.SchemaGroupVersion
+		conf.APIPath = "/apis"
+		conf.NegotiatedSerializer = Codecs.WithoutConversion()
+		c, err := rest.RESTClientFor(&conf)
+		if err != nil {
+			return nil, err
+		}
+		s.AuthorizationK8sIoV1 = NewAuthorizationK8sIoV1Client(&restBackend{client: c})
 	}
 	{
 		conf := *cfg
@@ -1596,6 +1611,174 @@ func (c *AuthenticationK8sIoV1) WatchTokenReview(ctx context.Context, opts metav
 	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".authentication.k8s.io", Version: "v1", Resource: "tokenreviews"}, opts)
 }
 
+type AuthorizationK8sIoV1 struct {
+	backend Backend
+}
+
+func NewAuthorizationK8sIoV1Client(b Backend) *AuthorizationK8sIoV1 {
+	return &AuthorizationK8sIoV1{backend: b}
+}
+
+func (c *AuthorizationK8sIoV1) GetLocalSubjectAccessReview(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*authorizationv1.LocalSubjectAccessReview, error) {
+	result, err := c.backend.Get(ctx, "localsubjectaccessreviews", "LocalSubjectAccessReview", namespace, name, opts, &authorizationv1.LocalSubjectAccessReview{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authorizationv1.LocalSubjectAccessReview), nil
+}
+
+func (c *AuthorizationK8sIoV1) CreateLocalSubjectAccessReview(ctx context.Context, v *authorizationv1.LocalSubjectAccessReview, opts metav1.CreateOptions) (*authorizationv1.LocalSubjectAccessReview, error) {
+	result, err := c.backend.Create(ctx, "localsubjectaccessreviews", "LocalSubjectAccessReview", v, opts, &authorizationv1.LocalSubjectAccessReview{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authorizationv1.LocalSubjectAccessReview), nil
+}
+
+func (c *AuthorizationK8sIoV1) UpdateLocalSubjectAccessReview(ctx context.Context, v *authorizationv1.LocalSubjectAccessReview, opts metav1.UpdateOptions) (*authorizationv1.LocalSubjectAccessReview, error) {
+	result, err := c.backend.Update(ctx, "localsubjectaccessreviews", "LocalSubjectAccessReview", v, opts, &authorizationv1.LocalSubjectAccessReview{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authorizationv1.LocalSubjectAccessReview), nil
+}
+
+func (c *AuthorizationK8sIoV1) DeleteLocalSubjectAccessReview(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".authorization.k8s.io", Version: "v1", Resource: "localsubjectaccessreviews"}, namespace, name, opts)
+}
+
+func (c *AuthorizationK8sIoV1) ListLocalSubjectAccessReview(ctx context.Context, namespace string, opts metav1.ListOptions) (*authorizationv1.LocalSubjectAccessReviewList, error) {
+	result, err := c.backend.List(ctx, "localsubjectaccessreviews", "LocalSubjectAccessReview", namespace, opts, &authorizationv1.LocalSubjectAccessReviewList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authorizationv1.LocalSubjectAccessReviewList), nil
+}
+
+func (c *AuthorizationK8sIoV1) WatchLocalSubjectAccessReview(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".authorization.k8s.io", Version: "v1", Resource: "localsubjectaccessreviews"}, namespace, opts)
+}
+
+func (c *AuthorizationK8sIoV1) GetSelfSubjectAccessReview(ctx context.Context, name string, opts metav1.GetOptions) (*authorizationv1.SelfSubjectAccessReview, error) {
+	result, err := c.backend.GetClusterScoped(ctx, "selfsubjectaccessreviews", "SelfSubjectAccessReview", name, opts, &authorizationv1.SelfSubjectAccessReview{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authorizationv1.SelfSubjectAccessReview), nil
+}
+
+func (c *AuthorizationK8sIoV1) CreateSelfSubjectAccessReview(ctx context.Context, v *authorizationv1.SelfSubjectAccessReview, opts metav1.CreateOptions) (*authorizationv1.SelfSubjectAccessReview, error) {
+	result, err := c.backend.CreateClusterScoped(ctx, "selfsubjectaccessreviews", "SelfSubjectAccessReview", v, opts, &authorizationv1.SelfSubjectAccessReview{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authorizationv1.SelfSubjectAccessReview), nil
+}
+
+func (c *AuthorizationK8sIoV1) UpdateSelfSubjectAccessReview(ctx context.Context, v *authorizationv1.SelfSubjectAccessReview, opts metav1.UpdateOptions) (*authorizationv1.SelfSubjectAccessReview, error) {
+	result, err := c.backend.UpdateClusterScoped(ctx, "selfsubjectaccessreviews", "SelfSubjectAccessReview", v, opts, &authorizationv1.SelfSubjectAccessReview{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authorizationv1.SelfSubjectAccessReview), nil
+}
+
+func (c *AuthorizationK8sIoV1) DeleteSelfSubjectAccessReview(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".authorization.k8s.io", Version: "v1", Resource: "selfsubjectaccessreviews"}, name, opts)
+}
+
+func (c *AuthorizationK8sIoV1) ListSelfSubjectAccessReview(ctx context.Context, opts metav1.ListOptions) (*authorizationv1.SelfSubjectAccessReviewList, error) {
+	result, err := c.backend.ListClusterScoped(ctx, "selfsubjectaccessreviews", "SelfSubjectAccessReview", opts, &authorizationv1.SelfSubjectAccessReviewList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authorizationv1.SelfSubjectAccessReviewList), nil
+}
+
+func (c *AuthorizationK8sIoV1) WatchSelfSubjectAccessReview(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".authorization.k8s.io", Version: "v1", Resource: "selfsubjectaccessreviews"}, opts)
+}
+
+func (c *AuthorizationK8sIoV1) GetSelfSubjectRulesReview(ctx context.Context, name string, opts metav1.GetOptions) (*authorizationv1.SelfSubjectRulesReview, error) {
+	result, err := c.backend.GetClusterScoped(ctx, "selfsubjectrulesreviews", "SelfSubjectRulesReview", name, opts, &authorizationv1.SelfSubjectRulesReview{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authorizationv1.SelfSubjectRulesReview), nil
+}
+
+func (c *AuthorizationK8sIoV1) CreateSelfSubjectRulesReview(ctx context.Context, v *authorizationv1.SelfSubjectRulesReview, opts metav1.CreateOptions) (*authorizationv1.SelfSubjectRulesReview, error) {
+	result, err := c.backend.CreateClusterScoped(ctx, "selfsubjectrulesreviews", "SelfSubjectRulesReview", v, opts, &authorizationv1.SelfSubjectRulesReview{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authorizationv1.SelfSubjectRulesReview), nil
+}
+
+func (c *AuthorizationK8sIoV1) UpdateSelfSubjectRulesReview(ctx context.Context, v *authorizationv1.SelfSubjectRulesReview, opts metav1.UpdateOptions) (*authorizationv1.SelfSubjectRulesReview, error) {
+	result, err := c.backend.UpdateClusterScoped(ctx, "selfsubjectrulesreviews", "SelfSubjectRulesReview", v, opts, &authorizationv1.SelfSubjectRulesReview{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authorizationv1.SelfSubjectRulesReview), nil
+}
+
+func (c *AuthorizationK8sIoV1) DeleteSelfSubjectRulesReview(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".authorization.k8s.io", Version: "v1", Resource: "selfsubjectrulesreviews"}, name, opts)
+}
+
+func (c *AuthorizationK8sIoV1) ListSelfSubjectRulesReview(ctx context.Context, opts metav1.ListOptions) (*authorizationv1.SelfSubjectRulesReviewList, error) {
+	result, err := c.backend.ListClusterScoped(ctx, "selfsubjectrulesreviews", "SelfSubjectRulesReview", opts, &authorizationv1.SelfSubjectRulesReviewList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authorizationv1.SelfSubjectRulesReviewList), nil
+}
+
+func (c *AuthorizationK8sIoV1) WatchSelfSubjectRulesReview(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".authorization.k8s.io", Version: "v1", Resource: "selfsubjectrulesreviews"}, opts)
+}
+
+func (c *AuthorizationK8sIoV1) GetSubjectAccessReview(ctx context.Context, name string, opts metav1.GetOptions) (*authorizationv1.SubjectAccessReview, error) {
+	result, err := c.backend.GetClusterScoped(ctx, "subjectaccessreviews", "SubjectAccessReview", name, opts, &authorizationv1.SubjectAccessReview{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authorizationv1.SubjectAccessReview), nil
+}
+
+func (c *AuthorizationK8sIoV1) CreateSubjectAccessReview(ctx context.Context, v *authorizationv1.SubjectAccessReview, opts metav1.CreateOptions) (*authorizationv1.SubjectAccessReview, error) {
+	result, err := c.backend.CreateClusterScoped(ctx, "subjectaccessreviews", "SubjectAccessReview", v, opts, &authorizationv1.SubjectAccessReview{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authorizationv1.SubjectAccessReview), nil
+}
+
+func (c *AuthorizationK8sIoV1) UpdateSubjectAccessReview(ctx context.Context, v *authorizationv1.SubjectAccessReview, opts metav1.UpdateOptions) (*authorizationv1.SubjectAccessReview, error) {
+	result, err := c.backend.UpdateClusterScoped(ctx, "subjectaccessreviews", "SubjectAccessReview", v, opts, &authorizationv1.SubjectAccessReview{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authorizationv1.SubjectAccessReview), nil
+}
+
+func (c *AuthorizationK8sIoV1) DeleteSubjectAccessReview(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".authorization.k8s.io", Version: "v1", Resource: "subjectaccessreviews"}, name, opts)
+}
+
+func (c *AuthorizationK8sIoV1) ListSubjectAccessReview(ctx context.Context, opts metav1.ListOptions) (*authorizationv1.SubjectAccessReviewList, error) {
+	result, err := c.backend.ListClusterScoped(ctx, "subjectaccessreviews", "SubjectAccessReview", opts, &authorizationv1.SubjectAccessReviewList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authorizationv1.SubjectAccessReviewList), nil
+}
+
+func (c *AuthorizationK8sIoV1) WatchSubjectAccessReview(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".authorization.k8s.io", Version: "v1", Resource: "subjectaccessreviews"}, opts)
+}
+
 type CertificatesK8sIoV1 struct {
 	backend Backend
 }
@@ -2141,6 +2324,14 @@ func (f *InformerFactory) InformerFor(obj runtime.Object) cache.SharedIndexInfor
 		return NewAuthenticationK8sIoV1Informer(f.cache, f.set.AuthenticationK8sIoV1, f.namespace, f.resyncPeriod).TokenRequestInformer()
 	case *authenticationv1.TokenReview:
 		return NewAuthenticationK8sIoV1Informer(f.cache, f.set.AuthenticationK8sIoV1, f.namespace, f.resyncPeriod).TokenReviewInformer()
+	case *authorizationv1.LocalSubjectAccessReview:
+		return NewAuthorizationK8sIoV1Informer(f.cache, f.set.AuthorizationK8sIoV1, f.namespace, f.resyncPeriod).LocalSubjectAccessReviewInformer()
+	case *authorizationv1.SelfSubjectAccessReview:
+		return NewAuthorizationK8sIoV1Informer(f.cache, f.set.AuthorizationK8sIoV1, f.namespace, f.resyncPeriod).SelfSubjectAccessReviewInformer()
+	case *authorizationv1.SelfSubjectRulesReview:
+		return NewAuthorizationK8sIoV1Informer(f.cache, f.set.AuthorizationK8sIoV1, f.namespace, f.resyncPeriod).SelfSubjectRulesReviewInformer()
+	case *authorizationv1.SubjectAccessReview:
+		return NewAuthorizationK8sIoV1Informer(f.cache, f.set.AuthorizationK8sIoV1, f.namespace, f.resyncPeriod).SubjectAccessReviewInformer()
 	case *certificatesv1.CertificateSigningRequest:
 		return NewCertificatesK8sIoV1Informer(f.cache, f.set.CertificatesK8sIoV1, f.namespace, f.resyncPeriod).CertificateSigningRequestInformer()
 	case *networkingv1.Ingress:
@@ -2228,6 +2419,14 @@ func (f *InformerFactory) InformerForResource(gvr schema.GroupVersionResource) c
 		return NewAuthenticationK8sIoV1Informer(f.cache, f.set.AuthenticationK8sIoV1, f.namespace, f.resyncPeriod).TokenRequestInformer()
 	case authenticationv1.SchemaGroupVersion.WithResource("tokenreviews"):
 		return NewAuthenticationK8sIoV1Informer(f.cache, f.set.AuthenticationK8sIoV1, f.namespace, f.resyncPeriod).TokenReviewInformer()
+	case authorizationv1.SchemaGroupVersion.WithResource("localsubjectaccessreviews"):
+		return NewAuthorizationK8sIoV1Informer(f.cache, f.set.AuthorizationK8sIoV1, f.namespace, f.resyncPeriod).LocalSubjectAccessReviewInformer()
+	case authorizationv1.SchemaGroupVersion.WithResource("selfsubjectaccessreviews"):
+		return NewAuthorizationK8sIoV1Informer(f.cache, f.set.AuthorizationK8sIoV1, f.namespace, f.resyncPeriod).SelfSubjectAccessReviewInformer()
+	case authorizationv1.SchemaGroupVersion.WithResource("selfsubjectrulesreviews"):
+		return NewAuthorizationK8sIoV1Informer(f.cache, f.set.AuthorizationK8sIoV1, f.namespace, f.resyncPeriod).SelfSubjectRulesReviewInformer()
+	case authorizationv1.SchemaGroupVersion.WithResource("subjectaccessreviews"):
+		return NewAuthorizationK8sIoV1Informer(f.cache, f.set.AuthorizationK8sIoV1, f.namespace, f.resyncPeriod).SubjectAccessReviewInformer()
 	case certificatesv1.SchemaGroupVersion.WithResource("certificatesigningrequests"):
 		return NewCertificatesK8sIoV1Informer(f.cache, f.set.CertificatesK8sIoV1, f.namespace, f.resyncPeriod).CertificateSigningRequestInformer()
 	case networkingv1.SchemaGroupVersion.WithResource("ingresses"):
@@ -2989,6 +3188,112 @@ func (f *AuthenticationK8sIoV1Informer) TokenReviewInformer() cache.SharedIndexI
 
 func (f *AuthenticationK8sIoV1Informer) TokenReviewLister() *AuthenticationK8sIoV1TokenReviewLister {
 	return NewAuthenticationK8sIoV1TokenReviewLister(f.TokenReviewInformer().GetIndexer())
+}
+
+type AuthorizationK8sIoV1Informer struct {
+	cache        *InformerCache
+	client       *AuthorizationK8sIoV1
+	namespace    string
+	resyncPeriod time.Duration
+	indexers     cache.Indexers
+}
+
+func NewAuthorizationK8sIoV1Informer(c *InformerCache, client *AuthorizationK8sIoV1, namespace string, resyncPeriod time.Duration) *AuthorizationK8sIoV1Informer {
+	return &AuthorizationK8sIoV1Informer{
+		cache:        c,
+		client:       client,
+		namespace:    namespace,
+		resyncPeriod: resyncPeriod,
+		indexers:     cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
+	}
+}
+
+func (f *AuthorizationK8sIoV1Informer) LocalSubjectAccessReviewInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&authorizationv1.LocalSubjectAccessReview{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListLocalSubjectAccessReview(context.TODO(), f.namespace, metav1.ListOptions{})
+				},
+				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchLocalSubjectAccessReview(context.TODO(), f.namespace, metav1.ListOptions{})
+				},
+			},
+			&authorizationv1.LocalSubjectAccessReview{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *AuthorizationK8sIoV1Informer) LocalSubjectAccessReviewLister() *AuthorizationK8sIoV1LocalSubjectAccessReviewLister {
+	return NewAuthorizationK8sIoV1LocalSubjectAccessReviewLister(f.LocalSubjectAccessReviewInformer().GetIndexer())
+}
+
+func (f *AuthorizationK8sIoV1Informer) SelfSubjectAccessReviewInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&authorizationv1.SelfSubjectAccessReview{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListSelfSubjectAccessReview(context.TODO(), metav1.ListOptions{})
+				},
+				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchSelfSubjectAccessReview(context.TODO(), metav1.ListOptions{})
+				},
+			},
+			&authorizationv1.SelfSubjectAccessReview{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *AuthorizationK8sIoV1Informer) SelfSubjectAccessReviewLister() *AuthorizationK8sIoV1SelfSubjectAccessReviewLister {
+	return NewAuthorizationK8sIoV1SelfSubjectAccessReviewLister(f.SelfSubjectAccessReviewInformer().GetIndexer())
+}
+
+func (f *AuthorizationK8sIoV1Informer) SelfSubjectRulesReviewInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&authorizationv1.SelfSubjectRulesReview{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListSelfSubjectRulesReview(context.TODO(), metav1.ListOptions{})
+				},
+				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchSelfSubjectRulesReview(context.TODO(), metav1.ListOptions{})
+				},
+			},
+			&authorizationv1.SelfSubjectRulesReview{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *AuthorizationK8sIoV1Informer) SelfSubjectRulesReviewLister() *AuthorizationK8sIoV1SelfSubjectRulesReviewLister {
+	return NewAuthorizationK8sIoV1SelfSubjectRulesReviewLister(f.SelfSubjectRulesReviewInformer().GetIndexer())
+}
+
+func (f *AuthorizationK8sIoV1Informer) SubjectAccessReviewInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&authorizationv1.SubjectAccessReview{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListSubjectAccessReview(context.TODO(), metav1.ListOptions{})
+				},
+				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchSubjectAccessReview(context.TODO(), metav1.ListOptions{})
+				},
+			},
+			&authorizationv1.SubjectAccessReview{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *AuthorizationK8sIoV1Informer) SubjectAccessReviewLister() *AuthorizationK8sIoV1SubjectAccessReviewLister {
+	return NewAuthorizationK8sIoV1SubjectAccessReviewLister(f.SubjectAccessReviewInformer().GetIndexer())
 }
 
 type CertificatesK8sIoV1Informer struct {
@@ -4091,6 +4396,114 @@ func (x *AuthenticationK8sIoV1TokenReviewLister) Get(name string) (*authenticati
 		return nil, k8serrors.NewNotFound(authenticationv1.SchemaGroupVersion.WithResource("tokenreview").GroupResource(), name)
 	}
 	return obj.(*authenticationv1.TokenReview).DeepCopy(), nil
+}
+
+type AuthorizationK8sIoV1LocalSubjectAccessReviewLister struct {
+	indexer cache.Indexer
+}
+
+func NewAuthorizationK8sIoV1LocalSubjectAccessReviewLister(indexer cache.Indexer) *AuthorizationK8sIoV1LocalSubjectAccessReviewLister {
+	return &AuthorizationK8sIoV1LocalSubjectAccessReviewLister{indexer: indexer}
+}
+
+func (x *AuthorizationK8sIoV1LocalSubjectAccessReviewLister) List(namespace string, selector labels.Selector) ([]*authorizationv1.LocalSubjectAccessReview, error) {
+	var ret []*authorizationv1.LocalSubjectAccessReview
+	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
+		ret = append(ret, m.(*authorizationv1.LocalSubjectAccessReview).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *AuthorizationK8sIoV1LocalSubjectAccessReviewLister) Get(namespace, name string) (*authorizationv1.LocalSubjectAccessReview, error) {
+	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(authorizationv1.SchemaGroupVersion.WithResource("localsubjectaccessreview").GroupResource(), name)
+	}
+	return obj.(*authorizationv1.LocalSubjectAccessReview).DeepCopy(), nil
+}
+
+type AuthorizationK8sIoV1SelfSubjectAccessReviewLister struct {
+	indexer cache.Indexer
+}
+
+func NewAuthorizationK8sIoV1SelfSubjectAccessReviewLister(indexer cache.Indexer) *AuthorizationK8sIoV1SelfSubjectAccessReviewLister {
+	return &AuthorizationK8sIoV1SelfSubjectAccessReviewLister{indexer: indexer}
+}
+
+func (x *AuthorizationK8sIoV1SelfSubjectAccessReviewLister) List(selector labels.Selector) ([]*authorizationv1.SelfSubjectAccessReview, error) {
+	var ret []*authorizationv1.SelfSubjectAccessReview
+	err := cache.ListAll(x.indexer, selector, func(m interface{}) {
+		ret = append(ret, m.(*authorizationv1.SelfSubjectAccessReview).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *AuthorizationK8sIoV1SelfSubjectAccessReviewLister) Get(name string) (*authorizationv1.SelfSubjectAccessReview, error) {
+	obj, exists, err := x.indexer.GetByKey("/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(authorizationv1.SchemaGroupVersion.WithResource("selfsubjectaccessreview").GroupResource(), name)
+	}
+	return obj.(*authorizationv1.SelfSubjectAccessReview).DeepCopy(), nil
+}
+
+type AuthorizationK8sIoV1SelfSubjectRulesReviewLister struct {
+	indexer cache.Indexer
+}
+
+func NewAuthorizationK8sIoV1SelfSubjectRulesReviewLister(indexer cache.Indexer) *AuthorizationK8sIoV1SelfSubjectRulesReviewLister {
+	return &AuthorizationK8sIoV1SelfSubjectRulesReviewLister{indexer: indexer}
+}
+
+func (x *AuthorizationK8sIoV1SelfSubjectRulesReviewLister) List(selector labels.Selector) ([]*authorizationv1.SelfSubjectRulesReview, error) {
+	var ret []*authorizationv1.SelfSubjectRulesReview
+	err := cache.ListAll(x.indexer, selector, func(m interface{}) {
+		ret = append(ret, m.(*authorizationv1.SelfSubjectRulesReview).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *AuthorizationK8sIoV1SelfSubjectRulesReviewLister) Get(name string) (*authorizationv1.SelfSubjectRulesReview, error) {
+	obj, exists, err := x.indexer.GetByKey("/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(authorizationv1.SchemaGroupVersion.WithResource("selfsubjectrulesreview").GroupResource(), name)
+	}
+	return obj.(*authorizationv1.SelfSubjectRulesReview).DeepCopy(), nil
+}
+
+type AuthorizationK8sIoV1SubjectAccessReviewLister struct {
+	indexer cache.Indexer
+}
+
+func NewAuthorizationK8sIoV1SubjectAccessReviewLister(indexer cache.Indexer) *AuthorizationK8sIoV1SubjectAccessReviewLister {
+	return &AuthorizationK8sIoV1SubjectAccessReviewLister{indexer: indexer}
+}
+
+func (x *AuthorizationK8sIoV1SubjectAccessReviewLister) List(selector labels.Selector) ([]*authorizationv1.SubjectAccessReview, error) {
+	var ret []*authorizationv1.SubjectAccessReview
+	err := cache.ListAll(x.indexer, selector, func(m interface{}) {
+		ret = append(ret, m.(*authorizationv1.SubjectAccessReview).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *AuthorizationK8sIoV1SubjectAccessReviewLister) Get(name string) (*authorizationv1.SubjectAccessReview, error) {
+	obj, exists, err := x.indexer.GetByKey("/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(authorizationv1.SchemaGroupVersion.WithResource("subjectaccessreview").GroupResource(), name)
+	}
+	return obj.(*authorizationv1.SubjectAccessReview).DeepCopy(), nil
 }
 
 type CertificatesK8sIoV1CertificateSigningRequestLister struct {
