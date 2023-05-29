@@ -12,6 +12,7 @@ import (
 	_ "k8s.io/api/coordination/v1"
 	_ "k8s.io/api/core/v1"
 	_ "k8s.io/api/discovery/v1"
+	_ "k8s.io/api/events/v1"
 	_ "k8s.io/api/networking/v1"
 	_ "k8s.io/api/policy/v1"
 	_ "k8s.io/api/rbac/v1"
