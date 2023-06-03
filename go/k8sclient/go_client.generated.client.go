@@ -28,6 +28,7 @@ import (
 	"go.f110.dev/kubeproto/go/apis/coordinationv1"
 	"go.f110.dev/kubeproto/go/apis/corev1"
 	"go.f110.dev/kubeproto/go/apis/discoveryv1"
+	"go.f110.dev/kubeproto/go/apis/eventsv1"
 	"go.f110.dev/kubeproto/go/apis/networkingv1"
 	"go.f110.dev/kubeproto/go/apis/policyv1"
 	"go.f110.dev/kubeproto/go/apis/rbacv1"
@@ -52,6 +53,7 @@ var localSchemeBuilder = runtime.SchemeBuilder{
 	certificatesv1.AddToScheme,
 	coordinationv1.AddToScheme,
 	discoveryv1.AddToScheme,
+	eventsv1.AddToScheme,
 	networkingv1.AddToScheme,
 	policyv1.AddToScheme,
 	rbacv1.AddToScheme,
@@ -70,6 +72,7 @@ func init() {
 		certificatesv1.AddToScheme,
 		coordinationv1.AddToScheme,
 		discoveryv1.AddToScheme,
+		eventsv1.AddToScheme,
 		networkingv1.AddToScheme,
 		policyv1.AddToScheme,
 		rbacv1.AddToScheme,
@@ -109,6 +112,7 @@ type Set struct {
 	CertificatesK8sIoV1          *CertificatesK8sIoV1
 	CoordinationK8sIoV1          *CoordinationK8sIoV1
 	DiscoveryK8sIoV1             *DiscoveryK8sIoV1
+	EventsK8sIoV1                *EventsK8sIoV1
 	NetworkingK8sIoV1            *NetworkingK8sIoV1
 	PolicyV1                     *PolicyV1
 	RbacAuthorizationK8sIoV1     *RbacAuthorizationK8sIoV1
@@ -226,6 +230,17 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 			return nil, err
 		}
 		s.DiscoveryK8sIoV1 = NewDiscoveryK8sIoV1Client(&restBackend{client: c})
+	}
+	{
+		conf := *cfg
+		conf.GroupVersion = &eventsv1.SchemaGroupVersion
+		conf.APIPath = "/apis"
+		conf.NegotiatedSerializer = Codecs.WithoutConversion()
+		c, err := rest.RESTClientFor(&conf)
+		if err != nil {
+			return nil, err
+		}
+		s.EventsK8sIoV1 = NewEventsK8sIoV1Client(&restBackend{client: c})
 	}
 	{
 		conf := *cfg
@@ -2134,6 +2149,54 @@ func (c *DiscoveryK8sIoV1) WatchEndpointSlice(ctx context.Context, namespace str
 	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".discovery.k8s.io", Version: "v1", Resource: "endpointslices"}, namespace, opts)
 }
 
+type EventsK8sIoV1 struct {
+	backend Backend
+}
+
+func NewEventsK8sIoV1Client(b Backend) *EventsK8sIoV1 {
+	return &EventsK8sIoV1{backend: b}
+}
+
+func (c *EventsK8sIoV1) GetEvent(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*eventsv1.Event, error) {
+	result, err := c.backend.Get(ctx, "events", "Event", namespace, name, opts, &eventsv1.Event{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*eventsv1.Event), nil
+}
+
+func (c *EventsK8sIoV1) CreateEvent(ctx context.Context, v *eventsv1.Event, opts metav1.CreateOptions) (*eventsv1.Event, error) {
+	result, err := c.backend.Create(ctx, "events", "Event", v, opts, &eventsv1.Event{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*eventsv1.Event), nil
+}
+
+func (c *EventsK8sIoV1) UpdateEvent(ctx context.Context, v *eventsv1.Event, opts metav1.UpdateOptions) (*eventsv1.Event, error) {
+	result, err := c.backend.Update(ctx, "events", "Event", v, opts, &eventsv1.Event{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*eventsv1.Event), nil
+}
+
+func (c *EventsK8sIoV1) DeleteEvent(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".events.k8s.io", Version: "v1", Resource: "events"}, namespace, name, opts)
+}
+
+func (c *EventsK8sIoV1) ListEvent(ctx context.Context, namespace string, opts metav1.ListOptions) (*eventsv1.EventList, error) {
+	result, err := c.backend.List(ctx, "events", "Event", namespace, opts, &eventsv1.EventList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*eventsv1.EventList), nil
+}
+
+func (c *EventsK8sIoV1) WatchEvent(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".events.k8s.io", Version: "v1", Resource: "events"}, namespace, opts)
+}
+
 type NetworkingK8sIoV1 struct {
 	backend Backend
 }
@@ -2699,6 +2762,8 @@ func (f *InformerFactory) InformerFor(obj runtime.Object) cache.SharedIndexInfor
 		return NewCoordinationK8sIoV1Informer(f.cache, f.set.CoordinationK8sIoV1, f.namespace, f.resyncPeriod).LeaseInformer()
 	case *discoveryv1.EndpointSlice:
 		return NewDiscoveryK8sIoV1Informer(f.cache, f.set.DiscoveryK8sIoV1, f.namespace, f.resyncPeriod).EndpointSliceInformer()
+	case *eventsv1.Event:
+		return NewEventsK8sIoV1Informer(f.cache, f.set.EventsK8sIoV1, f.namespace, f.resyncPeriod).EventInformer()
 	case *networkingv1.Ingress:
 		return NewNetworkingK8sIoV1Informer(f.cache, f.set.NetworkingK8sIoV1, f.namespace, f.resyncPeriod).IngressInformer()
 	case *networkingv1.IngressClass:
@@ -2806,6 +2871,8 @@ func (f *InformerFactory) InformerForResource(gvr schema.GroupVersionResource) c
 		return NewCoordinationK8sIoV1Informer(f.cache, f.set.CoordinationK8sIoV1, f.namespace, f.resyncPeriod).LeaseInformer()
 	case discoveryv1.SchemaGroupVersion.WithResource("endpointslices"):
 		return NewDiscoveryK8sIoV1Informer(f.cache, f.set.DiscoveryK8sIoV1, f.namespace, f.resyncPeriod).EndpointSliceInformer()
+	case eventsv1.SchemaGroupVersion.WithResource("events"):
+		return NewEventsK8sIoV1Informer(f.cache, f.set.EventsK8sIoV1, f.namespace, f.resyncPeriod).EventInformer()
 	case networkingv1.SchemaGroupVersion.WithResource("ingresses"):
 		return NewNetworkingK8sIoV1Informer(f.cache, f.set.NetworkingK8sIoV1, f.namespace, f.resyncPeriod).IngressInformer()
 	case networkingv1.SchemaGroupVersion.WithResource("ingressclasses"):
@@ -3895,6 +3962,46 @@ func (f *DiscoveryK8sIoV1Informer) EndpointSliceInformer() cache.SharedIndexInfo
 
 func (f *DiscoveryK8sIoV1Informer) EndpointSliceLister() *DiscoveryK8sIoV1EndpointSliceLister {
 	return NewDiscoveryK8sIoV1EndpointSliceLister(f.EndpointSliceInformer().GetIndexer())
+}
+
+type EventsK8sIoV1Informer struct {
+	cache        *InformerCache
+	client       *EventsK8sIoV1
+	namespace    string
+	resyncPeriod time.Duration
+	indexers     cache.Indexers
+}
+
+func NewEventsK8sIoV1Informer(c *InformerCache, client *EventsK8sIoV1, namespace string, resyncPeriod time.Duration) *EventsK8sIoV1Informer {
+	return &EventsK8sIoV1Informer{
+		cache:        c,
+		client:       client,
+		namespace:    namespace,
+		resyncPeriod: resyncPeriod,
+		indexers:     cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
+	}
+}
+
+func (f *EventsK8sIoV1Informer) EventInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&eventsv1.Event{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListEvent(context.TODO(), f.namespace, metav1.ListOptions{})
+				},
+				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchEvent(context.TODO(), f.namespace, metav1.ListOptions{})
+				},
+			},
+			&eventsv1.Event{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *EventsK8sIoV1Informer) EventLister() *EventsK8sIoV1EventLister {
+	return NewEventsK8sIoV1EventLister(f.EventInformer().GetIndexer())
 }
 
 type NetworkingK8sIoV1Informer struct {
@@ -5267,6 +5374,33 @@ func (x *DiscoveryK8sIoV1EndpointSliceLister) Get(namespace, name string) (*disc
 		return nil, k8serrors.NewNotFound(discoveryv1.SchemaGroupVersion.WithResource("endpointslice").GroupResource(), name)
 	}
 	return obj.(*discoveryv1.EndpointSlice).DeepCopy(), nil
+}
+
+type EventsK8sIoV1EventLister struct {
+	indexer cache.Indexer
+}
+
+func NewEventsK8sIoV1EventLister(indexer cache.Indexer) *EventsK8sIoV1EventLister {
+	return &EventsK8sIoV1EventLister{indexer: indexer}
+}
+
+func (x *EventsK8sIoV1EventLister) List(namespace string, selector labels.Selector) ([]*eventsv1.Event, error) {
+	var ret []*eventsv1.Event
+	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
+		ret = append(ret, m.(*eventsv1.Event).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *EventsK8sIoV1EventLister) Get(namespace, name string) (*eventsv1.Event, error) {
+	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(eventsv1.SchemaGroupVersion.WithResource("event").GroupResource(), name)
+	}
+	return obj.(*eventsv1.Event).DeepCopy(), nil
 }
 
 type NetworkingK8sIoV1IngressLister struct {
