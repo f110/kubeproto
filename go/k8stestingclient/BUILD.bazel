@@ -19,6 +19,7 @@ go_testing_client(
         "//k8s.io/api/networking/v1:networkingv1_proto",
         "//k8s.io/api/policy/v1:policyv1_proto",
         "//k8s.io/api/rbac/v1:rbacv1_proto",
+        "//k8s.io/api/scheduling/v1:schedulingv1_proto",
     ],
     client = "//go/k8sclient:go_client",
     importpath = "go.f110.dev/kubeproto/go/k8stestingclient",

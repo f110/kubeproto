@@ -51,6 +51,7 @@ func NewSet() *Set {
 	s.NetworkingK8sIoV1 = k8sclient.NewNetworkingK8sIoV1Client(&fakerBackend{fake: &s.fake})
 	s.PolicyV1 = k8sclient.NewPolicyV1Client(&fakerBackend{fake: &s.fake})
 	s.RbacAuthorizationK8sIoV1 = k8sclient.NewRbacAuthorizationK8sIoV1Client(&fakerBackend{fake: &s.fake})
+	s.SchedulingK8sIoV1 = k8sclient.NewSchedulingK8sIoV1Client(&fakerBackend{fake: &s.fake})
 	return s
 }
 
