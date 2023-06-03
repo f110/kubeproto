@@ -31,6 +31,7 @@ import (
 	"go.f110.dev/kubeproto/go/apis/networkingv1"
 	"go.f110.dev/kubeproto/go/apis/policyv1"
 	"go.f110.dev/kubeproto/go/apis/rbacv1"
+	"go.f110.dev/kubeproto/go/apis/schedulingv1"
 )
 
 var (
@@ -54,6 +55,7 @@ var localSchemeBuilder = runtime.SchemeBuilder{
 	networkingv1.AddToScheme,
 	policyv1.AddToScheme,
 	rbacv1.AddToScheme,
+	schedulingv1.AddToScheme,
 }
 
 func init() {
@@ -71,6 +73,7 @@ func init() {
 		networkingv1.AddToScheme,
 		policyv1.AddToScheme,
 		rbacv1.AddToScheme,
+		schedulingv1.AddToScheme,
 	} {
 		if err := v(Scheme); err != nil {
 			panic(err)
@@ -109,6 +112,7 @@ type Set struct {
 	NetworkingK8sIoV1            *NetworkingK8sIoV1
 	PolicyV1                     *PolicyV1
 	RbacAuthorizationK8sIoV1     *RbacAuthorizationK8sIoV1
+	SchedulingK8sIoV1            *SchedulingK8sIoV1
 }
 
 func NewSet(cfg *rest.Config) (*Set, error) {
@@ -255,6 +259,17 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 			return nil, err
 		}
 		s.RbacAuthorizationK8sIoV1 = NewRbacAuthorizationK8sIoV1Client(&restBackend{client: c})
+	}
+	{
+		conf := *cfg
+		conf.GroupVersion = &schedulingv1.SchemaGroupVersion
+		conf.APIPath = "/apis"
+		conf.NegotiatedSerializer = Codecs.WithoutConversion()
+		c, err := rest.RESTClientFor(&conf)
+		if err != nil {
+			return nil, err
+		}
+		s.SchedulingK8sIoV1 = NewSchedulingK8sIoV1Client(&restBackend{client: c})
 	}
 
 	return s, nil
@@ -2503,6 +2518,54 @@ func (c *RbacAuthorizationK8sIoV1) WatchRoleBinding(ctx context.Context, namespa
 	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".rbac.authorization.k8s.io", Version: "v1", Resource: "rolebindings"}, namespace, opts)
 }
 
+type SchedulingK8sIoV1 struct {
+	backend Backend
+}
+
+func NewSchedulingK8sIoV1Client(b Backend) *SchedulingK8sIoV1 {
+	return &SchedulingK8sIoV1{backend: b}
+}
+
+func (c *SchedulingK8sIoV1) GetPriorityClass(ctx context.Context, name string, opts metav1.GetOptions) (*schedulingv1.PriorityClass, error) {
+	result, err := c.backend.GetClusterScoped(ctx, "priorityclasses", "PriorityClass", name, opts, &schedulingv1.PriorityClass{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*schedulingv1.PriorityClass), nil
+}
+
+func (c *SchedulingK8sIoV1) CreatePriorityClass(ctx context.Context, v *schedulingv1.PriorityClass, opts metav1.CreateOptions) (*schedulingv1.PriorityClass, error) {
+	result, err := c.backend.CreateClusterScoped(ctx, "priorityclasses", "PriorityClass", v, opts, &schedulingv1.PriorityClass{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*schedulingv1.PriorityClass), nil
+}
+
+func (c *SchedulingK8sIoV1) UpdatePriorityClass(ctx context.Context, v *schedulingv1.PriorityClass, opts metav1.UpdateOptions) (*schedulingv1.PriorityClass, error) {
+	result, err := c.backend.UpdateClusterScoped(ctx, "priorityclasses", "PriorityClass", v, opts, &schedulingv1.PriorityClass{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*schedulingv1.PriorityClass), nil
+}
+
+func (c *SchedulingK8sIoV1) DeletePriorityClass(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".scheduling.k8s.io", Version: "v1", Resource: "priorityclasses"}, name, opts)
+}
+
+func (c *SchedulingK8sIoV1) ListPriorityClass(ctx context.Context, opts metav1.ListOptions) (*schedulingv1.PriorityClassList, error) {
+	result, err := c.backend.ListClusterScoped(ctx, "priorityclasses", "PriorityClass", opts, &schedulingv1.PriorityClassList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*schedulingv1.PriorityClassList), nil
+}
+
+func (c *SchedulingK8sIoV1) WatchPriorityClass(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".scheduling.k8s.io", Version: "v1", Resource: "priorityclasses"}, opts)
+}
+
 type InformerCache struct {
 	mu        sync.Mutex
 	informers map[reflect.Type]cache.SharedIndexInformer
@@ -2654,6 +2717,8 @@ func (f *InformerFactory) InformerFor(obj runtime.Object) cache.SharedIndexInfor
 		return NewRbacAuthorizationK8sIoV1Informer(f.cache, f.set.RbacAuthorizationK8sIoV1, f.namespace, f.resyncPeriod).RoleInformer()
 	case *rbacv1.RoleBinding:
 		return NewRbacAuthorizationK8sIoV1Informer(f.cache, f.set.RbacAuthorizationK8sIoV1, f.namespace, f.resyncPeriod).RoleBindingInformer()
+	case *schedulingv1.PriorityClass:
+		return NewSchedulingK8sIoV1Informer(f.cache, f.set.SchedulingK8sIoV1, f.namespace, f.resyncPeriod).PriorityClassInformer()
 	default:
 		return nil
 	}
@@ -2759,6 +2824,8 @@ func (f *InformerFactory) InformerForResource(gvr schema.GroupVersionResource) c
 		return NewRbacAuthorizationK8sIoV1Informer(f.cache, f.set.RbacAuthorizationK8sIoV1, f.namespace, f.resyncPeriod).RoleInformer()
 	case rbacv1.SchemaGroupVersion.WithResource("rolebindings"):
 		return NewRbacAuthorizationK8sIoV1Informer(f.cache, f.set.RbacAuthorizationK8sIoV1, f.namespace, f.resyncPeriod).RoleBindingInformer()
+	case schedulingv1.SchemaGroupVersion.WithResource("priorityclasses"):
+		return NewSchedulingK8sIoV1Informer(f.cache, f.set.SchedulingK8sIoV1, f.namespace, f.resyncPeriod).PriorityClassInformer()
 	default:
 		return nil
 	}
@@ -4082,6 +4149,46 @@ func (f *RbacAuthorizationK8sIoV1Informer) RoleBindingLister() *RbacAuthorizatio
 	return NewRbacAuthorizationK8sIoV1RoleBindingLister(f.RoleBindingInformer().GetIndexer())
 }
 
+type SchedulingK8sIoV1Informer struct {
+	cache        *InformerCache
+	client       *SchedulingK8sIoV1
+	namespace    string
+	resyncPeriod time.Duration
+	indexers     cache.Indexers
+}
+
+func NewSchedulingK8sIoV1Informer(c *InformerCache, client *SchedulingK8sIoV1, namespace string, resyncPeriod time.Duration) *SchedulingK8sIoV1Informer {
+	return &SchedulingK8sIoV1Informer{
+		cache:        c,
+		client:       client,
+		namespace:    namespace,
+		resyncPeriod: resyncPeriod,
+		indexers:     cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
+	}
+}
+
+func (f *SchedulingK8sIoV1Informer) PriorityClassInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&schedulingv1.PriorityClass{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListPriorityClass(context.TODO(), metav1.ListOptions{})
+				},
+				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchPriorityClass(context.TODO(), metav1.ListOptions{})
+				},
+			},
+			&schedulingv1.PriorityClass{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *SchedulingK8sIoV1Informer) PriorityClassLister() *SchedulingK8sIoV1PriorityClassLister {
+	return NewSchedulingK8sIoV1PriorityClassLister(f.PriorityClassInformer().GetIndexer())
+}
+
 type CoreV1BindingLister struct {
 	indexer cache.Indexer
 }
@@ -5403,4 +5510,31 @@ func (x *RbacAuthorizationK8sIoV1RoleBindingLister) Get(namespace, name string) 
 		return nil, k8serrors.NewNotFound(rbacv1.SchemaGroupVersion.WithResource("rolebinding").GroupResource(), name)
 	}
 	return obj.(*rbacv1.RoleBinding).DeepCopy(), nil
+}
+
+type SchedulingK8sIoV1PriorityClassLister struct {
+	indexer cache.Indexer
+}
+
+func NewSchedulingK8sIoV1PriorityClassLister(indexer cache.Indexer) *SchedulingK8sIoV1PriorityClassLister {
+	return &SchedulingK8sIoV1PriorityClassLister{indexer: indexer}
+}
+
+func (x *SchedulingK8sIoV1PriorityClassLister) List(selector labels.Selector) ([]*schedulingv1.PriorityClass, error) {
+	var ret []*schedulingv1.PriorityClass
+	err := cache.ListAll(x.indexer, selector, func(m interface{}) {
+		ret = append(ret, m.(*schedulingv1.PriorityClass).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *SchedulingK8sIoV1PriorityClassLister) Get(name string) (*schedulingv1.PriorityClass, error) {
+	obj, exists, err := x.indexer.GetByKey("/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(schedulingv1.SchemaGroupVersion.WithResource("priorityclass").GroupResource(), name)
+	}
+	return obj.(*schedulingv1.PriorityClass).DeepCopy(), nil
 }
