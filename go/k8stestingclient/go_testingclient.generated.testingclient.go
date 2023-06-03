@@ -48,6 +48,7 @@ func NewSet() *Set {
 	s.CertificatesK8sIoV1 = k8sclient.NewCertificatesK8sIoV1Client(&fakerBackend{fake: &s.fake})
 	s.CoordinationK8sIoV1 = k8sclient.NewCoordinationK8sIoV1Client(&fakerBackend{fake: &s.fake})
 	s.DiscoveryK8sIoV1 = k8sclient.NewDiscoveryK8sIoV1Client(&fakerBackend{fake: &s.fake})
+	s.EventsK8sIoV1 = k8sclient.NewEventsK8sIoV1Client(&fakerBackend{fake: &s.fake})
 	s.NetworkingK8sIoV1 = k8sclient.NewNetworkingK8sIoV1Client(&fakerBackend{fake: &s.fake})
 	s.PolicyV1 = k8sclient.NewPolicyV1Client(&fakerBackend{fake: &s.fake})
 	s.RbacAuthorizationK8sIoV1 = k8sclient.NewRbacAuthorizationK8sIoV1Client(&fakerBackend{fake: &s.fake})
