@@ -33,6 +33,7 @@ import (
 	"go.f110.dev/kubeproto/go/apis/policyv1"
 	"go.f110.dev/kubeproto/go/apis/rbacv1"
 	"go.f110.dev/kubeproto/go/apis/schedulingv1"
+	"go.f110.dev/kubeproto/go/apis/storagev1"
 )
 
 var (
@@ -58,6 +59,7 @@ var localSchemeBuilder = runtime.SchemeBuilder{
 	policyv1.AddToScheme,
 	rbacv1.AddToScheme,
 	schedulingv1.AddToScheme,
+	storagev1.AddToScheme,
 }
 
 func init() {
@@ -77,6 +79,7 @@ func init() {
 		policyv1.AddToScheme,
 		rbacv1.AddToScheme,
 		schedulingv1.AddToScheme,
+		storagev1.AddToScheme,
 	} {
 		if err := v(Scheme); err != nil {
 			panic(err)
@@ -117,6 +120,7 @@ type Set struct {
 	PolicyV1                     *PolicyV1
 	RbacAuthorizationK8sIoV1     *RbacAuthorizationK8sIoV1
 	SchedulingK8sIoV1            *SchedulingK8sIoV1
+	StorageK8sIoV1               *StorageK8sIoV1
 }
 
 func NewSet(cfg *rest.Config) (*Set, error) {
@@ -285,6 +289,17 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 			return nil, err
 		}
 		s.SchedulingK8sIoV1 = NewSchedulingK8sIoV1Client(&restBackend{client: c})
+	}
+	{
+		conf := *cfg
+		conf.GroupVersion = &storagev1.SchemaGroupVersion
+		conf.APIPath = "/apis"
+		conf.NegotiatedSerializer = Codecs.WithoutConversion()
+		c, err := rest.RESTClientFor(&conf)
+		if err != nil {
+			return nil, err
+		}
+		s.StorageK8sIoV1 = NewStorageK8sIoV1Client(&restBackend{client: c})
 	}
 
 	return s, nil
@@ -2629,6 +2644,214 @@ func (c *SchedulingK8sIoV1) WatchPriorityClass(ctx context.Context, opts metav1.
 	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".scheduling.k8s.io", Version: "v1", Resource: "priorityclasses"}, opts)
 }
 
+type StorageK8sIoV1 struct {
+	backend Backend
+}
+
+func NewStorageK8sIoV1Client(b Backend) *StorageK8sIoV1 {
+	return &StorageK8sIoV1{backend: b}
+}
+
+func (c *StorageK8sIoV1) GetCSIDriver(ctx context.Context, name string, opts metav1.GetOptions) (*storagev1.CSIDriver, error) {
+	result, err := c.backend.GetClusterScoped(ctx, "csidrivers", "CSIDriver", name, opts, &storagev1.CSIDriver{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.CSIDriver), nil
+}
+
+func (c *StorageK8sIoV1) CreateCSIDriver(ctx context.Context, v *storagev1.CSIDriver, opts metav1.CreateOptions) (*storagev1.CSIDriver, error) {
+	result, err := c.backend.CreateClusterScoped(ctx, "csidrivers", "CSIDriver", v, opts, &storagev1.CSIDriver{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.CSIDriver), nil
+}
+
+func (c *StorageK8sIoV1) UpdateCSIDriver(ctx context.Context, v *storagev1.CSIDriver, opts metav1.UpdateOptions) (*storagev1.CSIDriver, error) {
+	result, err := c.backend.UpdateClusterScoped(ctx, "csidrivers", "CSIDriver", v, opts, &storagev1.CSIDriver{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.CSIDriver), nil
+}
+
+func (c *StorageK8sIoV1) DeleteCSIDriver(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "csidrivers"}, name, opts)
+}
+
+func (c *StorageK8sIoV1) ListCSIDriver(ctx context.Context, opts metav1.ListOptions) (*storagev1.CSIDriverList, error) {
+	result, err := c.backend.ListClusterScoped(ctx, "csidrivers", "CSIDriver", opts, &storagev1.CSIDriverList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.CSIDriverList), nil
+}
+
+func (c *StorageK8sIoV1) WatchCSIDriver(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "csidrivers"}, opts)
+}
+
+func (c *StorageK8sIoV1) GetCSINode(ctx context.Context, name string, opts metav1.GetOptions) (*storagev1.CSINode, error) {
+	result, err := c.backend.GetClusterScoped(ctx, "csinodes", "CSINode", name, opts, &storagev1.CSINode{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.CSINode), nil
+}
+
+func (c *StorageK8sIoV1) CreateCSINode(ctx context.Context, v *storagev1.CSINode, opts metav1.CreateOptions) (*storagev1.CSINode, error) {
+	result, err := c.backend.CreateClusterScoped(ctx, "csinodes", "CSINode", v, opts, &storagev1.CSINode{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.CSINode), nil
+}
+
+func (c *StorageK8sIoV1) UpdateCSINode(ctx context.Context, v *storagev1.CSINode, opts metav1.UpdateOptions) (*storagev1.CSINode, error) {
+	result, err := c.backend.UpdateClusterScoped(ctx, "csinodes", "CSINode", v, opts, &storagev1.CSINode{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.CSINode), nil
+}
+
+func (c *StorageK8sIoV1) DeleteCSINode(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "csinodes"}, name, opts)
+}
+
+func (c *StorageK8sIoV1) ListCSINode(ctx context.Context, opts metav1.ListOptions) (*storagev1.CSINodeList, error) {
+	result, err := c.backend.ListClusterScoped(ctx, "csinodes", "CSINode", opts, &storagev1.CSINodeList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.CSINodeList), nil
+}
+
+func (c *StorageK8sIoV1) WatchCSINode(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "csinodes"}, opts)
+}
+
+func (c *StorageK8sIoV1) GetCSIStorageCapacity(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*storagev1.CSIStorageCapacity, error) {
+	result, err := c.backend.Get(ctx, "csistoragecapacities", "CSIStorageCapacity", namespace, name, opts, &storagev1.CSIStorageCapacity{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.CSIStorageCapacity), nil
+}
+
+func (c *StorageK8sIoV1) CreateCSIStorageCapacity(ctx context.Context, v *storagev1.CSIStorageCapacity, opts metav1.CreateOptions) (*storagev1.CSIStorageCapacity, error) {
+	result, err := c.backend.Create(ctx, "csistoragecapacities", "CSIStorageCapacity", v, opts, &storagev1.CSIStorageCapacity{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.CSIStorageCapacity), nil
+}
+
+func (c *StorageK8sIoV1) UpdateCSIStorageCapacity(ctx context.Context, v *storagev1.CSIStorageCapacity, opts metav1.UpdateOptions) (*storagev1.CSIStorageCapacity, error) {
+	result, err := c.backend.Update(ctx, "csistoragecapacities", "CSIStorageCapacity", v, opts, &storagev1.CSIStorageCapacity{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.CSIStorageCapacity), nil
+}
+
+func (c *StorageK8sIoV1) DeleteCSIStorageCapacity(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "csistoragecapacities"}, namespace, name, opts)
+}
+
+func (c *StorageK8sIoV1) ListCSIStorageCapacity(ctx context.Context, namespace string, opts metav1.ListOptions) (*storagev1.CSIStorageCapacityList, error) {
+	result, err := c.backend.List(ctx, "csistoragecapacities", "CSIStorageCapacity", namespace, opts, &storagev1.CSIStorageCapacityList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.CSIStorageCapacityList), nil
+}
+
+func (c *StorageK8sIoV1) WatchCSIStorageCapacity(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "csistoragecapacities"}, namespace, opts)
+}
+
+func (c *StorageK8sIoV1) GetStorageClass(ctx context.Context, name string, opts metav1.GetOptions) (*storagev1.StorageClass, error) {
+	result, err := c.backend.GetClusterScoped(ctx, "storageclasses", "StorageClass", name, opts, &storagev1.StorageClass{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.StorageClass), nil
+}
+
+func (c *StorageK8sIoV1) CreateStorageClass(ctx context.Context, v *storagev1.StorageClass, opts metav1.CreateOptions) (*storagev1.StorageClass, error) {
+	result, err := c.backend.CreateClusterScoped(ctx, "storageclasses", "StorageClass", v, opts, &storagev1.StorageClass{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.StorageClass), nil
+}
+
+func (c *StorageK8sIoV1) UpdateStorageClass(ctx context.Context, v *storagev1.StorageClass, opts metav1.UpdateOptions) (*storagev1.StorageClass, error) {
+	result, err := c.backend.UpdateClusterScoped(ctx, "storageclasses", "StorageClass", v, opts, &storagev1.StorageClass{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.StorageClass), nil
+}
+
+func (c *StorageK8sIoV1) DeleteStorageClass(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "storageclasses"}, name, opts)
+}
+
+func (c *StorageK8sIoV1) ListStorageClass(ctx context.Context, opts metav1.ListOptions) (*storagev1.StorageClassList, error) {
+	result, err := c.backend.ListClusterScoped(ctx, "storageclasses", "StorageClass", opts, &storagev1.StorageClassList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.StorageClassList), nil
+}
+
+func (c *StorageK8sIoV1) WatchStorageClass(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "storageclasses"}, opts)
+}
+
+func (c *StorageK8sIoV1) GetVolumeAttachment(ctx context.Context, name string, opts metav1.GetOptions) (*storagev1.VolumeAttachment, error) {
+	result, err := c.backend.GetClusterScoped(ctx, "volumeattachments", "VolumeAttachment", name, opts, &storagev1.VolumeAttachment{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.VolumeAttachment), nil
+}
+
+func (c *StorageK8sIoV1) CreateVolumeAttachment(ctx context.Context, v *storagev1.VolumeAttachment, opts metav1.CreateOptions) (*storagev1.VolumeAttachment, error) {
+	result, err := c.backend.CreateClusterScoped(ctx, "volumeattachments", "VolumeAttachment", v, opts, &storagev1.VolumeAttachment{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.VolumeAttachment), nil
+}
+
+func (c *StorageK8sIoV1) UpdateVolumeAttachment(ctx context.Context, v *storagev1.VolumeAttachment, opts metav1.UpdateOptions) (*storagev1.VolumeAttachment, error) {
+	result, err := c.backend.UpdateClusterScoped(ctx, "volumeattachments", "VolumeAttachment", v, opts, &storagev1.VolumeAttachment{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.VolumeAttachment), nil
+}
+
+func (c *StorageK8sIoV1) DeleteVolumeAttachment(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "volumeattachments"}, name, opts)
+}
+
+func (c *StorageK8sIoV1) ListVolumeAttachment(ctx context.Context, opts metav1.ListOptions) (*storagev1.VolumeAttachmentList, error) {
+	result, err := c.backend.ListClusterScoped(ctx, "volumeattachments", "VolumeAttachment", opts, &storagev1.VolumeAttachmentList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.VolumeAttachmentList), nil
+}
+
+func (c *StorageK8sIoV1) WatchVolumeAttachment(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "volumeattachments"}, opts)
+}
+
 type InformerCache struct {
 	mu        sync.Mutex
 	informers map[reflect.Type]cache.SharedIndexInformer
@@ -2784,6 +3007,16 @@ func (f *InformerFactory) InformerFor(obj runtime.Object) cache.SharedIndexInfor
 		return NewRbacAuthorizationK8sIoV1Informer(f.cache, f.set.RbacAuthorizationK8sIoV1, f.namespace, f.resyncPeriod).RoleBindingInformer()
 	case *schedulingv1.PriorityClass:
 		return NewSchedulingK8sIoV1Informer(f.cache, f.set.SchedulingK8sIoV1, f.namespace, f.resyncPeriod).PriorityClassInformer()
+	case *storagev1.CSIDriver:
+		return NewStorageK8sIoV1Informer(f.cache, f.set.StorageK8sIoV1, f.namespace, f.resyncPeriod).CSIDriverInformer()
+	case *storagev1.CSINode:
+		return NewStorageK8sIoV1Informer(f.cache, f.set.StorageK8sIoV1, f.namespace, f.resyncPeriod).CSINodeInformer()
+	case *storagev1.CSIStorageCapacity:
+		return NewStorageK8sIoV1Informer(f.cache, f.set.StorageK8sIoV1, f.namespace, f.resyncPeriod).CSIStorageCapacityInformer()
+	case *storagev1.StorageClass:
+		return NewStorageK8sIoV1Informer(f.cache, f.set.StorageK8sIoV1, f.namespace, f.resyncPeriod).StorageClassInformer()
+	case *storagev1.VolumeAttachment:
+		return NewStorageK8sIoV1Informer(f.cache, f.set.StorageK8sIoV1, f.namespace, f.resyncPeriod).VolumeAttachmentInformer()
 	default:
 		return nil
 	}
@@ -2893,6 +3126,16 @@ func (f *InformerFactory) InformerForResource(gvr schema.GroupVersionResource) c
 		return NewRbacAuthorizationK8sIoV1Informer(f.cache, f.set.RbacAuthorizationK8sIoV1, f.namespace, f.resyncPeriod).RoleBindingInformer()
 	case schedulingv1.SchemaGroupVersion.WithResource("priorityclasses"):
 		return NewSchedulingK8sIoV1Informer(f.cache, f.set.SchedulingK8sIoV1, f.namespace, f.resyncPeriod).PriorityClassInformer()
+	case storagev1.SchemaGroupVersion.WithResource("csidrivers"):
+		return NewStorageK8sIoV1Informer(f.cache, f.set.StorageK8sIoV1, f.namespace, f.resyncPeriod).CSIDriverInformer()
+	case storagev1.SchemaGroupVersion.WithResource("csinodes"):
+		return NewStorageK8sIoV1Informer(f.cache, f.set.StorageK8sIoV1, f.namespace, f.resyncPeriod).CSINodeInformer()
+	case storagev1.SchemaGroupVersion.WithResource("csistoragecapacities"):
+		return NewStorageK8sIoV1Informer(f.cache, f.set.StorageK8sIoV1, f.namespace, f.resyncPeriod).CSIStorageCapacityInformer()
+	case storagev1.SchemaGroupVersion.WithResource("storageclasses"):
+		return NewStorageK8sIoV1Informer(f.cache, f.set.StorageK8sIoV1, f.namespace, f.resyncPeriod).StorageClassInformer()
+	case storagev1.SchemaGroupVersion.WithResource("volumeattachments"):
+		return NewStorageK8sIoV1Informer(f.cache, f.set.StorageK8sIoV1, f.namespace, f.resyncPeriod).VolumeAttachmentInformer()
 	default:
 		return nil
 	}
@@ -4296,6 +4539,134 @@ func (f *SchedulingK8sIoV1Informer) PriorityClassLister() *SchedulingK8sIoV1Prio
 	return NewSchedulingK8sIoV1PriorityClassLister(f.PriorityClassInformer().GetIndexer())
 }
 
+type StorageK8sIoV1Informer struct {
+	cache        *InformerCache
+	client       *StorageK8sIoV1
+	namespace    string
+	resyncPeriod time.Duration
+	indexers     cache.Indexers
+}
+
+func NewStorageK8sIoV1Informer(c *InformerCache, client *StorageK8sIoV1, namespace string, resyncPeriod time.Duration) *StorageK8sIoV1Informer {
+	return &StorageK8sIoV1Informer{
+		cache:        c,
+		client:       client,
+		namespace:    namespace,
+		resyncPeriod: resyncPeriod,
+		indexers:     cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
+	}
+}
+
+func (f *StorageK8sIoV1Informer) CSIDriverInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&storagev1.CSIDriver{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListCSIDriver(context.TODO(), metav1.ListOptions{})
+				},
+				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchCSIDriver(context.TODO(), metav1.ListOptions{})
+				},
+			},
+			&storagev1.CSIDriver{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *StorageK8sIoV1Informer) CSIDriverLister() *StorageK8sIoV1CSIDriverLister {
+	return NewStorageK8sIoV1CSIDriverLister(f.CSIDriverInformer().GetIndexer())
+}
+
+func (f *StorageK8sIoV1Informer) CSINodeInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&storagev1.CSINode{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListCSINode(context.TODO(), metav1.ListOptions{})
+				},
+				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchCSINode(context.TODO(), metav1.ListOptions{})
+				},
+			},
+			&storagev1.CSINode{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *StorageK8sIoV1Informer) CSINodeLister() *StorageK8sIoV1CSINodeLister {
+	return NewStorageK8sIoV1CSINodeLister(f.CSINodeInformer().GetIndexer())
+}
+
+func (f *StorageK8sIoV1Informer) CSIStorageCapacityInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&storagev1.CSIStorageCapacity{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListCSIStorageCapacity(context.TODO(), f.namespace, metav1.ListOptions{})
+				},
+				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchCSIStorageCapacity(context.TODO(), f.namespace, metav1.ListOptions{})
+				},
+			},
+			&storagev1.CSIStorageCapacity{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *StorageK8sIoV1Informer) CSIStorageCapacityLister() *StorageK8sIoV1CSIStorageCapacityLister {
+	return NewStorageK8sIoV1CSIStorageCapacityLister(f.CSIStorageCapacityInformer().GetIndexer())
+}
+
+func (f *StorageK8sIoV1Informer) StorageClassInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&storagev1.StorageClass{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListStorageClass(context.TODO(), metav1.ListOptions{})
+				},
+				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchStorageClass(context.TODO(), metav1.ListOptions{})
+				},
+			},
+			&storagev1.StorageClass{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *StorageK8sIoV1Informer) StorageClassLister() *StorageK8sIoV1StorageClassLister {
+	return NewStorageK8sIoV1StorageClassLister(f.StorageClassInformer().GetIndexer())
+}
+
+func (f *StorageK8sIoV1Informer) VolumeAttachmentInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&storagev1.VolumeAttachment{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListVolumeAttachment(context.TODO(), metav1.ListOptions{})
+				},
+				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchVolumeAttachment(context.TODO(), metav1.ListOptions{})
+				},
+			},
+			&storagev1.VolumeAttachment{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *StorageK8sIoV1Informer) VolumeAttachmentLister() *StorageK8sIoV1VolumeAttachmentLister {
+	return NewStorageK8sIoV1VolumeAttachmentLister(f.VolumeAttachmentInformer().GetIndexer())
+}
+
 type CoreV1BindingLister struct {
 	indexer cache.Indexer
 }
@@ -5671,4 +6042,139 @@ func (x *SchedulingK8sIoV1PriorityClassLister) Get(name string) (*schedulingv1.P
 		return nil, k8serrors.NewNotFound(schedulingv1.SchemaGroupVersion.WithResource("priorityclass").GroupResource(), name)
 	}
 	return obj.(*schedulingv1.PriorityClass).DeepCopy(), nil
+}
+
+type StorageK8sIoV1CSIDriverLister struct {
+	indexer cache.Indexer
+}
+
+func NewStorageK8sIoV1CSIDriverLister(indexer cache.Indexer) *StorageK8sIoV1CSIDriverLister {
+	return &StorageK8sIoV1CSIDriverLister{indexer: indexer}
+}
+
+func (x *StorageK8sIoV1CSIDriverLister) List(selector labels.Selector) ([]*storagev1.CSIDriver, error) {
+	var ret []*storagev1.CSIDriver
+	err := cache.ListAll(x.indexer, selector, func(m interface{}) {
+		ret = append(ret, m.(*storagev1.CSIDriver).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *StorageK8sIoV1CSIDriverLister) Get(name string) (*storagev1.CSIDriver, error) {
+	obj, exists, err := x.indexer.GetByKey("/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(storagev1.SchemaGroupVersion.WithResource("csidriver").GroupResource(), name)
+	}
+	return obj.(*storagev1.CSIDriver).DeepCopy(), nil
+}
+
+type StorageK8sIoV1CSINodeLister struct {
+	indexer cache.Indexer
+}
+
+func NewStorageK8sIoV1CSINodeLister(indexer cache.Indexer) *StorageK8sIoV1CSINodeLister {
+	return &StorageK8sIoV1CSINodeLister{indexer: indexer}
+}
+
+func (x *StorageK8sIoV1CSINodeLister) List(selector labels.Selector) ([]*storagev1.CSINode, error) {
+	var ret []*storagev1.CSINode
+	err := cache.ListAll(x.indexer, selector, func(m interface{}) {
+		ret = append(ret, m.(*storagev1.CSINode).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *StorageK8sIoV1CSINodeLister) Get(name string) (*storagev1.CSINode, error) {
+	obj, exists, err := x.indexer.GetByKey("/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(storagev1.SchemaGroupVersion.WithResource("csinode").GroupResource(), name)
+	}
+	return obj.(*storagev1.CSINode).DeepCopy(), nil
+}
+
+type StorageK8sIoV1CSIStorageCapacityLister struct {
+	indexer cache.Indexer
+}
+
+func NewStorageK8sIoV1CSIStorageCapacityLister(indexer cache.Indexer) *StorageK8sIoV1CSIStorageCapacityLister {
+	return &StorageK8sIoV1CSIStorageCapacityLister{indexer: indexer}
+}
+
+func (x *StorageK8sIoV1CSIStorageCapacityLister) List(namespace string, selector labels.Selector) ([]*storagev1.CSIStorageCapacity, error) {
+	var ret []*storagev1.CSIStorageCapacity
+	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
+		ret = append(ret, m.(*storagev1.CSIStorageCapacity).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *StorageK8sIoV1CSIStorageCapacityLister) Get(namespace, name string) (*storagev1.CSIStorageCapacity, error) {
+	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(storagev1.SchemaGroupVersion.WithResource("csistoragecapacity").GroupResource(), name)
+	}
+	return obj.(*storagev1.CSIStorageCapacity).DeepCopy(), nil
+}
+
+type StorageK8sIoV1StorageClassLister struct {
+	indexer cache.Indexer
+}
+
+func NewStorageK8sIoV1StorageClassLister(indexer cache.Indexer) *StorageK8sIoV1StorageClassLister {
+	return &StorageK8sIoV1StorageClassLister{indexer: indexer}
+}
+
+func (x *StorageK8sIoV1StorageClassLister) List(selector labels.Selector) ([]*storagev1.StorageClass, error) {
+	var ret []*storagev1.StorageClass
+	err := cache.ListAll(x.indexer, selector, func(m interface{}) {
+		ret = append(ret, m.(*storagev1.StorageClass).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *StorageK8sIoV1StorageClassLister) Get(name string) (*storagev1.StorageClass, error) {
+	obj, exists, err := x.indexer.GetByKey("/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(storagev1.SchemaGroupVersion.WithResource("storageclass").GroupResource(), name)
+	}
+	return obj.(*storagev1.StorageClass).DeepCopy(), nil
+}
+
+type StorageK8sIoV1VolumeAttachmentLister struct {
+	indexer cache.Indexer
+}
+
+func NewStorageK8sIoV1VolumeAttachmentLister(indexer cache.Indexer) *StorageK8sIoV1VolumeAttachmentLister {
+	return &StorageK8sIoV1VolumeAttachmentLister{indexer: indexer}
+}
+
+func (x *StorageK8sIoV1VolumeAttachmentLister) List(selector labels.Selector) ([]*storagev1.VolumeAttachment, error) {
+	var ret []*storagev1.VolumeAttachment
+	err := cache.ListAll(x.indexer, selector, func(m interface{}) {
+		ret = append(ret, m.(*storagev1.VolumeAttachment).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *StorageK8sIoV1VolumeAttachmentLister) Get(name string) (*storagev1.VolumeAttachment, error) {
+	obj, exists, err := x.indexer.GetByKey("/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(storagev1.SchemaGroupVersion.WithResource("volumeattachment").GroupResource(), name)
+	}
+	return obj.(*storagev1.VolumeAttachment).DeepCopy(), nil
 }
