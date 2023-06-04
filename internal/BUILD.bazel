@@ -22,6 +22,7 @@ go_library(
         "//vendor/k8s.io/api/policy/v1:policy",
         "//vendor/k8s.io/api/rbac/v1:rbac",
         "//vendor/k8s.io/api/scheduling/v1:scheduling",
+        "//vendor/k8s.io/api/storage/v1:storage",
         "//vendor/k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1:apiextensions",
         "//vendor/sigs.k8s.io/gateway-api/apis/v1alpha2",
     ],
