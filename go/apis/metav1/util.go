@@ -1,6 +1,8 @@
 package metav1
 
 import (
+	"time"
+
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/watch"
@@ -78,4 +80,55 @@ func AddToGroupVersion(scheme *runtime.Scheme, groupVersion schema.GroupVersion)
 		&APIGroup{},
 		&APIResourceList{},
 	)
+}
+
+func Now() Time {
+	return NewTime(time.Now())
+}
+
+func NewTime(t time.Time) Time {
+	return Time{
+		Seconds: t.Unix(),
+		Nanos:   t.Nanosecond(),
+	}
+}
+
+func (in *Time) IsZero() bool {
+	if in == nil {
+		return true
+	}
+	t := time.Unix(in.Seconds, int64(in.Nanos))
+	return t.IsZero()
+}
+
+func (in *Time) Before(u *Time) bool {
+	if in != nil && u != nil {
+		return in.Time().Before(u.Time())
+	}
+	return false
+}
+
+func (in *Time) After(u *Time) bool {
+	if in != nil && u != nil {
+		return in.Time().After(u.Time())
+	}
+	return false
+}
+
+func (in *Time) Equal(u *Time) bool {
+	if in == nil && u == nil {
+		return true
+	}
+	if in != nil && u != nil {
+		return in.Time().Equal(u.Time())
+	}
+	return false
+}
+
+func (in *Time) Time() time.Time {
+	return time.Unix(in.Seconds, int64(in.Nanos))
+}
+
+func (in *Time) Unix() int64 {
+	return in.Time().Unix()
 }
