@@ -8,6 +8,7 @@ proto_library(
     deps = [
         "//:k8s_proto",
         "//:kubeproto",
+        "//example/proto/github.com/cert-manager/cert-manager/apis/metav1",
     ],
 )
 

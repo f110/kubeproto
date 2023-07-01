@@ -1,6 +1,7 @@
 package blogv1alpha2
 
 import (
+	metav1_1 "github.com/cert-manager/cert-manager/pkg/apis/meta/v1"
 	corev1 "go.f110.dev/kubeproto/go/apis/corev1"
 	metav1 "go.f110.dev/kubeproto/go/apis/metav1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -277,6 +278,7 @@ type BlogSpec struct {
 	Categories         []Category                `json:"categories"`
 	ServiceAccountJSON *corev1.SecretKeySelector `json:"serviceAccountJSON,omitempty"`
 	EditorSelector     LabelSelector             `json:"editorSelector"`
+	IssuerRef          metav1_1.ObjectReference  `json:"issuerRef"`
 }
 
 func (in *BlogSpec) DeepCopyInto(out *BlogSpec) {
@@ -300,6 +302,7 @@ func (in *BlogSpec) DeepCopyInto(out *BlogSpec) {
 		(*in).DeepCopyInto(*out)
 	}
 	in.EditorSelector.DeepCopyInto(&out.EditorSelector)
+	in.IssuerRef.DeepCopyInto(&out.IssuerRef)
 }
 
 func (in *BlogSpec) DeepCopy() *BlogSpec {

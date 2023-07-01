@@ -66,6 +66,8 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 	if hasRuntimeObject {
 		importPackages["k8s.io/apimachinery/pkg/runtime/schema"] = ""
 		importPackages["go.f110.dev/kubeproto/go/apis/metav1"] = ""
+		g.packageNamespaceManager.Add("k8s.io/apimachinery/pkg/runtime/schema", "")
+		g.packageNamespaceManager.Add("go.f110.dev/kubeproto/go/apis/metav1", "")
 
 		if ext.SubGroup != "" {
 			defW.F("const GroupName = \"%s.%s\"", ext.SubGroup, ext.Domain)
