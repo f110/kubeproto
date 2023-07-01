@@ -43,9 +43,6 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 	importPackages := map[string]string{
 		"k8s.io/apimachinery/pkg/runtime": "",
 	}
-	for k, v := range importPackages {
-		g.packageNamespaceManager.Add(k, v)
-	}
 
 	w := codegeneration.NewWriter()
 	messages := g.lister.GetMessages()
@@ -66,8 +63,6 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 	if hasRuntimeObject {
 		importPackages["k8s.io/apimachinery/pkg/runtime/schema"] = ""
 		importPackages["go.f110.dev/kubeproto/go/apis/metav1"] = ""
-		g.packageNamespaceManager.Add("k8s.io/apimachinery/pkg/runtime/schema", "")
-		g.packageNamespaceManager.Add("go.f110.dev/kubeproto/go/apis/metav1", "")
 
 		if ext.SubGroup != "" {
 			defW.F("const GroupName = \"%s.%s\"", ext.SubGroup, ext.Domain)
@@ -136,7 +131,7 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 
 		if obj.IsList() {
 			importPath, packageAlias, typ := g.lister.ResolveGoType(packageName, obj.Fields[0])
-			if importPath != "" {
+			if _, ok := importPackages[importPath]; !ok && importPath != "" {
 				importPackages[importPath] = packageAlias
 			}
 			defW.F("type %s %s", obj.ShortName, typ)
@@ -180,7 +175,7 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 					name = string(f.Name)
 				}
 				importPath, packageName, typ := g.lister.ResolveGoType(packageName, f)
-				if importPath != "" {
+				if _, ok := importPackages[importPath]; !ok && importPath != "" {
 					importPackages[importPath] = packageName
 				}
 				tag := f.Tag()
@@ -299,7 +294,8 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 
 	w.F("import (")
 	for p, a := range importPackages {
-		if a != "" {
+		alias := g.packageNamespaceManager.Alias(p)
+		if alias != "" {
 			w.F("%s %q", a, p)
 		} else {
 			w.F("%q", p)
