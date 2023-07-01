@@ -27,7 +27,7 @@ func NewFakeClientGenerator(fileToGenerate []string, files *protoregistry.Files)
 	}
 }
 
-func (g *FakeClientGenerator) Generate(out io.Writer, packageName, importPath, clientPath string) error {
+func (g *FakeClientGenerator) Generate(out io.Writer, packageName, importPath, clientPath string, fqdnSetName bool) error {
 	w := codegeneration.NewWriter()
 	w.F("package %s", path.Base(packageName))
 
@@ -54,7 +54,7 @@ func (g *FakeClientGenerator) Generate(out io.Writer, packageName, importPath, c
 	writer := codegeneration.NewWriter()
 
 	restClient := newRestFakeClientGenerator(groupVersions, clientPath)
-	if err := restClient.WriteTo(writer); err != nil {
+	if err := restClient.WriteTo(writer, fqdnSetName); err != nil {
 		return err
 	}
 	for p, a := range restClient.Import() {
@@ -111,7 +111,7 @@ func (g *restFakeClientGenerator) Import() map[string]string {
 	return importPackages
 }
 
-func (g *restFakeClientGenerator) WriteTo(writer *codegeneration.Writer) error {
+func (g *restFakeClientGenerator) WriteTo(writer *codegeneration.Writer, fqdn bool) error {
 	clientPackageName := path.Base(g.clientPath)
 
 	writer.F("var (")
@@ -140,7 +140,7 @@ func (g *restFakeClientGenerator) WriteTo(writer *codegeneration.Writer) error {
 	writer.F("")
 	for _, k := range keys(g.groupVersions) {
 		m := g.groupVersions[k][0]
-		clientName := m.ClientName()
+		clientName := m.ClientName(fqdn)
 		writer.F("s.%s = %s.New%sClient(&fakerBackend{fake: &s.fake})", clientName, clientPackageName, clientName)
 	}
 	writer.F("return s")

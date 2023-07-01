@@ -1,7 +1,7 @@
 package blogv1alpha1
 
 import (
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "go.f110.dev/kubeproto/go/apis/metav1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
@@ -12,7 +12,7 @@ var (
 	GroupVersion       = metav1.GroupVersion{Group: GroupName, Version: "v1alpha1"}
 	SchemeBuilder      = runtime.NewSchemeBuilder(addKnownTypes)
 	AddToScheme        = SchemeBuilder.AddToScheme
-	SchemaGroupVersion = schema.GroupVersion{Group: "blog.f110.dev", Version: "v1alpha1"}
+	SchemaGroupVersion = schema.GroupVersion{Group: GroupName, Version: "v1alpha1"}
 )
 
 func addKnownTypes(scheme *runtime.Scheme) error {

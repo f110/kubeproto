@@ -60,6 +60,7 @@ type Backend interface {
 	DeleteClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, name string, opts metav1.DeleteOptions) error
 	WatchClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, opts metav1.ListOptions) (watch.Interface, error)
 }
+
 type Set struct {
 	BlogV1alpha1 *BlogV1alpha1
 	BlogV1alpha2 *BlogV1alpha2

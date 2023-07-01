@@ -1,8 +1,8 @@
 package blogv1alpha2
 
 import (
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "go.f110.dev/kubeproto/go/apis/corev1"
+	metav1 "go.f110.dev/kubeproto/go/apis/metav1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
@@ -13,7 +13,7 @@ var (
 	GroupVersion       = metav1.GroupVersion{Group: GroupName, Version: "v1alpha2"}
 	SchemeBuilder      = runtime.NewSchemeBuilder(addKnownTypes)
 	AddToScheme        = SchemeBuilder.AddToScheme
-	SchemaGroupVersion = schema.GroupVersion{Group: "blog.f110.dev", Version: "v1alpha2"}
+	SchemaGroupVersion = schema.GroupVersion{Group: GroupName, Version: "v1alpha2"}
 )
 
 func addKnownTypes(scheme *runtime.Scheme) error {
@@ -32,9 +32,9 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 type PostPhase string
 
 const (
-	PostPhaseCreated      PostPhase = "Created"
-	PostPhaseProvisioning PostPhase = "Provisioning"
-	PostPhaseProvisioned  PostPhase = "Provisioned"
+	PostPhaseCREATED      PostPhase = "CREATED"
+	PostPhasePROVISIONING PostPhase = "PROVISIONING"
+	PostPhasePROVISIONED  PostPhase = "PROVISIONED"
 )
 
 type Author struct {
@@ -272,7 +272,7 @@ type BlogSpec struct {
 	Title          string               `json:"title"`
 	AuthorSelector metav1.LabelSelector `json:"authorSelector"`
 	// A list of all tags.
-	//  A tag is one of metadata of the post.
+	// A tag is one of metadata of the post.
 	Tags               []string                  `json:"tags"`
 	Categories         []Category                `json:"categories"`
 	ServiceAccountJSON *corev1.SecretKeySelector `json:"serviceAccountJSON,omitempty"`
@@ -337,11 +337,17 @@ func (in *BlogStatus) DeepCopy() *BlogStatus {
 }
 
 type PostSpec struct {
-	Subject string `json:"subject"`
+	Subject string   `json:"subject"`
+	Authors []string `json:"authors"`
 }
 
 func (in *PostSpec) DeepCopyInto(out *PostSpec) {
 	*out = *in
+	if in.Authors != nil {
+		t := make([]string, len(in.Authors))
+		copy(t, in.Authors)
+		out.Authors = t
+	}
 }
 
 func (in *PostSpec) DeepCopy() *PostSpec {

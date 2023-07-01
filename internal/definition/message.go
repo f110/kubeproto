@@ -298,9 +298,12 @@ func (m *Message) IsList() bool {
 	return false
 }
 
-func (m *Message) ClientName() string {
-	if m.Group != "" && m.Group != "." {
+func (m *Message) ClientName(fqdn bool) string {
+	if fqdn && m.Group != "" && m.Group != "." {
 		return fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.Group), stringsutil.ToUpperCamelCase(m.Version))
+	}
+	if m.SubGroup != "" {
+		return fmt.Sprintf("%s%s", stringsutil.ToUpperCamelCase(m.SubGroup), stringsutil.ToUpperCamelCase(m.Version))
 	}
 
 	// If Group is empty, we assume that the message belongs to core group (e.g. Pod)

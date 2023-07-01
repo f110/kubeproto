@@ -61,7 +61,8 @@ message Post {
 }
 
 message PostSpec {
-  string subject = 1;
+  string          subject = 1;
+  repeated string authors = 2;
 }
 
 message PostStatus {
