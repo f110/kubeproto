@@ -33,11 +33,20 @@ func genClient() error {
 	}
 
 	var outFile, importPath string
+	var FQNDNSetName bool
 	opt := input.GetParameter()
 	if strings.Contains(opt, ",") {
 		s := strings.Split(opt, ",")
 		outFile = s[0]
 		importPath = s[1]
+		if len(s) > 2 {
+			for _, v := range s[2:] {
+				switch v {
+				case "fqdn-set":
+					FQNDNSetName = true
+				}
+			}
+		}
 	} else {
 		outFile = opt
 	}
@@ -48,7 +57,7 @@ func genClient() error {
 	out := new(bytes.Buffer)
 	g := k8s.NewClientGenerator(input.FileToGenerate, files)
 	packageName := path.Base(filepath.Dir(outFile))
-	if err := g.Generate(out, packageName, importPath); err != nil {
+	if err := g.Generate(out, packageName, importPath, FQNDNSetName); err != nil {
 		return err
 	}
 	res.File = append(res.File, &pluginpb.CodeGeneratorResponse_File{

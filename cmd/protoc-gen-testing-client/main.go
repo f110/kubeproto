@@ -34,12 +34,21 @@ func genFakeClient() error {
 	}
 
 	var outFile, importPath, clientPath string
+	var FQDNSetName bool
 	opt := input.GetParameter()
 	if strings.Contains(opt, ",") {
 		s := strings.Split(opt, ",")
 		outFile = s[0]
 		importPath = s[1]
 		clientPath = s[2]
+		if len(s) > 3 {
+			for _, v := range s[2:] {
+				switch v {
+				case "fqdn-set":
+					FQDNSetName = true
+				}
+			}
+		}
 	} else {
 		return errors.New("import path and client path is mandatory")
 	}
@@ -50,7 +59,7 @@ func genFakeClient() error {
 	out := new(bytes.Buffer)
 	g := k8s.NewFakeClientGenerator(input.FileToGenerate, files)
 	packageName := path.Base(filepath.Dir(outFile))
-	if err := g.Generate(out, packageName, importPath, clientPath); err != nil {
+	if err := g.Generate(out, packageName, importPath, clientPath, FQDNSetName); err != nil {
 		return err
 	}
 	res.File = append(res.File, &pluginpb.CodeGeneratorResponse_File{

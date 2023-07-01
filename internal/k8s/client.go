@@ -30,7 +30,7 @@ func NewClientGenerator(fileToGenerate []string, files *protoregistry.Files) *Cl
 	}
 }
 
-func (g *ClientGenerator) Generate(out io.Writer, packageName, importPath string) error {
+func (g *ClientGenerator) Generate(out io.Writer, packageName, importPath string, fqdnSetName bool) error {
 	w := codegeneration.NewWriter()
 	w.F("package %s", path.Base(packageName))
 
@@ -111,7 +111,7 @@ type Backend interface {
 	writer.F("type Set struct {")
 	for _, key := range keys(groupVersions) {
 		m := groupVersions[key][0]
-		clientName := m.ClientName()
+		clientName := m.ClientName(fqdnSetName)
 		writer.F("%s *%s", clientName, clientName)
 	}
 	writer.F("}")
@@ -120,7 +120,7 @@ type Backend interface {
 	writer.F("s := &Set{}")
 	for _, key := range keys(groupVersions) {
 		m := groupVersions[key][0]
-		clientName := m.ClientName()
+		clientName := m.ClientName(fqdnSetName)
 		writer.F("{")
 		writer.F("conf := *cfg")
 		writer.F("conf.GroupVersion = &%s.SchemaGroupVersion", m.Package.Alias)
@@ -139,21 +139,21 @@ type Backend interface {
 	writer.F("")
 
 	restClient := newRestClientGenerator(groupVersions)
-	if err := restClient.WriteTo(writer); err != nil {
+	if err := restClient.WriteTo(writer, fqdnSetName); err != nil {
 		return err
 	}
 	for p, a := range restClient.Import() {
 		importPackages[p] = a
 	}
 	informer := newInformerGenerator(groupVersions)
-	if err := informer.WriteTo(writer); err != nil {
+	if err := informer.WriteTo(writer, fqdnSetName); err != nil {
 		return err
 	}
 	for p, a := range informer.Import() {
 		importPackages[p] = a
 	}
 	lister := newListerGenerator(groupVersions)
-	if err := lister.WriteTo(writer); err != nil {
+	if err := lister.WriteTo(writer, fqdnSetName); err != nil {
 		return err
 	}
 	for p, a := range lister.Import() {
@@ -249,7 +249,7 @@ func (g *restClientGenerator) Import() map[string]string {
 	return importPackages
 }
 
-func (g *restClientGenerator) WriteTo(writer *codegeneration.Writer) error {
+func (g *restClientGenerator) WriteTo(writer *codegeneration.Writer, fqdn bool) error {
 	writer.F(`type restBackend struct {
 	client *rest.RESTClient
 }
@@ -433,7 +433,7 @@ func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVe
 	for _, k := range keys(g.groupVersions) {
 		v := g.groupVersions[k]
 		m := v[0]
-		clientName := m.ClientName()
+		clientName := m.ClientName(fqdn)
 		writer.F(`type %s struct {
 	backend Backend
 }`, clientName)
@@ -619,7 +619,7 @@ func newInformerGenerator(groupVersions map[string][]*definition.Message) *infor
 	return &informerGenerator{groupVersions: groupVersions}
 }
 
-func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
+func (g *informerGenerator) WriteTo(writer *codegeneration.Writer, fqdn bool) error {
 	writer.F("type InformerCache struct {")
 	writer.F("mu sync.Mutex")
 	writer.F("informers map[reflect.Type]cache.SharedIndexInformer")
@@ -677,7 +677,7 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 	for _, k := range keys(g.groupVersions) {
 		v := g.groupVersions[k]
 		for _, m := range v {
-			clientName := m.ClientName()
+			clientName := m.ClientName(fqdn)
 			writer.F("case *%s.%s:", m.Package.Alias, m.ShortName)
 			writer.F("return New%sInformer(f.cache, f.set.%s, f.namespace, f.resyncPeriod).%sInformer()", clientName, clientName, m.ShortName)
 		}
@@ -693,7 +693,7 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 	for _, k := range keys(g.groupVersions) {
 		v := g.groupVersions[k]
 		for _, m := range v {
-			clientName := m.ClientName()
+			clientName := m.ClientName(fqdn)
 			writer.F("case %s.SchemaGroupVersion.WithResource(%q):", m.Package.Alias, strings.ToLower(stringsutil.Plural(m.ShortName)))
 			writer.F("return New%sInformer(f.cache, f.set.%s, f.namespace, f.resyncPeriod).%sInformer()", clientName, clientName, m.ShortName)
 		}
@@ -714,7 +714,7 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer) error {
 	for _, k := range keys(g.groupVersions) {
 		v := g.groupVersions[k]
 		m := v[0]
-		clientName := m.ClientName()
+		clientName := m.ClientName(fqdn)
 
 		writer.F("type %sInformer struct {", clientName)
 		writer.F("cache *InformerCache")
@@ -813,11 +813,11 @@ func (g *listerGenerator) Import() map[string]string {
 	return importPackages
 }
 
-func (g *listerGenerator) WriteTo(writer *codegeneration.Writer) error {
+func (g *listerGenerator) WriteTo(writer *codegeneration.Writer, fqdn bool) error {
 	for _, k := range keys(g.groupVersions) {
 		v := g.groupVersions[k]
 		m := v[0]
-		clientName := m.ClientName()
+		clientName := m.ClientName(fqdn)
 
 		for _, m := range v {
 			writer.F("type %s%sLister struct {", clientName, m.ShortName)

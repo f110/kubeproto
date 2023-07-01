@@ -332,18 +332,23 @@ spec:
             type: object
           spec:
             properties:
+              authors:
+                items:
+                  type: string
+                type: array
               subject:
                 type: string
             required:
             - subject
+            - authors
             type: object
           status:
             properties:
               phase:
                 enum:
-                - Created
-                - Provisioning
-                - Provisioned
+                - CREATED
+                - PROVISIONING
+                - PROVISIONED
                 type: string
               ready:
                 type: boolean

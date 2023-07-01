@@ -1,5 +1,5 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
-load("@io_bazel_rules_go//go:def.bzl", "go_context", "GoLibrary")
+load("@io_bazel_rules_go//go:def.bzl", "GoLibrary", "go_context")
 load("@rules_proto//proto:defs.bzl", "ProtoInfo")
 
 def _crd_proto_manifest(ctx):
@@ -53,18 +53,24 @@ crd_proto_manifest = rule(
     },
 )
 
+K8SClient = provider()
+
 def _go_client(ctx):
     go = go_context(ctx)
+    opts = ctx.attr.importpath
+    if ctx.attr.fqdn:
+        opts += ",fqdn-set"
     out = _execute_protoc(
         ctx,
         ctx.executable._compiler,
         ctx.attr._compiler_name,
         "generated.client.go",
         ctx.attr.srcs,
-        ctx.attr.importpath,
+        opts,
     )
     library = go.new_library(go, srcs = [out])
     source = go.library_to_source(go, ctx.attr, library, False)
+    k8s_client = K8SClient(fqdn = ctx.attr.fqdn)
 
     return [
         library,
@@ -72,6 +78,7 @@ def _go_client(ctx):
         DefaultInfo(
             files = depset([out]),
         ),
+        k8s_client,
     ]
 
 go_client = rule(
@@ -79,6 +86,7 @@ go_client = rule(
     attrs = {
         "srcs": attr.label_list(providers = [ProtoInfo]),
         "importpath": attr.string(mandatory = True),
+        "fqdn": attr.bool(default = False, doc = "Generate with FQDN name"),
         "protoc": attr.label(
             executable = True,
             cfg = "host",
@@ -99,13 +107,16 @@ go_client = rule(
 
 def _go_testing_client(ctx):
     go = go_context(ctx)
+    opts = "%s,%s" % (ctx.attr.importpath, ctx.attr.client[GoLibrary].importpath)
+    if ctx.attr.client[K8SClient].fqdn:
+        opts += ",fqdn-set"
     out = _execute_protoc(
         ctx,
         ctx.executable._compiler,
         ctx.attr._compiler_name,
         "generated.testingclient.go",
         ctx.attr.srcs,
-        "%s,%s" % (ctx.attr.importpath, ctx.attr.client[GoLibrary].importpath),
+        opts,
     )
     library = go.new_library(go, srcs = [out])
     source = go.library_to_source(go, ctx.attr, library, False)
@@ -123,7 +134,7 @@ go_testing_client = rule(
     attrs = {
         "srcs": attr.label_list(providers = [ProtoInfo]),
         "importpath": attr.string(mandatory = True),
-        "client": attr.label(mandatory = True, providers = [GoLibrary]),
+        "client": attr.label(mandatory = True, providers = [GoLibrary, K8SClient]),
         "protoc": attr.label(
             executable = True,
             cfg = "host",
