@@ -58,7 +58,7 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 
 	packageName := fileOpt.GetGoPackage()
 	kubeprotoGoPackage := proto.GetExtension(g.file.Options(), kubeproto.E_KubeprotoGoPackage)
-	if kubeprotoGoPackage != nil {
+	if kubeprotoGoPackage.(string) != "" {
 		packageName = kubeprotoGoPackage.(string)
 	}
 	w.F("package %s", path.Base(packageName))
