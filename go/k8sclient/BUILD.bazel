@@ -23,6 +23,7 @@ go_client(
         "//k8s.io/api/scheduling/v1:schedulingv1_proto",
         "//k8s.io/api/storage/v1:storagev1_proto",
     ],
+    fqdn = True,
     importpath = "go.f110.dev/kubeproto/go/k8sclient",
     visibility = ["//visibility:public"],
 )

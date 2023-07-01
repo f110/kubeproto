@@ -24,7 +24,7 @@ message Unknown {
   // Raw will hold the complete serialized object which couldn't be matched
   // with a registered type. Most likely, nothing should be done with this
   // except for passing it through the system.
-  optional bytes raw = 2 [(dev.f110.kubeproto.field) = { go_name: "Raw", inline: false }];
+  optional bytes raw = 2 [(dev.f110.kubeproto.field) = { go_name: "Raw", api_field_name: "-", inline: false }];
   // ContentEncoding is encoding used to encode 'Raw' data.
   // Unspecified means no encoding.
   string content_encoding = 3 [(dev.f110.kubeproto.field) = { go_name: "ContentEncoding", inline: false }];
