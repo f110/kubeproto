@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"k8s.io/apimachinery/pkg/api/meta"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -13,6 +12,7 @@ import (
 	k8stesting "k8s.io/client-go/testing"
 
 	"go.f110.dev/kubeproto/example/pkg/client"
+	"go.f110.dev/kubeproto/go/apis/metav1"
 )
 
 var (

@@ -10,6 +10,14 @@ import (
 
 var Unversioned = schema.GroupVersion{Group: "", Version: "v1"}
 
+const (
+	NamespaceDefault = "default"
+	NamespaceAll     = ""
+	NamespaceNone    = ""
+	NamespaceSystem  = "kube-system"
+	NamespacePublic  = "kube-public"
+)
+
 func (in *TypeMeta) GetObjectKind() schema.ObjectKind { return in }
 
 func (in *TypeMeta) SetGroupVersionKind(gvk schema.GroupVersionKind) {
@@ -131,4 +139,69 @@ func (in *Time) Time() time.Time {
 
 func (in *Time) Unix() int64 {
 	return in.Time().Unix()
+}
+
+type Object interface {
+	GetNamespace() string
+	SetNamespace(namespace string)
+	GetName() string
+	SetName(name string)
+	GetGenerateName() string
+	SetGenerateName(name string)
+	GetUID() string
+	SetUID(uid string)
+	GetResourceVersion() string
+	SetResourceVersion(version string)
+	GetGeneration() int64
+	SetGeneration(generation int64)
+	GetSelfLink() string
+	SetSelfLink(selfLink string)
+	GetCreationTimestamp() Time
+	SetCreationTimestamp(timestamp Time)
+	GetDeletionTimestamp() *Time
+	SetDeletionTimestamp(timestamp *Time)
+	GetDeletionGracePeriodSeconds() *int64
+	SetDeletionGracePeriodSeconds(*int64)
+	GetLabels() map[string]string
+	SetLabels(labels map[string]string)
+	GetAnnotations() map[string]string
+	SetAnnotations(annotations map[string]string)
+	GetFinalizers() []string
+	SetFinalizers(finalizers []string)
+	GetOwnerReferences() []OwnerReference
+	SetOwnerReferences([]OwnerReference)
+	GetManagedFields() []ManagedFieldsEntry
+	SetManagedFields(managedFields []ManagedFieldsEntry)
+}
+
+func NewControllerRef(owner Object, gvk schema.GroupVersionKind) *OwnerReference {
+	return &OwnerReference{
+		APIVersion:         gvk.GroupVersion().String(),
+		Kind:               gvk.Kind,
+		Name:               owner.GetName(),
+		UID:                owner.GetUID(),
+		BlockOwnerDeletion: true,
+		Controller:         true,
+	}
+}
+
+func IsControlledBy(obj Object, owner Object) bool {
+	for _, v := range obj.GetOwnerReferences() {
+		if v.Controller && v.UID == owner.GetUID() {
+			return true
+		}
+	}
+	return false
+}
+
+func HasAnnotation(obj ObjectMeta, key string) bool {
+	_, ok := obj.Annotations[key]
+	return ok
+}
+
+func SetMetadataAnnotation(obj *ObjectMeta, key string, value string) {
+	if obj.Annotations == nil {
+		obj.Annotations = make(map[string]string)
+	}
+	obj.Annotations[key] = value
 }
