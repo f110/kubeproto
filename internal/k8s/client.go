@@ -232,8 +232,8 @@ func newRestClientGenerator(groupVersions map[string][]*definition.Message) *res
 func (g *restClientGenerator) Import() map[string]string {
 	importPackages := map[string]string{
 		"k8s.io/client-go/rest":                "",
-		"k8s.io/apimachinery/pkg/apis/meta/v1": "metav1",
 		"k8s.io/apimachinery/pkg/watch":        "",
+		"go.f110.dev/kubeproto/go/apis/metav1": "",
 	}
 	for _, v := range g.groupVersions {
 		for _, m := range v {
@@ -266,8 +266,8 @@ func (r *restBackend) Get(ctx context.Context, resourceName, kindName, namespace
 
 func (r *restBackend) List(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error) {
 	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	if opts.TimeoutSeconds > 0 {
+		timeout = time.Duration(opts.TimeoutSeconds) * time.Second
 	}
 	return result, r.client.Get().
 		Namespace(namespace).
@@ -335,8 +335,8 @@ func (r *restBackend) Delete(ctx context.Context, gvr schema.GroupVersionResourc
 
 func (r *restBackend) Watch(ctx context.Context, gvr schema.GroupVersionResource, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
 	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	if opts.TimeoutSeconds > 0 {
+		timeout = time.Duration(opts.TimeoutSeconds) * time.Second
 	}
 	opts.Watch = true
 	return r.client.Get().
@@ -358,8 +358,8 @@ func (r *restBackend) GetClusterScoped(ctx context.Context, resourceName, kindNa
 
 func (r *restBackend) ListClusterScoped(ctx context.Context, resourceName, kindName string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error) {
 	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	if opts.TimeoutSeconds > 0 {
+		timeout = time.Duration(opts.TimeoutSeconds) * time.Second
 	}
 	return result, r.client.Get().
 		Resource(resourceName).
@@ -418,8 +418,8 @@ func (r *restBackend) DeleteClusterScoped(ctx context.Context, gvr schema.GroupV
 
 func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, opts metav1.ListOptions) (watch.Interface, error) {
 	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	if opts.TimeoutSeconds > 0 {
+		timeout = time.Duration(opts.TimeoutSeconds) * time.Second
 	}
 	opts.Watch = true
 	return r.client.Get().
@@ -595,11 +595,12 @@ func (g *informerGenerator) Import() map[string]string {
 		"context":                                "",
 		"time":                                   "",
 		"k8s.io/client-go/rest":                  "",
-		"k8s.io/apimachinery/pkg/apis/meta/v1":   "metav1",
 		"k8s.io/apimachinery/pkg/watch":          "",
 		"k8s.io/apimachinery/pkg/runtime":        "",
 		"k8s.io/apimachinery/pkg/runtime/schema": "",
 		"k8s.io/client-go/tools/cache":           "",
+		"go.f110.dev/kubeproto/go/apis/metav1":   "",
+		"k8s.io/apimachinery/pkg/apis/meta/v1":   "k8smetav1",
 	}
 	for _, v := range g.groupVersions {
 		for _, m := range v {
@@ -745,10 +746,10 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer, fqdn bool) er
 			if m.Scope == definition.ScopeTypeCluster {
 				writer.F("return cache.NewSharedIndexInformer(")
 				writer.F("&cache.ListWatch{")
-				writer.F("ListFunc: func (options metav1.ListOptions) (runtime.Object, error){")
+				writer.F("ListFunc: func (options k8smetav1.ListOptions) (runtime.Object, error){")
 				writer.F("return f.client.List%s(context.TODO(), metav1.ListOptions{})", m.ShortName)
 				writer.F("},") // end of ListFunc
-				writer.F("WatchFunc: func (options metav1.ListOptions) (watch.Interface, error){")
+				writer.F("WatchFunc: func (options k8smetav1.ListOptions) (watch.Interface, error){")
 				writer.F("return f.client.Watch%s(context.TODO(), metav1.ListOptions{})", m.ShortName)
 				writer.F("},") // end of WatchFunc
 				writer.F("},")
@@ -759,10 +760,10 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer, fqdn bool) er
 			} else {
 				writer.F("return cache.NewSharedIndexInformer(")
 				writer.F("&cache.ListWatch{")
-				writer.F("ListFunc: func (options metav1.ListOptions) (runtime.Object, error){")
+				writer.F("ListFunc: func (options k8smetav1.ListOptions) (runtime.Object, error){")
 				writer.F("return f.client.List%s(context.TODO(), f.namespace, metav1.ListOptions{})", m.ShortName)
 				writer.F("},") // end of ListFunc
-				writer.F("WatchFunc: func (options metav1.ListOptions) (watch.Interface, error){")
+				writer.F("WatchFunc: func (options k8smetav1.ListOptions) (watch.Interface, error){")
 				writer.F("return f.client.Watch%s(context.TODO(), f.namespace, metav1.ListOptions{})", m.ShortName)
 				writer.F("},") // end of WatchFunc
 				writer.F("},")

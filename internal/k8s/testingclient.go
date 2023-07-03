@@ -98,13 +98,13 @@ func newRestFakeClientGenerator(groupVersions map[string][]*definition.Message, 
 func (g *restFakeClientGenerator) Import() map[string]string {
 	importPackages := map[string]string{
 		"k8s.io/apimachinery/pkg/api/meta":           "",
-		"k8s.io/apimachinery/pkg/apis/meta/v1":       "metav1",
 		"k8s.io/apimachinery/pkg/watch":              "",
 		"k8s.io/apimachinery/pkg/labels":             "",
 		"k8s.io/apimachinery/pkg/runtime":            "",
 		"k8s.io/apimachinery/pkg/runtime/schema":     "",
 		"k8s.io/apimachinery/pkg/runtime/serializer": "",
 		"k8s.io/client-go/testing":                   "k8stesting",
+		"go.f110.dev/kubeproto/go/apis/metav1":       "",
 		g.clientPath:                                 "",
 	}
 
