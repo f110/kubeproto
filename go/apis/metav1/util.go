@@ -205,3 +205,49 @@ func SetMetadataAnnotation(obj *ObjectMeta, key string, value string) {
 	}
 	obj.Annotations[key] = value
 }
+
+// Functions for Object
+var _ Object = (*ObjectMeta)(nil)
+
+func (in *ObjectMeta) GetNamespace() string                { return in.Namespace }
+func (in *ObjectMeta) SetNamespace(namespace string)       { in.Namespace = namespace }
+func (in *ObjectMeta) GetName() string                     { return in.Name }
+func (in *ObjectMeta) SetName(name string)                 { in.Name = name }
+func (in *ObjectMeta) GetGenerateName() string             { return in.GenerateName }
+func (in *ObjectMeta) SetGenerateName(generateName string) { in.GenerateName = generateName }
+func (in *ObjectMeta) GetUID() string                      { return in.UID }
+func (in *ObjectMeta) SetUID(uid string)                   { in.UID = uid }
+func (in *ObjectMeta) GetResourceVersion() string          { return in.ResourceVersion }
+func (in *ObjectMeta) SetResourceVersion(version string)   { in.ResourceVersion = version }
+func (in *ObjectMeta) GetGeneration() int64                { return in.Generation }
+func (in *ObjectMeta) SetGeneration(generation int64)      { in.Generation = generation }
+func (in *ObjectMeta) GetSelfLink() string                 { return in.SelfLink }
+func (in *ObjectMeta) SetSelfLink(selfLink string)         { in.SelfLink = selfLink }
+func (in *ObjectMeta) GetCreationTimestamp() Time          { return *in.CreationTimestamp }
+func (in *ObjectMeta) SetCreationTimestamp(creationTimestamp Time) {
+	in.CreationTimestamp = &creationTimestamp
+}
+func (in *ObjectMeta) GetDeletionTimestamp() *Time { return in.DeletionTimestamp }
+func (in *ObjectMeta) SetDeletionTimestamp(deletionTimestamp *Time) {
+	in.DeletionTimestamp = deletionTimestamp
+}
+func (in *ObjectMeta) GetDeletionGracePeriodSeconds() *int64 {
+	return &in.DeletionGracePeriodSeconds
+}
+func (in *ObjectMeta) SetDeletionGracePeriodSeconds(deletionGracePeriodSeconds *int64) {
+	in.DeletionGracePeriodSeconds = *deletionGracePeriodSeconds
+}
+func (in *ObjectMeta) GetLabels() map[string]string                 { return in.Labels }
+func (in *ObjectMeta) SetLabels(labels map[string]string)           { in.Labels = labels }
+func (in *ObjectMeta) GetAnnotations() map[string]string            { return in.Annotations }
+func (in *ObjectMeta) SetAnnotations(annotations map[string]string) { in.Annotations = annotations }
+func (in *ObjectMeta) GetFinalizers() []string                      { return in.Finalizers }
+func (in *ObjectMeta) SetFinalizers(finalizers []string)            { in.Finalizers = finalizers }
+func (in *ObjectMeta) GetOwnerReferences() []OwnerReference         { return in.OwnerReferences }
+func (in *ObjectMeta) SetOwnerReferences(references []OwnerReference) {
+	in.OwnerReferences = references
+}
+func (in *ObjectMeta) GetManagedFields() []ManagedFieldsEntry { return in.ManagedFields }
+func (in *ObjectMeta) SetManagedFields(managedFields []ManagedFieldsEntry) {
+	in.ManagedFields = managedFields
+}
