@@ -41,7 +41,7 @@ var preDefinedPackages = []packageInformation{
 	{
 		GoPackage:       "k8s.io/apimachinery/pkg/apis/meta/v1",
 		ProtobufPackage: "k8s.io.apimachinery.pkg.apis.meta.v1",
-		ImportPath:      "go.f110.dev/kubeproto/go/apis/metav1",
+		ImportPath:      "k8s.io/apimachinery/pkg/apis/meta/v1",
 	},
 	{
 		GoPackage:       "k8s.io/apimachinery/pkg/api/resource",
@@ -61,37 +61,37 @@ var preDefinedPackages = []packageInformation{
 	{
 		GoPackage:       "k8s.io/api/core/v1",
 		ProtobufPackage: "k8s.io.api.core.v1",
-		ImportPath:      "go.f110.dev/kubeproto/go/apis/corev1",
+		ImportPath:      "k8s.io/api/core/v1",
 	},
 	{
 		GoPackage:       "k8s.io/api/apps/v1",
 		ProtobufPackage: "k8s.io.api.apps.v1",
-		ImportPath:      "go.f110.dev/kubeproto/go/apis/appsv1",
+		ImportPath:      "k8s.io/api/apps/v1",
 	},
 	{
 		GoPackage:       "k8s.io/api/batch/v1",
 		ProtobufPackage: "k8s.io.api.batch.v1",
-		ImportPath:      "go.f110.dev/kubeproto/go/apis/batchv1",
+		ImportPath:      "k8s.io/api/batch/v1",
 	},
 	{
 		GoPackage:       "k8s.io/api/policy/v1",
 		ProtobufPackage: "k8s.io.api.policy.v1",
-		ImportPath:      "go.f110.dev/kubeproto/go/apis/policyv1",
+		ImportPath:      "k8s.io/api/policy/v1",
 	},
 	{
 		GoPackage:       "k8s.io/api/networking/v1",
 		ProtobufPackage: "k8s.io.api.networking.v1",
-		ImportPath:      "go.f110.dev/kubeproto/go/apis/networkingv1",
+		ImportPath:      "k8s.io/api/networking/v1",
 	},
 	{
 		GoPackage:       "k8s.io/api/authentication/v1",
 		ProtobufPackage: "k8s.io.api.authentication.v1",
-		ImportPath:      "go.f110.dev/kubeproto/go/apis/authenticationv1",
+		ImportPath:      "k8s.io/api/authentication/v1",
 	},
 	{
 		GoPackage:       "k8s.io/api/admission/v1",
 		ProtobufPackage: "k8s.io.api.admission.v1",
-		ImportPath:      "go.f110.dev/kubeproto/go/apis/admissionv1",
+		ImportPath:      "k8s.io/api/admission/v1",
 	},
 	{
 		GoPackage:       "sigs.k8s.io/gateway-api/apis/v1alpha2",
