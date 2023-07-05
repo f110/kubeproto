@@ -8,7 +8,7 @@ import (
 	"time"
 
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	k8smetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -29,6 +29,7 @@ import (
 	"go.f110.dev/kubeproto/go/apis/corev1"
 	"go.f110.dev/kubeproto/go/apis/discoveryv1"
 	"go.f110.dev/kubeproto/go/apis/eventsv1"
+	"go.f110.dev/kubeproto/go/apis/metav1"
 	"go.f110.dev/kubeproto/go/apis/networkingv1"
 	"go.f110.dev/kubeproto/go/apis/policyv1"
 	"go.f110.dev/kubeproto/go/apis/rbacv1"
@@ -321,8 +322,8 @@ func (r *restBackend) Get(ctx context.Context, resourceName, kindName, namespace
 
 func (r *restBackend) List(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error) {
 	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	if opts.TimeoutSeconds > 0 {
+		timeout = time.Duration(opts.TimeoutSeconds) * time.Second
 	}
 	return result, r.client.Get().
 		Namespace(namespace).
@@ -390,8 +391,8 @@ func (r *restBackend) Delete(ctx context.Context, gvr schema.GroupVersionResourc
 
 func (r *restBackend) Watch(ctx context.Context, gvr schema.GroupVersionResource, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
 	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	if opts.TimeoutSeconds > 0 {
+		timeout = time.Duration(opts.TimeoutSeconds) * time.Second
 	}
 	opts.Watch = true
 	return r.client.Get().
@@ -413,8 +414,8 @@ func (r *restBackend) GetClusterScoped(ctx context.Context, resourceName, kindNa
 
 func (r *restBackend) ListClusterScoped(ctx context.Context, resourceName, kindName string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error) {
 	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	if opts.TimeoutSeconds > 0 {
+		timeout = time.Duration(opts.TimeoutSeconds) * time.Second
 	}
 	return result, r.client.Get().
 		Resource(resourceName).
@@ -473,8 +474,8 @@ func (r *restBackend) DeleteClusterScoped(ctx context.Context, gvr schema.GroupV
 
 func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, opts metav1.ListOptions) (watch.Interface, error) {
 	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	if opts.TimeoutSeconds > 0 {
+		timeout = time.Duration(opts.TimeoutSeconds) * time.Second
 	}
 	opts.Watch = true
 	return r.client.Get().
@@ -3169,10 +3170,10 @@ func (f *CoreV1Informer) BindingInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&corev1.Binding{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListBinding(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchBinding(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3191,10 +3192,10 @@ func (f *CoreV1Informer) ComponentStatusInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&corev1.ComponentStatus{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListComponentStatus(context.TODO(), metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchComponentStatus(context.TODO(), metav1.ListOptions{})
 				},
 			},
@@ -3213,10 +3214,10 @@ func (f *CoreV1Informer) ConfigMapInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&corev1.ConfigMap{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListConfigMap(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchConfigMap(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3235,10 +3236,10 @@ func (f *CoreV1Informer) EndpointsInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&corev1.Endpoints{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListEndpoints(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchEndpoints(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3257,10 +3258,10 @@ func (f *CoreV1Informer) EventInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&corev1.Event{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListEvent(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchEvent(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3279,10 +3280,10 @@ func (f *CoreV1Informer) LimitRangeInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&corev1.LimitRange{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListLimitRange(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchLimitRange(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3301,10 +3302,10 @@ func (f *CoreV1Informer) NamespaceInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&corev1.Namespace{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListNamespace(context.TODO(), metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchNamespace(context.TODO(), metav1.ListOptions{})
 				},
 			},
@@ -3323,10 +3324,10 @@ func (f *CoreV1Informer) NodeInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&corev1.Node{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListNode(context.TODO(), metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchNode(context.TODO(), metav1.ListOptions{})
 				},
 			},
@@ -3345,10 +3346,10 @@ func (f *CoreV1Informer) PersistentVolumeInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&corev1.PersistentVolume{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListPersistentVolume(context.TODO(), metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchPersistentVolume(context.TODO(), metav1.ListOptions{})
 				},
 			},
@@ -3367,10 +3368,10 @@ func (f *CoreV1Informer) PersistentVolumeClaimInformer() cache.SharedIndexInform
 	return f.cache.Write(&corev1.PersistentVolumeClaim{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListPersistentVolumeClaim(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchPersistentVolumeClaim(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3389,10 +3390,10 @@ func (f *CoreV1Informer) PodInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&corev1.Pod{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListPod(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchPod(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3411,10 +3412,10 @@ func (f *CoreV1Informer) PodStatusResultInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&corev1.PodStatusResult{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListPodStatusResult(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchPodStatusResult(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3433,10 +3434,10 @@ func (f *CoreV1Informer) PodTemplateInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&corev1.PodTemplate{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListPodTemplate(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchPodTemplate(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3455,10 +3456,10 @@ func (f *CoreV1Informer) RangeAllocationInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&corev1.RangeAllocation{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListRangeAllocation(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchRangeAllocation(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3477,10 +3478,10 @@ func (f *CoreV1Informer) ReplicationControllerInformer() cache.SharedIndexInform
 	return f.cache.Write(&corev1.ReplicationController{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListReplicationController(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchReplicationController(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3499,10 +3500,10 @@ func (f *CoreV1Informer) ResourceQuotaInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&corev1.ResourceQuota{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListResourceQuota(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchResourceQuota(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3521,10 +3522,10 @@ func (f *CoreV1Informer) SecretInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&corev1.Secret{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListSecret(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchSecret(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3543,10 +3544,10 @@ func (f *CoreV1Informer) ServiceInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&corev1.Service{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListService(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchService(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3565,10 +3566,10 @@ func (f *CoreV1Informer) ServiceAccountInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&corev1.ServiceAccount{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListServiceAccount(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchServiceAccount(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3605,10 +3606,10 @@ func (f *AdmissionregistrationK8sIoV1Informer) MutatingWebhookConfigurationInfor
 	return f.cache.Write(&admissionregistrationv1.MutatingWebhookConfiguration{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListMutatingWebhookConfiguration(context.TODO(), metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchMutatingWebhookConfiguration(context.TODO(), metav1.ListOptions{})
 				},
 			},
@@ -3627,10 +3628,10 @@ func (f *AdmissionregistrationK8sIoV1Informer) ValidatingWebhookConfigurationInf
 	return f.cache.Write(&admissionregistrationv1.ValidatingWebhookConfiguration{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListValidatingWebhookConfiguration(context.TODO(), metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchValidatingWebhookConfiguration(context.TODO(), metav1.ListOptions{})
 				},
 			},
@@ -3667,10 +3668,10 @@ func (f *AppsV1Informer) ControllerRevisionInformer() cache.SharedIndexInformer 
 	return f.cache.Write(&appsv1.ControllerRevision{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListControllerRevision(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchControllerRevision(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3689,10 +3690,10 @@ func (f *AppsV1Informer) CronJobInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&batchv1.CronJob{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListCronJob(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchCronJob(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3711,10 +3712,10 @@ func (f *AppsV1Informer) DaemonSetInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&appsv1.DaemonSet{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListDaemonSet(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchDaemonSet(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3733,10 +3734,10 @@ func (f *AppsV1Informer) DeploymentInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&appsv1.Deployment{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListDeployment(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchDeployment(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3755,10 +3756,10 @@ func (f *AppsV1Informer) JobInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&batchv1.Job{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListJob(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchJob(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3777,10 +3778,10 @@ func (f *AppsV1Informer) ReplicaSetInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&appsv1.ReplicaSet{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListReplicaSet(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchReplicaSet(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3799,10 +3800,10 @@ func (f *AppsV1Informer) StatefulSetInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&appsv1.StatefulSet{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListStatefulSet(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchStatefulSet(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3839,10 +3840,10 @@ func (f *AuthenticationK8sIoV1Informer) TokenRequestInformer() cache.SharedIndex
 	return f.cache.Write(&authenticationv1.TokenRequest{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListTokenRequest(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchTokenRequest(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3861,10 +3862,10 @@ func (f *AuthenticationK8sIoV1Informer) TokenReviewInformer() cache.SharedIndexI
 	return f.cache.Write(&authenticationv1.TokenReview{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListTokenReview(context.TODO(), metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchTokenReview(context.TODO(), metav1.ListOptions{})
 				},
 			},
@@ -3901,10 +3902,10 @@ func (f *AuthorizationK8sIoV1Informer) LocalSubjectAccessReviewInformer() cache.
 	return f.cache.Write(&authorizationv1.LocalSubjectAccessReview{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListLocalSubjectAccessReview(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchLocalSubjectAccessReview(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -3923,10 +3924,10 @@ func (f *AuthorizationK8sIoV1Informer) SelfSubjectAccessReviewInformer() cache.S
 	return f.cache.Write(&authorizationv1.SelfSubjectAccessReview{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListSelfSubjectAccessReview(context.TODO(), metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchSelfSubjectAccessReview(context.TODO(), metav1.ListOptions{})
 				},
 			},
@@ -3945,10 +3946,10 @@ func (f *AuthorizationK8sIoV1Informer) SelfSubjectRulesReviewInformer() cache.Sh
 	return f.cache.Write(&authorizationv1.SelfSubjectRulesReview{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListSelfSubjectRulesReview(context.TODO(), metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchSelfSubjectRulesReview(context.TODO(), metav1.ListOptions{})
 				},
 			},
@@ -3967,10 +3968,10 @@ func (f *AuthorizationK8sIoV1Informer) SubjectAccessReviewInformer() cache.Share
 	return f.cache.Write(&authorizationv1.SubjectAccessReview{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListSubjectAccessReview(context.TODO(), metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchSubjectAccessReview(context.TODO(), metav1.ListOptions{})
 				},
 			},
@@ -4007,10 +4008,10 @@ func (f *AutoscalingV1Informer) HorizontalPodAutoscalerInformer() cache.SharedIn
 	return f.cache.Write(&autoscalingv1.HorizontalPodAutoscaler{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListHorizontalPodAutoscaler(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchHorizontalPodAutoscaler(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -4029,10 +4030,10 @@ func (f *AutoscalingV1Informer) ScaleInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&autoscalingv1.Scale{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListScale(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchScale(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -4069,10 +4070,10 @@ func (f *AutoscalingV2Informer) HorizontalPodAutoscalerInformer() cache.SharedIn
 	return f.cache.Write(&autoscalingv2.HorizontalPodAutoscaler{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListHorizontalPodAutoscaler(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchHorizontalPodAutoscaler(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -4109,10 +4110,10 @@ func (f *CertificatesK8sIoV1Informer) CertificateSigningRequestInformer() cache.
 	return f.cache.Write(&certificatesv1.CertificateSigningRequest{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListCertificateSigningRequest(context.TODO(), metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchCertificateSigningRequest(context.TODO(), metav1.ListOptions{})
 				},
 			},
@@ -4149,10 +4150,10 @@ func (f *CoordinationK8sIoV1Informer) LeaseInformer() cache.SharedIndexInformer 
 	return f.cache.Write(&coordinationv1.Lease{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListLease(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchLease(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -4189,10 +4190,10 @@ func (f *DiscoveryK8sIoV1Informer) EndpointSliceInformer() cache.SharedIndexInfo
 	return f.cache.Write(&discoveryv1.EndpointSlice{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListEndpointSlice(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchEndpointSlice(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -4229,10 +4230,10 @@ func (f *EventsK8sIoV1Informer) EventInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&eventsv1.Event{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListEvent(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchEvent(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -4269,10 +4270,10 @@ func (f *NetworkingK8sIoV1Informer) IngressInformer() cache.SharedIndexInformer 
 	return f.cache.Write(&networkingv1.Ingress{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListIngress(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchIngress(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -4291,10 +4292,10 @@ func (f *NetworkingK8sIoV1Informer) IngressClassInformer() cache.SharedIndexInfo
 	return f.cache.Write(&networkingv1.IngressClass{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListIngressClass(context.TODO(), metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchIngressClass(context.TODO(), metav1.ListOptions{})
 				},
 			},
@@ -4313,10 +4314,10 @@ func (f *NetworkingK8sIoV1Informer) NetworkPolicyInformer() cache.SharedIndexInf
 	return f.cache.Write(&networkingv1.NetworkPolicy{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListNetworkPolicy(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchNetworkPolicy(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -4353,10 +4354,10 @@ func (f *PolicyV1Informer) EvictionInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&policyv1.Eviction{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListEviction(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchEviction(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -4375,10 +4376,10 @@ func (f *PolicyV1Informer) PodDisruptionBudgetInformer() cache.SharedIndexInform
 	return f.cache.Write(&policyv1.PodDisruptionBudget{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListPodDisruptionBudget(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchPodDisruptionBudget(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -4415,10 +4416,10 @@ func (f *RbacAuthorizationK8sIoV1Informer) ClusterRoleInformer() cache.SharedInd
 	return f.cache.Write(&rbacv1.ClusterRole{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListClusterRole(context.TODO(), metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchClusterRole(context.TODO(), metav1.ListOptions{})
 				},
 			},
@@ -4437,10 +4438,10 @@ func (f *RbacAuthorizationK8sIoV1Informer) ClusterRoleBindingInformer() cache.Sh
 	return f.cache.Write(&rbacv1.ClusterRoleBinding{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListClusterRoleBinding(context.TODO(), metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchClusterRoleBinding(context.TODO(), metav1.ListOptions{})
 				},
 			},
@@ -4459,10 +4460,10 @@ func (f *RbacAuthorizationK8sIoV1Informer) RoleInformer() cache.SharedIndexInfor
 	return f.cache.Write(&rbacv1.Role{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListRole(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchRole(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -4481,10 +4482,10 @@ func (f *RbacAuthorizationK8sIoV1Informer) RoleBindingInformer() cache.SharedInd
 	return f.cache.Write(&rbacv1.RoleBinding{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListRoleBinding(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchRoleBinding(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -4521,10 +4522,10 @@ func (f *SchedulingK8sIoV1Informer) PriorityClassInformer() cache.SharedIndexInf
 	return f.cache.Write(&schedulingv1.PriorityClass{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListPriorityClass(context.TODO(), metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchPriorityClass(context.TODO(), metav1.ListOptions{})
 				},
 			},
@@ -4561,10 +4562,10 @@ func (f *StorageK8sIoV1Informer) CSIDriverInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&storagev1.CSIDriver{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListCSIDriver(context.TODO(), metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchCSIDriver(context.TODO(), metav1.ListOptions{})
 				},
 			},
@@ -4583,10 +4584,10 @@ func (f *StorageK8sIoV1Informer) CSINodeInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&storagev1.CSINode{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListCSINode(context.TODO(), metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchCSINode(context.TODO(), metav1.ListOptions{})
 				},
 			},
@@ -4605,10 +4606,10 @@ func (f *StorageK8sIoV1Informer) CSIStorageCapacityInformer() cache.SharedIndexI
 	return f.cache.Write(&storagev1.CSIStorageCapacity{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListCSIStorageCapacity(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchCSIStorageCapacity(context.TODO(), f.namespace, metav1.ListOptions{})
 				},
 			},
@@ -4627,10 +4628,10 @@ func (f *StorageK8sIoV1Informer) StorageClassInformer() cache.SharedIndexInforme
 	return f.cache.Write(&storagev1.StorageClass{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListStorageClass(context.TODO(), metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchStorageClass(context.TODO(), metav1.ListOptions{})
 				},
 			},
@@ -4649,10 +4650,10 @@ func (f *StorageK8sIoV1Informer) VolumeAttachmentInformer() cache.SharedIndexInf
 	return f.cache.Write(&storagev1.VolumeAttachment{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
-				ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
 					return f.client.ListVolumeAttachment(context.TODO(), metav1.ListOptions{})
 				},
-				WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
 					return f.client.WatchVolumeAttachment(context.TODO(), metav1.ListOptions{})
 				},
 			},

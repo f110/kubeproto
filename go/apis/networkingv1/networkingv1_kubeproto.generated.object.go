@@ -1,8 +1,8 @@
 package networkingv1
 
 import (
-	corev1 "go.f110.dev/kubeproto/go/apis/corev1"
-	metav1 "go.f110.dev/kubeproto/go/apis/metav1"
+	"go.f110.dev/kubeproto/go/apis/corev1"
+	"go.f110.dev/kubeproto/go/apis/metav1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilintstr "k8s.io/apimachinery/pkg/util/intstr"

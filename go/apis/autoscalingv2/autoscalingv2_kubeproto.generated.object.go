@@ -1,8 +1,8 @@
 package autoscalingv2
 
 import (
-	corev1 "go.f110.dev/kubeproto/go/apis/corev1"
-	metav1 "go.f110.dev/kubeproto/go/apis/metav1"
+	"go.f110.dev/kubeproto/go/apis/corev1"
+	"go.f110.dev/kubeproto/go/apis/metav1"
 	apiresource "k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
