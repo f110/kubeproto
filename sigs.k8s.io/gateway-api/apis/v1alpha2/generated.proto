@@ -104,7 +104,8 @@ enum ListenerConditionType {
 
 enum PathMatchType {
   PATH_MATCH_TYPE_EXACT              = 0 [(dev.f110.kubeproto.value) = { value: "Exact" }];
-  PATH_MATCH_TYPE_REGULAR_EXPRESSION = 1;
+  PATH_MATCH_TYPE_PATH_PREFIX        = 1;
+  PATH_MATCH_TYPE_REGULAR_EXPRESSION = 2;
 }
 
 enum ProtocolType {

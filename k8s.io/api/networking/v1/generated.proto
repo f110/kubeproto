@@ -23,6 +23,12 @@ enum NetworkPolicyConditionType {
   NETWORK_POLICY_CONDITION_TYPE_FAILURE         = 2 [(dev.f110.kubeproto.value) = { value: "Failure" }];
 }
 
+enum PathType {
+  PATH_TYPE_EXACT                   = 0 [(dev.f110.kubeproto.value) = { value: "Exact" }];
+  PATH_TYPE_PREFIX                  = 1 [(dev.f110.kubeproto.value) = { value: "Prefix" }];
+  PATH_TYPE_IMPLEMENTATION_SPECIFIC = 2;
+}
+
 enum PolicyType {
   POLICY_TYPE_INGRESS = 0 [(dev.f110.kubeproto.value) = { value: "Ingress" }];
   POLICY_TYPE_EGRESS  = 1 [(dev.f110.kubeproto.value) = { value: "Egress" }];
@@ -48,7 +54,7 @@ message HTTPIngressPath {
   //   the IngressClass. Implementations can treat this as a separate PathType
   //   or treat it identically to Prefix or Exact path types.
   // Implementations are required to support all path types.
-  string path_type = 2 [(dev.f110.kubeproto.field) = { go_name: "PathType", api_field_name: "pathType", inline: false }];
+  optional PathType path_type = 2 [(dev.f110.kubeproto.field) = { go_name: "PathType", api_field_name: "pathType", inline: false }];
   // backend defines the referenced service endpoint to which the traffic
   // will be forwarded to.
   IngressBackend backend = 3 [(dev.f110.kubeproto.field) = { go_name: "Backend", api_field_name: "backend", inline: false }];
