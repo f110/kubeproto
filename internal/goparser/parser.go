@@ -520,21 +520,52 @@ func (g *Generator) constToEnumValue(v *ast.GenDecl) map[string][]*enumValue {
 		for _, v := range valueSpec.Names {
 			value += v.String()
 		}
+		// For: PolicyTypeIngress PolicyType = "Ingress"
+		// name is PolicyType. value is PolicyTypeIngress
 		if ident, ok := valueSpec.Type.(*ast.Ident); ok {
 			name = ident.Name
 		}
+		// For: PathTypeExact = PathType("Exact")
+		// name is PathType. value is PathTypeExact
+		if name == "" && len(valueSpec.Values) > 0 {
+			if v, ok := valueSpec.Values[0].(*ast.CallExpr); ok {
+				if ident, ok := v.Fun.(*ast.Ident); ok {
+					name = ident.Name
+				}
+			}
+		}
+
 		if name != "" && value != "" {
 			if len(valueSpec.Values) == 0 {
 				continue
 			}
-			lit, ok := valueSpec.Values[0].(*ast.BasicLit)
-			if !ok || lit.Kind != token.STRING {
+
+			var strValue string
+			switch v := valueSpec.Values[0].(type) {
+			case *ast.BasicLit:
+				if v.Kind != token.STRING {
+					continue
+				}
+				// Remove quotations
+				strValue = v.Value[1 : len(v.Value)-1]
+			case *ast.CallExpr:
+				if len(v.Args) == 0 {
+					continue
+				}
+				if lit, ok := v.Args[0].(*ast.BasicLit); ok {
+					if lit.Kind != token.STRING {
+						continue
+					}
+					// Remove quotations
+					strValue = lit.Value[1 : len(lit.Value)-1]
+				}
+			default:
 				continue
 			}
-			if strings.HasSuffix(value, "Prefix") {
+			if len(strValue) > 0 && strValue[len(strValue)-1] == '-' {
 				continue
 			}
-			strValue := lit.Value[1 : len(lit.Value)-1]
+
 			constDefinitions[name] = append(constDefinitions[name], &enumValue{Name: value, Value: strValue})
 		}
 	}

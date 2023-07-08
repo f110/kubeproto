@@ -5,10 +5,16 @@ option  go_package = "k8s.io/apimachinery/pkg/api/resource";
 
 import "kube.proto";
 
+enum Format {
+  FORMAT_DECIMAL_EXPONENT = 0;
+  FORMAT_BINARY_S_I       = 1;
+  FORMAT_DECIMAL_S_I      = 2;
+}
+
 message Quantity {
   // Change Format at will. See the comment for Canonicalize for
   // more details.
-  string format = 1 [(dev.f110.kubeproto.field) = { go_name: "Format", inline: false }];
+  Format format = 1 [(dev.f110.kubeproto.field) = { go_name: "Format", inline: false }];
 }
 
 message QuantityValue {
