@@ -44,6 +44,14 @@ const (
 	NetworkPolicyConditionTypeFailure        NetworkPolicyConditionType = "Failure"
 )
 
+type PathType string
+
+const (
+	PathTypeExact                  PathType = "Exact"
+	PathTypePrefix                 PathType = "Prefix"
+	PathTypeImplementationSpecific PathType = "ImplementationSpecific"
+)
+
 type PolicyType string
 
 const (
@@ -1021,7 +1029,7 @@ type HTTPIngressPath struct {
 	// the IngressClass. Implementations can treat this as a separate PathType
 	// or treat it identically to Prefix or Exact path types.
 	// Implementations are required to support all path types.
-	PathType string `json:"pathType"`
+	PathType PathType `json:"pathType,omitempty"`
 	// backend defines the referenced service endpoint to which the traffic
 	// will be forwarded to.
 	Backend IngressBackend `json:"backend"`
