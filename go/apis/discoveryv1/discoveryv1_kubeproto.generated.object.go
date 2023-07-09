@@ -25,6 +25,14 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 	return nil
 }
 
+type AddressType string
+
+const (
+	AddressTypeIpv4 AddressType = "IpV4"
+	AddressTypeIpv6 AddressType = "IpV6"
+	AddressTypeFQDN AddressType = "FQDN"
+)
+
 type EndpointSlice struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
@@ -35,7 +43,7 @@ type EndpointSlice struct {
 	// * IPv4: Represents an IPv4 Address.
 	// * IPv6: Represents an IPv6 Address.
 	// * FQDN: Represents a Fully Qualified Domain Name.
-	AddressType string `json:"addressType"`
+	AddressType AddressType `json:"addressType"`
 	// endpoints is a list of unique endpoints in this slice. Each slice may
 	// include a maximum of 1000 endpoints.
 	Endpoints []Endpoint `json:"endpoints"`
