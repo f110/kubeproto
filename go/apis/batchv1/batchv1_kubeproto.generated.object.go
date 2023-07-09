@@ -7,7 +7,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
-const GroupName = "apps"
+const GroupName = "batch"
 
 var (
 	GroupVersion       = metav1.GroupVersion{Group: GroupName, Version: "v1"}

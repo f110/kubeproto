@@ -141,7 +141,7 @@ k8s.io/api/apps/v1/generated.proto:
 .PHONY: k8s.io/api/batch/v1/generated.proto
 k8s.io/api/batch/v1/generated.proto:
 	mkdir -p $(@D)
-	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.batch.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/batchv1" --api-domain apps --api-version v1 --all $(CURDIR)/vendor/$(@D)
+	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.batch.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/batchv1" --api-domain batch --api-version v1 --all $(CURDIR)/vendor/$(@D)
 
 .PHONY: k8s.io/api/authentication/v1/generated.proto
 k8s.io/api/authentication/v1/generated.proto:

@@ -52,6 +52,7 @@ var localSchemeBuilder = runtime.SchemeBuilder{
 	authorizationv1.AddToScheme,
 	autoscalingv1.AddToScheme,
 	autoscalingv2.AddToScheme,
+	batchv1.AddToScheme,
 	certificatesv1.AddToScheme,
 	coordinationv1.AddToScheme,
 	discoveryv1.AddToScheme,
@@ -72,6 +73,7 @@ func init() {
 		authorizationv1.AddToScheme,
 		autoscalingv1.AddToScheme,
 		autoscalingv2.AddToScheme,
+		batchv1.AddToScheme,
 		certificatesv1.AddToScheme,
 		coordinationv1.AddToScheme,
 		discoveryv1.AddToScheme,
@@ -113,6 +115,7 @@ type Set struct {
 	AuthorizationK8sIoV1         *AuthorizationK8sIoV1
 	AutoscalingV1                *AutoscalingV1
 	AutoscalingV2                *AutoscalingV2
+	BatchV1                      *BatchV1
 	CertificatesK8sIoV1          *CertificatesK8sIoV1
 	CoordinationK8sIoV1          *CoordinationK8sIoV1
 	DiscoveryK8sIoV1             *DiscoveryK8sIoV1
@@ -202,6 +205,17 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 			return nil, err
 		}
 		s.AutoscalingV2 = NewAutoscalingV2Client(&restBackend{client: c})
+	}
+	{
+		conf := *cfg
+		conf.GroupVersion = &batchv1.SchemaGroupVersion
+		conf.APIPath = "/apis"
+		conf.NegotiatedSerializer = Codecs.WithoutConversion()
+		c, err := rest.RESTClientFor(&conf)
+		if err != nil {
+			return nil, err
+		}
+		s.BatchV1 = NewBatchV1Client(&restBackend{client: c})
 	}
 	{
 		conf := *cfg
@@ -1461,54 +1475,6 @@ func (c *AppsV1) WatchControllerRevision(ctx context.Context, namespace string, 
 	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".apps", Version: "v1", Resource: "controllerrevisions"}, namespace, opts)
 }
 
-func (c *AppsV1) GetCronJob(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*batchv1.CronJob, error) {
-	result, err := c.backend.Get(ctx, "cronjobs", "CronJob", namespace, name, opts, &batchv1.CronJob{})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*batchv1.CronJob), nil
-}
-
-func (c *AppsV1) CreateCronJob(ctx context.Context, v *batchv1.CronJob, opts metav1.CreateOptions) (*batchv1.CronJob, error) {
-	result, err := c.backend.Create(ctx, "cronjobs", "CronJob", v, opts, &batchv1.CronJob{})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*batchv1.CronJob), nil
-}
-
-func (c *AppsV1) UpdateCronJob(ctx context.Context, v *batchv1.CronJob, opts metav1.UpdateOptions) (*batchv1.CronJob, error) {
-	result, err := c.backend.Update(ctx, "cronjobs", "CronJob", v, opts, &batchv1.CronJob{})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*batchv1.CronJob), nil
-}
-
-func (c *AppsV1) UpdateStatusCronJob(ctx context.Context, v *batchv1.CronJob, opts metav1.UpdateOptions) (*batchv1.CronJob, error) {
-	result, err := c.backend.UpdateStatus(ctx, "cronjobs", "CronJob", v, opts, &batchv1.CronJob{})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*batchv1.CronJob), nil
-}
-
-func (c *AppsV1) DeleteCronJob(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".apps", Version: "v1", Resource: "cronjobs"}, namespace, name, opts)
-}
-
-func (c *AppsV1) ListCronJob(ctx context.Context, namespace string, opts metav1.ListOptions) (*batchv1.CronJobList, error) {
-	result, err := c.backend.List(ctx, "cronjobs", "CronJob", namespace, opts, &batchv1.CronJobList{})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*batchv1.CronJobList), nil
-}
-
-func (c *AppsV1) WatchCronJob(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".apps", Version: "v1", Resource: "cronjobs"}, namespace, opts)
-}
-
 func (c *AppsV1) GetDaemonSet(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*appsv1.DaemonSet, error) {
 	result, err := c.backend.Get(ctx, "daemonsets", "DaemonSet", namespace, name, opts, &appsv1.DaemonSet{})
 	if err != nil {
@@ -1603,54 +1569,6 @@ func (c *AppsV1) ListDeployment(ctx context.Context, namespace string, opts meta
 
 func (c *AppsV1) WatchDeployment(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
 	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".apps", Version: "v1", Resource: "deployments"}, namespace, opts)
-}
-
-func (c *AppsV1) GetJob(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*batchv1.Job, error) {
-	result, err := c.backend.Get(ctx, "jobs", "Job", namespace, name, opts, &batchv1.Job{})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*batchv1.Job), nil
-}
-
-func (c *AppsV1) CreateJob(ctx context.Context, v *batchv1.Job, opts metav1.CreateOptions) (*batchv1.Job, error) {
-	result, err := c.backend.Create(ctx, "jobs", "Job", v, opts, &batchv1.Job{})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*batchv1.Job), nil
-}
-
-func (c *AppsV1) UpdateJob(ctx context.Context, v *batchv1.Job, opts metav1.UpdateOptions) (*batchv1.Job, error) {
-	result, err := c.backend.Update(ctx, "jobs", "Job", v, opts, &batchv1.Job{})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*batchv1.Job), nil
-}
-
-func (c *AppsV1) UpdateStatusJob(ctx context.Context, v *batchv1.Job, opts metav1.UpdateOptions) (*batchv1.Job, error) {
-	result, err := c.backend.UpdateStatus(ctx, "jobs", "Job", v, opts, &batchv1.Job{})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*batchv1.Job), nil
-}
-
-func (c *AppsV1) DeleteJob(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".apps", Version: "v1", Resource: "jobs"}, namespace, name, opts)
-}
-
-func (c *AppsV1) ListJob(ctx context.Context, namespace string, opts metav1.ListOptions) (*batchv1.JobList, error) {
-	result, err := c.backend.List(ctx, "jobs", "Job", namespace, opts, &batchv1.JobList{})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*batchv1.JobList), nil
-}
-
-func (c *AppsV1) WatchJob(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".apps", Version: "v1", Resource: "jobs"}, namespace, opts)
 }
 
 func (c *AppsV1) GetReplicaSet(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*appsv1.ReplicaSet, error) {
@@ -2211,6 +2129,110 @@ func (c *AutoscalingV2) ListHorizontalPodAutoscaler(ctx context.Context, namespa
 
 func (c *AutoscalingV2) WatchHorizontalPodAutoscaler(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
 	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".autoscaling", Version: "v2", Resource: "horizontalpodautoscalers"}, namespace, opts)
+}
+
+type BatchV1 struct {
+	backend Backend
+}
+
+func NewBatchV1Client(b Backend) *BatchV1 {
+	return &BatchV1{backend: b}
+}
+
+func (c *BatchV1) GetCronJob(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*batchv1.CronJob, error) {
+	result, err := c.backend.Get(ctx, "cronjobs", "CronJob", namespace, name, opts, &batchv1.CronJob{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*batchv1.CronJob), nil
+}
+
+func (c *BatchV1) CreateCronJob(ctx context.Context, v *batchv1.CronJob, opts metav1.CreateOptions) (*batchv1.CronJob, error) {
+	result, err := c.backend.Create(ctx, "cronjobs", "CronJob", v, opts, &batchv1.CronJob{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*batchv1.CronJob), nil
+}
+
+func (c *BatchV1) UpdateCronJob(ctx context.Context, v *batchv1.CronJob, opts metav1.UpdateOptions) (*batchv1.CronJob, error) {
+	result, err := c.backend.Update(ctx, "cronjobs", "CronJob", v, opts, &batchv1.CronJob{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*batchv1.CronJob), nil
+}
+
+func (c *BatchV1) UpdateStatusCronJob(ctx context.Context, v *batchv1.CronJob, opts metav1.UpdateOptions) (*batchv1.CronJob, error) {
+	result, err := c.backend.UpdateStatus(ctx, "cronjobs", "CronJob", v, opts, &batchv1.CronJob{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*batchv1.CronJob), nil
+}
+
+func (c *BatchV1) DeleteCronJob(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".batch", Version: "v1", Resource: "cronjobs"}, namespace, name, opts)
+}
+
+func (c *BatchV1) ListCronJob(ctx context.Context, namespace string, opts metav1.ListOptions) (*batchv1.CronJobList, error) {
+	result, err := c.backend.List(ctx, "cronjobs", "CronJob", namespace, opts, &batchv1.CronJobList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*batchv1.CronJobList), nil
+}
+
+func (c *BatchV1) WatchCronJob(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".batch", Version: "v1", Resource: "cronjobs"}, namespace, opts)
+}
+
+func (c *BatchV1) GetJob(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*batchv1.Job, error) {
+	result, err := c.backend.Get(ctx, "jobs", "Job", namespace, name, opts, &batchv1.Job{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*batchv1.Job), nil
+}
+
+func (c *BatchV1) CreateJob(ctx context.Context, v *batchv1.Job, opts metav1.CreateOptions) (*batchv1.Job, error) {
+	result, err := c.backend.Create(ctx, "jobs", "Job", v, opts, &batchv1.Job{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*batchv1.Job), nil
+}
+
+func (c *BatchV1) UpdateJob(ctx context.Context, v *batchv1.Job, opts metav1.UpdateOptions) (*batchv1.Job, error) {
+	result, err := c.backend.Update(ctx, "jobs", "Job", v, opts, &batchv1.Job{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*batchv1.Job), nil
+}
+
+func (c *BatchV1) UpdateStatusJob(ctx context.Context, v *batchv1.Job, opts metav1.UpdateOptions) (*batchv1.Job, error) {
+	result, err := c.backend.UpdateStatus(ctx, "jobs", "Job", v, opts, &batchv1.Job{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*batchv1.Job), nil
+}
+
+func (c *BatchV1) DeleteJob(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".batch", Version: "v1", Resource: "jobs"}, namespace, name, opts)
+}
+
+func (c *BatchV1) ListJob(ctx context.Context, namespace string, opts metav1.ListOptions) (*batchv1.JobList, error) {
+	result, err := c.backend.List(ctx, "jobs", "Job", namespace, opts, &batchv1.JobList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*batchv1.JobList), nil
+}
+
+func (c *BatchV1) WatchJob(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".batch", Version: "v1", Resource: "jobs"}, namespace, opts)
 }
 
 type CertificatesK8sIoV1 struct {
@@ -3182,14 +3204,10 @@ func (f *InformerFactory) InformerFor(obj runtime.Object) cache.SharedIndexInfor
 		return NewAdmissionregistrationK8sIoV1Informer(f.cache, f.set.AdmissionregistrationK8sIoV1, f.namespace, f.resyncPeriod).ValidatingWebhookConfigurationInformer()
 	case *appsv1.ControllerRevision:
 		return NewAppsV1Informer(f.cache, f.set.AppsV1, f.namespace, f.resyncPeriod).ControllerRevisionInformer()
-	case *batchv1.CronJob:
-		return NewAppsV1Informer(f.cache, f.set.AppsV1, f.namespace, f.resyncPeriod).CronJobInformer()
 	case *appsv1.DaemonSet:
 		return NewAppsV1Informer(f.cache, f.set.AppsV1, f.namespace, f.resyncPeriod).DaemonSetInformer()
 	case *appsv1.Deployment:
 		return NewAppsV1Informer(f.cache, f.set.AppsV1, f.namespace, f.resyncPeriod).DeploymentInformer()
-	case *batchv1.Job:
-		return NewAppsV1Informer(f.cache, f.set.AppsV1, f.namespace, f.resyncPeriod).JobInformer()
 	case *appsv1.ReplicaSet:
 		return NewAppsV1Informer(f.cache, f.set.AppsV1, f.namespace, f.resyncPeriod).ReplicaSetInformer()
 	case *appsv1.StatefulSet:
@@ -3212,6 +3230,10 @@ func (f *InformerFactory) InformerFor(obj runtime.Object) cache.SharedIndexInfor
 		return NewAutoscalingV1Informer(f.cache, f.set.AutoscalingV1, f.namespace, f.resyncPeriod).ScaleInformer()
 	case *autoscalingv2.HorizontalPodAutoscaler:
 		return NewAutoscalingV2Informer(f.cache, f.set.AutoscalingV2, f.namespace, f.resyncPeriod).HorizontalPodAutoscalerInformer()
+	case *batchv1.CronJob:
+		return NewBatchV1Informer(f.cache, f.set.BatchV1, f.namespace, f.resyncPeriod).CronJobInformer()
+	case *batchv1.Job:
+		return NewBatchV1Informer(f.cache, f.set.BatchV1, f.namespace, f.resyncPeriod).JobInformer()
 	case *certificatesv1.CertificateSigningRequest:
 		return NewCertificatesK8sIoV1Informer(f.cache, f.set.CertificatesK8sIoV1, f.namespace, f.resyncPeriod).CertificateSigningRequestInformer()
 	case *coordinationv1.Lease:
@@ -3301,14 +3323,10 @@ func (f *InformerFactory) InformerForResource(gvr schema.GroupVersionResource) c
 		return NewAdmissionregistrationK8sIoV1Informer(f.cache, f.set.AdmissionregistrationK8sIoV1, f.namespace, f.resyncPeriod).ValidatingWebhookConfigurationInformer()
 	case appsv1.SchemaGroupVersion.WithResource("controllerrevisions"):
 		return NewAppsV1Informer(f.cache, f.set.AppsV1, f.namespace, f.resyncPeriod).ControllerRevisionInformer()
-	case batchv1.SchemaGroupVersion.WithResource("cronjobs"):
-		return NewAppsV1Informer(f.cache, f.set.AppsV1, f.namespace, f.resyncPeriod).CronJobInformer()
 	case appsv1.SchemaGroupVersion.WithResource("daemonsets"):
 		return NewAppsV1Informer(f.cache, f.set.AppsV1, f.namespace, f.resyncPeriod).DaemonSetInformer()
 	case appsv1.SchemaGroupVersion.WithResource("deployments"):
 		return NewAppsV1Informer(f.cache, f.set.AppsV1, f.namespace, f.resyncPeriod).DeploymentInformer()
-	case batchv1.SchemaGroupVersion.WithResource("jobs"):
-		return NewAppsV1Informer(f.cache, f.set.AppsV1, f.namespace, f.resyncPeriod).JobInformer()
 	case appsv1.SchemaGroupVersion.WithResource("replicasets"):
 		return NewAppsV1Informer(f.cache, f.set.AppsV1, f.namespace, f.resyncPeriod).ReplicaSetInformer()
 	case appsv1.SchemaGroupVersion.WithResource("statefulsets"):
@@ -3331,6 +3349,10 @@ func (f *InformerFactory) InformerForResource(gvr schema.GroupVersionResource) c
 		return NewAutoscalingV1Informer(f.cache, f.set.AutoscalingV1, f.namespace, f.resyncPeriod).ScaleInformer()
 	case autoscalingv2.SchemaGroupVersion.WithResource("horizontalpodautoscalers"):
 		return NewAutoscalingV2Informer(f.cache, f.set.AutoscalingV2, f.namespace, f.resyncPeriod).HorizontalPodAutoscalerInformer()
+	case batchv1.SchemaGroupVersion.WithResource("cronjobs"):
+		return NewBatchV1Informer(f.cache, f.set.BatchV1, f.namespace, f.resyncPeriod).CronJobInformer()
+	case batchv1.SchemaGroupVersion.WithResource("jobs"):
+		return NewBatchV1Informer(f.cache, f.set.BatchV1, f.namespace, f.resyncPeriod).JobInformer()
 	case certificatesv1.SchemaGroupVersion.WithResource("certificatesigningrequests"):
 		return NewCertificatesK8sIoV1Informer(f.cache, f.set.CertificatesK8sIoV1, f.namespace, f.resyncPeriod).CertificateSigningRequestInformer()
 	case coordinationv1.SchemaGroupVersion.WithResource("leases"):
@@ -3918,28 +3940,6 @@ func (f *AppsV1Informer) ControllerRevisionLister() *AppsV1ControllerRevisionLis
 	return NewAppsV1ControllerRevisionLister(f.ControllerRevisionInformer().GetIndexer())
 }
 
-func (f *AppsV1Informer) CronJobInformer() cache.SharedIndexInformer {
-	return f.cache.Write(&batchv1.CronJob{}, func() cache.SharedIndexInformer {
-		return cache.NewSharedIndexInformer(
-			&cache.ListWatch{
-				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListCronJob(context.TODO(), f.namespace, metav1.ListOptions{})
-				},
-				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchCronJob(context.TODO(), f.namespace, metav1.ListOptions{})
-				},
-			},
-			&batchv1.CronJob{},
-			f.resyncPeriod,
-			f.indexers,
-		)
-	})
-}
-
-func (f *AppsV1Informer) CronJobLister() *AppsV1CronJobLister {
-	return NewAppsV1CronJobLister(f.CronJobInformer().GetIndexer())
-}
-
 func (f *AppsV1Informer) DaemonSetInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&appsv1.DaemonSet{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
@@ -3982,28 +3982,6 @@ func (f *AppsV1Informer) DeploymentInformer() cache.SharedIndexInformer {
 
 func (f *AppsV1Informer) DeploymentLister() *AppsV1DeploymentLister {
 	return NewAppsV1DeploymentLister(f.DeploymentInformer().GetIndexer())
-}
-
-func (f *AppsV1Informer) JobInformer() cache.SharedIndexInformer {
-	return f.cache.Write(&batchv1.Job{}, func() cache.SharedIndexInformer {
-		return cache.NewSharedIndexInformer(
-			&cache.ListWatch{
-				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListJob(context.TODO(), f.namespace, metav1.ListOptions{})
-				},
-				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchJob(context.TODO(), f.namespace, metav1.ListOptions{})
-				},
-			},
-			&batchv1.Job{},
-			f.resyncPeriod,
-			f.indexers,
-		)
-	})
-}
-
-func (f *AppsV1Informer) JobLister() *AppsV1JobLister {
-	return NewAppsV1JobLister(f.JobInformer().GetIndexer())
 }
 
 func (f *AppsV1Informer) ReplicaSetInformer() cache.SharedIndexInformer {
@@ -4318,6 +4296,68 @@ func (f *AutoscalingV2Informer) HorizontalPodAutoscalerInformer() cache.SharedIn
 
 func (f *AutoscalingV2Informer) HorizontalPodAutoscalerLister() *AutoscalingV2HorizontalPodAutoscalerLister {
 	return NewAutoscalingV2HorizontalPodAutoscalerLister(f.HorizontalPodAutoscalerInformer().GetIndexer())
+}
+
+type BatchV1Informer struct {
+	cache        *InformerCache
+	client       *BatchV1
+	namespace    string
+	resyncPeriod time.Duration
+	indexers     cache.Indexers
+}
+
+func NewBatchV1Informer(c *InformerCache, client *BatchV1, namespace string, resyncPeriod time.Duration) *BatchV1Informer {
+	return &BatchV1Informer{
+		cache:        c,
+		client:       client,
+		namespace:    namespace,
+		resyncPeriod: resyncPeriod,
+		indexers:     cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
+	}
+}
+
+func (f *BatchV1Informer) CronJobInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&batchv1.CronJob{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListCronJob(context.TODO(), f.namespace, metav1.ListOptions{})
+				},
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchCronJob(context.TODO(), f.namespace, metav1.ListOptions{})
+				},
+			},
+			&batchv1.CronJob{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *BatchV1Informer) CronJobLister() *BatchV1CronJobLister {
+	return NewBatchV1CronJobLister(f.CronJobInformer().GetIndexer())
+}
+
+func (f *BatchV1Informer) JobInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&batchv1.Job{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListJob(context.TODO(), f.namespace, metav1.ListOptions{})
+				},
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchJob(context.TODO(), f.namespace, metav1.ListOptions{})
+				},
+			},
+			&batchv1.Job{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *BatchV1Informer) JobLister() *BatchV1JobLister {
+	return NewBatchV1JobLister(f.JobInformer().GetIndexer())
 }
 
 type CertificatesK8sIoV1Informer struct {
@@ -5494,33 +5534,6 @@ func (x *AppsV1ControllerRevisionLister) Get(namespace, name string) (*appsv1.Co
 	return obj.(*appsv1.ControllerRevision).DeepCopy(), nil
 }
 
-type AppsV1CronJobLister struct {
-	indexer cache.Indexer
-}
-
-func NewAppsV1CronJobLister(indexer cache.Indexer) *AppsV1CronJobLister {
-	return &AppsV1CronJobLister{indexer: indexer}
-}
-
-func (x *AppsV1CronJobLister) List(namespace string, selector labels.Selector) ([]*batchv1.CronJob, error) {
-	var ret []*batchv1.CronJob
-	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*batchv1.CronJob).DeepCopy())
-	})
-	return ret, err
-}
-
-func (x *AppsV1CronJobLister) Get(namespace, name string) (*batchv1.CronJob, error) {
-	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, k8serrors.NewNotFound(batchv1.SchemaGroupVersion.WithResource("cronjob").GroupResource(), name)
-	}
-	return obj.(*batchv1.CronJob).DeepCopy(), nil
-}
-
 type AppsV1DaemonSetLister struct {
 	indexer cache.Indexer
 }
@@ -5573,33 +5586,6 @@ func (x *AppsV1DeploymentLister) Get(namespace, name string) (*appsv1.Deployment
 		return nil, k8serrors.NewNotFound(appsv1.SchemaGroupVersion.WithResource("deployment").GroupResource(), name)
 	}
 	return obj.(*appsv1.Deployment).DeepCopy(), nil
-}
-
-type AppsV1JobLister struct {
-	indexer cache.Indexer
-}
-
-func NewAppsV1JobLister(indexer cache.Indexer) *AppsV1JobLister {
-	return &AppsV1JobLister{indexer: indexer}
-}
-
-func (x *AppsV1JobLister) List(namespace string, selector labels.Selector) ([]*batchv1.Job, error) {
-	var ret []*batchv1.Job
-	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*batchv1.Job).DeepCopy())
-	})
-	return ret, err
-}
-
-func (x *AppsV1JobLister) Get(namespace, name string) (*batchv1.Job, error) {
-	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, k8serrors.NewNotFound(batchv1.SchemaGroupVersion.WithResource("job").GroupResource(), name)
-	}
-	return obj.(*batchv1.Job).DeepCopy(), nil
 }
 
 type AppsV1ReplicaSetLister struct {
@@ -5897,6 +5883,60 @@ func (x *AutoscalingV2HorizontalPodAutoscalerLister) Get(namespace, name string)
 		return nil, k8serrors.NewNotFound(autoscalingv2.SchemaGroupVersion.WithResource("horizontalpodautoscaler").GroupResource(), name)
 	}
 	return obj.(*autoscalingv2.HorizontalPodAutoscaler).DeepCopy(), nil
+}
+
+type BatchV1CronJobLister struct {
+	indexer cache.Indexer
+}
+
+func NewBatchV1CronJobLister(indexer cache.Indexer) *BatchV1CronJobLister {
+	return &BatchV1CronJobLister{indexer: indexer}
+}
+
+func (x *BatchV1CronJobLister) List(namespace string, selector labels.Selector) ([]*batchv1.CronJob, error) {
+	var ret []*batchv1.CronJob
+	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
+		ret = append(ret, m.(*batchv1.CronJob).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *BatchV1CronJobLister) Get(namespace, name string) (*batchv1.CronJob, error) {
+	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(batchv1.SchemaGroupVersion.WithResource("cronjob").GroupResource(), name)
+	}
+	return obj.(*batchv1.CronJob).DeepCopy(), nil
+}
+
+type BatchV1JobLister struct {
+	indexer cache.Indexer
+}
+
+func NewBatchV1JobLister(indexer cache.Indexer) *BatchV1JobLister {
+	return &BatchV1JobLister{indexer: indexer}
+}
+
+func (x *BatchV1JobLister) List(namespace string, selector labels.Selector) ([]*batchv1.Job, error) {
+	var ret []*batchv1.Job
+	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
+		ret = append(ret, m.(*batchv1.Job).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *BatchV1JobLister) Get(namespace, name string) (*batchv1.Job, error) {
+	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(batchv1.SchemaGroupVersion.WithResource("job").GroupResource(), name)
+	}
+	return obj.(*batchv1.Job).DeepCopy(), nil
 }
 
 type CertificatesK8sIoV1CertificateSigningRequestLister struct {
