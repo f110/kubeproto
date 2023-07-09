@@ -29,7 +29,7 @@ message PodDisruptionBudget {
   // Specification of the desired behavior of the PodDisruptionBudget.
   optional PodDisruptionBudgetSpec spec = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
   // Most recently observed status of the PodDisruptionBudget.
-  optional PodDisruptionBudgetStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  optional PodDisruptionBudgetStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", sub_resource: true, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
   };

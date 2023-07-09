@@ -51,7 +51,7 @@ message CertificateSigningRequest {
   CertificateSigningRequestSpec spec = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
   // status contains information about whether the request is approved or denied,
   // and the certificate issued by the signer, or the failure condition indicating signer failure.
-  optional CertificateSigningRequestStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  optional CertificateSigningRequestStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", sub_resource: true, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
     scope: SCOPE_CLUSTER

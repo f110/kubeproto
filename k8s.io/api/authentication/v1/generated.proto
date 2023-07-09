@@ -30,7 +30,7 @@ message TokenRequest {
   // Spec holds information about the request being evaluated
   TokenRequestSpec spec = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
   // Status is filled in by the server and indicates whether the token can be authenticated.
-  optional TokenRequestStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  optional TokenRequestStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", sub_resource: true, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
   };
@@ -67,7 +67,7 @@ message TokenReview {
   // Spec holds information about the request being evaluated
   TokenReviewSpec spec = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
   // Status is filled in by the server and indicates whether the request can be authenticated.
-  optional TokenReviewStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  optional TokenReviewStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", sub_resource: true, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
     scope: SCOPE_CLUSTER

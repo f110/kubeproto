@@ -42,6 +42,7 @@ type ProtobufField struct {
 	GoName          string
 	APIFieldName    string
 	Kind            string
+	SubResource     bool
 	IsMap           bool
 	InvalidProtobuf bool
 	MapKeyKind      string
