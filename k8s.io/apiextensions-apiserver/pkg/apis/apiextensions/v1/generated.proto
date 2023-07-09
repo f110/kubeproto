@@ -107,7 +107,7 @@ message CustomResourceDefinition {
   // spec describes how the user wants the resources to appear
   CustomResourceDefinitionSpec spec = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
   // status indicates the actual state of the CustomResourceDefinition
-  optional CustomResourceDefinitionStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  optional CustomResourceDefinitionStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", sub_resource: true, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
     scope: SCOPE_CLUSTER

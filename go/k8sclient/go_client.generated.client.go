@@ -757,6 +757,14 @@ func (c *CoreV1) UpdateNamespace(ctx context.Context, v *corev1.Namespace, opts 
 	return result.(*corev1.Namespace), nil
 }
 
+func (c *CoreV1) UpdateStatusNamespace(ctx context.Context, v *corev1.Namespace, opts metav1.UpdateOptions) (*corev1.Namespace, error) {
+	result, err := c.backend.UpdateStatusClusterScoped(ctx, "namespaces", "Namespace", v, opts, &corev1.Namespace{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*corev1.Namespace), nil
+}
+
 func (c *CoreV1) DeleteNamespace(ctx context.Context, name string, opts metav1.DeleteOptions) error {
 	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "namespaces"}, name, opts)
 }
@@ -791,6 +799,14 @@ func (c *CoreV1) CreateNode(ctx context.Context, v *corev1.Node, opts metav1.Cre
 
 func (c *CoreV1) UpdateNode(ctx context.Context, v *corev1.Node, opts metav1.UpdateOptions) (*corev1.Node, error) {
 	result, err := c.backend.UpdateClusterScoped(ctx, "nodes", "Node", v, opts, &corev1.Node{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*corev1.Node), nil
+}
+
+func (c *CoreV1) UpdateStatusNode(ctx context.Context, v *corev1.Node, opts metav1.UpdateOptions) (*corev1.Node, error) {
+	result, err := c.backend.UpdateStatusClusterScoped(ctx, "nodes", "Node", v, opts, &corev1.Node{})
 	if err != nil {
 		return nil, err
 	}
@@ -837,6 +853,14 @@ func (c *CoreV1) UpdatePersistentVolume(ctx context.Context, v *corev1.Persisten
 	return result.(*corev1.PersistentVolume), nil
 }
 
+func (c *CoreV1) UpdateStatusPersistentVolume(ctx context.Context, v *corev1.PersistentVolume, opts metav1.UpdateOptions) (*corev1.PersistentVolume, error) {
+	result, err := c.backend.UpdateStatusClusterScoped(ctx, "persistentvolumes", "PersistentVolume", v, opts, &corev1.PersistentVolume{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*corev1.PersistentVolume), nil
+}
+
 func (c *CoreV1) DeletePersistentVolume(ctx context.Context, name string, opts metav1.DeleteOptions) error {
 	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "persistentvolumes"}, name, opts)
 }
@@ -871,6 +895,14 @@ func (c *CoreV1) CreatePersistentVolumeClaim(ctx context.Context, v *corev1.Pers
 
 func (c *CoreV1) UpdatePersistentVolumeClaim(ctx context.Context, v *corev1.PersistentVolumeClaim, opts metav1.UpdateOptions) (*corev1.PersistentVolumeClaim, error) {
 	result, err := c.backend.Update(ctx, "persistentvolumeclaims", "PersistentVolumeClaim", v, opts, &corev1.PersistentVolumeClaim{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*corev1.PersistentVolumeClaim), nil
+}
+
+func (c *CoreV1) UpdateStatusPersistentVolumeClaim(ctx context.Context, v *corev1.PersistentVolumeClaim, opts metav1.UpdateOptions) (*corev1.PersistentVolumeClaim, error) {
+	result, err := c.backend.UpdateStatus(ctx, "persistentvolumeclaims", "PersistentVolumeClaim", v, opts, &corev1.PersistentVolumeClaim{})
 	if err != nil {
 		return nil, err
 	}
@@ -917,6 +949,14 @@ func (c *CoreV1) UpdatePod(ctx context.Context, v *corev1.Pod, opts metav1.Updat
 	return result.(*corev1.Pod), nil
 }
 
+func (c *CoreV1) UpdateStatusPod(ctx context.Context, v *corev1.Pod, opts metav1.UpdateOptions) (*corev1.Pod, error) {
+	result, err := c.backend.UpdateStatus(ctx, "pods", "Pod", v, opts, &corev1.Pod{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*corev1.Pod), nil
+}
+
 func (c *CoreV1) DeletePod(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "pods"}, namespace, name, opts)
 }
@@ -951,6 +991,14 @@ func (c *CoreV1) CreatePodStatusResult(ctx context.Context, v *corev1.PodStatusR
 
 func (c *CoreV1) UpdatePodStatusResult(ctx context.Context, v *corev1.PodStatusResult, opts metav1.UpdateOptions) (*corev1.PodStatusResult, error) {
 	result, err := c.backend.Update(ctx, "podstatusresults", "PodStatusResult", v, opts, &corev1.PodStatusResult{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*corev1.PodStatusResult), nil
+}
+
+func (c *CoreV1) UpdateStatusPodStatusResult(ctx context.Context, v *corev1.PodStatusResult, opts metav1.UpdateOptions) (*corev1.PodStatusResult, error) {
+	result, err := c.backend.UpdateStatus(ctx, "podstatusresults", "PodStatusResult", v, opts, &corev1.PodStatusResult{})
 	if err != nil {
 		return nil, err
 	}
@@ -1077,6 +1125,14 @@ func (c *CoreV1) UpdateReplicationController(ctx context.Context, v *corev1.Repl
 	return result.(*corev1.ReplicationController), nil
 }
 
+func (c *CoreV1) UpdateStatusReplicationController(ctx context.Context, v *corev1.ReplicationController, opts metav1.UpdateOptions) (*corev1.ReplicationController, error) {
+	result, err := c.backend.UpdateStatus(ctx, "replicationcontrollers", "ReplicationController", v, opts, &corev1.ReplicationController{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*corev1.ReplicationController), nil
+}
+
 func (c *CoreV1) DeleteReplicationController(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "replicationcontrollers"}, namespace, name, opts)
 }
@@ -1111,6 +1167,14 @@ func (c *CoreV1) CreateResourceQuota(ctx context.Context, v *corev1.ResourceQuot
 
 func (c *CoreV1) UpdateResourceQuota(ctx context.Context, v *corev1.ResourceQuota, opts metav1.UpdateOptions) (*corev1.ResourceQuota, error) {
 	result, err := c.backend.Update(ctx, "resourcequotas", "ResourceQuota", v, opts, &corev1.ResourceQuota{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*corev1.ResourceQuota), nil
+}
+
+func (c *CoreV1) UpdateStatusResourceQuota(ctx context.Context, v *corev1.ResourceQuota, opts metav1.UpdateOptions) (*corev1.ResourceQuota, error) {
+	result, err := c.backend.UpdateStatus(ctx, "resourcequotas", "ResourceQuota", v, opts, &corev1.ResourceQuota{})
 	if err != nil {
 		return nil, err
 	}
@@ -1191,6 +1255,14 @@ func (c *CoreV1) CreateService(ctx context.Context, v *corev1.Service, opts meta
 
 func (c *CoreV1) UpdateService(ctx context.Context, v *corev1.Service, opts metav1.UpdateOptions) (*corev1.Service, error) {
 	result, err := c.backend.Update(ctx, "services", "Service", v, opts, &corev1.Service{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*corev1.Service), nil
+}
+
+func (c *CoreV1) UpdateStatusService(ctx context.Context, v *corev1.Service, opts metav1.UpdateOptions) (*corev1.Service, error) {
+	result, err := c.backend.UpdateStatus(ctx, "services", "Service", v, opts, &corev1.Service{})
 	if err != nil {
 		return nil, err
 	}
@@ -1413,6 +1485,14 @@ func (c *AppsV1) UpdateCronJob(ctx context.Context, v *batchv1.CronJob, opts met
 	return result.(*batchv1.CronJob), nil
 }
 
+func (c *AppsV1) UpdateStatusCronJob(ctx context.Context, v *batchv1.CronJob, opts metav1.UpdateOptions) (*batchv1.CronJob, error) {
+	result, err := c.backend.UpdateStatus(ctx, "cronjobs", "CronJob", v, opts, &batchv1.CronJob{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*batchv1.CronJob), nil
+}
+
 func (c *AppsV1) DeleteCronJob(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".apps", Version: "v1", Resource: "cronjobs"}, namespace, name, opts)
 }
@@ -1447,6 +1527,14 @@ func (c *AppsV1) CreateDaemonSet(ctx context.Context, v *appsv1.DaemonSet, opts 
 
 func (c *AppsV1) UpdateDaemonSet(ctx context.Context, v *appsv1.DaemonSet, opts metav1.UpdateOptions) (*appsv1.DaemonSet, error) {
 	result, err := c.backend.Update(ctx, "daemonsets", "DaemonSet", v, opts, &appsv1.DaemonSet{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*appsv1.DaemonSet), nil
+}
+
+func (c *AppsV1) UpdateStatusDaemonSet(ctx context.Context, v *appsv1.DaemonSet, opts metav1.UpdateOptions) (*appsv1.DaemonSet, error) {
+	result, err := c.backend.UpdateStatus(ctx, "daemonsets", "DaemonSet", v, opts, &appsv1.DaemonSet{})
 	if err != nil {
 		return nil, err
 	}
@@ -1493,6 +1581,14 @@ func (c *AppsV1) UpdateDeployment(ctx context.Context, v *appsv1.Deployment, opt
 	return result.(*appsv1.Deployment), nil
 }
 
+func (c *AppsV1) UpdateStatusDeployment(ctx context.Context, v *appsv1.Deployment, opts metav1.UpdateOptions) (*appsv1.Deployment, error) {
+	result, err := c.backend.UpdateStatus(ctx, "deployments", "Deployment", v, opts, &appsv1.Deployment{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*appsv1.Deployment), nil
+}
+
 func (c *AppsV1) DeleteDeployment(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".apps", Version: "v1", Resource: "deployments"}, namespace, name, opts)
 }
@@ -1527,6 +1623,14 @@ func (c *AppsV1) CreateJob(ctx context.Context, v *batchv1.Job, opts metav1.Crea
 
 func (c *AppsV1) UpdateJob(ctx context.Context, v *batchv1.Job, opts metav1.UpdateOptions) (*batchv1.Job, error) {
 	result, err := c.backend.Update(ctx, "jobs", "Job", v, opts, &batchv1.Job{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*batchv1.Job), nil
+}
+
+func (c *AppsV1) UpdateStatusJob(ctx context.Context, v *batchv1.Job, opts metav1.UpdateOptions) (*batchv1.Job, error) {
+	result, err := c.backend.UpdateStatus(ctx, "jobs", "Job", v, opts, &batchv1.Job{})
 	if err != nil {
 		return nil, err
 	}
@@ -1573,6 +1677,14 @@ func (c *AppsV1) UpdateReplicaSet(ctx context.Context, v *appsv1.ReplicaSet, opt
 	return result.(*appsv1.ReplicaSet), nil
 }
 
+func (c *AppsV1) UpdateStatusReplicaSet(ctx context.Context, v *appsv1.ReplicaSet, opts metav1.UpdateOptions) (*appsv1.ReplicaSet, error) {
+	result, err := c.backend.UpdateStatus(ctx, "replicasets", "ReplicaSet", v, opts, &appsv1.ReplicaSet{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*appsv1.ReplicaSet), nil
+}
+
 func (c *AppsV1) DeleteReplicaSet(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".apps", Version: "v1", Resource: "replicasets"}, namespace, name, opts)
 }
@@ -1607,6 +1719,14 @@ func (c *AppsV1) CreateStatefulSet(ctx context.Context, v *appsv1.StatefulSet, o
 
 func (c *AppsV1) UpdateStatefulSet(ctx context.Context, v *appsv1.StatefulSet, opts metav1.UpdateOptions) (*appsv1.StatefulSet, error) {
 	result, err := c.backend.Update(ctx, "statefulsets", "StatefulSet", v, opts, &appsv1.StatefulSet{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*appsv1.StatefulSet), nil
+}
+
+func (c *AppsV1) UpdateStatusStatefulSet(ctx context.Context, v *appsv1.StatefulSet, opts metav1.UpdateOptions) (*appsv1.StatefulSet, error) {
+	result, err := c.backend.UpdateStatus(ctx, "statefulsets", "StatefulSet", v, opts, &appsv1.StatefulSet{})
 	if err != nil {
 		return nil, err
 	}
@@ -1661,6 +1781,14 @@ func (c *AuthenticationK8sIoV1) UpdateTokenRequest(ctx context.Context, v *authe
 	return result.(*authenticationv1.TokenRequest), nil
 }
 
+func (c *AuthenticationK8sIoV1) UpdateStatusTokenRequest(ctx context.Context, v *authenticationv1.TokenRequest, opts metav1.UpdateOptions) (*authenticationv1.TokenRequest, error) {
+	result, err := c.backend.UpdateStatus(ctx, "tokenrequests", "TokenRequest", v, opts, &authenticationv1.TokenRequest{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authenticationv1.TokenRequest), nil
+}
+
 func (c *AuthenticationK8sIoV1) DeleteTokenRequest(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".authentication.k8s.io", Version: "v1", Resource: "tokenrequests"}, namespace, name, opts)
 }
@@ -1695,6 +1823,14 @@ func (c *AuthenticationK8sIoV1) CreateTokenReview(ctx context.Context, v *authen
 
 func (c *AuthenticationK8sIoV1) UpdateTokenReview(ctx context.Context, v *authenticationv1.TokenReview, opts metav1.UpdateOptions) (*authenticationv1.TokenReview, error) {
 	result, err := c.backend.UpdateClusterScoped(ctx, "tokenreviews", "TokenReview", v, opts, &authenticationv1.TokenReview{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authenticationv1.TokenReview), nil
+}
+
+func (c *AuthenticationK8sIoV1) UpdateStatusTokenReview(ctx context.Context, v *authenticationv1.TokenReview, opts metav1.UpdateOptions) (*authenticationv1.TokenReview, error) {
+	result, err := c.backend.UpdateStatusClusterScoped(ctx, "tokenreviews", "TokenReview", v, opts, &authenticationv1.TokenReview{})
 	if err != nil {
 		return nil, err
 	}
@@ -1749,6 +1885,14 @@ func (c *AuthorizationK8sIoV1) UpdateLocalSubjectAccessReview(ctx context.Contex
 	return result.(*authorizationv1.LocalSubjectAccessReview), nil
 }
 
+func (c *AuthorizationK8sIoV1) UpdateStatusLocalSubjectAccessReview(ctx context.Context, v *authorizationv1.LocalSubjectAccessReview, opts metav1.UpdateOptions) (*authorizationv1.LocalSubjectAccessReview, error) {
+	result, err := c.backend.UpdateStatus(ctx, "localsubjectaccessreviews", "LocalSubjectAccessReview", v, opts, &authorizationv1.LocalSubjectAccessReview{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authorizationv1.LocalSubjectAccessReview), nil
+}
+
 func (c *AuthorizationK8sIoV1) DeleteLocalSubjectAccessReview(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".authorization.k8s.io", Version: "v1", Resource: "localsubjectaccessreviews"}, namespace, name, opts)
 }
@@ -1783,6 +1927,14 @@ func (c *AuthorizationK8sIoV1) CreateSelfSubjectAccessReview(ctx context.Context
 
 func (c *AuthorizationK8sIoV1) UpdateSelfSubjectAccessReview(ctx context.Context, v *authorizationv1.SelfSubjectAccessReview, opts metav1.UpdateOptions) (*authorizationv1.SelfSubjectAccessReview, error) {
 	result, err := c.backend.UpdateClusterScoped(ctx, "selfsubjectaccessreviews", "SelfSubjectAccessReview", v, opts, &authorizationv1.SelfSubjectAccessReview{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authorizationv1.SelfSubjectAccessReview), nil
+}
+
+func (c *AuthorizationK8sIoV1) UpdateStatusSelfSubjectAccessReview(ctx context.Context, v *authorizationv1.SelfSubjectAccessReview, opts metav1.UpdateOptions) (*authorizationv1.SelfSubjectAccessReview, error) {
+	result, err := c.backend.UpdateStatusClusterScoped(ctx, "selfsubjectaccessreviews", "SelfSubjectAccessReview", v, opts, &authorizationv1.SelfSubjectAccessReview{})
 	if err != nil {
 		return nil, err
 	}
@@ -1829,6 +1981,14 @@ func (c *AuthorizationK8sIoV1) UpdateSelfSubjectRulesReview(ctx context.Context,
 	return result.(*authorizationv1.SelfSubjectRulesReview), nil
 }
 
+func (c *AuthorizationK8sIoV1) UpdateStatusSelfSubjectRulesReview(ctx context.Context, v *authorizationv1.SelfSubjectRulesReview, opts metav1.UpdateOptions) (*authorizationv1.SelfSubjectRulesReview, error) {
+	result, err := c.backend.UpdateStatusClusterScoped(ctx, "selfsubjectrulesreviews", "SelfSubjectRulesReview", v, opts, &authorizationv1.SelfSubjectRulesReview{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authorizationv1.SelfSubjectRulesReview), nil
+}
+
 func (c *AuthorizationK8sIoV1) DeleteSelfSubjectRulesReview(ctx context.Context, name string, opts metav1.DeleteOptions) error {
 	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".authorization.k8s.io", Version: "v1", Resource: "selfsubjectrulesreviews"}, name, opts)
 }
@@ -1863,6 +2023,14 @@ func (c *AuthorizationK8sIoV1) CreateSubjectAccessReview(ctx context.Context, v 
 
 func (c *AuthorizationK8sIoV1) UpdateSubjectAccessReview(ctx context.Context, v *authorizationv1.SubjectAccessReview, opts metav1.UpdateOptions) (*authorizationv1.SubjectAccessReview, error) {
 	result, err := c.backend.UpdateClusterScoped(ctx, "subjectaccessreviews", "SubjectAccessReview", v, opts, &authorizationv1.SubjectAccessReview{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authorizationv1.SubjectAccessReview), nil
+}
+
+func (c *AuthorizationK8sIoV1) UpdateStatusSubjectAccessReview(ctx context.Context, v *authorizationv1.SubjectAccessReview, opts metav1.UpdateOptions) (*authorizationv1.SubjectAccessReview, error) {
+	result, err := c.backend.UpdateStatusClusterScoped(ctx, "subjectaccessreviews", "SubjectAccessReview", v, opts, &authorizationv1.SubjectAccessReview{})
 	if err != nil {
 		return nil, err
 	}
@@ -1917,6 +2085,14 @@ func (c *AutoscalingV1) UpdateHorizontalPodAutoscaler(ctx context.Context, v *au
 	return result.(*autoscalingv1.HorizontalPodAutoscaler), nil
 }
 
+func (c *AutoscalingV1) UpdateStatusHorizontalPodAutoscaler(ctx context.Context, v *autoscalingv1.HorizontalPodAutoscaler, opts metav1.UpdateOptions) (*autoscalingv1.HorizontalPodAutoscaler, error) {
+	result, err := c.backend.UpdateStatus(ctx, "horizontalpodautoscalers", "HorizontalPodAutoscaler", v, opts, &autoscalingv1.HorizontalPodAutoscaler{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*autoscalingv1.HorizontalPodAutoscaler), nil
+}
+
 func (c *AutoscalingV1) DeleteHorizontalPodAutoscaler(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".autoscaling", Version: "v1", Resource: "horizontalpodautoscalers"}, namespace, name, opts)
 }
@@ -1951,6 +2127,14 @@ func (c *AutoscalingV1) CreateScale(ctx context.Context, v *autoscalingv1.Scale,
 
 func (c *AutoscalingV1) UpdateScale(ctx context.Context, v *autoscalingv1.Scale, opts metav1.UpdateOptions) (*autoscalingv1.Scale, error) {
 	result, err := c.backend.Update(ctx, "scales", "Scale", v, opts, &autoscalingv1.Scale{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*autoscalingv1.Scale), nil
+}
+
+func (c *AutoscalingV1) UpdateStatusScale(ctx context.Context, v *autoscalingv1.Scale, opts metav1.UpdateOptions) (*autoscalingv1.Scale, error) {
+	result, err := c.backend.UpdateStatus(ctx, "scales", "Scale", v, opts, &autoscalingv1.Scale{})
 	if err != nil {
 		return nil, err
 	}
@@ -2005,6 +2189,14 @@ func (c *AutoscalingV2) UpdateHorizontalPodAutoscaler(ctx context.Context, v *au
 	return result.(*autoscalingv2.HorizontalPodAutoscaler), nil
 }
 
+func (c *AutoscalingV2) UpdateStatusHorizontalPodAutoscaler(ctx context.Context, v *autoscalingv2.HorizontalPodAutoscaler, opts metav1.UpdateOptions) (*autoscalingv2.HorizontalPodAutoscaler, error) {
+	result, err := c.backend.UpdateStatus(ctx, "horizontalpodautoscalers", "HorizontalPodAutoscaler", v, opts, &autoscalingv2.HorizontalPodAutoscaler{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*autoscalingv2.HorizontalPodAutoscaler), nil
+}
+
 func (c *AutoscalingV2) DeleteHorizontalPodAutoscaler(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".autoscaling", Version: "v2", Resource: "horizontalpodautoscalers"}, namespace, name, opts)
 }
@@ -2047,6 +2239,14 @@ func (c *CertificatesK8sIoV1) CreateCertificateSigningRequest(ctx context.Contex
 
 func (c *CertificatesK8sIoV1) UpdateCertificateSigningRequest(ctx context.Context, v *certificatesv1.CertificateSigningRequest, opts metav1.UpdateOptions) (*certificatesv1.CertificateSigningRequest, error) {
 	result, err := c.backend.UpdateClusterScoped(ctx, "certificatesigningrequests", "CertificateSigningRequest", v, opts, &certificatesv1.CertificateSigningRequest{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*certificatesv1.CertificateSigningRequest), nil
+}
+
+func (c *CertificatesK8sIoV1) UpdateStatusCertificateSigningRequest(ctx context.Context, v *certificatesv1.CertificateSigningRequest, opts metav1.UpdateOptions) (*certificatesv1.CertificateSigningRequest, error) {
+	result, err := c.backend.UpdateStatusClusterScoped(ctx, "certificatesigningrequests", "CertificateSigningRequest", v, opts, &certificatesv1.CertificateSigningRequest{})
 	if err != nil {
 		return nil, err
 	}
@@ -2245,6 +2445,14 @@ func (c *NetworkingK8sIoV1) UpdateIngress(ctx context.Context, v *networkingv1.I
 	return result.(*networkingv1.Ingress), nil
 }
 
+func (c *NetworkingK8sIoV1) UpdateStatusIngress(ctx context.Context, v *networkingv1.Ingress, opts metav1.UpdateOptions) (*networkingv1.Ingress, error) {
+	result, err := c.backend.UpdateStatus(ctx, "ingresses", "Ingress", v, opts, &networkingv1.Ingress{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*networkingv1.Ingress), nil
+}
+
 func (c *NetworkingK8sIoV1) DeleteIngress(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".networking.k8s.io", Version: "v1", Resource: "ingresses"}, namespace, name, opts)
 }
@@ -2319,6 +2527,14 @@ func (c *NetworkingK8sIoV1) CreateNetworkPolicy(ctx context.Context, v *networki
 
 func (c *NetworkingK8sIoV1) UpdateNetworkPolicy(ctx context.Context, v *networkingv1.NetworkPolicy, opts metav1.UpdateOptions) (*networkingv1.NetworkPolicy, error) {
 	result, err := c.backend.Update(ctx, "networkpolicies", "NetworkPolicy", v, opts, &networkingv1.NetworkPolicy{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*networkingv1.NetworkPolicy), nil
+}
+
+func (c *NetworkingK8sIoV1) UpdateStatusNetworkPolicy(ctx context.Context, v *networkingv1.NetworkPolicy, opts metav1.UpdateOptions) (*networkingv1.NetworkPolicy, error) {
+	result, err := c.backend.UpdateStatus(ctx, "networkpolicies", "NetworkPolicy", v, opts, &networkingv1.NetworkPolicy{})
 	if err != nil {
 		return nil, err
 	}
@@ -2407,6 +2623,14 @@ func (c *PolicyV1) CreatePodDisruptionBudget(ctx context.Context, v *policyv1.Po
 
 func (c *PolicyV1) UpdatePodDisruptionBudget(ctx context.Context, v *policyv1.PodDisruptionBudget, opts metav1.UpdateOptions) (*policyv1.PodDisruptionBudget, error) {
 	result, err := c.backend.Update(ctx, "poddisruptionbudgets", "PodDisruptionBudget", v, opts, &policyv1.PodDisruptionBudget{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*policyv1.PodDisruptionBudget), nil
+}
+
+func (c *PolicyV1) UpdateStatusPodDisruptionBudget(ctx context.Context, v *policyv1.PodDisruptionBudget, opts metav1.UpdateOptions) (*policyv1.PodDisruptionBudget, error) {
+	result, err := c.backend.UpdateStatus(ctx, "poddisruptionbudgets", "PodDisruptionBudget", v, opts, &policyv1.PodDisruptionBudget{})
 	if err != nil {
 		return nil, err
 	}
@@ -2831,6 +3055,14 @@ func (c *StorageK8sIoV1) CreateVolumeAttachment(ctx context.Context, v *storagev
 
 func (c *StorageK8sIoV1) UpdateVolumeAttachment(ctx context.Context, v *storagev1.VolumeAttachment, opts metav1.UpdateOptions) (*storagev1.VolumeAttachment, error) {
 	result, err := c.backend.UpdateClusterScoped(ctx, "volumeattachments", "VolumeAttachment", v, opts, &storagev1.VolumeAttachment{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.VolumeAttachment), nil
+}
+
+func (c *StorageK8sIoV1) UpdateStatusVolumeAttachment(ctx context.Context, v *storagev1.VolumeAttachment, opts metav1.UpdateOptions) (*storagev1.VolumeAttachment, error) {
+	result, err := c.backend.UpdateStatusClusterScoped(ctx, "volumeattachments", "VolumeAttachment", v, opts, &storagev1.VolumeAttachment{})
 	if err != nil {
 		return nil, err
 	}

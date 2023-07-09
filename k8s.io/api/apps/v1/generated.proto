@@ -76,7 +76,7 @@ message DaemonSet {
   // Populated by the system.
   // Read-only.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
-  optional DaemonSetStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  optional DaemonSetStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", sub_resource: true, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
   };
@@ -180,7 +180,7 @@ message Deployment {
   // Specification of the desired behavior of the Deployment.
   optional DeploymentSpec spec = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
   // Most recently observed status of the Deployment.
-  optional DeploymentStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  optional DeploymentStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", sub_resource: true, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
   };
@@ -282,7 +282,7 @@ message ReplicaSet {
   // Populated by the system.
   // Read-only.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
-  optional ReplicaSetStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  optional ReplicaSetStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", sub_resource: true, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
   };
@@ -432,7 +432,7 @@ message StatefulSet {
   optional StatefulSetSpec spec = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
   // Status is the current status of Pods in this StatefulSet. This data
   // may be out of date by some window of time.
-  optional StatefulSetStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  optional StatefulSetStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", sub_resource: true, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
   };

@@ -1785,7 +1785,7 @@ message Namespace {
   optional NamespaceSpec spec = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
   // Status describes the current status of a Namespace.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
-  optional NamespaceStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  optional NamespaceStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", sub_resource: true, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
     scope: SCOPE_CLUSTER
@@ -1834,7 +1834,7 @@ message Node {
   // Populated by the system.
   // Read-only.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
-  optional NodeStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  optional NodeStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", sub_resource: true, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
     scope: SCOPE_CLUSTER
@@ -2112,7 +2112,7 @@ message PersistentVolume {
   // Populated by the system.
   // Read-only.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistent-volumes
-  optional PersistentVolumeStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  optional PersistentVolumeStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", sub_resource: true, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
     scope: SCOPE_CLUSTER
@@ -2126,7 +2126,7 @@ message PersistentVolumeClaim {
   // status represents the current information/status of a persistent volume claim.
   // Read-only.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
-  optional PersistentVolumeClaimStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  optional PersistentVolumeClaimStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", sub_resource: true, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
   };
@@ -2397,7 +2397,7 @@ message Pod {
   // Populated by the system.
   // Read-only.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
-  optional PodStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  optional PodStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", sub_resource: true, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
   };
@@ -2999,7 +2999,7 @@ message PodStatusResult {
   // Populated by the system.
   // Read-only.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
-  optional PodStatus status = 3 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  optional PodStatus status = 3 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", sub_resource: true, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
   };
@@ -3249,7 +3249,7 @@ message ReplicationController {
   // Populated by the system.
   // Read-only.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
-  optional ReplicationControllerStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  optional ReplicationControllerStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", sub_resource: true, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
   };
@@ -3339,7 +3339,7 @@ message ResourceQuota {
   optional ResourceQuotaSpec spec = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
   // Status defines the actual enforced quota and its current usage.
   // https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
-  optional ResourceQuotaStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  optional ResourceQuotaStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", sub_resource: true, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
   };
@@ -3670,7 +3670,7 @@ message Service {
   // Populated by the system.
   // Read-only.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
-  optional ServiceStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  optional ServiceStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", sub_resource: true, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
   };

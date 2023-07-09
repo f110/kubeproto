@@ -310,7 +310,7 @@ message VolumeAttachment {
   // status represents status of the VolumeAttachment request.
   // Populated by the entity completing the attach or detach
   // operation, i.e. the external-attacher.
-  optional VolumeAttachmentStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  optional VolumeAttachmentStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", sub_resource: true, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
     scope: SCOPE_CLUSTER

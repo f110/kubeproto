@@ -465,6 +465,9 @@ func (g *Generator) WriteFile(outputFilePath string) error {
 			if f.APIFieldName != "" {
 				w.Fn("api_field_name: %q, ", f.APIFieldName)
 			}
+			if f.SubResource {
+				w.Fn("sub_resource: true, ")
+			}
 			w.Fn("inline: %v}];", f.Inline)
 			w.F("")
 		}
@@ -611,6 +614,7 @@ func (g *Generator) structToProtobufMessage(v *ast.GenDecl, comment *ast.Comment
 		Name:        typeSpec.Name.String(),
 		UseFieldsOf: useFieldsOf,
 	}
+	var isExistStatusField bool
 	i := 1
 	for _, f := range typeSpec.Type.(*ast.StructType).Fields.List {
 		var name string
@@ -629,6 +633,9 @@ func (g *Generator) structToProtobufMessage(v *ast.GenDecl, comment *ast.Comment
 		if unicode.IsLower(rune(name[0])) {
 			// Private field is ignored
 			continue
+		}
+		if name == "Status" {
+			isExistStatusField = true
 		}
 
 		var inline, optional bool
@@ -729,6 +736,9 @@ func (g *Generator) structToProtobufMessage(v *ast.GenDecl, comment *ast.Comment
 			case "type_meta", "object_meta":
 			default:
 				fields = append(fields, f)
+			}
+			if isExistStatusField && f.Name == "status" {
+				f.SubResource = true
 			}
 		}
 		m.Fields = fields
