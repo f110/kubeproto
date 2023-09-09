@@ -114,6 +114,7 @@ type Backend interface {
 		clientName := m.ClientName(fqdnSetName)
 		writer.F("%s *%s", clientName, clientName)
 	}
+	writer.F("RESTClient *rest.RESTClient")
 	writer.F("}")
 	writer.F("")
 	writer.F("func NewSet(cfg *rest.Config) (*Set,error) {")
@@ -133,6 +134,14 @@ type Backend interface {
 		writer.F("s.%s = New%sClient(&restBackend{client: c})", clientName, clientName)
 		writer.F("}")
 	}
+	writer.F("{")
+	writer.F("conf := *cfg")
+	writer.F("c, err := rest.RESTClientFor(&conf)")
+	writer.F("if err != nil {")
+	writer.F("return nil, err")
+	writer.F("}")
+	writer.F("s.RESTClient = c")
+	writer.F("}")
 	writer.F("")
 	writer.F("return s, nil")
 	writer.F("}") // end of NewSet

@@ -66,6 +66,7 @@ type Backend interface {
 type Set struct {
 	BlogV1alpha1 *BlogV1alpha1
 	BlogV1alpha2 *BlogV1alpha2
+	RESTClient   *rest.RESTClient
 }
 
 func NewSet(cfg *rest.Config) (*Set, error) {
@@ -91,6 +92,14 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 			return nil, err
 		}
 		s.BlogV1alpha2 = NewBlogV1alpha2Client(&restBackend{client: c})
+	}
+	{
+		conf := *cfg
+		c, err := rest.RESTClientFor(&conf)
+		if err != nil {
+			return nil, err
+		}
+		s.RESTClient = c
 	}
 
 	return s, nil
