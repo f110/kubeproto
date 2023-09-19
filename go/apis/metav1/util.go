@@ -187,6 +187,15 @@ func (in *ObjectMeta) GetObjectMeta() *ObjectMeta {
 	return in
 }
 
+func (in *ObjectMeta) OwnedBy(ref OwnerReference) {
+	for _, v := range in.OwnerReferences {
+		if v.UID == ref.UID {
+			return
+		}
+	}
+	in.OwnerReferences = append(in.OwnerReferences, ref)
+}
+
 func (in *ListMeta) GetListMeta() *ListMeta {
 	return in
 }
