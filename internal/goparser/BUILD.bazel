@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "goparser",
@@ -12,4 +12,10 @@ go_library(
         "//internal/codegeneration",
         "//internal/stringsutil",
     ],
+)
+
+go_test(
+    name = "goparser_test",
+    srcs = ["parser_test.go"],
+    embed = [":goparser"],
 )

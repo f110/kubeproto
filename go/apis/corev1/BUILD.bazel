@@ -2,7 +2,10 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "corev1",
-    srcs = ["corev1_kubeproto.generated.object.go"],
+    srcs = [
+        "corev1_kubeproto.generated.object.go",
+        "util.go",
+    ],
     importpath = "go.f110.dev/kubeproto/go/apis/corev1",
     visibility = ["//visibility:public"],
     deps = [

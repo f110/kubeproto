@@ -292,8 +292,9 @@ func (r *restBackend) Create(ctx context.Context, resourceName, kindName string,
 	if m == nil {
 		return nil, errors.New("obj is not implement metav1.Object")
 	}
+	meta := m.GetObjectMeta()
 	return result, r.client.Post().
-		Namespace(m.GetNamespace()).
+		Namespace(meta.Namespace).
 		Resource(resourceName).
 		VersionedParams(&opts, ParameterCodec).
 		Body(obj).
@@ -306,10 +307,11 @@ func (r *restBackend) Update(ctx context.Context, resourceName, kindName string,
 	if m == nil {
 		return nil, errors.New("obj is not implement metav1.Object")
 	}
+	meta := m.GetObjectMeta()
 	return result, r.client.Put().
-		Namespace(m.GetNamespace()).
+		Namespace(meta.Namespace).
 		Resource(resourceName).
-		Name(m.GetName()).
+		Name(meta.Name).
 		VersionedParams(&opts, ParameterCodec).
 		Body(obj).
 		Do(ctx).
@@ -321,10 +323,11 @@ func (r *restBackend) UpdateStatus(ctx context.Context, resourceName, kindName s
 	if m == nil {
 		return nil, errors.New("obj is not implement metav1.Object")
 	}
+	meta := m.GetObjectMeta()
 	return result, r.client.Put().
-		Namespace(m.GetNamespace()).
+		Namespace(meta.Namespace).
 		Resource(resourceName).
-		Name(m.GetName()).
+		Name(meta.Name).
 		SubResource("status").
 		VersionedParams(&opts, ParameterCodec).
 		Body(obj).
@@ -392,9 +395,10 @@ func (r *restBackend) UpdateClusterScoped(ctx context.Context, resourceName, kin
 	if m == nil {
 		return nil, errors.New("obj is not implement metav1.Object")
 	}
+	meta := m.GetObjectMeta()
 	return result, r.client.Put().
 		Resource(resourceName).
-		Name(m.GetName()).
+		Name(meta.Name).
 		VersionedParams(&opts, ParameterCodec).
 		Body(obj).
 		Do(ctx).
@@ -406,9 +410,10 @@ func (r *restBackend) UpdateStatusClusterScoped(ctx context.Context, resourceNam
 	if m == nil {
 		return nil, errors.New("obj is not implement metav1.Object")
 	}
+	meta := m.GetObjectMeta()
 	return result, r.client.Put().
 		Resource(resourceName).
-		Name(m.GetName()).
+		Name(meta.Name).
 		SubResource("status").
 		VersionedParams(&opts, ParameterCodec).
 		Body(obj).

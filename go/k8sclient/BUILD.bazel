@@ -46,6 +46,7 @@ go_library(
         "//go/apis/corev1",
         "//go/apis/discoveryv1",
         "//go/apis/eventsv1",
+        "//go/apis/metav1",
         "//go/apis/networkingv1",
         "//go/apis/policyv1",
         "//go/apis/rbacv1",
