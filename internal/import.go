@@ -3,6 +3,7 @@ package internal
 import (
 	_ "k8s.io/api/admission/v1"
 	_ "k8s.io/api/admissionregistration/v1"
+	_ "k8s.io/api/apidiscovery/v2beta1"
 	_ "k8s.io/api/apps/v1"
 	_ "k8s.io/api/authorization/v1"
 	_ "k8s.io/api/autoscaling/v1"

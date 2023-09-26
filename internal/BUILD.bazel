@@ -8,6 +8,7 @@ go_library(
     deps = [
         "//vendor/k8s.io/api/admission/v1:admission",
         "//vendor/k8s.io/api/admissionregistration/v1:admissionregistration",
+        "//vendor/k8s.io/api/apidiscovery/v2beta1",
         "//vendor/k8s.io/api/apps/v1:apps",
         "//vendor/k8s.io/api/authorization/v1:authorization",
         "//vendor/k8s.io/api/autoscaling/v1:autoscaling",

@@ -1,0 +1,13 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "apidiscoveryv2beta1",
+    srcs = ["apidiscoveryv2beta1_kubeproto.generated.object.go"],
+    importpath = "go.f110.dev/kubeproto/go/apis/apidiscoveryv2beta1",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//go/apis/metav1",
+        "//vendor/k8s.io/apimachinery/pkg/runtime",
+        "//vendor/k8s.io/apimachinery/pkg/runtime/schema",
+    ],
+)

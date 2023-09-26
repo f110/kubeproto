@@ -30,7 +30,10 @@ go_testing_client(
 
 go_library(
     name = "k8stestingclient",
-    srcs = ["go_testingclient.generated.testingclient.go"],
+    srcs = [
+        "discovery.go",
+        "go_testingclient.generated.testingclient.go",
+    ],
     importpath = "go.f110.dev/kubeproto/go/k8stestingclient",
     visibility = ["//visibility:public"],
     deps = [
