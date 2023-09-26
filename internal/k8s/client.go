@@ -91,18 +91,18 @@ func (g *ClientGenerator) Generate(out io.Writer, packageName, importPath string
 
 	writer.F(`
 type Backend interface {
-	Get(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error)
-	List(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error)
-	Create(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error)
-	Update(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
-	UpdateStatus(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
+	Get(ctx context.Context, resourceName, namespace, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error)
+	List(ctx context.Context, resourceName, namespace string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error)
+	Create(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error)
+	Update(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
+	UpdateStatus(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	Delete(ctx context.Context, gvr schema.GroupVersionResource, namespace, name string, opts metav1.DeleteOptions) error
 	Watch(ctx context.Context, gvr schema.GroupVersionResource, namespace string, opts metav1.ListOptions) (watch.Interface, error)
-	GetClusterScoped(ctx context.Context, resourceName, kindName, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error)
-	ListClusterScoped(ctx context.Context, resourceName, kindName string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error)
-	CreateClusterScoped(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error)
-	UpdateClusterScoped(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
-	UpdateStatusClusterScoped(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
+	GetClusterScoped(ctx context.Context, resourceName, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error)
+	ListClusterScoped(ctx context.Context, resourceName string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error)
+	CreateClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error)
+	UpdateClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
+	UpdateStatusClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	DeleteClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, name string, opts metav1.DeleteOptions) error
 	WatchClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, opts metav1.ListOptions) (watch.Interface, error)
 }`)
@@ -263,7 +263,7 @@ func (g *restClientGenerator) WriteTo(writer *codegeneration.Writer, fqdn bool) 
 	client *rest.RESTClient
 }
 
-func (r *restBackend) Get(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error) {
+func (r *restBackend) Get(ctx context.Context, resourceName, namespace, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error) {
 	return result, r.client.Get().
 		Namespace(namespace).
 		Resource(resourceName).
@@ -273,7 +273,7 @@ func (r *restBackend) Get(ctx context.Context, resourceName, kindName, namespace
 		Into(result)
 }
 
-func (r *restBackend) List(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error) {
+func (r *restBackend) List(ctx context.Context, resourceName, namespace string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds > 0 {
 		timeout = time.Duration(opts.TimeoutSeconds) * time.Second
@@ -287,7 +287,7 @@ func (r *restBackend) List(ctx context.Context, resourceName, kindName, namespac
 		Into(result)
 }
 
-func (r *restBackend) Create(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error) {
+func (r *restBackend) Create(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error) {
 	m := obj.(metav1.Object)
 	if m == nil {
 		return nil, errors.New("obj is not implement metav1.Object")
@@ -302,7 +302,7 @@ func (r *restBackend) Create(ctx context.Context, resourceName, kindName string,
 		Into(result)
 }
 
-func (r *restBackend) Update(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
+func (r *restBackend) Update(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
 	m := obj.(metav1.Object)
 	if m == nil {
 		return nil, errors.New("obj is not implement metav1.Object")
@@ -318,7 +318,7 @@ func (r *restBackend) Update(ctx context.Context, resourceName, kindName string,
 		Into(result)
 }
 
-func (r *restBackend) UpdateStatus(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
+func (r *restBackend) UpdateStatus(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
 	m := obj.(metav1.Object)
 	if m == nil {
 		return nil, errors.New("obj is not implement metav1.Object")
@@ -359,7 +359,7 @@ func (r *restBackend) Watch(ctx context.Context, gvr schema.GroupVersionResource
 		Watch(ctx)
 }
 
-func (r *restBackend) GetClusterScoped(ctx context.Context, resourceName, kindName, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error) {
+func (r *restBackend) GetClusterScoped(ctx context.Context, resourceName, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error) {
 	return result, r.client.Get().
 		Resource(resourceName).
 		Name(name).
@@ -368,7 +368,7 @@ func (r *restBackend) GetClusterScoped(ctx context.Context, resourceName, kindNa
 		Into(result)
 }
 
-func (r *restBackend) ListClusterScoped(ctx context.Context, resourceName, kindName string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error) {
+func (r *restBackend) ListClusterScoped(ctx context.Context, resourceName string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds > 0 {
 		timeout = time.Duration(opts.TimeoutSeconds) * time.Second
@@ -381,7 +381,7 @@ func (r *restBackend) ListClusterScoped(ctx context.Context, resourceName, kindN
 		Into(result)
 }
 
-func (r *restBackend) CreateClusterScoped(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error) {
+func (r *restBackend) CreateClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error) {
 	return result, r.client.Post().
 		Resource(resourceName).
 		VersionedParams(&opts, ParameterCodec).
@@ -390,7 +390,7 @@ func (r *restBackend) CreateClusterScoped(ctx context.Context, resourceName, kin
 		Into(result)
 }
 
-func (r *restBackend) UpdateClusterScoped(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
+func (r *restBackend) UpdateClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
 	m := obj.(metav1.Object)
 	if m == nil {
 		return nil, errors.New("obj is not implement metav1.Object")
@@ -405,7 +405,7 @@ func (r *restBackend) UpdateClusterScoped(ctx context.Context, resourceName, kin
 		Into(result)
 }
 
-func (r *restBackend) UpdateStatusClusterScoped(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
+func (r *restBackend) UpdateStatusClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
 	m := obj.(metav1.Object)
 	if m == nil {
 		return nil, errors.New("obj is not implement metav1.Object")
@@ -463,7 +463,7 @@ func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVe
 			// GetXXX
 			if m.Scope == definition.ScopeTypeCluster {
 				writer.F("func(c *%s) Get%s(ctx context.Context, name string, opts metav1.GetOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg)
-				writer.F("result, err := c.backend.GetClusterScoped(ctx, %q, %q, name, opts, &%s{})", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName, structNameWithPkg)
+				writer.F("result, err := c.backend.GetClusterScoped(ctx, %q, name, opts, &%s{})", strings.ToLower(stringsutil.Plural(m.ShortName)), structNameWithPkg)
 				writer.F("if err != nil {")
 				writer.F("return nil, err")
 				writer.F("}")
@@ -472,7 +472,7 @@ func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVe
 				writer.F("")
 			} else {
 				writer.F("func(c *%s) Get%s(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg)
-				writer.F("result, err := c.backend.Get(ctx, %q, %q, namespace, name, opts, &%s{})", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName, structNameWithPkg)
+				writer.F("result, err := c.backend.Get(ctx, %q, namespace, name, opts, &%s{})", strings.ToLower(stringsutil.Plural(m.ShortName)), structNameWithPkg)
 				writer.F("if err != nil {")
 				writer.F("return nil, err")
 				writer.F("}")
@@ -484,7 +484,7 @@ func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVe
 			// CreateXXX
 			if m.Scope == definition.ScopeTypeCluster {
 				writer.F("func (c *%s) Create%s(ctx context.Context, v *%s, opts metav1.CreateOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg, structNameWithPkg)
-				writer.F("result, err := c.backend.CreateClusterScoped(ctx, %q, %q, v, opts, &%s{})", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName, structNameWithPkg)
+				writer.F("result, err := c.backend.CreateClusterScoped(ctx, %q, v, opts, &%s{})", strings.ToLower(stringsutil.Plural(m.ShortName)), structNameWithPkg)
 				writer.F("if err != nil {")
 				writer.F("return nil, err")
 				writer.F("}")
@@ -493,7 +493,7 @@ func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVe
 				writer.F("")
 			} else {
 				writer.F("func (c *%s) Create%s(ctx context.Context, v *%s, opts metav1.CreateOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg, structNameWithPkg)
-				writer.F("result, err := c.backend.Create(ctx, %q, %q, v, opts, &%s{})", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName, structNameWithPkg)
+				writer.F("result, err := c.backend.Create(ctx, %q, v, opts, &%s{})", strings.ToLower(stringsutil.Plural(m.ShortName)), structNameWithPkg)
 				writer.F("if err != nil {")
 				writer.F("return nil, err")
 				writer.F("}")
@@ -505,7 +505,7 @@ func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVe
 			// UpdateXXX
 			if m.Scope == definition.ScopeTypeCluster {
 				writer.F("func (c *%s) Update%s(ctx context.Context, v *%s, opts metav1.UpdateOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg, structNameWithPkg)
-				writer.F("result, err := c.backend.UpdateClusterScoped(ctx, %q, %q, v, opts, &%s{})", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName, structNameWithPkg)
+				writer.F("result, err := c.backend.UpdateClusterScoped(ctx, %q, v, opts, &%s{})", strings.ToLower(stringsutil.Plural(m.ShortName)), structNameWithPkg)
 				writer.F("if err != nil {")
 				writer.F("return nil, err")
 				writer.F("}")
@@ -514,7 +514,7 @@ func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVe
 				writer.F("")
 			} else {
 				writer.F("func (c *%s) Update%s(ctx context.Context, v *%s, opts metav1.UpdateOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg, structNameWithPkg)
-				writer.F("result, err := c.backend.Update(ctx, %q, %q, v, opts, &%s{})", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName, structNameWithPkg)
+				writer.F("result, err := c.backend.Update(ctx, %q, v, opts, &%s{})", strings.ToLower(stringsutil.Plural(m.ShortName)), structNameWithPkg)
 				writer.F("if err != nil {")
 				writer.F("return nil, err")
 				writer.F("}")
@@ -527,7 +527,7 @@ func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVe
 			if m.IsDefinedSubResource() {
 				if m.Scope == definition.ScopeTypeCluster {
 					writer.F("func (c *%s) UpdateStatus%s(ctx context.Context, v *%s, opts metav1.UpdateOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg, structNameWithPkg)
-					writer.F("result, err := c.backend.UpdateStatusClusterScoped(ctx, %q, %q, v, opts, &%s{})", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName, structNameWithPkg)
+					writer.F("result, err := c.backend.UpdateStatusClusterScoped(ctx, %q, v, opts, &%s{})", strings.ToLower(stringsutil.Plural(m.ShortName)), structNameWithPkg)
 					writer.F("if err != nil {")
 					writer.F("return nil, err")
 					writer.F("}")
@@ -536,7 +536,7 @@ func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVe
 					writer.F("")
 				} else {
 					writer.F("func (c *%s) UpdateStatus%s(ctx context.Context, v *%s, opts metav1.UpdateOptions) (*%s, error) {", clientName, m.ShortName, structNameWithPkg, structNameWithPkg)
-					writer.F("result, err := c.backend.UpdateStatus(ctx, %q, %q, v, opts, &%s{})", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName, structNameWithPkg)
+					writer.F("result, err := c.backend.UpdateStatus(ctx, %q, v, opts, &%s{})", strings.ToLower(stringsutil.Plural(m.ShortName)), structNameWithPkg)
 					writer.F("if err != nil {")
 					writer.F("return nil, err")
 					writer.F("}")
@@ -562,7 +562,7 @@ func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVe
 			// ListXXX
 			if m.Scope == definition.ScopeTypeCluster {
 				writer.F("func (c *%s) List%s(ctx context.Context, opts metav1.ListOptions) (*%s.%sList, error) {", clientName, m.ShortName, m.Package.Alias, m.ShortName)
-				writer.F("result, err := c.backend.ListClusterScoped(ctx, %q, %q, opts, &%s.%sList{})", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName, m.Package.Alias, m.ShortName)
+				writer.F("result, err := c.backend.ListClusterScoped(ctx, %q, opts, &%s.%sList{})", strings.ToLower(stringsutil.Plural(m.ShortName)), m.Package.Alias, m.ShortName)
 				writer.F("if err != nil {")
 				writer.F("return nil, err")
 				writer.F("}")
@@ -571,7 +571,7 @@ func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVe
 				writer.F("")
 			} else {
 				writer.F("func (c *%s) List%s(ctx context.Context, namespace string, opts metav1.ListOptions) (*%s.%sList, error) {", clientName, m.ShortName, m.Package.Alias, m.ShortName)
-				writer.F("result, err := c.backend.List(ctx, %q, %q, namespace, opts, &%s.%sList{})", strings.ToLower(stringsutil.Plural(m.ShortName)), m.ShortName, m.Package.Alias, m.ShortName)
+				writer.F("result, err := c.backend.List(ctx, %q, namespace, opts, &%s.%sList{})", strings.ToLower(stringsutil.Plural(m.ShortName)), m.Package.Alias, m.ShortName)
 				writer.F("if err != nil {")
 				writer.F("return nil, err")
 				writer.F("}")
