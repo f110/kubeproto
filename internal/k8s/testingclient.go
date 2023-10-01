@@ -161,7 +161,7 @@ type fakerBackend struct {
 }
 `)
 
-	writer.F(`func (f *fakerBackend) Get(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error) {
+	writer.F(`func (f *fakerBackend) Get(ctx context.Context, resourceName, namespace, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error) {
 	gvks, _, err := %s.Scheme.ObjectKinds(result)
 	if err != nil {
 		return nil, err
@@ -173,8 +173,9 @@ type fakerBackend struct {
 	}
 	return obj.DeepCopyObject(), nil
 }`, clientPackageName)
+	writer.F("")
 
-	writer.F(`func (f *fakerBackend) List(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error) {
+	writer.F(`func (f *fakerBackend) List(ctx context.Context, resourceName, namespace string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error) {
 	gvks, _, err := %s.Scheme.ObjectKinds(result)
 	if err != nil {
 		return nil, err
@@ -197,7 +198,8 @@ type fakerBackend struct {
 	filtered := make([]runtime.Object, 0)
 	for _, item := range objs {
 		m := item.(metav1.Object)
-		if label.Matches(labels.Set(m.GetLabels())) {
+		objMeta := m.GetObjectMeta()
+		if label.Matches(labels.Set(objMeta.Labels)) {
 			filtered = append(filtered, item)
 		}
 	}
@@ -206,15 +208,34 @@ type fakerBackend struct {
 	}
 	return obj.DeepCopyObject(), err
 }`, clientPackageName)
+	writer.F("")
 
-	writer.F(`func (f *fakerBackend) Create(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error) {
+	writer.F(`func (f *fakerBackend) Create(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error) {
 	gvks, _, err := %s.Scheme.ObjectKinds(result)
 	if err != nil {
 		return nil, err
 	}
 	gvk := gvks[0]
 	m := obj.(metav1.Object)
-	obj, err = f.fake.Invokes(k8stesting.NewCreateAction(gvk.GroupVersion().WithResource(resourceName), m.GetNamespace(), obj), result)
+	objMeta := m.GetObjectMeta()
+	obj, err = f.fake.Invokes(k8stesting.NewCreateAction(gvk.GroupVersion().WithResource(resourceName), objMeta.Namespace, obj), result)
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.DeepCopyObject(), err
+}`, clientPackageName)
+	writer.F("")
+
+	writer.F(`func (f *fakerBackend) Update(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
+	gvks, _, err := %s.Scheme.ObjectKinds(result)
+	if err != nil {
+		return nil, err
+	}
+	gvk := gvks[0]
+	m := obj.(metav1.Object)
+	objMeta := m.GetObjectMeta()
+	obj, err = f.fake.Invokes(k8stesting.NewUpdateAction(gvk.GroupVersion().WithResource(resourceName), objMeta.Namespace, obj), result)
 
 	if obj == nil {
 		return nil, err
@@ -222,29 +243,15 @@ type fakerBackend struct {
 	return obj.DeepCopyObject(), err
 }`, clientPackageName)
 
-	writer.F(`func (f *fakerBackend) Update(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
+	writer.F(`func (f *fakerBackend) UpdateStatus(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
 	gvks, _, err := %s.Scheme.ObjectKinds(result)
 	if err != nil {
 		return nil, err
 	}
 	gvk := gvks[0]
 	m := obj.(metav1.Object)
-	obj, err = f.fake.Invokes(k8stesting.NewUpdateAction(gvk.GroupVersion().WithResource(resourceName), m.GetNamespace(), obj), result)
-
-	if obj == nil {
-		return nil, err
-	}
-	return obj.DeepCopyObject(), err
-}`, clientPackageName)
-
-	writer.F(`func (f *fakerBackend) UpdateStatus(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
-	gvks, _, err := %s.Scheme.ObjectKinds(result)
-	if err != nil {
-		return nil, err
-	}
-	gvk := gvks[0]
-	m := obj.(metav1.Object)
-	obj, err = f.fake.Invokes(k8stesting.NewUpdateSubresourceAction(gvk.GroupVersion().WithResource(resourceName), "status", m.GetNamespace(), obj), result)
+	objMeta := m.GetObjectMeta()
+	obj, err = f.fake.Invokes(k8stesting.NewUpdateSubresourceAction(gvk.GroupVersion().WithResource(resourceName), "status", objMeta.Namespace, obj), result)
 
 	if obj == nil {
 		return nil, err
@@ -264,24 +271,24 @@ type fakerBackend struct {
 `)
 
 	// For non-namespaced resource
-	writer.F(`func (f *fakerBackend) GetClusterScoped(ctx context.Context, resourceName, kindName, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error) {
-	return f.Get(ctx, resourceName, kindName, "", name, opts, result)
+	writer.F(`func (f *fakerBackend) GetClusterScoped(ctx context.Context, resourceName, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error) {
+	return f.Get(ctx, resourceName, "", name, opts, result)
 }
 
-func (f *fakerBackend) ListClusterScoped(ctx context.Context, resourceName, kindName string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error) {
-	return f.List(ctx, resourceName, kindName, "", opts, result)
+func (f *fakerBackend) ListClusterScoped(ctx context.Context, resourceName string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error) {
+	return f.List(ctx, resourceName, "", opts, result)
 }
 
-func (f *fakerBackend) CreateClusterScoped(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error) {
-	return f.Create(ctx, resourceName, kindName, obj, opts, result)
+func (f *fakerBackend) CreateClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error) {
+	return f.Create(ctx, resourceName, obj, opts, result)
 }
 
-func (f *fakerBackend) UpdateClusterScoped(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
-	return f.Update(ctx, resourceName, kindName, obj, opts, result)
+func (f *fakerBackend) UpdateClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
+	return f.Update(ctx, resourceName, obj, opts, result)
 }
 
-func (f *fakerBackend) UpdateStatusClusterScoped(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
-	return f.UpdateStatus(ctx, resourceName, kindName, obj,  opts, result)
+func (f *fakerBackend) UpdateStatusClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
+	return f.UpdateStatus(ctx, resourceName, obj,  opts, result)
 }
 
 func (f *fakerBackend) DeleteClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, name string, opts metav1.DeleteOptions) error {
