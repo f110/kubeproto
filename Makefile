@@ -36,7 +36,8 @@ gen-proto: k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto \
 	k8s.io/api/coordination/v1/generated.proto \
 	k8s.io/api/events/v1/generated.proto \
 	k8s.io/api/scheduling/v1/generated.proto \
-	k8s.io/api/storage/v1/generated.proto
+	k8s.io/api/storage/v1/generated.proto \
+	k8s.io/api/apidiscovery/v2beta1/generated.proto
 
 .PHONY: gen-go
 gen-go: go/apis/metav1/metav1_kubeproto.generated.object.go \
@@ -57,6 +58,7 @@ gen-go: go/apis/metav1/metav1_kubeproto.generated.object.go \
 	go/apis/eventsv1/eventsv1_kubeproto.generated.object.go \
 	go/apis/schedulingv1/schedulingv1_kubeproto.generated.object.go \
 	go/apis/storagev1/storagev1_kubeproto.generated.object.go \
+	go/apis/apidiscoveryv2beta1/apidiscoveryv2beta1_kubeproto.generated.object.go \
 	go/k8sclient/go_client.generated.client.go \
 	go/k8stestingclient/go_testingclient.generated.testingclient.go
 
@@ -218,6 +220,11 @@ k8s.io/api/storage/v1/generated.proto:
 	mkdir -p $(@D)
 	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.storage.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/storagev1" --api-domain storage.k8s.io --api-version v1 --all $(CURDIR)/vendor/$(@D)
 
+.PHONY: k8s.io/api/apidiscovery/v2beta1/generated.proto
+k8s.io/api/apidiscovery/v2beta1/generated.proto:
+	mkdir -p $(@D)
+	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.apidiscovery.v2beta1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/apidiscoveryv2beta1" --api-domain apidiscovery.k8s.io --api-version v2beta1 --all $(CURDIR)/vendor/$(@D)
+
 .PHONY: k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto
 k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto:
 	mkdir -p $(@D)
@@ -358,5 +365,12 @@ go/apis/schedulingv1/schedulingv1_kubeproto.generated.object.go: k8s.io/api/sche
 go/apis/storagev1/storagev1_kubeproto.generated.object.go: k8s.io/api/storage/v1/generated.proto
 	@mkdir -p $(@D)
 	bazel build //$(<D):storagev1_kubeproto
+	cp ./bazel-bin/$(<D)/$(@F) $(@D)
+	@chmod 0644 $@
+
+.PHONY: go/apis/apidiscoveryv2beta1/apidiscoveryv2beta1_kubeproto.generated.object.go
+go/apis/apidiscoveryv2beta1/apidiscoveryv2beta1_kubeproto.generated.object.go: k8s.io/api/apidiscovery/v2beta1/generated.proto
+	@mkdir -p $(@D)
+	bazel build //$(<D):apidiscoveryv2beta1_kubeproto
 	cp ./bazel-bin/$(<D)/$(@F) $(@D)
 	@chmod 0644 $@

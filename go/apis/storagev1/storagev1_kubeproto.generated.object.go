@@ -1,11 +1,12 @@
 package storagev1
 
 import (
-	"go.f110.dev/kubeproto/go/apis/corev1"
-	"go.f110.dev/kubeproto/go/apis/metav1"
 	apiresource "k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+
+	"go.f110.dev/kubeproto/go/apis/corev1"
+	"go.f110.dev/kubeproto/go/apis/metav1"
 )
 
 const GroupName = "storage.k8s.io"
@@ -319,7 +320,7 @@ type StorageClass struct {
 	// Each volume plugin defines its own supported topology specifications.
 	// An empty TopologySelectorTerm list means there is no topology restriction.
 	// This field is only honored by servers that enable the VolumeScheduling feature.
-	AllowedTopologies []corev1.TopologySelectorTerm `json:"allowedTopologies"`
+	//AllowedTopologies []corev1.TopologySelectorTerm `json:"allowedTopologies"`
 }
 
 func (in *StorageClass) DeepCopyInto(out *StorageClass) {
@@ -338,13 +339,13 @@ func (in *StorageClass) DeepCopyInto(out *StorageClass) {
 		copy(t, in.MountOptions)
 		out.MountOptions = t
 	}
-	if in.AllowedTopologies != nil {
-		l := make([]corev1.TopologySelectorTerm, len(in.AllowedTopologies))
-		for i := range in.AllowedTopologies {
-			in.AllowedTopologies[i].DeepCopyInto(&l[i])
-		}
-		out.AllowedTopologies = l
-	}
+	//if in.AllowedTopologies != nil {
+	//	l := make([]corev1.TopologySelectorTerm, len(in.AllowedTopologies))
+	//	for i := range in.AllowedTopologies {
+	//		in.AllowedTopologies[i].DeepCopyInto(&l[i])
+	//	}
+	//	out.AllowedTopologies = l
+	//}
 }
 
 func (in *StorageClass) DeepCopy() *StorageClass {
