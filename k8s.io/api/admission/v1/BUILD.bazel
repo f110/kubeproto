@@ -1,4 +1,5 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
+load("//bazel:def.bzl", "kubeproto_go_api")
 
 proto_library(
     name = "admissionv1_proto",
@@ -11,8 +12,6 @@ proto_library(
         "//k8s.io/apimachinery/pkg/apis/meta/v1:metav1_proto",
     ],
 )
-
-load("//bazel:def.bzl", "kubeproto_go_api")
 
 kubeproto_go_api(
     name = "admissionv1_kubeproto",

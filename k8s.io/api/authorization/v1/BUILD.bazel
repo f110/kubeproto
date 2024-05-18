@@ -1,4 +1,5 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
+load("//bazel:def.bzl", "kubeproto_go_api")
 
 proto_library(
     name = "authorizationv1_proto",
@@ -8,8 +9,6 @@ proto_library(
         "//:kubeproto",
     ],
 )
-
-load("//bazel:def.bzl", "kubeproto_go_api")
 
 kubeproto_go_api(
     name = "authorizationv1_kubeproto",
