@@ -30,20 +30,6 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 	return nil
 }
 
-type NetworkPolicyConditionReason string
-
-const (
-	NetworkPolicyConditionReasonFeatureNotSupported NetworkPolicyConditionReason = "FeatureNotSupported"
-)
-
-type NetworkPolicyConditionType string
-
-const (
-	NetworkPolicyConditionTypeAccepted       NetworkPolicyConditionType = "Accepted"
-	NetworkPolicyConditionTypePartialFailure NetworkPolicyConditionType = "PartialFailure"
-	NetworkPolicyConditionTypeFailure        NetworkPolicyConditionType = "Failure"
-)
-
 type PathType string
 
 const (
@@ -212,9 +198,6 @@ type NetworkPolicy struct {
 	metav1.ObjectMeta `json:"metadata"`
 	// spec represents the specification of the desired behavior for this NetworkPolicy.
 	Spec *NetworkPolicySpec `json:"spec,omitempty"`
-	// status represents the current state of the NetworkPolicy.
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
-	Status *NetworkPolicyStatus `json:"status,omitempty"`
 }
 
 func (in *NetworkPolicy) DeepCopyInto(out *NetworkPolicy) {
@@ -224,11 +207,6 @@ func (in *NetworkPolicy) DeepCopyInto(out *NetworkPolicy) {
 	if in.Spec != nil {
 		in, out := &in.Spec, &out.Spec
 		*out = new(NetworkPolicySpec)
-		(*in).DeepCopyInto(*out)
-	}
-	if in.Status != nil {
-		in, out := &in.Status, &out.Status
-		*out = new(NetworkPolicyStatus)
 		(*in).DeepCopyInto(*out)
 	}
 }
@@ -469,32 +447,6 @@ func (in *NetworkPolicySpec) DeepCopy() *NetworkPolicySpec {
 	return out
 }
 
-type NetworkPolicyStatus struct {
-	// conditions holds an array of metav1.Condition that describe the state of the NetworkPolicy.
-	// Current service state
-	Conditions []metav1.Condition `json:"conditions"`
-}
-
-func (in *NetworkPolicyStatus) DeepCopyInto(out *NetworkPolicyStatus) {
-	*out = *in
-	if in.Conditions != nil {
-		l := make([]metav1.Condition, len(in.Conditions))
-		for i := range in.Conditions {
-			in.Conditions[i].DeepCopyInto(&l[i])
-		}
-		out.Conditions = l
-	}
-}
-
-func (in *NetworkPolicyStatus) DeepCopy() *NetworkPolicyStatus {
-	if in == nil {
-		return nil
-	}
-	out := new(NetworkPolicyStatus)
-	in.DeepCopyInto(out)
-	return out
-}
-
 type IngressBackend struct {
 	// service references a service as a backend.
 	// This is a mutually exclusive setting with "Resource".
@@ -589,12 +541,12 @@ type IngressRule struct {
 	// just traffic matching the host to the default backend or all traffic to the
 	// default backend, is left to the controller fulfilling the Ingress. Http is
 	// currently the only supported IngressRuleValue.
-	IngressRuleValue IngressRuleValue `json:"ingressRuleValue"`
+	IngressRuleValue `json:",inline"`
 }
 
 func (in *IngressRule) DeepCopyInto(out *IngressRule) {
 	*out = *in
-	in.IngressRuleValue.DeepCopyInto(&out.IngressRuleValue)
+	out.IngressRuleValue = in.IngressRuleValue
 }
 
 func (in *IngressRule) DeepCopy() *IngressRule {

@@ -17,10 +17,9 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 
-	"go.f110.dev/kubeproto/go/apis/metav1"
-
 	"go.f110.dev/kubeproto/example/pkg/apis/blogv1alpha1"
 	"go.f110.dev/kubeproto/example/pkg/apis/blogv1alpha2"
+	"go.f110.dev/kubeproto/go/apis/metav1"
 )
 
 var (
@@ -47,18 +46,18 @@ func init() {
 }
 
 type Backend interface {
-	Get(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error)
-	List(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error)
-	Create(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error)
-	Update(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
-	UpdateStatus(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
+	Get(ctx context.Context, resourceName, namespace, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error)
+	List(ctx context.Context, resourceName, namespace string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error)
+	Create(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error)
+	Update(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
+	UpdateStatus(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	Delete(ctx context.Context, gvr schema.GroupVersionResource, namespace, name string, opts metav1.DeleteOptions) error
 	Watch(ctx context.Context, gvr schema.GroupVersionResource, namespace string, opts metav1.ListOptions) (watch.Interface, error)
-	GetClusterScoped(ctx context.Context, resourceName, kindName, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error)
-	ListClusterScoped(ctx context.Context, resourceName, kindName string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error)
-	CreateClusterScoped(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error)
-	UpdateClusterScoped(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
-	UpdateStatusClusterScoped(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
+	GetClusterScoped(ctx context.Context, resourceName, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error)
+	ListClusterScoped(ctx context.Context, resourceName string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error)
+	CreateClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error)
+	UpdateClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
+	UpdateStatusClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	DeleteClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, name string, opts metav1.DeleteOptions) error
 	WatchClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, opts metav1.ListOptions) (watch.Interface, error)
 }
@@ -109,7 +108,7 @@ type restBackend struct {
 	client *rest.RESTClient
 }
 
-func (r *restBackend) Get(ctx context.Context, resourceName, kindName, namespace, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error) {
+func (r *restBackend) Get(ctx context.Context, resourceName, namespace, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error) {
 	return result, r.client.Get().
 		Namespace(namespace).
 		Resource(resourceName).
@@ -119,7 +118,7 @@ func (r *restBackend) Get(ctx context.Context, resourceName, kindName, namespace
 		Into(result)
 }
 
-func (r *restBackend) List(ctx context.Context, resourceName, kindName, namespace string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error) {
+func (r *restBackend) List(ctx context.Context, resourceName, namespace string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds > 0 {
 		timeout = time.Duration(opts.TimeoutSeconds) * time.Second
@@ -133,13 +132,14 @@ func (r *restBackend) List(ctx context.Context, resourceName, kindName, namespac
 		Into(result)
 }
 
-func (r *restBackend) Create(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error) {
+func (r *restBackend) Create(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error) {
 	m := obj.(metav1.Object)
 	if m == nil {
 		return nil, errors.New("obj is not implement metav1.Object")
 	}
+	meta := m.GetObjectMeta()
 	return result, r.client.Post().
-		Namespace(m.GetNamespace()).
+		Namespace(meta.Namespace).
 		Resource(resourceName).
 		VersionedParams(&opts, ParameterCodec).
 		Body(obj).
@@ -147,30 +147,32 @@ func (r *restBackend) Create(ctx context.Context, resourceName, kindName string,
 		Into(result)
 }
 
-func (r *restBackend) Update(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
+func (r *restBackend) Update(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
 	m := obj.(metav1.Object)
 	if m == nil {
 		return nil, errors.New("obj is not implement metav1.Object")
 	}
+	meta := m.GetObjectMeta()
 	return result, r.client.Put().
-		Namespace(m.GetNamespace()).
+		Namespace(meta.Namespace).
 		Resource(resourceName).
-		Name(m.GetName()).
+		Name(meta.Name).
 		VersionedParams(&opts, ParameterCodec).
 		Body(obj).
 		Do(ctx).
 		Into(result)
 }
 
-func (r *restBackend) UpdateStatus(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
+func (r *restBackend) UpdateStatus(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
 	m := obj.(metav1.Object)
 	if m == nil {
 		return nil, errors.New("obj is not implement metav1.Object")
 	}
+	meta := m.GetObjectMeta()
 	return result, r.client.Put().
-		Namespace(m.GetNamespace()).
+		Namespace(meta.Namespace).
 		Resource(resourceName).
-		Name(m.GetName()).
+		Name(meta.Name).
 		SubResource("status").
 		VersionedParams(&opts, ParameterCodec).
 		Body(obj).
@@ -202,7 +204,7 @@ func (r *restBackend) Watch(ctx context.Context, gvr schema.GroupVersionResource
 		Watch(ctx)
 }
 
-func (r *restBackend) GetClusterScoped(ctx context.Context, resourceName, kindName, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error) {
+func (r *restBackend) GetClusterScoped(ctx context.Context, resourceName, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error) {
 	return result, r.client.Get().
 		Resource(resourceName).
 		Name(name).
@@ -211,7 +213,7 @@ func (r *restBackend) GetClusterScoped(ctx context.Context, resourceName, kindNa
 		Into(result)
 }
 
-func (r *restBackend) ListClusterScoped(ctx context.Context, resourceName, kindName string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error) {
+func (r *restBackend) ListClusterScoped(ctx context.Context, resourceName string, opts metav1.ListOptions, result runtime.Object) (runtime.Object, error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds > 0 {
 		timeout = time.Duration(opts.TimeoutSeconds) * time.Second
@@ -224,7 +226,7 @@ func (r *restBackend) ListClusterScoped(ctx context.Context, resourceName, kindN
 		Into(result)
 }
 
-func (r *restBackend) CreateClusterScoped(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error) {
+func (r *restBackend) CreateClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error) {
 	return result, r.client.Post().
 		Resource(resourceName).
 		VersionedParams(&opts, ParameterCodec).
@@ -233,28 +235,30 @@ func (r *restBackend) CreateClusterScoped(ctx context.Context, resourceName, kin
 		Into(result)
 }
 
-func (r *restBackend) UpdateClusterScoped(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
+func (r *restBackend) UpdateClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
 	m := obj.(metav1.Object)
 	if m == nil {
 		return nil, errors.New("obj is not implement metav1.Object")
 	}
+	meta := m.GetObjectMeta()
 	return result, r.client.Put().
 		Resource(resourceName).
-		Name(m.GetName()).
+		Name(meta.Name).
 		VersionedParams(&opts, ParameterCodec).
 		Body(obj).
 		Do(ctx).
 		Into(result)
 }
 
-func (r *restBackend) UpdateStatusClusterScoped(ctx context.Context, resourceName, kindName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
+func (r *restBackend) UpdateStatusClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
 	m := obj.(metav1.Object)
 	if m == nil {
 		return nil, errors.New("obj is not implement metav1.Object")
 	}
+	meta := m.GetObjectMeta()
 	return result, r.client.Put().
 		Resource(resourceName).
-		Name(m.GetName()).
+		Name(meta.Name).
 		SubResource("status").
 		VersionedParams(&opts, ParameterCodec).
 		Body(obj).
@@ -293,7 +297,7 @@ func NewBlogV1alpha1Client(b Backend) *BlogV1alpha1 {
 }
 
 func (c *BlogV1alpha1) GetBlog(ctx context.Context, name string, opts metav1.GetOptions) (*blogv1alpha1.Blog, error) {
-	result, err := c.backend.GetClusterScoped(ctx, "blogs", "Blog", name, opts, &blogv1alpha1.Blog{})
+	result, err := c.backend.GetClusterScoped(ctx, "blogs", name, opts, &blogv1alpha1.Blog{})
 	if err != nil {
 		return nil, err
 	}
@@ -301,7 +305,7 @@ func (c *BlogV1alpha1) GetBlog(ctx context.Context, name string, opts metav1.Get
 }
 
 func (c *BlogV1alpha1) CreateBlog(ctx context.Context, v *blogv1alpha1.Blog, opts metav1.CreateOptions) (*blogv1alpha1.Blog, error) {
-	result, err := c.backend.CreateClusterScoped(ctx, "blogs", "Blog", v, opts, &blogv1alpha1.Blog{})
+	result, err := c.backend.CreateClusterScoped(ctx, "blogs", v, opts, &blogv1alpha1.Blog{})
 	if err != nil {
 		return nil, err
 	}
@@ -309,7 +313,7 @@ func (c *BlogV1alpha1) CreateBlog(ctx context.Context, v *blogv1alpha1.Blog, opt
 }
 
 func (c *BlogV1alpha1) UpdateBlog(ctx context.Context, v *blogv1alpha1.Blog, opts metav1.UpdateOptions) (*blogv1alpha1.Blog, error) {
-	result, err := c.backend.UpdateClusterScoped(ctx, "blogs", "Blog", v, opts, &blogv1alpha1.Blog{})
+	result, err := c.backend.UpdateClusterScoped(ctx, "blogs", v, opts, &blogv1alpha1.Blog{})
 	if err != nil {
 		return nil, err
 	}
@@ -321,7 +325,7 @@ func (c *BlogV1alpha1) DeleteBlog(ctx context.Context, name string, opts metav1.
 }
 
 func (c *BlogV1alpha1) ListBlog(ctx context.Context, opts metav1.ListOptions) (*blogv1alpha1.BlogList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "blogs", "Blog", opts, &blogv1alpha1.BlogList{})
+	result, err := c.backend.ListClusterScoped(ctx, "blogs", opts, &blogv1alpha1.BlogList{})
 	if err != nil {
 		return nil, err
 	}
@@ -333,7 +337,7 @@ func (c *BlogV1alpha1) WatchBlog(ctx context.Context, opts metav1.ListOptions) (
 }
 
 func (c *BlogV1alpha1) GetPost(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*blogv1alpha1.Post, error) {
-	result, err := c.backend.Get(ctx, "posts", "Post", namespace, name, opts, &blogv1alpha1.Post{})
+	result, err := c.backend.Get(ctx, "posts", namespace, name, opts, &blogv1alpha1.Post{})
 	if err != nil {
 		return nil, err
 	}
@@ -341,7 +345,7 @@ func (c *BlogV1alpha1) GetPost(ctx context.Context, namespace, name string, opts
 }
 
 func (c *BlogV1alpha1) CreatePost(ctx context.Context, v *blogv1alpha1.Post, opts metav1.CreateOptions) (*blogv1alpha1.Post, error) {
-	result, err := c.backend.Create(ctx, "posts", "Post", v, opts, &blogv1alpha1.Post{})
+	result, err := c.backend.Create(ctx, "posts", v, opts, &blogv1alpha1.Post{})
 	if err != nil {
 		return nil, err
 	}
@@ -349,7 +353,7 @@ func (c *BlogV1alpha1) CreatePost(ctx context.Context, v *blogv1alpha1.Post, opt
 }
 
 func (c *BlogV1alpha1) UpdatePost(ctx context.Context, v *blogv1alpha1.Post, opts metav1.UpdateOptions) (*blogv1alpha1.Post, error) {
-	result, err := c.backend.Update(ctx, "posts", "Post", v, opts, &blogv1alpha1.Post{})
+	result, err := c.backend.Update(ctx, "posts", v, opts, &blogv1alpha1.Post{})
 	if err != nil {
 		return nil, err
 	}
@@ -361,7 +365,7 @@ func (c *BlogV1alpha1) DeletePost(ctx context.Context, namespace, name string, o
 }
 
 func (c *BlogV1alpha1) ListPost(ctx context.Context, namespace string, opts metav1.ListOptions) (*blogv1alpha1.PostList, error) {
-	result, err := c.backend.List(ctx, "posts", "Post", namespace, opts, &blogv1alpha1.PostList{})
+	result, err := c.backend.List(ctx, "posts", namespace, opts, &blogv1alpha1.PostList{})
 	if err != nil {
 		return nil, err
 	}
@@ -381,7 +385,7 @@ func NewBlogV1alpha2Client(b Backend) *BlogV1alpha2 {
 }
 
 func (c *BlogV1alpha2) GetAuthor(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*blogv1alpha2.Author, error) {
-	result, err := c.backend.Get(ctx, "authors", "Author", namespace, name, opts, &blogv1alpha2.Author{})
+	result, err := c.backend.Get(ctx, "authors", namespace, name, opts, &blogv1alpha2.Author{})
 	if err != nil {
 		return nil, err
 	}
@@ -389,7 +393,7 @@ func (c *BlogV1alpha2) GetAuthor(ctx context.Context, namespace, name string, op
 }
 
 func (c *BlogV1alpha2) CreateAuthor(ctx context.Context, v *blogv1alpha2.Author, opts metav1.CreateOptions) (*blogv1alpha2.Author, error) {
-	result, err := c.backend.Create(ctx, "authors", "Author", v, opts, &blogv1alpha2.Author{})
+	result, err := c.backend.Create(ctx, "authors", v, opts, &blogv1alpha2.Author{})
 	if err != nil {
 		return nil, err
 	}
@@ -397,7 +401,7 @@ func (c *BlogV1alpha2) CreateAuthor(ctx context.Context, v *blogv1alpha2.Author,
 }
 
 func (c *BlogV1alpha2) UpdateAuthor(ctx context.Context, v *blogv1alpha2.Author, opts metav1.UpdateOptions) (*blogv1alpha2.Author, error) {
-	result, err := c.backend.Update(ctx, "authors", "Author", v, opts, &blogv1alpha2.Author{})
+	result, err := c.backend.Update(ctx, "authors", v, opts, &blogv1alpha2.Author{})
 	if err != nil {
 		return nil, err
 	}
@@ -409,7 +413,7 @@ func (c *BlogV1alpha2) DeleteAuthor(ctx context.Context, namespace, name string,
 }
 
 func (c *BlogV1alpha2) ListAuthor(ctx context.Context, namespace string, opts metav1.ListOptions) (*blogv1alpha2.AuthorList, error) {
-	result, err := c.backend.List(ctx, "authors", "Author", namespace, opts, &blogv1alpha2.AuthorList{})
+	result, err := c.backend.List(ctx, "authors", namespace, opts, &blogv1alpha2.AuthorList{})
 	if err != nil {
 		return nil, err
 	}
@@ -421,7 +425,7 @@ func (c *BlogV1alpha2) WatchAuthor(ctx context.Context, namespace string, opts m
 }
 
 func (c *BlogV1alpha2) GetBlog(ctx context.Context, name string, opts metav1.GetOptions) (*blogv1alpha2.Blog, error) {
-	result, err := c.backend.GetClusterScoped(ctx, "blogs", "Blog", name, opts, &blogv1alpha2.Blog{})
+	result, err := c.backend.GetClusterScoped(ctx, "blogs", name, opts, &blogv1alpha2.Blog{})
 	if err != nil {
 		return nil, err
 	}
@@ -429,7 +433,7 @@ func (c *BlogV1alpha2) GetBlog(ctx context.Context, name string, opts metav1.Get
 }
 
 func (c *BlogV1alpha2) CreateBlog(ctx context.Context, v *blogv1alpha2.Blog, opts metav1.CreateOptions) (*blogv1alpha2.Blog, error) {
-	result, err := c.backend.CreateClusterScoped(ctx, "blogs", "Blog", v, opts, &blogv1alpha2.Blog{})
+	result, err := c.backend.CreateClusterScoped(ctx, "blogs", v, opts, &blogv1alpha2.Blog{})
 	if err != nil {
 		return nil, err
 	}
@@ -437,7 +441,7 @@ func (c *BlogV1alpha2) CreateBlog(ctx context.Context, v *blogv1alpha2.Blog, opt
 }
 
 func (c *BlogV1alpha2) UpdateBlog(ctx context.Context, v *blogv1alpha2.Blog, opts metav1.UpdateOptions) (*blogv1alpha2.Blog, error) {
-	result, err := c.backend.UpdateClusterScoped(ctx, "blogs", "Blog", v, opts, &blogv1alpha2.Blog{})
+	result, err := c.backend.UpdateClusterScoped(ctx, "blogs", v, opts, &blogv1alpha2.Blog{})
 	if err != nil {
 		return nil, err
 	}
@@ -449,7 +453,7 @@ func (c *BlogV1alpha2) DeleteBlog(ctx context.Context, name string, opts metav1.
 }
 
 func (c *BlogV1alpha2) ListBlog(ctx context.Context, opts metav1.ListOptions) (*blogv1alpha2.BlogList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "blogs", "Blog", opts, &blogv1alpha2.BlogList{})
+	result, err := c.backend.ListClusterScoped(ctx, "blogs", opts, &blogv1alpha2.BlogList{})
 	if err != nil {
 		return nil, err
 	}
@@ -461,7 +465,7 @@ func (c *BlogV1alpha2) WatchBlog(ctx context.Context, opts metav1.ListOptions) (
 }
 
 func (c *BlogV1alpha2) GetPost(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*blogv1alpha2.Post, error) {
-	result, err := c.backend.Get(ctx, "posts", "Post", namespace, name, opts, &blogv1alpha2.Post{})
+	result, err := c.backend.Get(ctx, "posts", namespace, name, opts, &blogv1alpha2.Post{})
 	if err != nil {
 		return nil, err
 	}
@@ -469,7 +473,7 @@ func (c *BlogV1alpha2) GetPost(ctx context.Context, namespace, name string, opts
 }
 
 func (c *BlogV1alpha2) CreatePost(ctx context.Context, v *blogv1alpha2.Post, opts metav1.CreateOptions) (*blogv1alpha2.Post, error) {
-	result, err := c.backend.Create(ctx, "posts", "Post", v, opts, &blogv1alpha2.Post{})
+	result, err := c.backend.Create(ctx, "posts", v, opts, &blogv1alpha2.Post{})
 	if err != nil {
 		return nil, err
 	}
@@ -477,7 +481,7 @@ func (c *BlogV1alpha2) CreatePost(ctx context.Context, v *blogv1alpha2.Post, opt
 }
 
 func (c *BlogV1alpha2) UpdatePost(ctx context.Context, v *blogv1alpha2.Post, opts metav1.UpdateOptions) (*blogv1alpha2.Post, error) {
-	result, err := c.backend.Update(ctx, "posts", "Post", v, opts, &blogv1alpha2.Post{})
+	result, err := c.backend.Update(ctx, "posts", v, opts, &blogv1alpha2.Post{})
 	if err != nil {
 		return nil, err
 	}
@@ -489,7 +493,7 @@ func (c *BlogV1alpha2) DeletePost(ctx context.Context, namespace, name string, o
 }
 
 func (c *BlogV1alpha2) ListPost(ctx context.Context, namespace string, opts metav1.ListOptions) (*blogv1alpha2.PostList, error) {
-	result, err := c.backend.List(ctx, "posts", "Post", namespace, opts, &blogv1alpha2.PostList{})
+	result, err := c.backend.List(ctx, "posts", namespace, opts, &blogv1alpha2.PostList{})
 	if err != nil {
 		return nil, err
 	}

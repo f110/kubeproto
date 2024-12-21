@@ -35,6 +35,7 @@ message ClusterRoleBinding {
   repeated Subject subjects = 3 [(dev.f110.kubeproto.field) = { go_name: "Subjects", api_field_name: "subjects", inline: false }];
   // RoleRef can only reference a ClusterRole in the global namespace.
   // If the RoleRef cannot be resolved, the Authorizer must return an error.
+  // This field is immutable.
   RoleRef role_ref = 4 [(dev.f110.kubeproto.field) = { go_name: "RoleRef", api_field_name: "roleRef", inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
@@ -87,6 +88,7 @@ message RoleBinding {
   repeated Subject subjects = 3 [(dev.f110.kubeproto.field) = { go_name: "Subjects", api_field_name: "subjects", inline: false }];
   // RoleRef can reference a Role in the current namespace or a ClusterRole in the global namespace.
   // If the RoleRef cannot be resolved, the Authorizer must return an error.
+  // This field is immutable.
   RoleRef role_ref = 4 [(dev.f110.kubeproto.field) = { go_name: "RoleRef", api_field_name: "roleRef", inline: false }];
 
   option (dev.f110.kubeproto.kind) = {

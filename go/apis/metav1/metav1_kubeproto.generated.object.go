@@ -12,6 +12,11 @@ const (
 	CauseTypeFieldValueDuplicate      CauseType = "FieldValueDuplicate"
 	CauseTypeFieldValueInvalid        CauseType = "FieldValueInvalid"
 	CauseTypeFieldValueNotSupported   CauseType = "FieldValueNotSupported"
+	CauseTypeFieldValueForbidden      CauseType = "FieldValueForbidden"
+	CauseTypeFieldValueTooLong        CauseType = "FieldValueTooLong"
+	CauseTypeFieldValueTooMany        CauseType = "FieldValueTooMany"
+	CauseTypeInternalError            CauseType = "InternalError"
+	CauseTypeFieldValueTypeInvalid    CauseType = "FieldValueTypeInvalid"
 	CauseTypeUnexpectedServerResponse CauseType = "UnexpectedServerResponse"
 	CauseTypeFieldManagerConflict     CauseType = "FieldManagerConflict"
 	CauseTypeResourceVersionTooLarge  CauseType = "ResourceVersionTooLarge"
@@ -31,6 +36,15 @@ const (
 	DeletionPropagationOrphan     DeletionPropagation = "Orphan"
 	DeletionPropagationBackground DeletionPropagation = "Background"
 	DeletionPropagationForeground DeletionPropagation = "Foreground"
+)
+
+type FieldSelectorOperator string
+
+const (
+	FieldSelectorOperatorIn           FieldSelectorOperator = "In"
+	FieldSelectorOperatorNotIn        FieldSelectorOperator = "NotIn"
+	FieldSelectorOperatorExists       FieldSelectorOperator = "Exists"
+	FieldSelectorOperatorDoesNotExist FieldSelectorOperator = "DoesNotExist"
 )
 
 type IncludeObjectPolicy string
@@ -82,6 +96,7 @@ const (
 	StatusReasonGone                  StatusReason = "Gone"
 	StatusReasonInvalid               StatusReason = "Invalid"
 	StatusReasonServerTimeout         StatusReason = "ServerTimeout"
+	StatusReasonStorageReadError      StatusReason = "StorageReadError"
 	StatusReasonTimeout               StatusReason = "Timeout"
 	StatusReasonTooManyRequests       StatusReason = "TooManyRequests"
 	StatusReasonBadRequest            StatusReason = "BadRequest"
@@ -502,6 +517,19 @@ type DeleteOptions struct {
 	// request. Valid values are:
 	// - All: all dry run stages will be processed
 	DryRun []string `json:"dryRun"`
+	// if set to true, it will trigger an unsafe deletion of the resource in
+	// case the normal deletion flow fails with a corrupt object error.
+	// A resource is considered corrupt if it can not be retrieved from
+	// the underlying storage successfully because of a) its data can
+	// not be transformed e.g. decryption failure, or b) it fails
+	// to decode into an object.
+	// NOTE: unsafe deletion ignores finalizer constraints, skips
+	// precondition checks, and removes the object from the storage.
+	// WARNING: This may potentially break the cluster if the workload
+	// associated with the resource being unsafe-deleted relies on normal
+	// deletion flow. Use only if you REALLY know what you are doing.
+	// The default value is false, and the user must opt in to enable it
+	IgnoreStoreReadErrorWithClusterBreakingPotential bool `json:"ignoreStoreReadErrorWithClusterBreakingPotential,omitempty"`
 }
 
 func (in *DeleteOptions) DeepCopyInto(out *DeleteOptions) {
@@ -548,6 +576,37 @@ func (in *Duration) DeepCopy() *Duration {
 		return nil
 	}
 	out := new(Duration)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type FieldSelectorRequirement struct {
+	// key is the field selector key that the requirement applies to.
+	Key string `json:"key"`
+	// operator represents a key's relationship to a set of values.
+	// Valid operators are In, NotIn, Exists, DoesNotExist.
+	// The list of operators may grow in the future.
+	Operator FieldSelectorOperator `json:"operator"`
+	// values is an array of string values.
+	// If the operator is In or NotIn, the values array must be non-empty.
+	// If the operator is Exists or DoesNotExist, the values array must be empty.
+	Values []string `json:"values"`
+}
+
+func (in *FieldSelectorRequirement) DeepCopyInto(out *FieldSelectorRequirement) {
+	*out = *in
+	if in.Values != nil {
+		t := make([]string, len(in.Values))
+		copy(t, in.Values)
+		out.Values = t
+	}
+}
+
+func (in *FieldSelectorRequirement) DeepCopy() *FieldSelectorRequirement {
+	if in == nil {
+		return nil
+	}
+	out := new(FieldSelectorRequirement)
 	in.DeepCopyInto(out)
 	return out
 }

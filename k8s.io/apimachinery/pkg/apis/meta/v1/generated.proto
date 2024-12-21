@@ -13,9 +13,14 @@ enum CauseType {
   CAUSE_TYPE_FIELD_VALUE_DUPLICATE      = 2;
   CAUSE_TYPE_FIELD_VALUE_INVALID        = 3;
   CAUSE_TYPE_FIELD_VALUE_NOT_SUPPORTED  = 4;
-  CAUSE_TYPE_UNEXPECTED_SERVER_RESPONSE = 5;
-  CAUSE_TYPE_FIELD_MANAGER_CONFLICT     = 6;
-  CAUSE_TYPE_RESOURCE_VERSION_TOO_LARGE = 7;
+  CAUSE_TYPE_FIELD_VALUE_FORBIDDEN      = 5;
+  CAUSE_TYPE_FIELD_VALUE_TOO_LONG       = 6;
+  CAUSE_TYPE_FIELD_VALUE_TOO_MANY       = 7;
+  CAUSE_TYPE_INTERNAL_ERROR             = 8;
+  CAUSE_TYPE_FIELD_VALUE_TYPE_INVALID   = 9;
+  CAUSE_TYPE_UNEXPECTED_SERVER_RESPONSE = 10;
+  CAUSE_TYPE_FIELD_MANAGER_CONFLICT     = 11;
+  CAUSE_TYPE_RESOURCE_VERSION_TOO_LARGE = 12;
 }
 
 enum ConditionStatus {
@@ -28,6 +33,13 @@ enum DeletionPropagation {
   DELETION_PROPAGATION_ORPHAN     = 0 [(dev.f110.kubeproto.value) = { value: "Orphan" }];
   DELETION_PROPAGATION_BACKGROUND = 1 [(dev.f110.kubeproto.value) = { value: "Background" }];
   DELETION_PROPAGATION_FOREGROUND = 2 [(dev.f110.kubeproto.value) = { value: "Foreground" }];
+}
+
+enum FieldSelectorOperator {
+  FIELD_SELECTOR_OPERATOR_IN             = 0 [(dev.f110.kubeproto.value) = { value: "In" }];
+  FIELD_SELECTOR_OPERATOR_NOT_IN         = 1;
+  FIELD_SELECTOR_OPERATOR_EXISTS         = 2 [(dev.f110.kubeproto.value) = { value: "Exists" }];
+  FIELD_SELECTOR_OPERATOR_DOES_NOT_EXIST = 3;
 }
 
 enum IncludeObjectPolicy {
@@ -67,16 +79,17 @@ enum StatusReason {
   STATUS_REASON_GONE                     = 6 [(dev.f110.kubeproto.value) = { value: "Gone" }];
   STATUS_REASON_INVALID                  = 7 [(dev.f110.kubeproto.value) = { value: "Invalid" }];
   STATUS_REASON_SERVER_TIMEOUT           = 8;
-  STATUS_REASON_TIMEOUT                  = 9 [(dev.f110.kubeproto.value) = { value: "Timeout" }];
-  STATUS_REASON_TOO_MANY_REQUESTS        = 10;
-  STATUS_REASON_BAD_REQUEST              = 11;
-  STATUS_REASON_METHOD_NOT_ALLOWED       = 12;
-  STATUS_REASON_NOT_ACCEPTABLE           = 13;
-  STATUS_REASON_REQUEST_ENTITY_TOO_LARGE = 14;
-  STATUS_REASON_UNSUPPORTED_MEDIA_TYPE   = 15;
-  STATUS_REASON_INTERNAL_ERROR           = 16;
-  STATUS_REASON_EXPIRED                  = 17 [(dev.f110.kubeproto.value) = { value: "Expired" }];
-  STATUS_REASON_SERVICE_UNAVAILABLE      = 18;
+  STATUS_REASON_STORAGE_READ_ERROR       = 9;
+  STATUS_REASON_TIMEOUT                  = 10 [(dev.f110.kubeproto.value) = { value: "Timeout" }];
+  STATUS_REASON_TOO_MANY_REQUESTS        = 11;
+  STATUS_REASON_BAD_REQUEST              = 12;
+  STATUS_REASON_METHOD_NOT_ALLOWED       = 13;
+  STATUS_REASON_NOT_ACCEPTABLE           = 14;
+  STATUS_REASON_REQUEST_ENTITY_TOO_LARGE = 15;
+  STATUS_REASON_UNSUPPORTED_MEDIA_TYPE   = 16;
+  STATUS_REASON_INTERNAL_ERROR           = 17;
+  STATUS_REASON_EXPIRED                  = 18 [(dev.f110.kubeproto.value) = { value: "Expired" }];
+  STATUS_REASON_SERVICE_UNAVAILABLE      = 19;
 }
 
 message APIGroup {
@@ -268,10 +281,36 @@ message DeleteOptions {
   // request. Valid values are:
   // - All: all dry run stages will be processed
   repeated string dry_run = 6 [(dev.f110.kubeproto.field) = { go_name: "DryRun", api_field_name: "dryRun", inline: false }];
+  // if set to true, it will trigger an unsafe deletion of the resource in
+  // case the normal deletion flow fails with a corrupt object error.
+  // A resource is considered corrupt if it can not be retrieved from
+  // the underlying storage successfully because of a) its data can
+  // not be transformed e.g. decryption failure, or b) it fails
+  // to decode into an object.
+  // NOTE: unsafe deletion ignores finalizer constraints, skips
+  // precondition checks, and removes the object from the storage.
+  // WARNING: This may potentially break the cluster if the workload
+  // associated with the resource being unsafe-deleted relies on normal
+  // deletion flow. Use only if you REALLY know what you are doing.
+  // The default value is false, and the user must opt in to enable it
+  optional bool ignore_store_read_error_with_cluster_breaking_potential = 7 [(dev.f110.kubeproto.field) = { go_name: "IgnoreStoreReadErrorWithClusterBreakingPotential", api_field_name: "ignoreStoreReadErrorWithClusterBreakingPotential", inline: false }];
 }
 
 message Duration {
   int64 duration = 1 [(dev.f110.kubeproto.field) = { go_name: "Duration", inline: false }];
+}
+
+message FieldSelectorRequirement {
+  // key is the field selector key that the requirement applies to.
+  string key = 1 [(dev.f110.kubeproto.field) = { go_name: "Key", api_field_name: "key", inline: false }];
+  // operator represents a key's relationship to a set of values.
+  // Valid operators are In, NotIn, Exists, DoesNotExist.
+  // The list of operators may grow in the future.
+  FieldSelectorOperator operator = 2 [(dev.f110.kubeproto.field) = { go_name: "Operator", api_field_name: "operator", inline: false }];
+  // values is an array of string values.
+  // If the operator is In or NotIn, the values array must be non-empty.
+  // If the operator is Exists or DoesNotExist, the values array must be empty.
+  repeated string values = 3 [(dev.f110.kubeproto.field) = { go_name: "Values", api_field_name: "values", inline: false }];
 }
 
 message FieldsV1 {

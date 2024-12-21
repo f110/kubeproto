@@ -82,6 +82,7 @@ type ClusterRoleBinding struct {
 	Subjects []Subject `json:"subjects"`
 	// RoleRef can only reference a ClusterRole in the global namespace.
 	// If the RoleRef cannot be resolved, the Authorizer must return an error.
+	// This field is immutable.
 	RoleRef RoleRef `json:"roleRef"`
 }
 
@@ -228,6 +229,7 @@ type RoleBinding struct {
 	Subjects []Subject `json:"subjects"`
 	// RoleRef can reference a Role in the current namespace or a ClusterRole in the global namespace.
 	// If the RoleRef cannot be resolved, the Authorizer must return an error.
+	// This field is immutable.
 	RoleRef RoleRef `json:"roleRef"`
 }
 

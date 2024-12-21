@@ -9,9 +9,36 @@ option (dev.f110.kubeproto.k8s) = {
 option (dev.f110.kubeproto.kubeproto_go_package) = "go.f110.dev/kubeproto/go/apis/authorizationv1";
 
 import "kube.proto";
+import "k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto";
 
 message ExtraValue {
   repeated string items = 1 [(dev.f110.kubeproto.field) = { go_name: "", inline: false }];
+}
+
+message FieldSelectorAttributes {
+  // rawSelector is the serialization of a field selector that would be included in a query parameter.
+  // Webhook implementations are encouraged to ignore rawSelector.
+  // The kube-apiserver's *SubjectAccessReview will parse the rawSelector as long as the requirements are not present.
+  optional string raw_selector = 1 [(dev.f110.kubeproto.field) = { go_name: "RawSelector", api_field_name: "rawSelector", inline: false }];
+  // requirements is the parsed interpretation of a field selector.
+  // All requirements must be met for a resource instance to match the selector.
+  // Webhook implementations should handle requirements, but how to handle them is up to the webhook.
+  // Since requirements can only limit the request, it is safe to authorize as unlimited request if the requirements
+  // are not understood.
+  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.FieldSelectorRequirement requirements = 2 [(dev.f110.kubeproto.field) = { go_name: "Requirements", api_field_name: "requirements", inline: false }];
+}
+
+message LabelSelectorAttributes {
+  // rawSelector is the serialization of a field selector that would be included in a query parameter.
+  // Webhook implementations are encouraged to ignore rawSelector.
+  // The kube-apiserver's *SubjectAccessReview will parse the rawSelector as long as the requirements are not present.
+  optional string raw_selector = 1 [(dev.f110.kubeproto.field) = { go_name: "RawSelector", api_field_name: "rawSelector", inline: false }];
+  // requirements is the parsed interpretation of a label selector.
+  // All requirements must be met for a resource instance to match the selector.
+  // Webhook implementations should handle requirements, but how to handle them is up to the webhook.
+  // Since requirements can only limit the request, it is safe to authorize as unlimited request if the requirements
+  // are not understood.
+  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement requirements = 2 [(dev.f110.kubeproto.field) = { go_name: "Requirements", api_field_name: "requirements", inline: false }];
 }
 
 message LocalSubjectAccessReview {
@@ -58,6 +85,14 @@ message ResourceAttributes {
   optional string subresource = 6 [(dev.f110.kubeproto.field) = { go_name: "Subresource", api_field_name: "subresource", inline: false }];
   // Name is the name of the resource being requested for a "get" or deleted for a "delete". "" (empty) means all.
   optional string name = 7 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  // fieldSelector describes the limitation on access based on field.  It can only limit access, not broaden it.
+  // This field  is alpha-level. To use this field, you must enable the
+  // `AuthorizeWithSelectors` feature gate (disabled by default).
+  optional FieldSelectorAttributes field_selector = 8 [(dev.f110.kubeproto.field) = { go_name: "FieldSelector", api_field_name: "fieldSelector", inline: false }];
+  // labelSelector describes the limitation on access based on labels.  It can only limit access, not broaden it.
+  // This field  is alpha-level. To use this field, you must enable the
+  // `AuthorizeWithSelectors` feature gate (disabled by default).
+  optional LabelSelectorAttributes label_selector = 9 [(dev.f110.kubeproto.field) = { go_name: "LabelSelector", api_field_name: "labelSelector", inline: false }];
 }
 
 message ResourceRule {
