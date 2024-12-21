@@ -3,9 +3,9 @@
 # gazelle:resolve go go.f110.dev/kubeproto //:kubeproto_lib
 # gazelle:exclude example
 
-load("@bazel_gazelle//:def.bzl", "gazelle")
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
-load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
+load("@gazelle//:def.bzl", "gazelle")
+load("@rules_go//go:def.bzl", "go_library")
+load("@rules_go//proto:def.bzl", "go_proto_library")
 load("@rules_proto//proto:defs.bzl", "proto_library")
 
 gazelle(name = "gazelle")
@@ -36,7 +36,7 @@ proto_library(
     srcs = ["kube.proto"],
     visibility = ["//visibility:public"],
     deps = [
-        "@com_google_protobuf//:descriptor_proto",
+        "@protobuf//:descriptor_proto",
     ],
 )
 

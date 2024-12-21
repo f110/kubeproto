@@ -1,5 +1,5 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
-load("@io_bazel_rules_go//go:def.bzl", "GoLibrary", "go_context")
+load("@rules_go//go:def.bzl", "GoLibrary", "go_context")
 load("@rules_proto//proto:defs.bzl", "ProtoInfo")
 
 def _crd_proto_manifest(ctx):
@@ -42,7 +42,7 @@ crd_proto_manifest = rule(
         "protoc": attr.label(
             executable = True,
             cfg = "host",
-            default = "@com_google_protobuf//:protoc",
+            default = "@protobuf//:protoc",
         ),
         "_compiler": attr.label(
             executable = True,
@@ -90,7 +90,7 @@ go_client = rule(
         "protoc": attr.label(
             executable = True,
             cfg = "host",
-            default = "@com_google_protobuf//:protoc",
+            default = "@protobuf//:protoc",
         ),
         "_compiler": attr.label(
             executable = True,
@@ -99,10 +99,10 @@ go_client = rule(
         ),
         "_compiler_name": attr.string(default = "client"),
         "_go_context_data": attr.label(
-            default = "@io_bazel_rules_go//:go_context_data",
+            default = "@rules_go//:go_context_data",
         ),
     },
-    toolchains = ["@io_bazel_rules_go//go:toolchain"],
+    toolchains = ["@rules_go//go:toolchain"],
 )
 
 def _go_testing_client(ctx):
@@ -138,7 +138,7 @@ go_testing_client = rule(
         "protoc": attr.label(
             executable = True,
             cfg = "host",
-            default = "@com_google_protobuf//:protoc",
+            default = "@protobuf//:protoc",
         ),
         "_compiler": attr.label(
             executable = True,
@@ -147,10 +147,10 @@ go_testing_client = rule(
         ),
         "_compiler_name": attr.string(default = "testing-client"),
         "_go_context_data": attr.label(
-            default = "@io_bazel_rules_go//:go_context_data",
+            default = "@rules_go//:go_context_data",
         ),
     },
-    toolchains = ["@io_bazel_rules_go//go:toolchain"],
+    toolchains = ["@rules_go//go:toolchain"],
 )
 
 def _execute_protoc(ctx, compiler, compiler_name, suffix, srcs, opts = ""):
@@ -216,7 +216,7 @@ kubeproto_go_api = rule(
         "protoc": attr.label(
             executable = True,
             cfg = "host",
-            default = "@com_google_protobuf//:protoc",
+            default = "@protobuf//:protoc",
         ),
         "_object_compiler": attr.label(
             executable = True,
@@ -225,8 +225,8 @@ kubeproto_go_api = rule(
         ),
         "_object_compiler_name": attr.string(default = "object"),
         "_go_context_data": attr.label(
-            default = "@io_bazel_rules_go//:go_context_data",
+            default = "@rules_go//:go_context_data",
         ),
     },
-    toolchains = ["@io_bazel_rules_go//go:toolchain"],
+    toolchains = ["@rules_go//go:toolchain"],
 )
