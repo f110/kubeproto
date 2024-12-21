@@ -11,6 +11,10 @@ option (dev.f110.kubeproto.kubeproto_go_package) = "go.f110.dev/kubeproto/go/api
 import "kube.proto";
 import "k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto";
 
+enum CoordinatedLeaseStrategy {
+  COORDINATED_LEASE_STRATEGY_OLDEST_EMULATION_VERSION = 0;
+}
+
 message Lease {
   // spec contains the specification of the Lease.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
@@ -31,9 +35,11 @@ message LeaseList {
 
 message LeaseSpec {
   // holderIdentity contains the identity of the holder of a current lease.
+  // If Coordinated Leader Election is used, the holder identity must be
+  // equal to the elected LeaseCandidate.metadata.name field.
   optional string holder_identity = 1 [(dev.f110.kubeproto.field) = { go_name: "HolderIdentity", api_field_name: "holderIdentity", inline: false }];
   // leaseDurationSeconds is a duration that candidates for a lease need
-  // to wait to force acquire it. This is measure against time of last
+  // to wait to force acquire it. This is measured against the time of last
   // observed renewTime.
   optional int32 lease_duration_seconds = 2 [(dev.f110.kubeproto.field) = { go_name: "LeaseDurationSeconds", api_field_name: "leaseDurationSeconds", inline: false }];
   // acquireTime is a time when the current lease was acquired.
@@ -44,4 +50,12 @@ message LeaseSpec {
   // leaseTransitions is the number of transitions of a lease between
   // holders.
   optional int32 lease_transitions = 5 [(dev.f110.kubeproto.field) = { go_name: "LeaseTransitions", api_field_name: "leaseTransitions", inline: false }];
+  // Strategy indicates the strategy for picking the leader for coordinated leader election.
+  // If the field is not specified, there is no active coordination for this lease.
+  // (Alpha) Using this field requires the CoordinatedLeaderElection feature gate to be enabled.
+  optional CoordinatedLeaseStrategy strategy = 6 [(dev.f110.kubeproto.field) = { go_name: "Strategy", api_field_name: "strategy", inline: false }];
+  // PreferredHolder signals to a lease holder that the lease has a
+  // more optimal holder and should be given up.
+  // This field can only be set if Strategy is also set.
+  optional string preferred_holder = 7 [(dev.f110.kubeproto.field) = { go_name: "PreferredHolder", api_field_name: "preferredHolder", inline: false }];
 }

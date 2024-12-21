@@ -493,7 +493,7 @@ type CSIDriverSpec struct {
 	// The CSI driver specifies podInfoOnMount as part of driver deployment.
 	// If true, Kubelet will pass pod information as VolumeContext in the CSI NodePublishVolume() calls.
 	// The CSI driver is responsible for parsing and validating the information passed in as VolumeContext.
-	// The following VolumeConext will be passed if podInfoOnMount is set to true.
+	// The following VolumeContext will be passed if podInfoOnMount is set to true.
 	// This list might grow, but the prefix will be used.
 	// "csi.storage.k8s.io/pod.name": pod.Name
 	// "csi.storage.k8s.io/pod.namespace": pod.Namespace
@@ -506,7 +506,7 @@ type CSIDriverSpec struct {
 	// As Kubernetes 1.15 doesn't support this field, drivers can only support one mode when
 	// deployed on such a cluster and the deployment determines which mode that is, for example
 	// via a command line parameter of the driver.
-	// This field is immutable.
+	// This field was immutable in Kubernetes < 1.29 and now is mutable.
 	PodInfoOnMount bool `json:"podInfoOnMount,omitempty"`
 	// volumeLifecycleModes defines what kind of volumes this CSI volume driver supports.
 	// The default if the list is empty is "Persistent", which is the usage defined by the
@@ -535,7 +535,7 @@ type CSIDriverSpec struct {
 	// fsGroupPolicy defines if the underlying volume supports changing ownership and
 	// permission of the volume before being mounted.
 	// Refer to the specific FSGroupPolicy values for additional details.
-	// This field is immutable.
+	// This field was immutable in Kubernetes < 1.29 and now is mutable.
 	// Defaults to ReadWriteOnceWithFSType, which will examine each volume
 	// to determine if Kubernetes should modify ownership and permissions of the volume.
 	// With the default policy the defined fsGroup will only be applied

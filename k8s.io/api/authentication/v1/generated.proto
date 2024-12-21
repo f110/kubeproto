@@ -26,6 +26,20 @@ message ExtraValue {
   repeated string items = 1 [(dev.f110.kubeproto.field) = { go_name: "", inline: false }];
 }
 
+message SelfSubjectReview {
+  // Status is filled in by the server with the user attributes.
+  optional SelfSubjectReviewStatus status = 3 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", sub_resource: true, inline: false }];
+
+  option (dev.f110.kubeproto.kind) = {
+    scope: SCOPE_CLUSTER
+  };
+}
+
+message SelfSubjectReviewStatus {
+  // User attributes of the user making this request.
+  optional UserInfo user_info = 1 [(dev.f110.kubeproto.field) = { go_name: "UserInfo", api_field_name: "userInfo", inline: false }];
+}
+
 message TokenRequest {
   // Spec holds information about the request being evaluated
   TokenRequestSpec spec = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];

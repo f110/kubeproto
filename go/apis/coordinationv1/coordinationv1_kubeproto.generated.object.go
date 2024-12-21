@@ -24,6 +24,12 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 	return nil
 }
 
+type CoordinatedLeaseStrategy string
+
+const (
+	CoordinatedLeaseStrategyOldestEmulationVersion CoordinatedLeaseStrategy = "OldestEmulationVersion"
+)
+
 type Lease struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
@@ -96,9 +102,11 @@ func (in *LeaseList) DeepCopyObject() runtime.Object {
 
 type LeaseSpec struct {
 	// holderIdentity contains the identity of the holder of a current lease.
+	// If Coordinated Leader Election is used, the holder identity must be
+	// equal to the elected LeaseCandidate.metadata.name field.
 	HolderIdentity string `json:"holderIdentity,omitempty"`
 	// leaseDurationSeconds is a duration that candidates for a lease need
-	// to wait to force acquire it. This is measure against time of last
+	// to wait to force acquire it. This is measured against the time of last
 	// observed renewTime.
 	LeaseDurationSeconds int `json:"leaseDurationSeconds,omitempty"`
 	// acquireTime is a time when the current lease was acquired.
@@ -109,6 +117,14 @@ type LeaseSpec struct {
 	// leaseTransitions is the number of transitions of a lease between
 	// holders.
 	LeaseTransitions int `json:"leaseTransitions,omitempty"`
+	// Strategy indicates the strategy for picking the leader for coordinated leader election.
+	// If the field is not specified, there is no active coordination for this lease.
+	// (Alpha) Using this field requires the CoordinatedLeaderElection feature gate to be enabled.
+	Strategy CoordinatedLeaseStrategy `json:"strategy,omitempty"`
+	// PreferredHolder signals to a lease holder that the lease has a
+	// more optimal holder and should be given up.
+	// This field can only be set if Strategy is also set.
+	PreferredHolder string `json:"preferredHolder,omitempty"`
 }
 
 func (in *LeaseSpec) DeepCopyInto(out *LeaseSpec) {

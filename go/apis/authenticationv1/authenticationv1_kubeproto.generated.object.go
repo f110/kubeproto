@@ -17,12 +17,83 @@ var (
 
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemaGroupVersion,
+		&SelfSubjectReview{},
+		&SelfSubjectReviewList{},
 		&TokenRequest{},
 		&TokenRequestList{},
 		&TokenReview{},
 		&TokenReviewList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemaGroupVersion)
+	return nil
+}
+
+type SelfSubjectReview struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata"`
+	// Status is filled in by the server with the user attributes.
+	Status *SelfSubjectReviewStatus `json:"status,omitempty"`
+}
+
+func (in *SelfSubjectReview) DeepCopyInto(out *SelfSubjectReview) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
+	if in.Status != nil {
+		in, out := &in.Status, &out.Status
+		*out = new(SelfSubjectReviewStatus)
+		(*in).DeepCopyInto(*out)
+	}
+}
+
+func (in *SelfSubjectReview) DeepCopy() *SelfSubjectReview {
+	if in == nil {
+		return nil
+	}
+	out := new(SelfSubjectReview)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *SelfSubjectReview) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	}
+	return nil
+}
+
+type SelfSubjectReviewList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata"`
+	Items           []SelfSubjectReview `json:"items"`
+}
+
+func (in *SelfSubjectReviewList) DeepCopyInto(out *SelfSubjectReviewList) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
+	if in.Items != nil {
+		l := make([]SelfSubjectReview, len(in.Items))
+		for i := range in.Items {
+			in.Items[i].DeepCopyInto(&l[i])
+		}
+		out.Items = l
+	}
+}
+
+func (in *SelfSubjectReviewList) DeepCopy() *SelfSubjectReviewList {
+	if in == nil {
+		return nil
+	}
+	out := new(SelfSubjectReviewList)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *SelfSubjectReviewList) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	}
 	return nil
 }
 
@@ -170,6 +241,29 @@ func (in *TokenReviewList) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+type SelfSubjectReviewStatus struct {
+	// User attributes of the user making this request.
+	UserInfo *UserInfo `json:"userInfo,omitempty"`
+}
+
+func (in *SelfSubjectReviewStatus) DeepCopyInto(out *SelfSubjectReviewStatus) {
+	*out = *in
+	if in.UserInfo != nil {
+		in, out := &in.UserInfo, &out.UserInfo
+		*out = new(UserInfo)
+		(*in).DeepCopyInto(*out)
+	}
+}
+
+func (in *SelfSubjectReviewStatus) DeepCopy() *SelfSubjectReviewStatus {
+	if in == nil {
+		return nil
+	}
+	out := new(SelfSubjectReviewStatus)
+	in.DeepCopyInto(out)
+	return out
+}
+
 type TokenRequestSpec struct {
 	// Audiences are the intendend audiences of the token. A recipient of a
 	// token must identify themself with an identifier in the list of
@@ -305,30 +399,6 @@ func (in *TokenReviewStatus) DeepCopy() *TokenReviewStatus {
 	return out
 }
 
-type BoundObjectReference struct {
-	// Kind of the referent. Valid kinds are 'Pod' and 'Secret'.
-	Kind string `json:"kind,omitempty"`
-	// API version of the referent.
-	APIVersion string `json:"apiVersion,omitempty"`
-	// Name of the referent.
-	Name string `json:"name,omitempty"`
-	// UID of the referent.
-	UID string `json:"uid,omitempty"`
-}
-
-func (in *BoundObjectReference) DeepCopyInto(out *BoundObjectReference) {
-	*out = *in
-}
-
-func (in *BoundObjectReference) DeepCopy() *BoundObjectReference {
-	if in == nil {
-		return nil
-	}
-	out := new(BoundObjectReference)
-	in.DeepCopyInto(out)
-	return out
-}
-
 type UserInfo struct {
 	// The name that uniquely identifies this user among all active users.
 	Username string `json:"username,omitempty"`
@@ -363,6 +433,30 @@ func (in *UserInfo) DeepCopy() *UserInfo {
 		return nil
 	}
 	out := new(UserInfo)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type BoundObjectReference struct {
+	// Kind of the referent. Valid kinds are 'Pod' and 'Secret'.
+	Kind string `json:"kind,omitempty"`
+	// API version of the referent.
+	APIVersion string `json:"apiVersion,omitempty"`
+	// Name of the referent.
+	Name string `json:"name,omitempty"`
+	// UID of the referent.
+	UID string `json:"uid,omitempty"`
+}
+
+func (in *BoundObjectReference) DeepCopyInto(out *BoundObjectReference) {
+	*out = *in
+}
+
+func (in *BoundObjectReference) DeepCopy() *BoundObjectReference {
+	if in == nil {
+		return nil
+	}
+	out := new(BoundObjectReference)
 	in.DeepCopyInto(out)
 	return out
 }

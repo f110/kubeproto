@@ -1401,6 +1401,94 @@ func (c *AdmissionregistrationK8sIoV1) WatchMutatingWebhookConfiguration(ctx con
 	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".admissionregistration.k8s.io", Version: "v1", Resource: "mutatingwebhookconfigurations"}, opts)
 }
 
+func (c *AdmissionregistrationK8sIoV1) GetValidatingAdmissionPolicy(ctx context.Context, name string, opts metav1.GetOptions) (*admissionregistrationv1.ValidatingAdmissionPolicy, error) {
+	result, err := c.backend.GetClusterScoped(ctx, "validatingadmissionpolicies", name, opts, &admissionregistrationv1.ValidatingAdmissionPolicy{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*admissionregistrationv1.ValidatingAdmissionPolicy), nil
+}
+
+func (c *AdmissionregistrationK8sIoV1) CreateValidatingAdmissionPolicy(ctx context.Context, v *admissionregistrationv1.ValidatingAdmissionPolicy, opts metav1.CreateOptions) (*admissionregistrationv1.ValidatingAdmissionPolicy, error) {
+	result, err := c.backend.CreateClusterScoped(ctx, "validatingadmissionpolicies", v, opts, &admissionregistrationv1.ValidatingAdmissionPolicy{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*admissionregistrationv1.ValidatingAdmissionPolicy), nil
+}
+
+func (c *AdmissionregistrationK8sIoV1) UpdateValidatingAdmissionPolicy(ctx context.Context, v *admissionregistrationv1.ValidatingAdmissionPolicy, opts metav1.UpdateOptions) (*admissionregistrationv1.ValidatingAdmissionPolicy, error) {
+	result, err := c.backend.UpdateClusterScoped(ctx, "validatingadmissionpolicies", v, opts, &admissionregistrationv1.ValidatingAdmissionPolicy{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*admissionregistrationv1.ValidatingAdmissionPolicy), nil
+}
+
+func (c *AdmissionregistrationK8sIoV1) UpdateStatusValidatingAdmissionPolicy(ctx context.Context, v *admissionregistrationv1.ValidatingAdmissionPolicy, opts metav1.UpdateOptions) (*admissionregistrationv1.ValidatingAdmissionPolicy, error) {
+	result, err := c.backend.UpdateStatusClusterScoped(ctx, "validatingadmissionpolicies", v, opts, &admissionregistrationv1.ValidatingAdmissionPolicy{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*admissionregistrationv1.ValidatingAdmissionPolicy), nil
+}
+
+func (c *AdmissionregistrationK8sIoV1) DeleteValidatingAdmissionPolicy(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".admissionregistration.k8s.io", Version: "v1", Resource: "validatingadmissionpolicies"}, name, opts)
+}
+
+func (c *AdmissionregistrationK8sIoV1) ListValidatingAdmissionPolicy(ctx context.Context, opts metav1.ListOptions) (*admissionregistrationv1.ValidatingAdmissionPolicyList, error) {
+	result, err := c.backend.ListClusterScoped(ctx, "validatingadmissionpolicies", opts, &admissionregistrationv1.ValidatingAdmissionPolicyList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*admissionregistrationv1.ValidatingAdmissionPolicyList), nil
+}
+
+func (c *AdmissionregistrationK8sIoV1) WatchValidatingAdmissionPolicy(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".admissionregistration.k8s.io", Version: "v1", Resource: "validatingadmissionpolicies"}, opts)
+}
+
+func (c *AdmissionregistrationK8sIoV1) GetValidatingAdmissionPolicyBinding(ctx context.Context, name string, opts metav1.GetOptions) (*admissionregistrationv1.ValidatingAdmissionPolicyBinding, error) {
+	result, err := c.backend.GetClusterScoped(ctx, "validatingadmissionpolicybindings", name, opts, &admissionregistrationv1.ValidatingAdmissionPolicyBinding{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*admissionregistrationv1.ValidatingAdmissionPolicyBinding), nil
+}
+
+func (c *AdmissionregistrationK8sIoV1) CreateValidatingAdmissionPolicyBinding(ctx context.Context, v *admissionregistrationv1.ValidatingAdmissionPolicyBinding, opts metav1.CreateOptions) (*admissionregistrationv1.ValidatingAdmissionPolicyBinding, error) {
+	result, err := c.backend.CreateClusterScoped(ctx, "validatingadmissionpolicybindings", v, opts, &admissionregistrationv1.ValidatingAdmissionPolicyBinding{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*admissionregistrationv1.ValidatingAdmissionPolicyBinding), nil
+}
+
+func (c *AdmissionregistrationK8sIoV1) UpdateValidatingAdmissionPolicyBinding(ctx context.Context, v *admissionregistrationv1.ValidatingAdmissionPolicyBinding, opts metav1.UpdateOptions) (*admissionregistrationv1.ValidatingAdmissionPolicyBinding, error) {
+	result, err := c.backend.UpdateClusterScoped(ctx, "validatingadmissionpolicybindings", v, opts, &admissionregistrationv1.ValidatingAdmissionPolicyBinding{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*admissionregistrationv1.ValidatingAdmissionPolicyBinding), nil
+}
+
+func (c *AdmissionregistrationK8sIoV1) DeleteValidatingAdmissionPolicyBinding(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".admissionregistration.k8s.io", Version: "v1", Resource: "validatingadmissionpolicybindings"}, name, opts)
+}
+
+func (c *AdmissionregistrationK8sIoV1) ListValidatingAdmissionPolicyBinding(ctx context.Context, opts metav1.ListOptions) (*admissionregistrationv1.ValidatingAdmissionPolicyBindingList, error) {
+	result, err := c.backend.ListClusterScoped(ctx, "validatingadmissionpolicybindings", opts, &admissionregistrationv1.ValidatingAdmissionPolicyBindingList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*admissionregistrationv1.ValidatingAdmissionPolicyBindingList), nil
+}
+
+func (c *AdmissionregistrationK8sIoV1) WatchValidatingAdmissionPolicyBinding(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".admissionregistration.k8s.io", Version: "v1", Resource: "validatingadmissionpolicybindings"}, opts)
+}
+
 func (c *AdmissionregistrationK8sIoV1) GetValidatingWebhookConfiguration(ctx context.Context, name string, opts metav1.GetOptions) (*admissionregistrationv1.ValidatingWebhookConfiguration, error) {
 	result, err := c.backend.GetClusterScoped(ctx, "validatingwebhookconfigurations", name, opts, &admissionregistrationv1.ValidatingWebhookConfiguration{})
 	if err != nil {
@@ -1687,6 +1775,54 @@ type AuthenticationK8sIoV1 struct {
 
 func NewAuthenticationK8sIoV1Client(b Backend) *AuthenticationK8sIoV1 {
 	return &AuthenticationK8sIoV1{backend: b}
+}
+
+func (c *AuthenticationK8sIoV1) GetSelfSubjectReview(ctx context.Context, name string, opts metav1.GetOptions) (*authenticationv1.SelfSubjectReview, error) {
+	result, err := c.backend.GetClusterScoped(ctx, "selfsubjectreviews", name, opts, &authenticationv1.SelfSubjectReview{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authenticationv1.SelfSubjectReview), nil
+}
+
+func (c *AuthenticationK8sIoV1) CreateSelfSubjectReview(ctx context.Context, v *authenticationv1.SelfSubjectReview, opts metav1.CreateOptions) (*authenticationv1.SelfSubjectReview, error) {
+	result, err := c.backend.CreateClusterScoped(ctx, "selfsubjectreviews", v, opts, &authenticationv1.SelfSubjectReview{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authenticationv1.SelfSubjectReview), nil
+}
+
+func (c *AuthenticationK8sIoV1) UpdateSelfSubjectReview(ctx context.Context, v *authenticationv1.SelfSubjectReview, opts metav1.UpdateOptions) (*authenticationv1.SelfSubjectReview, error) {
+	result, err := c.backend.UpdateClusterScoped(ctx, "selfsubjectreviews", v, opts, &authenticationv1.SelfSubjectReview{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authenticationv1.SelfSubjectReview), nil
+}
+
+func (c *AuthenticationK8sIoV1) UpdateStatusSelfSubjectReview(ctx context.Context, v *authenticationv1.SelfSubjectReview, opts metav1.UpdateOptions) (*authenticationv1.SelfSubjectReview, error) {
+	result, err := c.backend.UpdateStatusClusterScoped(ctx, "selfsubjectreviews", v, opts, &authenticationv1.SelfSubjectReview{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authenticationv1.SelfSubjectReview), nil
+}
+
+func (c *AuthenticationK8sIoV1) DeleteSelfSubjectReview(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".authentication.k8s.io", Version: "v1", Resource: "selfsubjectreviews"}, name, opts)
+}
+
+func (c *AuthenticationK8sIoV1) ListSelfSubjectReview(ctx context.Context, opts metav1.ListOptions) (*authenticationv1.SelfSubjectReviewList, error) {
+	result, err := c.backend.ListClusterScoped(ctx, "selfsubjectreviews", opts, &authenticationv1.SelfSubjectReviewList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*authenticationv1.SelfSubjectReviewList), nil
+}
+
+func (c *AuthenticationK8sIoV1) WatchSelfSubjectReview(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".authentication.k8s.io", Version: "v1", Resource: "selfsubjectreviews"}, opts)
 }
 
 func (c *AuthenticationK8sIoV1) GetTokenRequest(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*authenticationv1.TokenRequest, error) {
@@ -2569,14 +2705,6 @@ func (c *NetworkingK8sIoV1) UpdateNetworkPolicy(ctx context.Context, v *networki
 	return result.(*networkingv1.NetworkPolicy), nil
 }
 
-func (c *NetworkingK8sIoV1) UpdateStatusNetworkPolicy(ctx context.Context, v *networkingv1.NetworkPolicy, opts metav1.UpdateOptions) (*networkingv1.NetworkPolicy, error) {
-	result, err := c.backend.UpdateStatus(ctx, "networkpolicies", v, opts, &networkingv1.NetworkPolicy{})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*networkingv1.NetworkPolicy), nil
-}
-
 func (c *NetworkingK8sIoV1) DeleteNetworkPolicy(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".networking.k8s.io", Version: "v1", Resource: "networkpolicies"}, namespace, name, opts)
 }
@@ -3214,6 +3342,10 @@ func (f *InformerFactory) InformerFor(obj runtime.Object) cache.SharedIndexInfor
 		return NewCoreV1Informer(f.cache, f.set.CoreV1, f.namespace, f.resyncPeriod).ServiceAccountInformer()
 	case *admissionregistrationv1.MutatingWebhookConfiguration:
 		return NewAdmissionregistrationK8sIoV1Informer(f.cache, f.set.AdmissionregistrationK8sIoV1, f.namespace, f.resyncPeriod).MutatingWebhookConfigurationInformer()
+	case *admissionregistrationv1.ValidatingAdmissionPolicy:
+		return NewAdmissionregistrationK8sIoV1Informer(f.cache, f.set.AdmissionregistrationK8sIoV1, f.namespace, f.resyncPeriod).ValidatingAdmissionPolicyInformer()
+	case *admissionregistrationv1.ValidatingAdmissionPolicyBinding:
+		return NewAdmissionregistrationK8sIoV1Informer(f.cache, f.set.AdmissionregistrationK8sIoV1, f.namespace, f.resyncPeriod).ValidatingAdmissionPolicyBindingInformer()
 	case *admissionregistrationv1.ValidatingWebhookConfiguration:
 		return NewAdmissionregistrationK8sIoV1Informer(f.cache, f.set.AdmissionregistrationK8sIoV1, f.namespace, f.resyncPeriod).ValidatingWebhookConfigurationInformer()
 	case *appsv1.ControllerRevision:
@@ -3226,6 +3358,8 @@ func (f *InformerFactory) InformerFor(obj runtime.Object) cache.SharedIndexInfor
 		return NewAppsV1Informer(f.cache, f.set.AppsV1, f.namespace, f.resyncPeriod).ReplicaSetInformer()
 	case *appsv1.StatefulSet:
 		return NewAppsV1Informer(f.cache, f.set.AppsV1, f.namespace, f.resyncPeriod).StatefulSetInformer()
+	case *authenticationv1.SelfSubjectReview:
+		return NewAuthenticationK8sIoV1Informer(f.cache, f.set.AuthenticationK8sIoV1, f.namespace, f.resyncPeriod).SelfSubjectReviewInformer()
 	case *authenticationv1.TokenRequest:
 		return NewAuthenticationK8sIoV1Informer(f.cache, f.set.AuthenticationK8sIoV1, f.namespace, f.resyncPeriod).TokenRequestInformer()
 	case *authenticationv1.TokenReview:
@@ -3333,6 +3467,10 @@ func (f *InformerFactory) InformerForResource(gvr schema.GroupVersionResource) c
 		return NewCoreV1Informer(f.cache, f.set.CoreV1, f.namespace, f.resyncPeriod).ServiceAccountInformer()
 	case admissionregistrationv1.SchemaGroupVersion.WithResource("mutatingwebhookconfigurations"):
 		return NewAdmissionregistrationK8sIoV1Informer(f.cache, f.set.AdmissionregistrationK8sIoV1, f.namespace, f.resyncPeriod).MutatingWebhookConfigurationInformer()
+	case admissionregistrationv1.SchemaGroupVersion.WithResource("validatingadmissionpolicies"):
+		return NewAdmissionregistrationK8sIoV1Informer(f.cache, f.set.AdmissionregistrationK8sIoV1, f.namespace, f.resyncPeriod).ValidatingAdmissionPolicyInformer()
+	case admissionregistrationv1.SchemaGroupVersion.WithResource("validatingadmissionpolicybindings"):
+		return NewAdmissionregistrationK8sIoV1Informer(f.cache, f.set.AdmissionregistrationK8sIoV1, f.namespace, f.resyncPeriod).ValidatingAdmissionPolicyBindingInformer()
 	case admissionregistrationv1.SchemaGroupVersion.WithResource("validatingwebhookconfigurations"):
 		return NewAdmissionregistrationK8sIoV1Informer(f.cache, f.set.AdmissionregistrationK8sIoV1, f.namespace, f.resyncPeriod).ValidatingWebhookConfigurationInformer()
 	case appsv1.SchemaGroupVersion.WithResource("controllerrevisions"):
@@ -3345,6 +3483,8 @@ func (f *InformerFactory) InformerForResource(gvr schema.GroupVersionResource) c
 		return NewAppsV1Informer(f.cache, f.set.AppsV1, f.namespace, f.resyncPeriod).ReplicaSetInformer()
 	case appsv1.SchemaGroupVersion.WithResource("statefulsets"):
 		return NewAppsV1Informer(f.cache, f.set.AppsV1, f.namespace, f.resyncPeriod).StatefulSetInformer()
+	case authenticationv1.SchemaGroupVersion.WithResource("selfsubjectreviews"):
+		return NewAuthenticationK8sIoV1Informer(f.cache, f.set.AuthenticationK8sIoV1, f.namespace, f.resyncPeriod).SelfSubjectReviewInformer()
 	case authenticationv1.SchemaGroupVersion.WithResource("tokenrequests"):
 		return NewAuthenticationK8sIoV1Informer(f.cache, f.set.AuthenticationK8sIoV1, f.namespace, f.resyncPeriod).TokenRequestInformer()
 	case authenticationv1.SchemaGroupVersion.WithResource("tokenreviews"):
@@ -3892,6 +4032,50 @@ func (f *AdmissionregistrationK8sIoV1Informer) MutatingWebhookConfigurationListe
 	return NewAdmissionregistrationK8sIoV1MutatingWebhookConfigurationLister(f.MutatingWebhookConfigurationInformer().GetIndexer())
 }
 
+func (f *AdmissionregistrationK8sIoV1Informer) ValidatingAdmissionPolicyInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&admissionregistrationv1.ValidatingAdmissionPolicy{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListValidatingAdmissionPolicy(context.TODO(), metav1.ListOptions{})
+				},
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchValidatingAdmissionPolicy(context.TODO(), metav1.ListOptions{})
+				},
+			},
+			&admissionregistrationv1.ValidatingAdmissionPolicy{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *AdmissionregistrationK8sIoV1Informer) ValidatingAdmissionPolicyLister() *AdmissionregistrationK8sIoV1ValidatingAdmissionPolicyLister {
+	return NewAdmissionregistrationK8sIoV1ValidatingAdmissionPolicyLister(f.ValidatingAdmissionPolicyInformer().GetIndexer())
+}
+
+func (f *AdmissionregistrationK8sIoV1Informer) ValidatingAdmissionPolicyBindingInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&admissionregistrationv1.ValidatingAdmissionPolicyBinding{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListValidatingAdmissionPolicyBinding(context.TODO(), metav1.ListOptions{})
+				},
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchValidatingAdmissionPolicyBinding(context.TODO(), metav1.ListOptions{})
+				},
+			},
+			&admissionregistrationv1.ValidatingAdmissionPolicyBinding{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *AdmissionregistrationK8sIoV1Informer) ValidatingAdmissionPolicyBindingLister() *AdmissionregistrationK8sIoV1ValidatingAdmissionPolicyBindingLister {
+	return NewAdmissionregistrationK8sIoV1ValidatingAdmissionPolicyBindingLister(f.ValidatingAdmissionPolicyBindingInformer().GetIndexer())
+}
+
 func (f *AdmissionregistrationK8sIoV1Informer) ValidatingWebhookConfigurationInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&admissionregistrationv1.ValidatingWebhookConfiguration{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
@@ -4058,6 +4242,28 @@ func NewAuthenticationK8sIoV1Informer(c *InformerCache, client *AuthenticationK8
 		resyncPeriod: resyncPeriod,
 		indexers:     cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
 	}
+}
+
+func (f *AuthenticationK8sIoV1Informer) SelfSubjectReviewInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&authenticationv1.SelfSubjectReview{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListSelfSubjectReview(context.TODO(), metav1.ListOptions{})
+				},
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchSelfSubjectReview(context.TODO(), metav1.ListOptions{})
+				},
+			},
+			&authenticationv1.SelfSubjectReview{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *AuthenticationK8sIoV1Informer) SelfSubjectReviewLister() *AuthenticationK8sIoV1SelfSubjectReviewLister {
+	return NewAuthenticationK8sIoV1SelfSubjectReviewLister(f.SelfSubjectReviewInformer().GetIndexer())
 }
 
 func (f *AuthenticationK8sIoV1Informer) TokenRequestInformer() cache.SharedIndexInformer {
@@ -5494,6 +5700,60 @@ func (x *AdmissionregistrationK8sIoV1MutatingWebhookConfigurationLister) Get(nam
 	return obj.(*admissionregistrationv1.MutatingWebhookConfiguration).DeepCopy(), nil
 }
 
+type AdmissionregistrationK8sIoV1ValidatingAdmissionPolicyLister struct {
+	indexer cache.Indexer
+}
+
+func NewAdmissionregistrationK8sIoV1ValidatingAdmissionPolicyLister(indexer cache.Indexer) *AdmissionregistrationK8sIoV1ValidatingAdmissionPolicyLister {
+	return &AdmissionregistrationK8sIoV1ValidatingAdmissionPolicyLister{indexer: indexer}
+}
+
+func (x *AdmissionregistrationK8sIoV1ValidatingAdmissionPolicyLister) List(selector labels.Selector) ([]*admissionregistrationv1.ValidatingAdmissionPolicy, error) {
+	var ret []*admissionregistrationv1.ValidatingAdmissionPolicy
+	err := cache.ListAll(x.indexer, selector, func(m interface{}) {
+		ret = append(ret, m.(*admissionregistrationv1.ValidatingAdmissionPolicy).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *AdmissionregistrationK8sIoV1ValidatingAdmissionPolicyLister) Get(name string) (*admissionregistrationv1.ValidatingAdmissionPolicy, error) {
+	obj, exists, err := x.indexer.GetByKey("/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(admissionregistrationv1.SchemaGroupVersion.WithResource("validatingadmissionpolicy").GroupResource(), name)
+	}
+	return obj.(*admissionregistrationv1.ValidatingAdmissionPolicy).DeepCopy(), nil
+}
+
+type AdmissionregistrationK8sIoV1ValidatingAdmissionPolicyBindingLister struct {
+	indexer cache.Indexer
+}
+
+func NewAdmissionregistrationK8sIoV1ValidatingAdmissionPolicyBindingLister(indexer cache.Indexer) *AdmissionregistrationK8sIoV1ValidatingAdmissionPolicyBindingLister {
+	return &AdmissionregistrationK8sIoV1ValidatingAdmissionPolicyBindingLister{indexer: indexer}
+}
+
+func (x *AdmissionregistrationK8sIoV1ValidatingAdmissionPolicyBindingLister) List(selector labels.Selector) ([]*admissionregistrationv1.ValidatingAdmissionPolicyBinding, error) {
+	var ret []*admissionregistrationv1.ValidatingAdmissionPolicyBinding
+	err := cache.ListAll(x.indexer, selector, func(m interface{}) {
+		ret = append(ret, m.(*admissionregistrationv1.ValidatingAdmissionPolicyBinding).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *AdmissionregistrationK8sIoV1ValidatingAdmissionPolicyBindingLister) Get(name string) (*admissionregistrationv1.ValidatingAdmissionPolicyBinding, error) {
+	obj, exists, err := x.indexer.GetByKey("/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(admissionregistrationv1.SchemaGroupVersion.WithResource("validatingadmissionpolicybinding").GroupResource(), name)
+	}
+	return obj.(*admissionregistrationv1.ValidatingAdmissionPolicyBinding).DeepCopy(), nil
+}
+
 type AdmissionregistrationK8sIoV1ValidatingWebhookConfigurationLister struct {
 	indexer cache.Indexer
 }
@@ -5654,6 +5914,33 @@ func (x *AppsV1StatefulSetLister) Get(namespace, name string) (*appsv1.StatefulS
 		return nil, k8serrors.NewNotFound(appsv1.SchemaGroupVersion.WithResource("statefulset").GroupResource(), name)
 	}
 	return obj.(*appsv1.StatefulSet).DeepCopy(), nil
+}
+
+type AuthenticationK8sIoV1SelfSubjectReviewLister struct {
+	indexer cache.Indexer
+}
+
+func NewAuthenticationK8sIoV1SelfSubjectReviewLister(indexer cache.Indexer) *AuthenticationK8sIoV1SelfSubjectReviewLister {
+	return &AuthenticationK8sIoV1SelfSubjectReviewLister{indexer: indexer}
+}
+
+func (x *AuthenticationK8sIoV1SelfSubjectReviewLister) List(selector labels.Selector) ([]*authenticationv1.SelfSubjectReview, error) {
+	var ret []*authenticationv1.SelfSubjectReview
+	err := cache.ListAll(x.indexer, selector, func(m interface{}) {
+		ret = append(ret, m.(*authenticationv1.SelfSubjectReview).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *AuthenticationK8sIoV1SelfSubjectReviewLister) Get(name string) (*authenticationv1.SelfSubjectReview, error) {
+	obj, exists, err := x.indexer.GetByKey("/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(authenticationv1.SchemaGroupVersion.WithResource("selfsubjectreview").GroupResource(), name)
+	}
+	return obj.(*authenticationv1.SelfSubjectReview).DeepCopy(), nil
 }
 
 type AuthenticationK8sIoV1TokenRequestLister struct {

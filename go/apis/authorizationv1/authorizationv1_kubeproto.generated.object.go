@@ -509,10 +509,28 @@ type ResourceAttributes struct {
 	Subresource string `json:"subresource,omitempty"`
 	// Name is the name of the resource being requested for a "get" or deleted for a "delete". "" (empty) means all.
 	Name string `json:"name,omitempty"`
+	// fieldSelector describes the limitation on access based on field.  It can only limit access, not broaden it.
+	// This field  is alpha-level. To use this field, you must enable the
+	// `AuthorizeWithSelectors` feature gate (disabled by default).
+	FieldSelector *FieldSelectorAttributes `json:"fieldSelector,omitempty"`
+	// labelSelector describes the limitation on access based on labels.  It can only limit access, not broaden it.
+	// This field  is alpha-level. To use this field, you must enable the
+	// `AuthorizeWithSelectors` feature gate (disabled by default).
+	LabelSelector *LabelSelectorAttributes `json:"labelSelector,omitempty"`
 }
 
 func (in *ResourceAttributes) DeepCopyInto(out *ResourceAttributes) {
 	*out = *in
+	if in.FieldSelector != nil {
+		in, out := &in.FieldSelector, &out.FieldSelector
+		*out = new(FieldSelectorAttributes)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.LabelSelector != nil {
+		in, out := &in.LabelSelector, &out.LabelSelector
+		*out = new(LabelSelectorAttributes)
+		(*in).DeepCopyInto(*out)
+	}
 }
 
 func (in *ResourceAttributes) DeepCopy() *ResourceAttributes {
@@ -619,6 +637,72 @@ func (in *NonResourceRule) DeepCopy() *NonResourceRule {
 		return nil
 	}
 	out := new(NonResourceRule)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type FieldSelectorAttributes struct {
+	// rawSelector is the serialization of a field selector that would be included in a query parameter.
+	// Webhook implementations are encouraged to ignore rawSelector.
+	// The kube-apiserver's *SubjectAccessReview will parse the rawSelector as long as the requirements are not present.
+	RawSelector string `json:"rawSelector,omitempty"`
+	// requirements is the parsed interpretation of a field selector.
+	// All requirements must be met for a resource instance to match the selector.
+	// Webhook implementations should handle requirements, but how to handle them is up to the webhook.
+	// Since requirements can only limit the request, it is safe to authorize as unlimited request if the requirements
+	// are not understood.
+	Requirements []metav1.FieldSelectorRequirement `json:"requirements"`
+}
+
+func (in *FieldSelectorAttributes) DeepCopyInto(out *FieldSelectorAttributes) {
+	*out = *in
+	if in.Requirements != nil {
+		l := make([]metav1.FieldSelectorRequirement, len(in.Requirements))
+		for i := range in.Requirements {
+			in.Requirements[i].DeepCopyInto(&l[i])
+		}
+		out.Requirements = l
+	}
+}
+
+func (in *FieldSelectorAttributes) DeepCopy() *FieldSelectorAttributes {
+	if in == nil {
+		return nil
+	}
+	out := new(FieldSelectorAttributes)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type LabelSelectorAttributes struct {
+	// rawSelector is the serialization of a field selector that would be included in a query parameter.
+	// Webhook implementations are encouraged to ignore rawSelector.
+	// The kube-apiserver's *SubjectAccessReview will parse the rawSelector as long as the requirements are not present.
+	RawSelector string `json:"rawSelector,omitempty"`
+	// requirements is the parsed interpretation of a label selector.
+	// All requirements must be met for a resource instance to match the selector.
+	// Webhook implementations should handle requirements, but how to handle them is up to the webhook.
+	// Since requirements can only limit the request, it is safe to authorize as unlimited request if the requirements
+	// are not understood.
+	Requirements []metav1.LabelSelectorRequirement `json:"requirements"`
+}
+
+func (in *LabelSelectorAttributes) DeepCopyInto(out *LabelSelectorAttributes) {
+	*out = *in
+	if in.Requirements != nil {
+		l := make([]metav1.LabelSelectorRequirement, len(in.Requirements))
+		for i := range in.Requirements {
+			in.Requirements[i].DeepCopyInto(&l[i])
+		}
+		out.Requirements = l
+	}
+}
+
+func (in *LabelSelectorAttributes) DeepCopy() *LabelSelectorAttributes {
+	if in == nil {
+		return nil
+	}
+	out := new(LabelSelectorAttributes)
 	in.DeepCopyInto(out)
 	return out
 }

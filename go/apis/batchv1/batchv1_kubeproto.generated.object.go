@@ -45,18 +45,20 @@ const (
 type JobConditionType string
 
 const (
-	JobConditionTypeSuspended     JobConditionType = "Suspended"
-	JobConditionTypeComplete      JobConditionType = "Complete"
-	JobConditionTypeFailed        JobConditionType = "Failed"
-	JobConditionTypeFailureTarget JobConditionType = "FailureTarget"
+	JobConditionTypeSuspended          JobConditionType = "Suspended"
+	JobConditionTypeComplete           JobConditionType = "Complete"
+	JobConditionTypeFailed             JobConditionType = "Failed"
+	JobConditionTypeFailureTarget      JobConditionType = "FailureTarget"
+	JobConditionTypeSuccessCriteriaMet JobConditionType = "SuccessCriteriaMet"
 )
 
 type PodFailurePolicyAction string
 
 const (
-	PodFailurePolicyActionFailJob PodFailurePolicyAction = "FailJob"
-	PodFailurePolicyActionIgnore  PodFailurePolicyAction = "Ignore"
-	PodFailurePolicyActionCount   PodFailurePolicyAction = "Count"
+	PodFailurePolicyActionFailJob   PodFailurePolicyAction = "FailJob"
+	PodFailurePolicyActionFailIndex PodFailurePolicyAction = "FailIndex"
+	PodFailurePolicyActionIgnore    PodFailurePolicyAction = "Ignore"
+	PodFailurePolicyActionCount     PodFailurePolicyAction = "Count"
 )
 
 type PodFailurePolicyOnExitCodesOperator string
@@ -64,6 +66,13 @@ type PodFailurePolicyOnExitCodesOperator string
 const (
 	PodFailurePolicyOnExitCodesOperatorIn    PodFailurePolicyOnExitCodesOperator = "In"
 	PodFailurePolicyOnExitCodesOperatorNotIn PodFailurePolicyOnExitCodesOperator = "NotIn"
+)
+
+type PodReplacementPolicy string
+
+const (
+	PodReplacementPolicyTerminatingOrFailed PodReplacementPolicy = "TerminatingOrFailed"
+	PodReplacementPolicyFailed              PodReplacementPolicy = "Failed"
 )
 
 type CronJob struct {
@@ -337,12 +346,38 @@ type JobSpec struct {
 	// represented by the jobs's .status.failed field, is incremented and it is
 	// checked against the backoffLimit. This field cannot be used in combination
 	// with restartPolicy=OnFailure.
-	// This field is alpha-level. To use this field, you must enable the
-	// `JobPodFailurePolicy` feature gate (disabled by default).
 	PodFailurePolicy *PodFailurePolicy `json:"podFailurePolicy,omitempty"`
+	// successPolicy specifies the policy when the Job can be declared as succeeded.
+	// If empty, the default behavior applies - the Job is declared as succeeded
+	// only when the number of succeeded pods equals to the completions.
+	// When the field is specified, it must be immutable and works only for the Indexed Jobs.
+	// Once the Job meets the SuccessPolicy, the lingering pods are terminated.
+	// This field is beta-level. To use this field, you must enable the
+	// `JobSuccessPolicy` feature gate (enabled by default).
+	SuccessPolicy *SuccessPolicy `json:"successPolicy,omitempty"`
 	// Specifies the number of retries before marking this job failed.
 	// Defaults to 6
 	BackoffLimit int `json:"backoffLimit,omitempty"`
+	// Specifies the limit for the number of retries within an
+	// index before marking this index as failed. When enabled the number of
+	// failures per index is kept in the pod's
+	// batch.kubernetes.io/job-index-failure-count annotation. It can only
+	// be set when Job's completionMode=Indexed, and the Pod's restart
+	// policy is Never. The field is immutable.
+	// This field is beta-level. It can be used when the `JobBackoffLimitPerIndex`
+	// feature gate is enabled (enabled by default).
+	BackoffLimitPerIndex int `json:"backoffLimitPerIndex,omitempty"`
+	// Specifies the maximal number of failed indexes before marking the Job as
+	// failed, when backoffLimitPerIndex is set. Once the number of failed
+	// indexes exceeds this number the entire Job is marked as Failed and its
+	// execution is terminated. When left as null the job continues execution of
+	// all of its indexes and is marked with the `Complete` Job condition.
+	// It can only be specified when backoffLimitPerIndex is set.
+	// It can be null or up to completions. It is required and must be
+	// less than or equal to 10^4 when is completions greater than 10^5.
+	// This field is beta-level. It can be used when the `JobBackoffLimitPerIndex`
+	// feature gate is enabled (enabled by default).
+	MaxFailedIndexes int `json:"maxFailedIndexes,omitempty"`
 	// A label query over pods that should match the pod count.
 	// Normally, the system sets this field for you.
 	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
@@ -398,6 +433,29 @@ type JobSpec struct {
 	// Suspending a Job will reset the StartTime field of the Job, effectively
 	// resetting the ActiveDeadlineSeconds timer too. Defaults to false.
 	Suspend bool `json:"suspend,omitempty"`
+	// podReplacementPolicy specifies when to create replacement Pods.
+	// Possible values are:
+	// - TerminatingOrFailed means that we recreate pods
+	// when they are terminating (has a metadata.deletionTimestamp) or failed.
+	// - Failed means to wait until a previously created Pod is fully terminated (has phase
+	// Failed or Succeeded) before creating a replacement Pod.
+	// When using podFailurePolicy, Failed is the the only allowed value.
+	// TerminatingOrFailed and Failed are allowed values when podFailurePolicy is not in use.
+	// This is an beta field. To use this, enable the JobPodReplacementPolicy feature toggle.
+	// This is on by default.
+	PodReplacementPolicy PodReplacementPolicy `json:"podReplacementPolicy,omitempty"`
+	// ManagedBy field indicates the controller that manages a Job. The k8s Job
+	// controller reconciles jobs which don't have this field at all or the field
+	// value is the reserved string `kubernetes.io/job-controller`, but skips
+	// reconciling Jobs with a custom value for this field.
+	// The value must be a valid domain-prefixed path (e.g. acme.io/foo) -
+	// all characters before the first "/" must be a valid subdomain as defined
+	// by RFC 1123. All characters trailing the first "/" must be valid HTTP Path
+	// characters as defined by RFC 3986. The value cannot exceed 63 characters.
+	// This field is immutable.
+	// This field is beta-level. The job controller accepts setting the field
+	// when the feature gate JobManagedBy is enabled (enabled by default).
+	ManagedBy string `json:"managedBy,omitempty"`
 }
 
 func (in *JobSpec) DeepCopyInto(out *JobSpec) {
@@ -405,6 +463,11 @@ func (in *JobSpec) DeepCopyInto(out *JobSpec) {
 	if in.PodFailurePolicy != nil {
 		in, out := &in.PodFailurePolicy, &out.PodFailurePolicy
 		*out = new(PodFailurePolicy)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.SuccessPolicy != nil {
+		in, out := &in.SuccessPolicy, &out.SuccessPolicy
+		*out = new(SuccessPolicy)
 		(*in).DeepCopyInto(*out)
 	}
 	if in.Selector != nil {
@@ -431,24 +494,42 @@ type JobStatus struct {
 	// status true; when the Job is resumed, the status of this condition will
 	// become false. When a Job is completed, one of the conditions will have
 	// type "Complete" and status true.
+	// A job is considered finished when it is in a terminal condition, either
+	// "Complete" or "Failed". A Job cannot have both the "Complete" and "Failed" conditions.
+	// Additionally, it cannot be in the "Complete" and "FailureTarget" conditions.
+	// The "Complete", "Failed" and "FailureTarget" conditions cannot be disabled.
 	// More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/
 	Conditions []JobCondition `json:"conditions"`
 	// Represents time when the job controller started processing a job. When a
 	// Job is created in the suspended state, this field is not set until the
 	// first time it is resumed. This field is reset every time a Job is resumed
 	// from suspension. It is represented in RFC3339 form and is in UTC.
+	// Once set, the field can only be removed when the job is suspended.
+	// The field cannot be modified while the job is unsuspended or finished.
 	StartTime *metav1.Time `json:"startTime,omitempty"`
 	// Represents time when the job was completed. It is not guaranteed to
 	// be set in happens-before order across separate operations.
 	// It is represented in RFC3339 form and is in UTC.
-	// The completion time is only set when the job finishes successfully.
+	// The completion time is set when the job finishes successfully, and only then.
+	// The value cannot be updated or removed. The value indicates the same or
+	// later point in time as the startTime field.
 	CompletionTime *metav1.Time `json:"completionTime,omitempty"`
-	// The number of pending and running pods.
+	// The number of pending and running pods which are not terminating (without
+	// a deletionTimestamp).
+	// The value is zero for finished jobs.
 	Active int `json:"active,omitempty"`
 	// The number of pods which reached phase Succeeded.
+	// The value increases monotonically for a given spec. However, it may
+	// decrease in reaction to scale down of elastic indexed jobs.
 	Succeeded int `json:"succeeded,omitempty"`
 	// The number of pods which reached phase Failed.
+	// The value increases monotonically.
 	Failed int `json:"failed,omitempty"`
+	// The number of pods which are terminating (in phase Pending or Running
+	// and have a deletionTimestamp).
+	// This field is beta-level. The job controller populates the field when
+	// the feature gate JobPodReplacementPolicy is enabled (enabled by default).
+	Terminating int `json:"terminating,omitempty"`
 	// completedIndexes holds the completed indexes when .spec.completionMode =
 	// "Indexed" in a text format. The indexes are represented as decimal integers
 	// separated by commas. The numbers are listed in increasing order. Three or
@@ -457,6 +538,18 @@ type JobStatus struct {
 	// For example, if the completed indexes are 1, 3, 4, 5 and 7, they are
 	// represented as "1,3-5,7".
 	CompletedIndexes string `json:"completedIndexes,omitempty"`
+	// FailedIndexes holds the failed indexes when spec.backoffLimitPerIndex is set.
+	// The indexes are represented in the text format analogous as for the
+	// `completedIndexes` field, ie. they are kept as decimal integers
+	// separated by commas. The numbers are listed in increasing order. Three or
+	// more consecutive numbers are compressed and represented by the first and
+	// last element of the series, separated by a hyphen.
+	// For example, if the failed indexes are 1, 3, 4, 5 and 7, they are
+	// represented as "1,3-5,7".
+	// The set of failed indexes cannot overlap with the set of completed indexes.
+	// This field is beta-level. It can be used when the `JobBackoffLimitPerIndex`
+	// feature gate is enabled (enabled by default).
+	FailedIndexes string `json:"failedIndexes,omitempty"`
 	// uncountedTerminatedPods holds the UIDs of Pods that have terminated but
 	// the job controller hasn't yet accounted for in the status counters.
 	// The job controller creates pods with a finalizer. When a pod terminates
@@ -468,10 +561,10 @@ type JobStatus struct {
 	// counter.
 	// Old jobs might not be tracked using this field, in which case the field
 	// remains null.
+	// The structure is empty for finished jobs.
 	UncountedTerminatedPods *UncountedTerminatedPods `json:"uncountedTerminatedPods,omitempty"`
-	// The number of pods which have a Ready condition.
-	// This field is beta-level. The job controller populates the field when
-	// the feature gate JobReadyPods is enabled (enabled by default).
+	// The number of active pods which have a Ready condition and are not
+	// terminating (without a deletionTimestamp).
 	Ready int `json:"ready,omitempty"`
 }
 
@@ -571,6 +664,36 @@ func (in *PodFailurePolicy) DeepCopy() *PodFailurePolicy {
 	return out
 }
 
+type SuccessPolicy struct {
+	// rules represents the list of alternative rules for the declaring the Jobs
+	// as successful before `.status.succeeded >= .spec.completions`. Once any of the rules are met,
+	// the "SucceededCriteriaMet" condition is added, and the lingering pods are removed.
+	// The terminal state for such a Job has the "Complete" condition.
+	// Additionally, these rules are evaluated in order; Once the Job meets one of the rules,
+	// other rules are ignored. At most 20 elements are allowed.
+	Rules []SuccessPolicyRule `json:"rules"`
+}
+
+func (in *SuccessPolicy) DeepCopyInto(out *SuccessPolicy) {
+	*out = *in
+	if in.Rules != nil {
+		l := make([]SuccessPolicyRule, len(in.Rules))
+		for i := range in.Rules {
+			in.Rules[i].DeepCopyInto(&l[i])
+		}
+		out.Rules = l
+	}
+}
+
+func (in *SuccessPolicy) DeepCopy() *SuccessPolicy {
+	if in == nil {
+		return nil
+	}
+	out := new(SuccessPolicy)
+	in.DeepCopyInto(out)
+	return out
+}
+
 type JobCondition struct {
 	// Type of job condition, Complete or Failed.
 	Type JobConditionType `json:"type"`
@@ -644,6 +767,10 @@ type PodFailurePolicyRule struct {
 	// Possible values are:
 	// - FailJob: indicates that the pod's job is marked as Failed and all
 	// running pods are terminated.
+	// - FailIndex: indicates that the pod's index is marked as Failed and will
+	// not be restarted.
+	// This value is beta-level. It can be used when the
+	// `JobBackoffLimitPerIndex` feature gate is enabled (enabled by default).
 	// - Ignore: indicates that the counter towards the .backoffLimit is not
 	// incremented and a replacement pod is created.
 	// - Count: indicates that the pod is handled in the default way - the
@@ -680,6 +807,45 @@ func (in *PodFailurePolicyRule) DeepCopy() *PodFailurePolicyRule {
 		return nil
 	}
 	out := new(PodFailurePolicyRule)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type SuccessPolicyRule struct {
+	// succeededIndexes specifies the set of indexes
+	// which need to be contained in the actual set of the succeeded indexes for the Job.
+	// The list of indexes must be within 0 to ".spec.completions-1" and
+	// must not contain duplicates. At least one element is required.
+	// The indexes are represented as intervals separated by commas.
+	// The intervals can be a decimal integer or a pair of decimal integers separated by a hyphen.
+	// The number are listed in represented by the first and last element of the series,
+	// separated by a hyphen.
+	// For example, if the completed indexes are 1, 3, 4, 5 and 7, they are
+	// represented as "1,3-5,7".
+	// When this field is null, this field doesn't default to any value
+	// and is never evaluated at any time.
+	SucceededIndexes string `json:"succeededIndexes,omitempty"`
+	// succeededCount specifies the minimal required size of the actual set of the succeeded indexes
+	// for the Job. When succeededCount is used along with succeededIndexes, the check is
+	// constrained only to the set of indexes specified by succeededIndexes.
+	// For example, given that succeededIndexes is "1-4", succeededCount is "3",
+	// and completed indexes are "1", "3", and "5", the Job isn't declared as succeeded
+	// because only "1" and "3" indexes are considered in that rules.
+	// When this field is null, this doesn't default to any value and
+	// is never evaluated at any time.
+	// When specified it needs to be a positive integer.
+	SucceededCount int `json:"succeededCount,omitempty"`
+}
+
+func (in *SuccessPolicyRule) DeepCopyInto(out *SuccessPolicyRule) {
+	*out = *in
+}
+
+func (in *SuccessPolicyRule) DeepCopy() *SuccessPolicyRule {
+	if in == nil {
+		return nil
+	}
+	out := new(SuccessPolicyRule)
 	in.DeepCopyInto(out)
 	return out
 }

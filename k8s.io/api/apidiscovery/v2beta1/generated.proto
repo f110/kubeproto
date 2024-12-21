@@ -47,7 +47,7 @@ message APIResourceDiscovery {
   string resource = 1 [(dev.f110.kubeproto.field) = { go_name: "Resource", api_field_name: "resource", inline: false }];
   // responseKind describes the group, version, and kind of the serialization schema for the object type this endpoint typically returns.
   // APIs may return other objects types at their discretion, such as error conditions, requests for alternate representations, or other operation specific behavior.
-  // This value will be null if an APIService reports subresources but supports no operations on the parent resource
+  // This value will be null or empty if an APIService reports subresources but supports no operations on the parent resource
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.GroupVersionKind response_kind = 2 [(dev.f110.kubeproto.field) = { go_name: "ResponseKind", api_field_name: "responseKind", inline: false }];
   // scope indicates the scope of a resource, either Cluster or Namespaced
   ResourceScope scope = 3 [(dev.f110.kubeproto.field) = { go_name: "Scope", api_field_name: "scope", inline: false }];
@@ -74,7 +74,7 @@ message APISubresourceDiscovery {
   // for this resource across all versions.
   string subresource = 1 [(dev.f110.kubeproto.field) = { go_name: "Subresource", api_field_name: "subresource", inline: false }];
   // responseKind describes the group, version, and kind of the serialization schema for the object type this endpoint typically returns.
-  // Some subresources do not return normal resources, these will have null return types.
+  // Some subresources do not return normal resources, these will have null or empty return types.
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.GroupVersionKind response_kind = 2 [(dev.f110.kubeproto.field) = { go_name: "ResponseKind", api_field_name: "responseKind", inline: false }];
   // acceptedTypes describes the kinds that this endpoint accepts.
   // Subresources may accept the standard content types or define

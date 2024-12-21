@@ -30,6 +30,13 @@ enum CustomResourceDefinitionConditionType {
   CUSTOM_RESOURCE_DEFINITION_CONDITION_TYPE_KUBERNETES_API_APPROVAL_POLICY_CONFORMANT = 4 [(dev.f110.kubeproto.value) = { value: "KubernetesAPIApprovalPolicyConformant" }];
 }
 
+enum FieldValueErrorReason {
+  FIELD_VALUE_ERROR_REASON_FIELD_VALUE_REQUIRED  = 0;
+  FIELD_VALUE_ERROR_REASON_FIELD_VALUE_DUPLICATE = 1;
+  FIELD_VALUE_ERROR_REASON_FIELD_VALUE_INVALID   = 2;
+  FIELD_VALUE_ERROR_REASON_FIELD_VALUE_FORBIDDEN = 3;
+}
+
 enum ResourceScope {
   RESOURCE_SCOPE_CLUSTER    = 0 [(dev.f110.kubeproto.value) = { value: "Cluster" }];
   RESOURCE_SCOPE_NAMESPACED = 1 [(dev.f110.kubeproto.value) = { value: "Namespaced" }];
@@ -230,6 +237,10 @@ message CustomResourceDefinitionVersion {
   // See https://kubernetes.io/docs/reference/using-api/api-concepts/#receiving-resources-as-tables for details.
   // If no columns are specified, a single column displaying the age of the custom resource is used.
   repeated CustomResourceColumnDefinition additional_printer_columns = 8 [(dev.f110.kubeproto.field) = { go_name: "AdditionalPrinterColumns", api_field_name: "additionalPrinterColumns", inline: false }];
+  // selectableFields specifies paths to fields that may be used as field selectors.
+  // A maximum of 8 selectable fields are allowed.
+  // See https://kubernetes.io/docs/concepts/overview/working-with-objects/field-selectors
+  repeated SelectableField selectable_fields = 9 [(dev.f110.kubeproto.field) = { go_name: "SelectableFields", api_field_name: "selectableFields", inline: false }];
 }
 
 message CustomResourceSubresourceScale {
@@ -410,7 +421,6 @@ message JSONSchemaProps {
   //      Atomic maps will be entirely replaced when updated.
   optional string x_map_type = 43 [(dev.f110.kubeproto.field) = { go_name: "XMapType", api_field_name: "x-kubernetes-map-type", inline: false }];
   // x-kubernetes-validations describes a list of validation rules written in the CEL expression language.
-  // This field is an alpha-level. Using this field requires the feature gate `CustomResourceValidationExpressions` to be enabled.
   optional ValidationRules x_validations = 44 [(dev.f110.kubeproto.field) = { go_name: "XValidations", api_field_name: "x-kubernetes-validations", inline: false }];
 }
 
@@ -427,6 +437,18 @@ message JSONSchemaPropsOrBool {
 message JSONSchemaPropsOrStringArray {
   optional JSONSchemaProps schema   = 1 [(dev.f110.kubeproto.field) = { go_name: "Schema", inline: false }];
   repeated string          property = 2 [(dev.f110.kubeproto.field) = { go_name: "Property", inline: false }];
+}
+
+message SelectableField {
+  // jsonPath is a simple JSON path which is evaluated against each custom resource to produce a
+  // field selector value.
+  // Only JSON paths without the array notation are allowed.
+  // Must point to a field of type string, boolean or integer. Types with enum values
+  // and strings with formats are allowed.
+  // If jsonPath refers to absent field in a resource, the jsonPath evaluates to an empty string.
+  // Must not point to metdata fields.
+  // Required.
+  string json_path = 1 [(dev.f110.kubeproto.field) = { go_name: "JSONPath", api_field_name: "jsonPath", inline: false }];
 }
 
 message ServiceReference {
@@ -493,6 +515,15 @@ message ValidationRule {
   //   - 'map': `X + Y` performs a merge where the array positions of all keys in `X` are preserved but the values
   //     are overwritten by values in `Y` when the key sets of `X` and `Y` intersect. Elements in `Y` with
   //     non-intersecting keys are appended, retaining their partial order.
+  // If `rule` makes use of the `oldSelf` variable it is implicitly a
+  // `transition rule`.
+  // By default, the `oldSelf` variable is the same type as `self`.
+  // When `optionalOldSelf` is true, the `oldSelf` variable is a CEL optional
+  //  variable whose value() is the same type as `self`.
+  // See the documentation for the `optionalOldSelf` field for details.
+  // Transition rules by default are applied only on UPDATE requests and are
+  // skipped if an old value could not be found. You can opt a transition
+  // rule into unconditional evaluation by setting `optionalOldSelf` to true.
   string rule = 1 [(dev.f110.kubeproto.field) = { go_name: "Rule", api_field_name: "rule", inline: false }];
   // Message represents the message displayed when validation fails. The message is required if the Rule contains
   // line breaks. The message must not contain line breaks.
@@ -510,6 +541,33 @@ message ValidationRule {
   // Example:
   // "x must be less than max ("+string(self.max)+")"
   optional string message_expression = 3 [(dev.f110.kubeproto.field) = { go_name: "MessageExpression", api_field_name: "messageExpression", inline: false }];
+  // reason provides a machine-readable validation failure reason that is returned to the caller when a request fails this validation rule.
+  // The HTTP status code returned to the caller will match the reason of the reason of the first failed validation rule.
+  // The currently supported reasons are: "FieldValueInvalid", "FieldValueForbidden", "FieldValueRequired", "FieldValueDuplicate".
+  // If not set, default to use "FieldValueInvalid".
+  // All future added reasons must be accepted by clients when reading this value and unknown reasons should be treated as FieldValueInvalid.
+  optional FieldValueErrorReason reason = 4 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
+  // fieldPath represents the field path returned when the validation fails.
+  // It must be a relative JSON path (i.e. with array notation) scoped to the location of this x-kubernetes-validations extension in the schema and refer to an existing field.
+  // e.g. when validation checks if a specific attribute `foo` under a map `testMap`, the fieldPath could be set to `.testMap.foo`
+  // If the validation checks two lists must have unique attributes, the fieldPath could be set to either of the list: e.g. `.testList`
+  // It does not support list numeric index.
+  // It supports child operation to refer to an existing field currently. Refer to [JSONPath support in Kubernetes](https://kubernetes.io/docs/reference/kubectl/jsonpath/) for more info.
+  // Numeric index of array is not supported.
+  // For field name which contains special characters, use `['specialName']` to refer the field name.
+  // e.g. for attribute `foo.34$` appears in a list `testList`, the fieldPath could be set to `.testList['foo.34$']`
+  optional string field_path = 5 [(dev.f110.kubeproto.field) = { go_name: "FieldPath", api_field_name: "fieldPath", inline: false }];
+  // optionalOldSelf is used to opt a transition rule into evaluation
+  // even when the object is first created, or if the old object is
+  // missing the value.
+  // When enabled `oldSelf` will be a CEL optional whose value will be
+  // `None` if there is no old value, or when the object is initially created.
+  // You may check for presence of oldSelf using `oldSelf.hasValue()` and
+  // unwrap it after checking using `oldSelf.value()`. Check the CEL
+  // documentation for Optional types for more information:
+  // https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes
+  // May not be set unless `oldSelf` is used in `rule`.
+  optional bool optional_old_self = 6 [(dev.f110.kubeproto.field) = { go_name: "OptionalOldSelf", api_field_name: "optionalOldSelf", inline: false }];
 }
 
 message ValidationRules {
