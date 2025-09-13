@@ -1,8 +1,6 @@
 module go.f110.dev/kubeproto
 
-go 1.23.0
-
-toolchain go1.23.4
+go 1.24.7
 
 require (
 	github.com/gertd/go-pluralize v0.2.0
