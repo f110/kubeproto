@@ -18,6 +18,8 @@ proto_library(
         ":kubeproto",
         "//k8s.io/api/apps/v1:appsv1_proto",
         "//k8s.io/api/core/v1:corev1_proto",
+        "//k8s.io/apimachinery:apimachinery_proto",
+        "//k8s.io/apimachinery/pkg/apis/meta/v1:metav1_proto",
     ],
 )
 
@@ -28,6 +30,7 @@ proto_library(
     deps = [
         ":k8s_proto",
         ":kubeproto",
+        "//k8s.io/apimachinery/pkg/apis/meta/v1:metav1_proto",
     ],
 )
 
