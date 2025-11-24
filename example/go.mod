@@ -1,6 +1,6 @@
 module go.f110.dev/kubeproto/example
 
-go 1.20
+go 1.25.4
 
 require (
 	github.com/cert-manager/cert-manager v1.9.0-beta.1.0.20220924143035-9a328bd798b2
