@@ -1,5 +1,17 @@
-load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
 load("//bazel:def.bzl", "kubeproto_go_api")
+load("//bazel:protobuf.bzl", "gen_protobuf")
+
+gen_protobuf(
+    name = "gen",
+    srcs = ["//vendor/k8s.io/api/discovery/v1:discovery"],
+    proto_package_name = "k8s.io.api.discovery.v1",
+    importpath = "k8s.io/api/discovery/v1",
+    api_domain = "discovery.k8s.io",
+    api_version = "v1",
+    kubeproto_importpath = "go.f110.dev/kubeproto/go/apis/discoveryv1",
+    all = True,
+)
 
 proto_library(
     name = "discoveryv1_proto",

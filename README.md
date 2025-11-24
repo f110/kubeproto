@@ -38,7 +38,7 @@ message Blog {
 BUILD at pkg/apis/GROUP_AND_VERSION for generating deepcopy and register
 
 ```
-load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
 load("//bazel:def.bzl", "kubeproto_go_api")
 
 proto_library(

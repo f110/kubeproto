@@ -1,6 +1,6 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_go//go:def.bzl", "GoLibrary", "go_context")
-load("@rules_proto//proto:defs.bzl", "ProtoInfo")
+load("@protobuf//bazel/common:proto_info.bzl", "ProtoInfo")
 
 def _crd_proto_manifest(ctx):
     args = ctx.actions.args()

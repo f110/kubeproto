@@ -1,5 +1,17 @@
-load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
 load("//bazel:def.bzl", "kubeproto_go_api")
+load("//bazel:protobuf.bzl", "gen_protobuf")
+
+gen_protobuf(
+    name = "gen",
+    srcs = ["//vendor/k8s.io/api/apps/v1:apps"],
+    proto_package_name = "k8s.io.api.apps.v1",
+    importpath = "k8s.io/api/apps/v1",
+    api_domain = "apps",
+    api_version = "v1",
+    kubeproto_importpath = "go.f110.dev/kubeproto/go/apis/appsv1",
+    all = True,
+)
 
 proto_library(
     name = "appsv1_proto",
@@ -8,7 +20,8 @@ proto_library(
     deps = [
         "//:kubeproto",
         "//k8s.io/api/core/v1:corev1_proto",
-        "//k8s.io/apimachinery:apimachinery_proto",
+        "//k8s.io/apimachinery/pkg/runtime:runtime_proto",
+        "//k8s.io/apimachinery/pkg/util/intstr:intstr_proto",
         "//k8s.io/apimachinery/pkg/apis/meta/v1:metav1_proto",
     ],
 )
