@@ -1,0 +1,22 @@
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
+load("//bazel:protobuf.bzl", "gen_protobuf")
+
+gen_protobuf(
+    name = "gen",
+    srcs = ["//vendor/sigs.k8s.io/gateway-api/apis/v1alpha2"],
+    proto_package_name = "sigs.k8s.io.gateway_api.apis.v1alpha2",
+    importpath = "sigs.k8s.io/gateway-api/apis/v1alpha2",
+    api_domain = "gateway",
+    api_sub_group = "networking.k8s.io",
+    api_version = "v1alpha2",
+    all = True,
+)
+
+proto_library(
+    name = "resource_proto",
+    srcs = ["generated.proto"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:kubeproto",
+    ],
+)

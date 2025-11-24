@@ -115,128 +115,153 @@ go/k8stestingclient/go_testingclient.generated.testingclient.go: k8s.io/api/core
 
 .PHONY: k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto
 k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(shell pwd)/$@ --proto-package k8s.io.apimachinery.pkg.apis.meta.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/metav1" --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: k8s.io/apimachinery/pkg/api/resource/generated.proto
 k8s.io/apimachinery/pkg/api/resource/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.apimachinery.pkg.api.resource --go-package $(@D) --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: k8s.io/apimachinery/pkg/util/intstr/generated.proto
 k8s.io/apimachinery/pkg/util/intstr/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.apimachinery.pkg.util.intstr --go-package $(@D) --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: k8s.io/apimachinery/pkg/runtime/generated.proto
 k8s.io/apimachinery/pkg/runtime/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(shell pwd)/$@ --proto-package k8s.io.apimachinery.pkg.runtime --go-package $(@D) $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: k8s.io/api/core/v1/generated.proto
 k8s.io/api/core/v1/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.core.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/corev1" --api-version v1 --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: k8s.io/api/apps/v1/generated.proto
 k8s.io/api/apps/v1/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.apps.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/appsv1" --api-domain apps --api-version v1 --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: k8s.io/api/batch/v1/generated.proto
 k8s.io/api/batch/v1/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.batch.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/batchv1" --api-domain batch --api-version v1 --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: k8s.io/api/authentication/v1/generated.proto
 k8s.io/api/authentication/v1/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.authentication.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/authenticationv1" --api-domain authentication.k8s.io --api-version v1 --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: k8s.io/api/admission/v1/generated.proto
 k8s.io/api/admission/v1/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.admission.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/admissionv1" --api-domain admission.k8s.io --api-version v1 --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: k8s.io/api/policy/v1/generated.proto
 k8s.io/api/policy/v1/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.policy.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/policyv1" --api-domain policy --api-version v1 --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: k8s.io/api/networking/v1/generated.proto
 k8s.io/api/networking/v1/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.networking.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/networkingv1" --api-domain networking.k8s.io --api-version v1 --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: k8s.io/api/rbac/v1/generated.proto
 k8s.io/api/rbac/v1/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.rbac.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/rbacv1" --api-domain rbac.authorization.k8s.io --api-version v1 --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: k8s.io/api/admissionregistration/v1/generated.proto
 k8s.io/api/admissionregistration/v1/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.admissionregistration.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/admissionregistrationv1" --api-domain admissionregistration.k8s.io --api-version v1 --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: k8s.io/api/certificates/v1/generated.proto
 k8s.io/api/certificates/v1/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.certificates.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/certificatesv1" --api-domain certificates.k8s.io --api-version v1 --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: k8s.io/api/authorization/v1/generated.proto
 k8s.io/api/authorization/v1/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.authorization.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/authorizationv1" --api-domain authorization.k8s.io --api-version v1 --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: k8s.io/api/discovery/v1/generated.proto
 k8s.io/api/discovery/v1/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.discovery.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/discoveryv1" --api-domain discovery.k8s.io --api-version v1 --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: k8s.io/api/autoscaling/v1/generated.proto
 k8s.io/api/autoscaling/v1/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.autoscaling.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/autoscalingv1" --api-domain autoscaling --api-version v1 --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: k8s.io/api/autoscaling/v2/generated.proto
 k8s.io/api/autoscaling/v2/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.autoscaling.v2 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/autoscalingv2" --api-domain autoscaling --api-version v2 --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: k8s.io/api/coordination/v1/generated.proto
 k8s.io/api/coordination/v1/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.coordination.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/coordinationv1" --api-domain coordination.k8s.io --api-version v1 --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: k8s.io/api/events/v1/generated.proto
 k8s.io/api/events/v1/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.events.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/eventsv1" --api-domain events.k8s.io --api-version v1 --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: k8s.io/api/scheduling/v1/generated.proto
 k8s.io/api/scheduling/v1/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.scheduling.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/schedulingv1" --api-domain scheduling.k8s.io --api-version v1 --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: k8s.io/api/storage/v1/generated.proto
 k8s.io/api/storage/v1/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.storage.v1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/storagev1" --api-domain storage.k8s.io --api-version v1 --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: k8s.io/api/apidiscovery/v2beta1/generated.proto
 k8s.io/api/apidiscovery/v2beta1/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.api.apidiscovery.v2beta1 --go-package $(@D) --kubeproto-package "go.f110.dev/kubeproto/go/apis/apidiscoveryv2beta1" --api-domain apidiscovery.k8s.io --api-version v2beta1 --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto
 k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1 --go-package $(@D) --api-domain apiextensions --api-version v1 --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: sigs.k8s.io/gateway-api/apis/v1alpha2/generated.proto
 sigs.k8s.io/gateway-api/apis/v1alpha2/generated.proto:
+	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
-	$(BAZEL) run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ --proto-package sigs.k8s.io.gateway_api.apis.v1alpha2 --go-package $(@D) --api-domain gateway --api-sub-group networking.k8s.io --api-version v1alpha2 --all $(CURDIR)/vendor/$(@D)
+	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: go/apis/metav1/metav1_kubeproto.generated.object.go
 go/apis/metav1/metav1_kubeproto.generated.object.go: k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto

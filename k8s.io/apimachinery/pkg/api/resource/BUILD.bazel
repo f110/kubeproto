@@ -1,0 +1,19 @@
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
+load("//bazel:protobuf.bzl", "gen_protobuf")
+
+gen_protobuf(
+    name = "gen",
+    srcs = ["//vendor/k8s.io/apimachinery/pkg/api/resource"],
+    proto_package_name = "k8s.io.apimachinery.pkg.api.resource",
+    importpath = "k8s.io/apimachinery/pkg/api/resource",
+    all = True,
+)
+
+proto_library(
+    name = "resource_proto",
+    srcs = ["generated.proto"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:kubeproto",
+    ],
+)
