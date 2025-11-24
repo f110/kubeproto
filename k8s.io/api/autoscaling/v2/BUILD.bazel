@@ -4,13 +4,13 @@ load("//bazel:protobuf.bzl", "gen_protobuf")
 
 gen_protobuf(
     name = "gen",
-    srcs = ["//vendor/k8s.io/api/autoscaling/v2:autoscaling"],
-    proto_package_name = "k8s.io.api.autoscaling.v2",
-    importpath = "k8s.io/api/autoscaling/v2",
+    srcs = ["@io_k8s_api//autoscaling/v2:autoscaling"],
+    all = True,
     api_domain = "autoscaling",
     api_version = "v2",
+    importpath = "k8s.io/api/autoscaling/v2",
     kubeproto_importpath = "go.f110.dev/kubeproto/go/apis/autoscalingv2",
-    all = True,
+    proto_package_name = "k8s.io.api.autoscaling.v2",
 )
 
 proto_library(

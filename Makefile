@@ -4,7 +4,7 @@ GO ?= $(BAZEL) run @rules_go//go --
 .PHONY: deps
 deps:
 	$(GO) mod tidy
-	$(GO) mod vendor
+	$(BAZEL) mod tidy
 	$(BAZEL) run //:gazelle
 
 kube.pb.go: kube.proto

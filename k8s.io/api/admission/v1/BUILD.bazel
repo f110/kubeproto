@@ -4,13 +4,13 @@ load("//bazel:protobuf.bzl", "gen_protobuf")
 
 gen_protobuf(
     name = "gen",
-    srcs = ["//vendor/k8s.io/api/admission/v1:admission"],
-    proto_package_name = "k8s.io.api.admission.v1",
-    importpath = "k8s.io/api/admission/v1",
+    srcs = ["@io_k8s_api//admission/v1:admission"],
+    all = True,
     api_domain = "admission.k8s.io",
     api_version = "v1",
+    importpath = "k8s.io/api/admission/v1",
     kubeproto_importpath = "go.f110.dev/kubeproto/go/apis/admissionv1",
-    all = True,
+    proto_package_name = "k8s.io.api.admission.v1",
 )
 
 proto_library(

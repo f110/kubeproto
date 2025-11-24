@@ -4,11 +4,11 @@ load("//bazel:protobuf.bzl", "gen_protobuf")
 
 gen_protobuf(
     name = "gen",
-    srcs = ["//vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta"],
-    proto_package_name = "k8s.io.apimachinery.pkg.apis.meta.v1",
+    srcs = ["@io_k8s_apimachinery//pkg/apis/meta/v1:meta"],
+    all = True,
     importpath = "k8s.io/apimachinery/pkg/apis/meta/v1",
     kubeproto_importpath = "go.f110.dev/kubeproto/go/apis/metav1",
-    all = True,
+    proto_package_name = "k8s.io.apimachinery.pkg.apis.meta.v1",
 )
 
 proto_library(

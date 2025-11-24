@@ -4,13 +4,13 @@ load("//bazel:protobuf.bzl", "gen_protobuf")
 
 gen_protobuf(
     name = "gen",
-    srcs = ["//vendor/k8s.io/api/coordination/v1:coordination"],
-    proto_package_name = "k8s.io.api.coordination.v1",
-    importpath = "k8s.io/api/coordination/v1",
+    srcs = ["@io_k8s_api//coordination/v1:coordination"],
+    all = True,
     api_domain = "coordination.k8s.io",
     api_version = "v1",
+    importpath = "k8s.io/api/coordination/v1",
     kubeproto_importpath = "go.f110.dev/kubeproto/go/apis/coordinationv1",
-    all = True,
+    proto_package_name = "k8s.io.api.coordination.v1",
 )
 
 proto_library(

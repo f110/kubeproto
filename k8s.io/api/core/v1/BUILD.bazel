@@ -4,12 +4,12 @@ load("//bazel:protobuf.bzl", "gen_protobuf")
 
 gen_protobuf(
     name = "gen",
-    srcs = ["//vendor/k8s.io/api/core/v1:core"],
-    proto_package_name = "k8s.io.api.core.v1",
-    importpath = "k8s.io/api/core/v1",
-    api_version = "v1",
-    kubeproto_importpath = "go.f110.dev/kubeproto/go/apis/corev1",
+    srcs = ["@io_k8s_api//core/v1:core"],
     all = True,
+    api_version = "v1",
+    importpath = "k8s.io/api/core/v1",
+    kubeproto_importpath = "go.f110.dev/kubeproto/go/apis/corev1",
+    proto_package_name = "k8s.io.api.core.v1",
 )
 
 proto_library(
@@ -18,8 +18,8 @@ proto_library(
     visibility = ["//visibility:public"],
     deps = [
         "//:kubeproto",
-        "//k8s.io/apimachinery/pkg/apis/meta/v1:metav1_proto",
         "//k8s.io/apimachinery/pkg/api/resource:resource_proto",
+        "//k8s.io/apimachinery/pkg/apis/meta/v1:metav1_proto",
         "//k8s.io/apimachinery/pkg/util/intstr:intstr_proto",
     ],
 )

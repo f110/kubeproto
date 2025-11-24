@@ -7,7 +7,7 @@ go_library(
     visibility = ["//visibility:private"],
     deps = [
         "//internal/goparser",
-        "//vendor/github.com/spf13/pflag",
+        "@com_github_spf13_pflag//:pflag",
     ],
 )
 

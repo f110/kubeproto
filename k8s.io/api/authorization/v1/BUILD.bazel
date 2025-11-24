@@ -4,13 +4,13 @@ load("//bazel:protobuf.bzl", "gen_protobuf")
 
 gen_protobuf(
     name = "gen",
-    srcs = ["//vendor/k8s.io/api/authorization/v1:authorization"],
-    proto_package_name = "k8s.io.api.authorization.v1",
-    importpath = "k8s.io/api/authorization/v1",
+    srcs = ["@io_k8s_api//authorization/v1:authorization"],
+    all = True,
     api_domain = "authorization.k8s.io",
     api_version = "v1",
+    importpath = "k8s.io/api/authorization/v1",
     kubeproto_importpath = "go.f110.dev/kubeproto/go/apis/authorizationv1",
-    all = True,
+    proto_package_name = "k8s.io.api.authorization.v1",
 )
 
 proto_library(
