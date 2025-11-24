@@ -3,13 +3,13 @@ load("//bazel:protobuf.bzl", "gen_protobuf")
 
 gen_protobuf(
     name = "gen",
-    srcs = ["//vendor/sigs.k8s.io/gateway-api/apis/v1alpha2"],
-    proto_package_name = "sigs.k8s.io.gateway_api.apis.v1alpha2",
-    importpath = "sigs.k8s.io/gateway-api/apis/v1alpha2",
+    srcs = ["@io_k8s_sigs_gateway_api//apis/v1alpha2"],
+    all = True,
     api_domain = "gateway",
     api_sub_group = "networking.k8s.io",
     api_version = "v1alpha2",
-    all = True,
+    importpath = "sigs.k8s.io/gateway-api/apis/v1alpha2",
+    proto_package_name = "sigs.k8s.io.gateway_api.apis.v1alpha2",
 )
 
 proto_library(

@@ -13,10 +13,10 @@ go_library(
     deps = [
         "//:kubeproto_lib",
         "//internal/stringsutil",
-        "//vendor/google.golang.org/protobuf/proto",
-        "//vendor/google.golang.org/protobuf/reflect/protoreflect",
-        "//vendor/google.golang.org/protobuf/reflect/protoregistry",
-        "//vendor/google.golang.org/protobuf/types/descriptorpb",
+        "@org_golang_google_protobuf//proto",
+        "@org_golang_google_protobuf//reflect/protoreflect",
+        "@org_golang_google_protobuf//reflect/protoregistry",
+        "@org_golang_google_protobuf//types/descriptorpb",
     ],
 )
 
@@ -25,8 +25,8 @@ go_test(
     srcs = ["enum_test.go"],
     embed = [":definition"],
     deps = [
-        "//vendor/github.com/stretchr/testify/assert",
-        "//vendor/google.golang.org/protobuf/proto",
-        "//vendor/google.golang.org/protobuf/types/descriptorpb",
+        "@com_github_stretchr_testify//assert",
+        "@org_golang_google_protobuf//proto",
+        "@org_golang_google_protobuf//types/descriptorpb",
     ],
 )

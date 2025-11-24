@@ -4,13 +4,13 @@ load("//bazel:protobuf.bzl", "gen_protobuf")
 
 gen_protobuf(
     name = "gen",
-    srcs = ["//vendor/k8s.io/api/apidiscovery/v2beta1:v2beta1"],
-    proto_package_name = "k8s.io.api.apidiscovery.v2beta1",
-    importpath = "k8s.io/api/apidiscovery/v2beta1",
+    srcs = ["@io_k8s_api//apidiscovery/v2beta1"],
+    all = True,
     api_domain = "apidiscovery.k8s.io",
     api_version = "v2beta1",
+    importpath = "k8s.io/api/apidiscovery/v2beta1",
     kubeproto_importpath = "go.f110.dev/kubeproto/go/apis/apidiscoveryv2beta1",
-    all = True,
+    proto_package_name = "k8s.io.api.apidiscovery.v2beta1",
 )
 
 proto_library(

@@ -8,7 +8,7 @@ go_library(
     deps = [
         "//go/apis/corev1",
         "//go/apis/metav1",
-        "//vendor/k8s.io/apimachinery/pkg/runtime",
-        "//vendor/k8s.io/apimachinery/pkg/runtime/schema",
+        "@io_k8s_apimachinery//pkg/runtime",
+        "@io_k8s_apimachinery//pkg/runtime/schema",
     ],
 )

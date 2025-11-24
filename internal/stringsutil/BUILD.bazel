@@ -5,12 +5,12 @@ go_library(
     srcs = ["strings.go"],
     importpath = "go.f110.dev/kubeproto/internal/stringsutil",
     visibility = ["//:__subpackages__"],
-    deps = ["//vendor/github.com/gertd/go-pluralize"],
+    deps = ["@com_github_gertd_go_pluralize//:go-pluralize"],
 )
 
 go_test(
     name = "stringsutil_test",
     srcs = ["strings_test.go"],
     embed = [":stringsutil"],
-    deps = ["//vendor/github.com/stretchr/testify/assert"],
+    deps = ["@com_github_stretchr_testify//assert"],
 )

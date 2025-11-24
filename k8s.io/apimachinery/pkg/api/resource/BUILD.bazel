@@ -3,10 +3,10 @@ load("//bazel:protobuf.bzl", "gen_protobuf")
 
 gen_protobuf(
     name = "gen",
-    srcs = ["//vendor/k8s.io/apimachinery/pkg/api/resource"],
-    proto_package_name = "k8s.io.apimachinery.pkg.api.resource",
-    importpath = "k8s.io/apimachinery/pkg/api/resource",
+    srcs = ["@io_k8s_apimachinery//pkg/api/resource"],
     all = True,
+    importpath = "k8s.io/apimachinery/pkg/api/resource",
+    proto_package_name = "k8s.io.apimachinery.pkg.api.resource",
 )
 
 proto_library(
