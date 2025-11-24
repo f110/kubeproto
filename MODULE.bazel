@@ -4,4 +4,4 @@ bazel_dep(name = "protobuf", version = "32.1")
 
 go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk")
 
-go_sdk.download(version = "1.24.7")
+go_sdk.from_file(go_mod = "//:go.mod")
