@@ -1,7 +1,9 @@
 load("@rules_go//go:def.bzl", "GoInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-def _gen_protobuf(ctx):
+KubeProtoLibrary = provider()
+
+def _gen_protobuf_impl(ctx):
     import_path = ""
     srcs = []
     dir = ""
@@ -23,6 +25,10 @@ def _gen_protobuf(ctx):
         args.add("--api-sub-group=%s" % ctx.attr.api_sub_group)
     if ctx.attr.api_version:
         args.add("--api-version=%s" % ctx.attr.api_version)
+    if ctx.attr.deps:
+        for d in ctx.attr.deps:
+            dep = d[KubeProtoLibrary]
+            args.add("--imports=%s:%s:%s" % (dep.go_package, dep.proto_package, dep.file_import_path))
     if ctx.attr.kubeproto_importpath:
         args.add("--kubeproto-package=%s" % ctx.attr.kubeproto_importpath)
     if ctx.attr.all:
@@ -41,11 +47,16 @@ def _gen_protobuf(ctx):
     return [
         DefaultInfo(
             files = depset([out]),
+        ),
+        KubeProtoLibrary(
+            proto_package = ctx.attr.proto_package_name,
+            go_package = ctx.attr.importpath,
+            file_import_path = ctx.attr.dir,
         )
     ]
 
-gen_protobuf = rule(
-    implementation = _gen_protobuf,
+_gen_protobuf = rule(
+    implementation = _gen_protobuf_impl,
     attrs = {
         "srcs": attr.label_list(providers = [GoInfo]),
         "proto_package_name": attr.string(),
@@ -53,8 +64,10 @@ gen_protobuf = rule(
         "api_domain": attr.string(),
         "api_sub_group": attr.string(),
         "api_version": attr.string(),
-        "kubeproto_importpath": attr.string(),
+        "dir": attr.string(),
         "all": attr.bool(default = False),
+        "deps": attr.label_list(providers = [KubeProtoLibrary]),
+        "kubeproto_importpath": attr.string(),
         "_cmd": attr.label(
             executable = True,
             cfg = "host",
@@ -62,3 +75,10 @@ gen_protobuf = rule(
         )
     }
 )
+
+def gen_protobuf(name, **kwargs):
+    if not "dir" in kwargs:
+        dir = native.package_name()
+        kwargs["dir"] = dir
+
+    _gen_protobuf(name = name, **kwargs)
