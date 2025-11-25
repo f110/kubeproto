@@ -13,10 +13,11 @@ gen_protobuf(
 )
 
 proto_library(
-    name = "resource_proto",
+    name = "v1alpha2_proto",
     srcs = ["generated.proto"],
     visibility = ["//visibility:public"],
     deps = [
         "//:kubeproto",
+        "//k8s.io/apimachinery/pkg/apis/meta/v1:metav1_proto"
     ],
 )
