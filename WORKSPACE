@@ -1,1 +1,1 @@
-workspace(name = "go_f110_dev_kubeproto")
+workspace(name = "dev_f110_kubeproto")
