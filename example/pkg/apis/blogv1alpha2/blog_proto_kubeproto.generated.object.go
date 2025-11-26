@@ -342,6 +342,7 @@ func (in *BlogStatus) DeepCopy() *BlogStatus {
 type PostSpec struct {
 	Subject string   `json:"subject"`
 	Authors []string `json:"authors"`
+	Count   uint64   `json:"count,omitempty"`
 }
 
 func (in *PostSpec) DeepCopyInto(out *PostSpec) {
