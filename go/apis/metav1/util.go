@@ -141,6 +141,10 @@ func (in *Time) Unix() int64 {
 	return in.Time().Unix()
 }
 
+func (in *Duration) TimeDuration() time.Duration {
+	return time.Duration(in.Duration)
+}
+
 type Object interface {
 	GetObjectMeta() *ObjectMeta
 }
