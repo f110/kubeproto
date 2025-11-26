@@ -1,9 +1,23 @@
+BAZEL ?= bazel
+
 .PHONY: build
 build: pkg/apis/blogv1alpha1/blog_proto_kubeproto.generated.object.go \
 		pkg/apis/blogv1alpha2/blog_proto_kubeproto.generated.object.go \
 		pkg/client/k8s.generated.client.go \
 		pkg/client/testingclient/k8s.generated.testingclient.go \
 		crd/blog.crd.yaml
+
+.PHONY: build-thirdparty
+build-thirdparty: proto/github.com/cert-manager/cert-manager/apis/metav1/generated.proto \
+		proto/github.com/cert-manager/cert-manager/apis/acmev1/generated.proto \
+		proto/github.com/cert-manager/cert-manager/apis/certmanagerv1/generated.proto \
+		proto/github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoringv1/generated.proto \
+		proto/github.com/cert-manager/cert-manager/apis/metav1/metav1_kubeproto.generated.object.go \
+		proto/github.com/cert-manager/cert-manager/apis/acmev1/acmev1_kubeproto.generated.object.go \
+		proto/github.com/cert-manager/cert-manager/apis/certmanagerv1/certmanagerv1_kubeproto.generated.object.go \
+		proto/github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoringv1/monitoringv1_kubeproto.generated.object.go \
+		pkg/thirdpartyclient/thirdpartyclient.generated.client.go \
+		pkg/thirdpartyclient/testingthirdpartyclient/testingthirdpartyclient.generated.testingclient.go
 
 .PHONY: pkg/apis/blogv1alpha1/blog_proto_kubeproto.generated.object.go
 pkg/apis/blogv1alpha1/blog_proto_kubeproto.generated.object.go:
@@ -56,53 +70,59 @@ pkg/thirdpartyclient/testingthirdpartyclient/testingthirdpartyclient.generated.t
 
 .PHONY: proto/github.com/cert-manager/cert-manager/apis/certmanagerv1/generated.proto
 proto/github.com/cert-manager/cert-manager/apis/certmanagerv1/generated.proto:
+	$(BAZEL) build //example/$(@D):gen
 	mkdir -p $(@D)
-	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ \
-		--proto-package github.com.cert_manager.cert_manager.apis.certmanagerv1 \
-		--go-package github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1 \
-		--api-sub-group cert-manager.io \
-		--api-version v1 \
-		--imports github.com/cert-manager/cert-manager/pkg/apis/meta/v1:github.com.cert_manager.cert_manager.apis.metav1:github.com/cert-manager/cert-manager/apis/metav1 \
-		--imports github.com/cert-manager/cert-manager/pkg/apis/acme/v1:github.com.cert_manager.cert_manager.apis.acmev1:github.com/cert-manager/cert-manager/apis/acmev1 \
-		--import-prefix example/proto \
-		--all \
-		$(CURDIR)/vendor/github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1
+	cp ../bazel-bin/example/$@ $(@D)
+	@chmod 644 $@
 
 .PHONY: proto/github.com/cert-manager/cert-manager/apis/metav1/generated.proto
 proto/github.com/cert-manager/cert-manager/apis/metav1/generated.proto:
+	$(BAZEL) build //example/$(@D):gen
 	mkdir -p $(@D)
-	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ \
-		--proto-package github.com.cert_manager.cert_manager.apis.metav1 \
-		--go-package github.com/cert-manager/cert-manager/pkg/apis/meta/v1 \
-		--api-sub-group cert-manager.io \
-		--api-version v1 \
-		--all \
-		$(CURDIR)/vendor/github.com/cert-manager/cert-manager/pkg/apis/meta/v1
+	cp ../bazel-bin/example/$@ $(@D)
+	@chmod 644 $@
 
 .PHONY: proto/github.com/cert-manager/cert-manager/apis/acmev1/generated.proto
 proto/github.com/cert-manager/cert-manager/apis/acmev1/generated.proto:
+	$(BAZEL) build //example/$(@D):gen
 	mkdir -p $(@D)
-	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ \
-		--proto-package github.com.cert_manager.cert_manager.apis.acmev1 \
-		--go-package github.com/cert-manager/cert-manager/pkg/apis/acme/v1 \
-		--api-sub-group cert-manager.io \
-		--api-version v1 \
-		--imports github.com/cert-manager/cert-manager/pkg/apis/meta/v1:github.com.cert_manager.cert_manager.apis.metav1:github.com/cert-manager/cert-manager/apis/metav1 \
-		--import-prefix example/proto \
-		--all \
-		$(CURDIR)/vendor/github.com/cert-manager/cert-manager/pkg/apis/acme/v1
+	cp ../bazel-bin/example/$@ $(@D)
+	@chmod 644 $@
 
 .PHONY: proto/github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoringv1/generated.proto
 proto/github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoringv1/generated.proto:
+	$(BAZEL) build //example/$(@D):gen
 	mkdir -p $(@D)
-	bazel run //cmd/gen-go-to-protobuf -- --out $(CURDIR)/$@ \
-		--proto-package github.com.prometheus_operator.prometheus_operator.apis.monitoringv1 \
-		--go-package github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1 \
-		--api-sub-group coreos.com \
-		--api-domain monitor \
-		--api-version v1 \
-		--all \
-		$(CURDIR)/vendor/github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1
+	cp ../bazel-bin/example/$@ $(@D)
+	@chmod 644 $@
+
+.PHONY: proto/github.com/cert-manager/cert-manager/apis/acmev1/acmev1_kubeproto.generated.object.go
+proto/github.com/cert-manager/cert-manager/apis/acmev1/acmev1_kubeproto.generated.object.go:
+	$(BAZEL) build //example/$(@D):acmev1_kubeproto
+	mkdir -p $(@D)
+	cp ../bazel-bin/example/$@ $(@D)
+	@chmod 644 $@
+
+.PHONY: proto/github.com/cert-manager/cert-manager/apis/certmanagerv1/certmanagerv1_kubeproto.generated.object.go
+proto/github.com/cert-manager/cert-manager/apis/certmanagerv1/certmanagerv1_kubeproto.generated.object.go:
+	$(BAZEL) build //example/$(@D):certmanagerv1_kubeproto
+	mkdir -p $(@D)
+	cp ../bazel-bin/example/$@ $(@D)
+	@chmod 644 $@
+
+.PHONY: proto/github.com/cert-manager/cert-manager/apis/metav1/metav1_kubeproto.generated.object.go
+proto/github.com/cert-manager/cert-manager/apis/metav1/metav1_kubeproto.generated.object.go:
+	$(BAZEL) build //example/$(@D):metav1_kubeproto
+	mkdir -p $(@D)
+	cp ../bazel-bin/example/$@ $(@D)
+	@chmod 644 $@
+
+.PHONY: proto/github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoringv1/monitoringv1_kubeproto.generated.object.go
+proto/github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoringv1/monitoringv1_kubeproto.generated.object.go:
+	$(BAZEL) build //example/$(@D):monitoringv1_kubeproto
+	mkdir -p $(@D)
+	cp ../bazel-bin/example/$@ $(@D)
+	@chmod 644 $@
 
 .PHONY: clean
 clean:
@@ -110,3 +130,13 @@ clean:
 	rm -f pkg/apis/githubv1alpha2/github_proto_kubeproto.generated.object.go
 	rm -f pkg/apis/miniov1alpha1/minio_proto_kubeproto.generated.object.go
 	rm -f crd/github.crd.yaml
+	rm -f proto/github.com/cert-manager/cert-manager/apis/metav1/generated.proto
+	rm -f proto/github.com/cert-manager/cert-manager/apis/acmev1/generated.proto
+	rm -f proto/github.com/cert-manager/cert-manager/apis/certmanagerv1/generated.proto
+	rm -f proto/github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoringv1/generated.proto
+	rm -f proto/github.com/cert-manager/cert-manager/apis/metav1/metav1_kubeproto.generated.object.go
+	rm -f proto/github.com/cert-manager/cert-manager/apis/acmev1/acmev1_kubeproto.generated.object.go
+	rm -f proto/github.com/cert-manager/cert-manager/apis/certmanagerv1/certmanagerv1_kubeproto.generated.object.go
+	rm -f proto/github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoringv1/monitoringv1_kubeproto.generated.object.go
+	rm -f pkg/thirdpartyclient/thirdpartyclient.generated.client.go
+	rm -f pkg/thirdpartyclient/testingthirdpartyclient/testingthirdpartyclient.generated.testingclient.go
