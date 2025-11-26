@@ -18,6 +18,6 @@ proto_library(
     visibility = ["//visibility:public"],
     deps = [
         "//:kubeproto",
-        "//k8s.io/apimachinery/pkg/apis/meta/v1:metav1_proto"
+        "//k8s.io/apimachinery/pkg/apis/meta/v1:metav1_proto",
     ],
 )
