@@ -28,7 +28,7 @@ def _gen_protobuf_impl(ctx):
     if ctx.attr.deps:
         for d in ctx.attr.deps:
             dep = d[KubeProtoLibrary]
-            args.add("--imports=%s:%s:%s" % (dep.go_package, dep.proto_package, dep.file_import_path))
+            args.add("--imports=%s:%s:%s" % (dep.origin_go_package, dep.proto_package, dep.file_import_path))
     if ctx.attr.kubeproto_importpath:
         args.add("--kubeproto-package=%s" % ctx.attr.kubeproto_importpath)
     if ctx.attr.all:
@@ -52,6 +52,7 @@ def _gen_protobuf_impl(ctx):
             proto_package = ctx.attr.proto_package_name,
             go_package = ctx.attr.importpath,
             file_import_path = ctx.attr.dir,
+            origin_go_package = import_path,
         )
     ]
 
