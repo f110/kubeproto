@@ -1,7 +1,7 @@
 package admissionregistrationv1
 
 import (
-	metav1 "go.f110.dev/kubeproto/go/apis/metav1"
+	"go.f110.dev/kubeproto/go/apis/metav1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
@@ -19,6 +19,10 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemaGroupVersion,
 		&MutatingWebhookConfiguration{},
 		&MutatingWebhookConfigurationList{},
+		&ValidatingAdmissionPolicy{},
+		&ValidatingAdmissionPolicyBinding{},
+		&ValidatingAdmissionPolicyBindingList{},
+		&ValidatingAdmissionPolicyList{},
 		&ValidatingWebhookConfiguration{},
 		&ValidatingWebhookConfigurationList{},
 	)
@@ -50,6 +54,13 @@ const (
 	OperationTypeCONNECT  OperationType = "CONNECT"
 )
 
+type ParameterNotFoundActionType string
+
+const (
+	ParameterNotFoundActionTypeAllow ParameterNotFoundActionType = "Allow"
+	ParameterNotFoundActionTypeDeny  ParameterNotFoundActionType = "Deny"
+)
+
 type ReinvocationPolicyType string
 
 const (
@@ -72,6 +83,14 @@ const (
 	SideEffectClassNone         SideEffectClass = "None"
 	SideEffectClassSome         SideEffectClass = "Some"
 	SideEffectClassNoneOnDryRun SideEffectClass = "NoneOnDryRun"
+)
+
+type ValidationAction string
+
+const (
+	ValidationActionDeny  ValidationAction = "Deny"
+	ValidationActionWarn  ValidationAction = "Warn"
+	ValidationActionAudit ValidationAction = "Audit"
 )
 
 type MutatingWebhookConfiguration struct {
@@ -139,6 +158,154 @@ func (in *MutatingWebhookConfigurationList) DeepCopy() *MutatingWebhookConfigura
 }
 
 func (in *MutatingWebhookConfigurationList) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	}
+	return nil
+}
+
+type ValidatingAdmissionPolicy struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata"`
+	// Specification of the desired behavior of the ValidatingAdmissionPolicy.
+	Spec *ValidatingAdmissionPolicySpec `json:"spec,omitempty"`
+	// The status of the ValidatingAdmissionPolicy, including warnings that are useful to determine if the policy
+	// behaves in the expected way.
+	// Populated by the system.
+	// Read-only.
+	Status *ValidatingAdmissionPolicyStatus `json:"status,omitempty"`
+}
+
+func (in *ValidatingAdmissionPolicy) DeepCopyInto(out *ValidatingAdmissionPolicy) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
+	if in.Spec != nil {
+		in, out := &in.Spec, &out.Spec
+		*out = new(ValidatingAdmissionPolicySpec)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.Status != nil {
+		in, out := &in.Status, &out.Status
+		*out = new(ValidatingAdmissionPolicyStatus)
+		(*in).DeepCopyInto(*out)
+	}
+}
+
+func (in *ValidatingAdmissionPolicy) DeepCopy() *ValidatingAdmissionPolicy {
+	if in == nil {
+		return nil
+	}
+	out := new(ValidatingAdmissionPolicy)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *ValidatingAdmissionPolicy) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	}
+	return nil
+}
+
+type ValidatingAdmissionPolicyBinding struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata"`
+	// Specification of the desired behavior of the ValidatingAdmissionPolicyBinding.
+	Spec *ValidatingAdmissionPolicyBindingSpec `json:"spec,omitempty"`
+}
+
+func (in *ValidatingAdmissionPolicyBinding) DeepCopyInto(out *ValidatingAdmissionPolicyBinding) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
+	if in.Spec != nil {
+		in, out := &in.Spec, &out.Spec
+		*out = new(ValidatingAdmissionPolicyBindingSpec)
+		(*in).DeepCopyInto(*out)
+	}
+}
+
+func (in *ValidatingAdmissionPolicyBinding) DeepCopy() *ValidatingAdmissionPolicyBinding {
+	if in == nil {
+		return nil
+	}
+	out := new(ValidatingAdmissionPolicyBinding)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *ValidatingAdmissionPolicyBinding) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	}
+	return nil
+}
+
+type ValidatingAdmissionPolicyBindingList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata"`
+	Items           []ValidatingAdmissionPolicyBinding `json:"items"`
+}
+
+func (in *ValidatingAdmissionPolicyBindingList) DeepCopyInto(out *ValidatingAdmissionPolicyBindingList) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
+	if in.Items != nil {
+		l := make([]ValidatingAdmissionPolicyBinding, len(in.Items))
+		for i := range in.Items {
+			in.Items[i].DeepCopyInto(&l[i])
+		}
+		out.Items = l
+	}
+}
+
+func (in *ValidatingAdmissionPolicyBindingList) DeepCopy() *ValidatingAdmissionPolicyBindingList {
+	if in == nil {
+		return nil
+	}
+	out := new(ValidatingAdmissionPolicyBindingList)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *ValidatingAdmissionPolicyBindingList) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	}
+	return nil
+}
+
+type ValidatingAdmissionPolicyList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata"`
+	Items           []ValidatingAdmissionPolicy `json:"items"`
+}
+
+func (in *ValidatingAdmissionPolicyList) DeepCopyInto(out *ValidatingAdmissionPolicyList) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
+	if in.Items != nil {
+		l := make([]ValidatingAdmissionPolicy, len(in.Items))
+		for i := range in.Items {
+			in.Items[i].DeepCopyInto(&l[i])
+		}
+		out.Items = l
+	}
+}
+
+func (in *ValidatingAdmissionPolicyList) DeepCopy() *ValidatingAdmissionPolicyList {
+	if in == nil {
+		return nil
+	}
+	out := new(ValidatingAdmissionPolicyList)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *ValidatingAdmissionPolicyList) DeepCopyObject() runtime.Object {
 	if c := in.DeepCopy(); c != nil {
 		return c
 	}
@@ -334,6 +501,17 @@ type MutatingWebhook struct {
 	// * to validate an object after all mutations are guaranteed complete, use a validating admission webhook instead.
 	// Defaults to "Never".
 	ReinvocationPolicy ReinvocationPolicyType `json:"reinvocationPolicy,omitempty"`
+	// MatchConditions is a list of conditions that must be met for a request to be sent to this
+	// webhook. Match conditions filter requests that have already been matched by the rules,
+	// namespaceSelector, and objectSelector. An empty list of matchConditions matches all requests.
+	// There are a maximum of 64 match conditions allowed.
+	// The exact matching logic is (in order):
+	// 1. If ANY matchCondition evaluates to FALSE, the webhook is skipped.
+	// 2. If ALL matchConditions evaluate to TRUE, the webhook is called.
+	// 3. If any matchCondition evaluates to an error (but none are FALSE):
+	// - If failurePolicy=Fail, reject the request
+	// - If failurePolicy=Ignore, the error is ignored and the webhook is skipped
+	MatchConditions []MatchCondition `json:"matchConditions"`
 }
 
 func (in *MutatingWebhook) DeepCopyInto(out *MutatingWebhook) {
@@ -361,6 +539,13 @@ func (in *MutatingWebhook) DeepCopyInto(out *MutatingWebhook) {
 		copy(t, in.AdmissionReviewVersions)
 		out.AdmissionReviewVersions = t
 	}
+	if in.MatchConditions != nil {
+		l := make([]MatchCondition, len(in.MatchConditions))
+		for i := range in.MatchConditions {
+			in.MatchConditions[i].DeepCopyInto(&l[i])
+		}
+		out.MatchConditions = l
+	}
 }
 
 func (in *MutatingWebhook) DeepCopy() *MutatingWebhook {
@@ -368,6 +553,222 @@ func (in *MutatingWebhook) DeepCopy() *MutatingWebhook {
 		return nil
 	}
 	out := new(MutatingWebhook)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type ValidatingAdmissionPolicySpec struct {
+	// ParamKind specifies the kind of resources used to parameterize this policy.
+	// If absent, there are no parameters for this policy and the param CEL variable will not be provided to validation expressions.
+	// If ParamKind refers to a non-existent kind, this policy definition is mis-configured and the FailurePolicy is applied.
+	// If paramKind is specified but paramRef is unset in ValidatingAdmissionPolicyBinding, the params variable will be null.
+	ParamKind *ParamKind `json:"paramKind,omitempty"`
+	// MatchConstraints specifies what resources this policy is designed to validate.
+	// The AdmissionPolicy cares about a request if it matches _all_ Constraints.
+	// However, in order to prevent clusters from being put into an unstable state that cannot be recovered from via the API
+	// ValidatingAdmissionPolicy cannot match ValidatingAdmissionPolicy and ValidatingAdmissionPolicyBinding.
+	// Required.
+	MatchConstraints *MatchResources `json:"matchConstraints,omitempty"`
+	// Validations contain CEL expressions which is used to apply the validation.
+	// Validations and AuditAnnotations may not both be empty; a minimum of one Validations or AuditAnnotations is
+	// required.
+	Validations []Validation `json:"validations"`
+	// failurePolicy defines how to handle failures for the admission policy. Failures can
+	// occur from CEL expression parse errors, type check errors, runtime errors and invalid
+	// or mis-configured policy definitions or bindings.
+	// A policy is invalid if spec.paramKind refers to a non-existent Kind.
+	// A binding is invalid if spec.paramRef.name refers to a non-existent resource.
+	// failurePolicy does not define how validations that evaluate to false are handled.
+	// When failurePolicy is set to Fail, ValidatingAdmissionPolicyBinding validationActions
+	// define how failures are enforced.
+	// Allowed values are Ignore or Fail. Defaults to Fail.
+	FailurePolicy FailurePolicyType `json:"failurePolicy,omitempty"`
+	// auditAnnotations contains CEL expressions which are used to produce audit
+	// annotations for the audit event of the API request.
+	// validations and auditAnnotations may not both be empty; a least one of validations or auditAnnotations is
+	// required.
+	AuditAnnotations []AuditAnnotation `json:"auditAnnotations"`
+	// MatchConditions is a list of conditions that must be met for a request to be validated.
+	// Match conditions filter requests that have already been matched by the rules,
+	// namespaceSelector, and objectSelector. An empty list of matchConditions matches all requests.
+	// There are a maximum of 64 match conditions allowed.
+	// If a parameter object is provided, it can be accessed via the `params` handle in the same
+	// manner as validation expressions.
+	// The exact matching logic is (in order):
+	// 1. If ANY matchCondition evaluates to FALSE, the policy is skipped.
+	// 2. If ALL matchConditions evaluate to TRUE, the policy is evaluated.
+	// 3. If any matchCondition evaluates to an error (but none are FALSE):
+	// - If failurePolicy=Fail, reject the request
+	// - If failurePolicy=Ignore, the policy is skipped
+	MatchConditions []MatchCondition `json:"matchConditions"`
+	// Variables contain definitions of variables that can be used in composition of other expressions.
+	// Each variable is defined as a named CEL expression.
+	// The variables defined here will be available under `variables` in other expressions of the policy
+	// except MatchConditions because MatchConditions are evaluated before the rest of the policy.
+	// The expression of a variable can refer to other variables defined earlier in the list but not those after.
+	// Thus, Variables must be sorted by the order of first appearance and acyclic.
+	Variables []Variable `json:"variables"`
+}
+
+func (in *ValidatingAdmissionPolicySpec) DeepCopyInto(out *ValidatingAdmissionPolicySpec) {
+	*out = *in
+	if in.ParamKind != nil {
+		in, out := &in.ParamKind, &out.ParamKind
+		*out = new(ParamKind)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.MatchConstraints != nil {
+		in, out := &in.MatchConstraints, &out.MatchConstraints
+		*out = new(MatchResources)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.Validations != nil {
+		l := make([]Validation, len(in.Validations))
+		for i := range in.Validations {
+			in.Validations[i].DeepCopyInto(&l[i])
+		}
+		out.Validations = l
+	}
+	if in.AuditAnnotations != nil {
+		l := make([]AuditAnnotation, len(in.AuditAnnotations))
+		for i := range in.AuditAnnotations {
+			in.AuditAnnotations[i].DeepCopyInto(&l[i])
+		}
+		out.AuditAnnotations = l
+	}
+	if in.MatchConditions != nil {
+		l := make([]MatchCondition, len(in.MatchConditions))
+		for i := range in.MatchConditions {
+			in.MatchConditions[i].DeepCopyInto(&l[i])
+		}
+		out.MatchConditions = l
+	}
+	if in.Variables != nil {
+		l := make([]Variable, len(in.Variables))
+		for i := range in.Variables {
+			in.Variables[i].DeepCopyInto(&l[i])
+		}
+		out.Variables = l
+	}
+}
+
+func (in *ValidatingAdmissionPolicySpec) DeepCopy() *ValidatingAdmissionPolicySpec {
+	if in == nil {
+		return nil
+	}
+	out := new(ValidatingAdmissionPolicySpec)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type ValidatingAdmissionPolicyStatus struct {
+	// The generation observed by the controller.
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
+	// The results of type checking for each expression.
+	// Presence of this field indicates the completion of the type checking.
+	TypeChecking *TypeChecking `json:"typeChecking,omitempty"`
+	// The conditions represent the latest available observations of a policy's current state.
+	Conditions []metav1.Condition `json:"conditions"`
+}
+
+func (in *ValidatingAdmissionPolicyStatus) DeepCopyInto(out *ValidatingAdmissionPolicyStatus) {
+	*out = *in
+	if in.TypeChecking != nil {
+		in, out := &in.TypeChecking, &out.TypeChecking
+		*out = new(TypeChecking)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.Conditions != nil {
+		l := make([]metav1.Condition, len(in.Conditions))
+		for i := range in.Conditions {
+			in.Conditions[i].DeepCopyInto(&l[i])
+		}
+		out.Conditions = l
+	}
+}
+
+func (in *ValidatingAdmissionPolicyStatus) DeepCopy() *ValidatingAdmissionPolicyStatus {
+	if in == nil {
+		return nil
+	}
+	out := new(ValidatingAdmissionPolicyStatus)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type ValidatingAdmissionPolicyBindingSpec struct {
+	// PolicyName references a ValidatingAdmissionPolicy name which the ValidatingAdmissionPolicyBinding binds to.
+	// If the referenced resource does not exist, this binding is considered invalid and will be ignored
+	// Required.
+	PolicyName string `json:"policyName,omitempty"`
+	// paramRef specifies the parameter resource used to configure the admission control policy.
+	// It should point to a resource of the type specified in ParamKind of the bound ValidatingAdmissionPolicy.
+	// If the policy specifies a ParamKind and the resource referred to by ParamRef does not exist, this binding is considered mis-configured and the FailurePolicy of the ValidatingAdmissionPolicy applied.
+	// If the policy does not specify a ParamKind then this field is ignored, and the rules are evaluated without a param.
+	ParamRef *ParamRef `json:"paramRef,omitempty"`
+	// MatchResources declares what resources match this binding and will be validated by it.
+	// Note that this is intersected with the policy's matchConstraints, so only requests that are matched by the policy can be selected by this.
+	// If this is unset, all resources matched by the policy are validated by this binding
+	// When resourceRules is unset, it does not constrain resource matching. If a resource is matched by the other fields of this object, it will be validated.
+	// Note that this is differs from ValidatingAdmissionPolicy matchConstraints, where resourceRules are required.
+	MatchResources *MatchResources `json:"matchResources,omitempty"`
+	// validationActions declares how Validations of the referenced ValidatingAdmissionPolicy are enforced.
+	// If a validation evaluates to false it is always enforced according to these actions.
+	// Failures defined by the ValidatingAdmissionPolicy's FailurePolicy are enforced according
+	// to these actions only if the FailurePolicy is set to Fail, otherwise the failures are
+	// ignored. This includes compilation errors, runtime errors and misconfigurations of the policy.
+	// validationActions is declared as a set of action values. Order does
+	// not matter. validationActions may not contain duplicates of the same action.
+	// The supported actions values are:
+	// "Deny" specifies that a validation failure results in a denied request.
+	// "Warn" specifies that a validation failure is reported to the request client
+	// in HTTP Warning headers, with a warning code of 299. Warnings can be sent
+	// both for allowed or denied admission responses.
+	// "Audit" specifies that a validation failure is included in the published
+	// audit event for the request. The audit event will contain a
+	// `validation.policy.admission.k8s.io/validation_failure` audit annotation
+	// with a value containing the details of the validation failures, formatted as
+	// a JSON list of objects, each with the following fields:
+	// - message: The validation failure message string
+	// - policy: The resource name of the ValidatingAdmissionPolicy
+	// - binding: The resource name of the ValidatingAdmissionPolicyBinding
+	// - expressionIndex: The index of the failed validations in the ValidatingAdmissionPolicy
+	// - validationActions: The enforcement actions enacted for the validation failure
+	// Example audit annotation:
+	// `"validation.policy.admission.k8s.io/validation_failure": "[{\"message\": \"Invalid value\", {\"policy\": \"policy.example.com\", {\"binding\": \"policybinding.example.com\", {\"expressionIndex\": \"1\", {\"validationActions\": [\"Audit\"]}]"`
+	// Clients should expect to handle additional values by ignoring
+	// any values not recognized.
+	// "Deny" and "Warn" may not be used together since this combination
+	// needlessly duplicates the validation failure both in the
+	// API response body and the HTTP warning headers.
+	// Required.
+	ValidationActions []ValidationAction `json:"validationActions"`
+}
+
+func (in *ValidatingAdmissionPolicyBindingSpec) DeepCopyInto(out *ValidatingAdmissionPolicyBindingSpec) {
+	*out = *in
+	if in.ParamRef != nil {
+		in, out := &in.ParamRef, &out.ParamRef
+		*out = new(ParamRef)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.MatchResources != nil {
+		in, out := &in.MatchResources, &out.MatchResources
+		*out = new(MatchResources)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.ValidationActions != nil {
+		t := make([]ValidationAction, len(in.ValidationActions))
+		copy(t, in.ValidationActions)
+		out.ValidationActions = t
+	}
+}
+
+func (in *ValidatingAdmissionPolicyBindingSpec) DeepCopy() *ValidatingAdmissionPolicyBindingSpec {
+	if in == nil {
+		return nil
+	}
+	out := new(ValidatingAdmissionPolicyBindingSpec)
 	in.DeepCopyInto(out)
 	return out
 }
@@ -477,6 +878,17 @@ type ValidatingWebhook struct {
 	// include any versions known to the API Server, calls to the webhook will fail
 	// and be subject to the failure policy.
 	AdmissionReviewVersions []string `json:"admissionReviewVersions"`
+	// MatchConditions is a list of conditions that must be met for a request to be sent to this
+	// webhook. Match conditions filter requests that have already been matched by the rules,
+	// namespaceSelector, and objectSelector. An empty list of matchConditions matches all requests.
+	// There are a maximum of 64 match conditions allowed.
+	// The exact matching logic is (in order):
+	// 1. If ANY matchCondition evaluates to FALSE, the webhook is skipped.
+	// 2. If ALL matchConditions evaluate to TRUE, the webhook is called.
+	// 3. If any matchCondition evaluates to an error (but none are FALSE):
+	// - If failurePolicy=Fail, reject the request
+	// - If failurePolicy=Ignore, the error is ignored and the webhook is skipped
+	MatchConditions []MatchCondition `json:"matchConditions"`
 }
 
 func (in *ValidatingWebhook) DeepCopyInto(out *ValidatingWebhook) {
@@ -503,6 +915,13 @@ func (in *ValidatingWebhook) DeepCopyInto(out *ValidatingWebhook) {
 		t := make([]string, len(in.AdmissionReviewVersions))
 		copy(t, in.AdmissionReviewVersions)
 		out.AdmissionReviewVersions = t
+	}
+	if in.MatchConditions != nil {
+		l := make([]MatchCondition, len(in.MatchConditions))
+		for i := range in.MatchConditions {
+			in.MatchConditions[i].DeepCopyInto(&l[i])
+		}
+		out.MatchConditions = l
 	}
 }
 
@@ -594,6 +1013,403 @@ func (in *RuleWithOperations) DeepCopy() *RuleWithOperations {
 	return out
 }
 
+type MatchCondition struct {
+	// Name is an identifier for this match condition, used for strategic merging of MatchConditions,
+	// as well as providing an identifier for logging purposes. A good name should be descriptive of
+	// the associated expression.
+	// Name must be a qualified name consisting of alphanumeric characters, '-', '_' or '.', and
+	// must start and end with an alphanumeric character (e.g. 'MyName',  or 'my.name',  or
+	// '123-abc', regex used for validation is '([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]') with an
+	// optional DNS subdomain prefix and '/' (e.g. 'example.com/MyName')
+	// Required.
+	Name string `json:"name"`
+	// Expression represents the expression which will be evaluated by CEL. Must evaluate to bool.
+	// CEL expressions have access to the contents of the AdmissionRequest and Authorizer, organized into CEL variables:
+	// 'object' - The object from the incoming request. The value is null for DELETE requests.
+	// 'oldObject' - The existing object. The value is null for CREATE requests.
+	// 'request' - Attributes of the admission request(/pkg/apis/admission/types.go#AdmissionRequest).
+	// 'authorizer' - A CEL Authorizer. May be used to perform authorization checks for the principal (user or service account) of the request.
+	// See https://pkg.go.dev/k8s.io/apiserver/pkg/cel/library#Authz
+	// 'authorizer.requestResource' - A CEL ResourceCheck constructed from the 'authorizer' and configured with the
+	// request resource.
+	// Documentation on CEL: https://kubernetes.io/docs/reference/using-api/cel/
+	// Required.
+	Expression string `json:"expression"`
+}
+
+func (in *MatchCondition) DeepCopyInto(out *MatchCondition) {
+	*out = *in
+}
+
+func (in *MatchCondition) DeepCopy() *MatchCondition {
+	if in == nil {
+		return nil
+	}
+	out := new(MatchCondition)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type ParamKind struct {
+	// APIVersion is the API group version the resources belong to.
+	// In format of "group/version".
+	// Required.
+	APIVersion string `json:"apiVersion,omitempty"`
+	// Kind is the API kind the resources belong to.
+	// Required.
+	Kind string `json:"kind,omitempty"`
+}
+
+func (in *ParamKind) DeepCopyInto(out *ParamKind) {
+	*out = *in
+}
+
+func (in *ParamKind) DeepCopy() *ParamKind {
+	if in == nil {
+		return nil
+	}
+	out := new(ParamKind)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type MatchResources struct {
+	// NamespaceSelector decides whether to run the admission control policy on an object based
+	// on whether the namespace for that object matches the selector. If the
+	// object itself is a namespace, the matching is performed on
+	// object.metadata.labels. If the object is another cluster scoped resource,
+	// it never skips the policy.
+	// For example, to run the webhook on any objects whose namespace is not
+	// associated with "runlevel" of "0" or "1";  you will set the selector as
+	// follows:
+	// "namespaceSelector": {
+	// "matchExpressions": [
+	// {
+	// "key": "runlevel",
+	// "operator": "NotIn",
+	// "values": [
+	// "0",
+	// "1"
+	// ]
+	// }
+	// ]
+	// }
+	// If instead you want to only run the policy on any objects whose
+	// namespace is associated with the "environment" of "prod" or "staging";
+	// you will set the selector as follows:
+	// "namespaceSelector": {
+	// "matchExpressions": [
+	// {
+	// "key": "environment",
+	// "operator": "In",
+	// "values": [
+	// "prod",
+	// "staging"
+	// ]
+	// }
+	// ]
+	// }
+	// See
+	// https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+	// for more examples of label selectors.
+	// Default to the empty LabelSelector, which matches everything.
+	NamespaceSelector *metav1.LabelSelector `json:"namespaceSelector,omitempty"`
+	// ObjectSelector decides whether to run the validation based on if the
+	// object has matching labels. objectSelector is evaluated against both
+	// the oldObject and newObject that would be sent to the cel validation, and
+	// is considered to match if either object matches the selector. A null
+	// object (oldObject in the case of create, or newObject in the case of
+	// delete) or an object that cannot have labels (like a
+	// DeploymentRollback or a PodProxyOptions object) is not considered to
+	// match.
+	// Use the object selector only if the webhook is opt-in, because end
+	// users may skip the admission webhook by setting the labels.
+	// Default to the empty LabelSelector, which matches everything.
+	ObjectSelector *metav1.LabelSelector `json:"objectSelector,omitempty"`
+	// ResourceRules describes what operations on what resources/subresources the ValidatingAdmissionPolicy matches.
+	// The policy cares about an operation if it matches _any_ Rule.
+	ResourceRules []NamedRuleWithOperations `json:"resourceRules"`
+	// ExcludeResourceRules describes what operations on what resources/subresources the ValidatingAdmissionPolicy should not care about.
+	// The exclude rules take precedence over include rules (if a resource matches both, it is excluded)
+	ExcludeResourceRules []NamedRuleWithOperations `json:"excludeResourceRules"`
+	// matchPolicy defines how the "MatchResources" list is used to match incoming requests.
+	// Allowed values are "Exact" or "Equivalent".
+	// - Exact: match a request only if it exactly matches a specified rule.
+	// For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1,
+	// but "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`,
+	// a request to apps/v1beta1 or extensions/v1beta1 would not be sent to the ValidatingAdmissionPolicy.
+	// - Equivalent: match a request if modifies a resource listed in rules, even via another API group or version.
+	// For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1,
+	// and "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`,
+	// a request to apps/v1beta1 or extensions/v1beta1 would be converted to apps/v1 and sent to the ValidatingAdmissionPolicy.
+	// Defaults to "Equivalent"
+	MatchPolicy MatchPolicyType `json:"matchPolicy,omitempty"`
+}
+
+func (in *MatchResources) DeepCopyInto(out *MatchResources) {
+	*out = *in
+	if in.NamespaceSelector != nil {
+		in, out := &in.NamespaceSelector, &out.NamespaceSelector
+		*out = new(metav1.LabelSelector)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.ObjectSelector != nil {
+		in, out := &in.ObjectSelector, &out.ObjectSelector
+		*out = new(metav1.LabelSelector)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.ResourceRules != nil {
+		l := make([]NamedRuleWithOperations, len(in.ResourceRules))
+		for i := range in.ResourceRules {
+			in.ResourceRules[i].DeepCopyInto(&l[i])
+		}
+		out.ResourceRules = l
+	}
+	if in.ExcludeResourceRules != nil {
+		l := make([]NamedRuleWithOperations, len(in.ExcludeResourceRules))
+		for i := range in.ExcludeResourceRules {
+			in.ExcludeResourceRules[i].DeepCopyInto(&l[i])
+		}
+		out.ExcludeResourceRules = l
+	}
+}
+
+func (in *MatchResources) DeepCopy() *MatchResources {
+	if in == nil {
+		return nil
+	}
+	out := new(MatchResources)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type Validation struct {
+	// Expression represents the expression which will be evaluated by CEL.
+	// ref: https://github.com/google/cel-spec
+	// CEL expressions have access to the contents of the API request/response, organized into CEL variables as well as some other useful variables:
+	// - 'object' - The object from the incoming request. The value is null for DELETE requests.
+	// - 'oldObject' - The existing object. The value is null for CREATE requests.
+	// - 'request' - Attributes of the API request([ref](/pkg/apis/admission/types.go#AdmissionRequest)).
+	// - 'params' - Parameter resource referred to by the policy binding being evaluated. Only populated if the policy has a ParamKind.
+	// - 'namespaceObject' - The namespace object that the incoming object belongs to. The value is null for cluster-scoped resources.
+	// - 'variables' - Map of composited variables, from its name to its lazily evaluated value.
+	// For example, a variable named 'foo' can be accessed as 'variables.foo'.
+	// - 'authorizer' - A CEL Authorizer. May be used to perform authorization checks for the principal (user or service account) of the request.
+	// See https://pkg.go.dev/k8s.io/apiserver/pkg/cel/library#Authz
+	// - 'authorizer.requestResource' - A CEL ResourceCheck constructed from the 'authorizer' and configured with the
+	// request resource.
+	// The `apiVersion`, `kind`, `metadata.name` and `metadata.generateName` are always accessible from the root of the
+	// object. No other metadata properties are accessible.
+	// Only property names of the form `[a-zA-Z_.-/][a-zA-Z0-9_.-/]*` are accessible.
+	// Accessible property names are escaped according to the following rules when accessed in the expression:
+	// - '__' escapes to '__underscores__'
+	// - '.' escapes to '__dot__'
+	// - '-' escapes to '__dash__'
+	// - '/' escapes to '__slash__'
+	// - Property names that exactly match a CEL RESERVED keyword escape to '__{keyword}__'. The keywords are:
+	// "true", "false", "null", "in", "as", "break", "const", "continue", "else", "for", "function", "if",
+	// "import", "let", "loop", "package", "namespace", "return".
+	// Examples:
+	// - Expression accessing a property named "namespace": {"Expression": "object.__namespace__ > 0"}
+	// - Expression accessing a property named "x-prop": {"Expression": "object.x__dash__prop > 0"}
+	// - Expression accessing a property named "redact__d": {"Expression": "object.redact__underscores__d > 0"}
+	// Equality on arrays with list type of 'set' or 'map' ignores element order, i.e. [1, 2] == [2, 1].
+	// Concatenation on arrays with x-kubernetes-list-type use the semantics of the list type:
+	// - 'set': `X + Y` performs a union where the array positions of all elements in `X` are preserved and
+	// non-intersecting elements in `Y` are appended, retaining their partial order.
+	// - 'map': `X + Y` performs a merge where the array positions of all keys in `X` are preserved but the values
+	// are overwritten by values in `Y` when the key sets of `X` and `Y` intersect. Elements in `Y` with
+	// non-intersecting keys are appended, retaining their partial order.
+	// Required.
+	Expression string `json:"expression"`
+	// Message represents the message displayed when validation fails. The message is required if the Expression contains
+	// line breaks. The message must not contain line breaks.
+	// If unset, the message is "failed rule: {Rule}".
+	// e.g. "must be a URL with the host matching spec.host"
+	// If the Expression contains line breaks. Message is required.
+	// The message must not contain line breaks.
+	// If unset, the message is "failed Expression: {Expression}".
+	Message string `json:"message,omitempty"`
+	// Reason represents a machine-readable description of why this validation failed.
+	// If this is the first validation in the list to fail, this reason, as well as the
+	// corresponding HTTP response code, are used in the
+	// HTTP response to the client.
+	// The currently supported reasons are: "Unauthorized", "Forbidden", "Invalid", "RequestEntityTooLarge".
+	// If not set, StatusReasonInvalid is used in the response to the client.
+	Reason metav1.StatusReason `json:"reason,omitempty"`
+	// messageExpression declares a CEL expression that evaluates to the validation failure message that is returned when this rule fails.
+	// Since messageExpression is used as a failure message, it must evaluate to a string.
+	// If both message and messageExpression are present on a validation, then messageExpression will be used if validation fails.
+	// If messageExpression results in a runtime error, the runtime error is logged, and the validation failure message is produced
+	// as if the messageExpression field were unset. If messageExpression evaluates to an empty string, a string with only spaces, or a string
+	// that contains line breaks, then the validation failure message will also be produced as if the messageExpression field were unset, and
+	// the fact that messageExpression produced an empty string/string with only spaces/string with line breaks will be logged.
+	// messageExpression has access to all the same variables as the `expression` except for 'authorizer' and 'authorizer.requestResource'.
+	// Example:
+	// "object.x must be less than max ("+string(params.max)+")"
+	MessageExpression string `json:"messageExpression,omitempty"`
+}
+
+func (in *Validation) DeepCopyInto(out *Validation) {
+	*out = *in
+}
+
+func (in *Validation) DeepCopy() *Validation {
+	if in == nil {
+		return nil
+	}
+	out := new(Validation)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type AuditAnnotation struct {
+	// key specifies the audit annotation key. The audit annotation keys of
+	// a ValidatingAdmissionPolicy must be unique. The key must be a qualified
+	// name ([A-Za-z0-9][-A-Za-z0-9_.]*) no more than 63 bytes in length.
+	// The key is combined with the resource name of the
+	// ValidatingAdmissionPolicy to construct an audit annotation key:
+	// "{ValidatingAdmissionPolicy name}/{key}".
+	// If an admission webhook uses the same resource name as this ValidatingAdmissionPolicy
+	// and the same audit annotation key, the annotation key will be identical.
+	// In this case, the first annotation written with the key will be included
+	// in the audit event and all subsequent annotations with the same key
+	// will be discarded.
+	// Required.
+	Key string `json:"key"`
+	// valueExpression represents the expression which is evaluated by CEL to
+	// produce an audit annotation value. The expression must evaluate to either
+	// a string or null value. If the expression evaluates to a string, the
+	// audit annotation is included with the string value. If the expression
+	// evaluates to null or empty string the audit annotation will be omitted.
+	// The valueExpression may be no longer than 5kb in length.
+	// If the result of the valueExpression is more than 10kb in length, it
+	// will be truncated to 10kb.
+	// If multiple ValidatingAdmissionPolicyBinding resources match an
+	// API request, then the valueExpression will be evaluated for
+	// each binding. All unique values produced by the valueExpressions
+	// will be joined together in a comma-separated list.
+	// Required.
+	ValueExpression string `json:"valueExpression"`
+}
+
+func (in *AuditAnnotation) DeepCopyInto(out *AuditAnnotation) {
+	*out = *in
+}
+
+func (in *AuditAnnotation) DeepCopy() *AuditAnnotation {
+	if in == nil {
+		return nil
+	}
+	out := new(AuditAnnotation)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type Variable struct {
+	// Name is the name of the variable. The name must be a valid CEL identifier and unique among all variables.
+	// The variable can be accessed in other expressions through `variables`
+	// For example, if name is "foo", the variable will be available as `variables.foo`
+	Name string `json:"name"`
+	// Expression is the expression that will be evaluated as the value of the variable.
+	// The CEL expression has access to the same identifiers as the CEL expressions in Validation.
+	Expression string `json:"expression"`
+}
+
+func (in *Variable) DeepCopyInto(out *Variable) {
+	*out = *in
+}
+
+func (in *Variable) DeepCopy() *Variable {
+	if in == nil {
+		return nil
+	}
+	out := new(Variable)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type TypeChecking struct {
+	// The type checking warnings for each expression.
+	ExpressionWarnings []ExpressionWarning `json:"expressionWarnings"`
+}
+
+func (in *TypeChecking) DeepCopyInto(out *TypeChecking) {
+	*out = *in
+	if in.ExpressionWarnings != nil {
+		l := make([]ExpressionWarning, len(in.ExpressionWarnings))
+		for i := range in.ExpressionWarnings {
+			in.ExpressionWarnings[i].DeepCopyInto(&l[i])
+		}
+		out.ExpressionWarnings = l
+	}
+}
+
+func (in *TypeChecking) DeepCopy() *TypeChecking {
+	if in == nil {
+		return nil
+	}
+	out := new(TypeChecking)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type ParamRef struct {
+	// name is the name of the resource being referenced.
+	// One of `name` or `selector` must be set, but `name` and `selector` are
+	// mutually exclusive properties. If one is set, the other must be unset.
+	// A single parameter used for all admission requests can be configured
+	// by setting the `name` field, leaving `selector` blank, and setting namespace
+	// if `paramKind` is namespace-scoped.
+	Name string `json:"name,omitempty"`
+	// namespace is the namespace of the referenced resource. Allows limiting
+	// the search for params to a specific namespace. Applies to both `name` and
+	// `selector` fields.
+	// A per-namespace parameter may be used by specifying a namespace-scoped
+	// `paramKind` in the policy and leaving this field empty.
+	// - If `paramKind` is cluster-scoped, this field MUST be unset. Setting this
+	// field results in a configuration error.
+	// - If `paramKind` is namespace-scoped, the namespace of the object being
+	// evaluated for admission will be used when this field is left unset. Take
+	// care that if this is left empty the binding must not match any cluster-scoped
+	// resources, which will result in an error.
+	Namespace string `json:"namespace,omitempty"`
+	// selector can be used to match multiple param objects based on their labels.
+	// Supply selector: {} to match all resources of the ParamKind.
+	// If multiple params are found, they are all evaluated with the policy expressions
+	// and the results are ANDed together.
+	// One of `name` or `selector` must be set, but `name` and `selector` are
+	// mutually exclusive properties. If one is set, the other must be unset.
+	Selector *metav1.LabelSelector `json:"selector,omitempty"`
+	// `parameterNotFoundAction` controls the behavior of the binding when the resource
+	// exists, and name or selector is valid, but there are no parameters
+	// matched by the binding. If the value is set to `Allow`, then no
+	// matched parameters will be treated as successful validation by the binding.
+	// If set to `Deny`, then no matched parameters will be subject to the
+	// `failurePolicy` of the policy.
+	// Allowed values are `Allow` or `Deny`
+	// Required
+	ParameterNotFoundAction ParameterNotFoundActionType `json:"parameterNotFoundAction,omitempty"`
+}
+
+func (in *ParamRef) DeepCopyInto(out *ParamRef) {
+	*out = *in
+	if in.Selector != nil {
+		in, out := &in.Selector, &out.Selector
+		*out = new(metav1.LabelSelector)
+		(*in).DeepCopyInto(*out)
+	}
+}
+
+func (in *ParamRef) DeepCopy() *ParamRef {
+	if in == nil {
+		return nil
+	}
+	out := new(ParamRef)
+	in.DeepCopyInto(out)
+	return out
+}
+
 type ServiceReference struct {
 	// `namespace` is the namespace of the service.
 	// Required
@@ -680,6 +1496,56 @@ func (in *Rule) DeepCopy() *Rule {
 		return nil
 	}
 	out := new(Rule)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type NamedRuleWithOperations struct {
+	// ResourceNames is an optional white list of names that the rule applies to.  An empty set means that everything is allowed.
+	ResourceNames []string `json:"resourceNames"`
+	// RuleWithOperations is a tuple of Operations and Resources.
+	RuleWithOperations `json:",inline"`
+}
+
+func (in *NamedRuleWithOperations) DeepCopyInto(out *NamedRuleWithOperations) {
+	*out = *in
+	if in.ResourceNames != nil {
+		t := make([]string, len(in.ResourceNames))
+		copy(t, in.ResourceNames)
+		out.ResourceNames = t
+	}
+	out.RuleWithOperations = in.RuleWithOperations
+}
+
+func (in *NamedRuleWithOperations) DeepCopy() *NamedRuleWithOperations {
+	if in == nil {
+		return nil
+	}
+	out := new(NamedRuleWithOperations)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type ExpressionWarning struct {
+	// The path to the field that refers the expression.
+	// For example, the reference to the expression of the first item of
+	// validations is "spec.validations[0].expression"
+	FieldRef string `json:"fieldRef"`
+	// The content of type checking information in a human-readable form.
+	// Each line of the warning contains the type that the expression is checked
+	// against, followed by the type check error from the compiler.
+	Warning string `json:"warning"`
+}
+
+func (in *ExpressionWarning) DeepCopyInto(out *ExpressionWarning) {
+	*out = *in
+}
+
+func (in *ExpressionWarning) DeepCopy() *ExpressionWarning {
+	if in == nil {
+		return nil
+	}
+	out := new(ExpressionWarning)
 	in.DeepCopyInto(out)
 	return out
 }
