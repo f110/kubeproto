@@ -12,7 +12,17 @@ go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk")
 go_sdk.from_file(go_mod = "//:go.mod")
 
 go_deps = use_extension("@gazelle//:extensions.bzl", "go_deps")
-go_deps.from_file(go_work = "//:go.work")
+go_deps.from_file(go_mod = "//:go.mod")
+go_deps.module(
+    path = "github.com/cert-manager/cert-manager",
+    sum = "h1:gmDm7nNwzJck8n/Erhi7M2xmrCF6AYr72OM/qbnN/MU=",
+    version = "v1.9.0-beta.1.0.20220924143035-9a328bd798b2",
+)
+go_deps.module(
+    path = "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring",
+    sum = "h1:QCykBFSafyEBIAoajA9m+dqDf4Tt4AFQCcLsC9HQPUQ=",
+    version = "v0.59.2",
+)
 use_repo(
     go_deps,
     "com_github_cert_manager_cert_manager",
@@ -20,7 +30,6 @@ use_repo(
     "com_github_prometheus_operator_prometheus_operator_pkg_apis_monitoring",
     "com_github_spf13_pflag",
     "com_github_stretchr_testify",
-    "dev_f110_go_kubeproto",
     "in_gopkg_yaml_v2",
     "io_k8s_api",
     "io_k8s_apiextensions_apiserver",
