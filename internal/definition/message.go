@@ -19,6 +19,7 @@ var protoreflectKindMap = map[protoreflect.Kind]string{
 	protoreflect.Int64Kind:  "int64",
 	protoreflect.Uint64Kind: "uint64",
 	protoreflect.Int32Kind:  "int",
+	protoreflect.Uint32Kind: "uint32",
 	protoreflect.BoolKind:   "bool",
 	protoreflect.BytesKind:  "[]byte",
 }
@@ -28,6 +29,7 @@ var ProtoreflectKindToJSONSchemaType = map[protoreflect.Kind]string{
 	protoreflect.Int64Kind:  "integer",
 	protoreflect.Uint64Kind: "integer",
 	protoreflect.Int32Kind:  "integer",
+	protoreflect.Uint32Kind: "integer",
 	protoreflect.BoolKind:   "boolean",
 }
 
