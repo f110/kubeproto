@@ -562,7 +562,7 @@ func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVe
 			// ListXXX
 			if m.Scope == definition.ScopeTypeCluster {
 				writer.F("func (c *%s) List%s(ctx context.Context, opts metav1.ListOptions) (*%s.%sList, error) {", clientName, m.ShortName, m.Package.Alias, m.ShortName)
-				writer.F("result, err := c.backend.ListClusterScoped(ctx, %q, opts, &%s.%sList{})", strings.ToLower(stringsutil.Plural(m.ShortName)), m.Package.Alias, m.ShortName)
+				writer.F("result, err := c.backend.ListClusterScoped(ctx, %q, opts, &%s.%s{})", strings.ToLower(stringsutil.Plural(m.ShortName)), m.Package.Alias, m.ShortName)
 				writer.F("if err != nil {")
 				writer.F("return nil, err")
 				writer.F("}")

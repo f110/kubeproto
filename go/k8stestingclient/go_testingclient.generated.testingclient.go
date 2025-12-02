@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"k8s.io/apimachinery/pkg/api/meta"
+	k8smetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -89,13 +90,18 @@ func (f *fakerBackend) List(ctx context.Context, resourceName, namespace string,
 		return nil, err
 	}
 	gvk := gvks[0]
-	obj, err := f.fake.Invokes(k8stesting.NewListAction(gvk.GroupVersion().WithResource(resourceName), gvk, namespace, opts), result)
+	k8sListOpt := k8smetav1.ListOptions{
+		LabelSelector:   opts.LabelSelector,
+		FieldSelector:   opts.FieldSelector,
+		ResourceVersion: opts.ResourceVersion,
+	}
+	obj, err := f.fake.Invokes(k8stesting.NewListAction(gvk.GroupVersion().WithResource(resourceName), gvk, namespace, k8sListOpt), result)
 
 	if obj == nil {
 		return nil, err
 	}
 
-	label, _, _ := k8stesting.ExtractFromListOptions(opts)
+	label, _, _ := k8stesting.ExtractFromListOptions(k8sListOpt)
 	if label == nil {
 		label = labels.Everything()
 	}
