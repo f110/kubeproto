@@ -9,8 +9,10 @@ go_library(
     importpath = "go.f110.dev/kubeproto/go/apis/metav1",
     visibility = ["//visibility:public"],
     deps = [
+        "@io_k8s_apimachinery//pkg/labels",
         "@io_k8s_apimachinery//pkg/runtime",
         "@io_k8s_apimachinery//pkg/runtime/schema",
+        "@io_k8s_apimachinery//pkg/selection",
         "@io_k8s_apimachinery//pkg/watch",
     ],
 )

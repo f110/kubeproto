@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"go.f110.dev/kubeproto/go/apis/metav1"
 )
@@ -58,4 +59,8 @@ func GetObjectReference(scheme *runtime.Scheme, obj runtime.Object) (*ObjectRefe
 		UID:             objectMeta.UID,
 		ResourceVersion: objectMeta.ResourceVersion,
 	}, nil
+}
+
+func (in *Pod) GetObjectKind() schema.ObjectKind {
+	return &in.TypeMeta
 }
