@@ -1,0 +1,8 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "assertion",
+    srcs = ["error.go"],
+    importpath = "go.f110.dev/kubeproto/go/internal/assertion",
+    visibility = ["//go:__subpackages__"],
+)
