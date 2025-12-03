@@ -546,7 +546,7 @@ func (c *CoreV1) UpdateBinding(ctx context.Context, v *corev1.Binding, opts meta
 }
 
 func (c *CoreV1) DeleteBinding(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "bindings"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "bindings"}, namespace, name, opts)
 }
 
 func (c *CoreV1) ListBinding(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.BindingList, error) {
@@ -558,7 +558,7 @@ func (c *CoreV1) ListBinding(ctx context.Context, namespace string, opts metav1.
 }
 
 func (c *CoreV1) WatchBinding(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "bindings"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "bindings"}, namespace, opts)
 }
 
 func (c *CoreV1) GetComponentStatus(ctx context.Context, name string, opts metav1.GetOptions) (*corev1.ComponentStatus, error) {
@@ -586,7 +586,7 @@ func (c *CoreV1) UpdateComponentStatus(ctx context.Context, v *corev1.ComponentS
 }
 
 func (c *CoreV1) DeleteComponentStatus(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "componentstatuses"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "componentstatuses"}, name, opts)
 }
 
 func (c *CoreV1) ListComponentStatus(ctx context.Context, opts metav1.ListOptions) (*corev1.ComponentStatusList, error) {
@@ -598,7 +598,7 @@ func (c *CoreV1) ListComponentStatus(ctx context.Context, opts metav1.ListOption
 }
 
 func (c *CoreV1) WatchComponentStatus(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "componentstatuses"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "componentstatuses"}, opts)
 }
 
 func (c *CoreV1) GetConfigMap(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*corev1.ConfigMap, error) {
@@ -626,7 +626,7 @@ func (c *CoreV1) UpdateConfigMap(ctx context.Context, v *corev1.ConfigMap, opts 
 }
 
 func (c *CoreV1) DeleteConfigMap(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "configmaps"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "configmaps"}, namespace, name, opts)
 }
 
 func (c *CoreV1) ListConfigMap(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.ConfigMapList, error) {
@@ -638,7 +638,7 @@ func (c *CoreV1) ListConfigMap(ctx context.Context, namespace string, opts metav
 }
 
 func (c *CoreV1) WatchConfigMap(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "configmaps"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "configmaps"}, namespace, opts)
 }
 
 func (c *CoreV1) GetEndpoints(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*corev1.Endpoints, error) {
@@ -666,7 +666,7 @@ func (c *CoreV1) UpdateEndpoints(ctx context.Context, v *corev1.Endpoints, opts 
 }
 
 func (c *CoreV1) DeleteEndpoints(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "endpoints"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "endpoints"}, namespace, name, opts)
 }
 
 func (c *CoreV1) ListEndpoints(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.EndpointsList, error) {
@@ -678,7 +678,7 @@ func (c *CoreV1) ListEndpoints(ctx context.Context, namespace string, opts metav
 }
 
 func (c *CoreV1) WatchEndpoints(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "endpoints"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "endpoints"}, namespace, opts)
 }
 
 func (c *CoreV1) GetEvent(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*corev1.Event, error) {
@@ -706,7 +706,7 @@ func (c *CoreV1) UpdateEvent(ctx context.Context, v *corev1.Event, opts metav1.U
 }
 
 func (c *CoreV1) DeleteEvent(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "events"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "events"}, namespace, name, opts)
 }
 
 func (c *CoreV1) ListEvent(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.EventList, error) {
@@ -718,7 +718,7 @@ func (c *CoreV1) ListEvent(ctx context.Context, namespace string, opts metav1.Li
 }
 
 func (c *CoreV1) WatchEvent(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "events"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "events"}, namespace, opts)
 }
 
 func (c *CoreV1) GetLimitRange(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*corev1.LimitRange, error) {
@@ -746,7 +746,7 @@ func (c *CoreV1) UpdateLimitRange(ctx context.Context, v *corev1.LimitRange, opt
 }
 
 func (c *CoreV1) DeleteLimitRange(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "limitranges"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "limitranges"}, namespace, name, opts)
 }
 
 func (c *CoreV1) ListLimitRange(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.LimitRangeList, error) {
@@ -758,7 +758,7 @@ func (c *CoreV1) ListLimitRange(ctx context.Context, namespace string, opts meta
 }
 
 func (c *CoreV1) WatchLimitRange(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "limitranges"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "limitranges"}, namespace, opts)
 }
 
 func (c *CoreV1) GetNamespace(ctx context.Context, name string, opts metav1.GetOptions) (*corev1.Namespace, error) {
@@ -794,7 +794,7 @@ func (c *CoreV1) UpdateStatusNamespace(ctx context.Context, v *corev1.Namespace,
 }
 
 func (c *CoreV1) DeleteNamespace(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "namespaces"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "namespaces"}, name, opts)
 }
 
 func (c *CoreV1) ListNamespace(ctx context.Context, opts metav1.ListOptions) (*corev1.NamespaceList, error) {
@@ -806,7 +806,7 @@ func (c *CoreV1) ListNamespace(ctx context.Context, opts metav1.ListOptions) (*c
 }
 
 func (c *CoreV1) WatchNamespace(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "namespaces"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "namespaces"}, opts)
 }
 
 func (c *CoreV1) GetNode(ctx context.Context, name string, opts metav1.GetOptions) (*corev1.Node, error) {
@@ -842,7 +842,7 @@ func (c *CoreV1) UpdateStatusNode(ctx context.Context, v *corev1.Node, opts meta
 }
 
 func (c *CoreV1) DeleteNode(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "nodes"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "nodes"}, name, opts)
 }
 
 func (c *CoreV1) ListNode(ctx context.Context, opts metav1.ListOptions) (*corev1.NodeList, error) {
@@ -854,7 +854,7 @@ func (c *CoreV1) ListNode(ctx context.Context, opts metav1.ListOptions) (*corev1
 }
 
 func (c *CoreV1) WatchNode(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "nodes"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "nodes"}, opts)
 }
 
 func (c *CoreV1) GetPersistentVolume(ctx context.Context, name string, opts metav1.GetOptions) (*corev1.PersistentVolume, error) {
@@ -890,7 +890,7 @@ func (c *CoreV1) UpdateStatusPersistentVolume(ctx context.Context, v *corev1.Per
 }
 
 func (c *CoreV1) DeletePersistentVolume(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "persistentvolumes"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "persistentvolumes"}, name, opts)
 }
 
 func (c *CoreV1) ListPersistentVolume(ctx context.Context, opts metav1.ListOptions) (*corev1.PersistentVolumeList, error) {
@@ -902,7 +902,7 @@ func (c *CoreV1) ListPersistentVolume(ctx context.Context, opts metav1.ListOptio
 }
 
 func (c *CoreV1) WatchPersistentVolume(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "persistentvolumes"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "persistentvolumes"}, opts)
 }
 
 func (c *CoreV1) GetPersistentVolumeClaim(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*corev1.PersistentVolumeClaim, error) {
@@ -938,7 +938,7 @@ func (c *CoreV1) UpdateStatusPersistentVolumeClaim(ctx context.Context, v *corev
 }
 
 func (c *CoreV1) DeletePersistentVolumeClaim(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "persistentvolumeclaims"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "persistentvolumeclaims"}, namespace, name, opts)
 }
 
 func (c *CoreV1) ListPersistentVolumeClaim(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.PersistentVolumeClaimList, error) {
@@ -950,7 +950,7 @@ func (c *CoreV1) ListPersistentVolumeClaim(ctx context.Context, namespace string
 }
 
 func (c *CoreV1) WatchPersistentVolumeClaim(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "persistentvolumeclaims"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "persistentvolumeclaims"}, namespace, opts)
 }
 
 func (c *CoreV1) GetPod(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*corev1.Pod, error) {
@@ -986,7 +986,7 @@ func (c *CoreV1) UpdateStatusPod(ctx context.Context, v *corev1.Pod, opts metav1
 }
 
 func (c *CoreV1) DeletePod(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "pods"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "pods"}, namespace, name, opts)
 }
 
 func (c *CoreV1) ListPod(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.PodList, error) {
@@ -998,7 +998,7 @@ func (c *CoreV1) ListPod(ctx context.Context, namespace string, opts metav1.List
 }
 
 func (c *CoreV1) WatchPod(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "pods"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "pods"}, namespace, opts)
 }
 
 func (c *CoreV1) GetPodStatusResult(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*corev1.PodStatusResult, error) {
@@ -1034,7 +1034,7 @@ func (c *CoreV1) UpdateStatusPodStatusResult(ctx context.Context, v *corev1.PodS
 }
 
 func (c *CoreV1) DeletePodStatusResult(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "podstatusresults"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "podstatusresults"}, namespace, name, opts)
 }
 
 func (c *CoreV1) ListPodStatusResult(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.PodStatusResultList, error) {
@@ -1046,7 +1046,7 @@ func (c *CoreV1) ListPodStatusResult(ctx context.Context, namespace string, opts
 }
 
 func (c *CoreV1) WatchPodStatusResult(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "podstatusresults"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "podstatusresults"}, namespace, opts)
 }
 
 func (c *CoreV1) GetPodTemplate(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*corev1.PodTemplate, error) {
@@ -1074,7 +1074,7 @@ func (c *CoreV1) UpdatePodTemplate(ctx context.Context, v *corev1.PodTemplate, o
 }
 
 func (c *CoreV1) DeletePodTemplate(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "podtemplates"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "podtemplates"}, namespace, name, opts)
 }
 
 func (c *CoreV1) ListPodTemplate(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.PodTemplateList, error) {
@@ -1086,7 +1086,7 @@ func (c *CoreV1) ListPodTemplate(ctx context.Context, namespace string, opts met
 }
 
 func (c *CoreV1) WatchPodTemplate(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "podtemplates"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "podtemplates"}, namespace, opts)
 }
 
 func (c *CoreV1) GetRangeAllocation(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*corev1.RangeAllocation, error) {
@@ -1114,7 +1114,7 @@ func (c *CoreV1) UpdateRangeAllocation(ctx context.Context, v *corev1.RangeAlloc
 }
 
 func (c *CoreV1) DeleteRangeAllocation(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "rangeallocations"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "rangeallocations"}, namespace, name, opts)
 }
 
 func (c *CoreV1) ListRangeAllocation(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.RangeAllocationList, error) {
@@ -1126,7 +1126,7 @@ func (c *CoreV1) ListRangeAllocation(ctx context.Context, namespace string, opts
 }
 
 func (c *CoreV1) WatchRangeAllocation(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "rangeallocations"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "rangeallocations"}, namespace, opts)
 }
 
 func (c *CoreV1) GetReplicationController(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*corev1.ReplicationController, error) {
@@ -1162,7 +1162,7 @@ func (c *CoreV1) UpdateStatusReplicationController(ctx context.Context, v *corev
 }
 
 func (c *CoreV1) DeleteReplicationController(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "replicationcontrollers"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "replicationcontrollers"}, namespace, name, opts)
 }
 
 func (c *CoreV1) ListReplicationController(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.ReplicationControllerList, error) {
@@ -1174,7 +1174,7 @@ func (c *CoreV1) ListReplicationController(ctx context.Context, namespace string
 }
 
 func (c *CoreV1) WatchReplicationController(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "replicationcontrollers"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "replicationcontrollers"}, namespace, opts)
 }
 
 func (c *CoreV1) GetResourceQuota(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*corev1.ResourceQuota, error) {
@@ -1210,7 +1210,7 @@ func (c *CoreV1) UpdateStatusResourceQuota(ctx context.Context, v *corev1.Resour
 }
 
 func (c *CoreV1) DeleteResourceQuota(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "resourcequotas"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "resourcequotas"}, namespace, name, opts)
 }
 
 func (c *CoreV1) ListResourceQuota(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.ResourceQuotaList, error) {
@@ -1222,7 +1222,7 @@ func (c *CoreV1) ListResourceQuota(ctx context.Context, namespace string, opts m
 }
 
 func (c *CoreV1) WatchResourceQuota(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "resourcequotas"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "resourcequotas"}, namespace, opts)
 }
 
 func (c *CoreV1) GetSecret(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*corev1.Secret, error) {
@@ -1250,7 +1250,7 @@ func (c *CoreV1) UpdateSecret(ctx context.Context, v *corev1.Secret, opts metav1
 }
 
 func (c *CoreV1) DeleteSecret(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "secrets"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "secrets"}, namespace, name, opts)
 }
 
 func (c *CoreV1) ListSecret(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.SecretList, error) {
@@ -1262,7 +1262,7 @@ func (c *CoreV1) ListSecret(ctx context.Context, namespace string, opts metav1.L
 }
 
 func (c *CoreV1) WatchSecret(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "secrets"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "secrets"}, namespace, opts)
 }
 
 func (c *CoreV1) GetService(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*corev1.Service, error) {
@@ -1298,7 +1298,7 @@ func (c *CoreV1) UpdateStatusService(ctx context.Context, v *corev1.Service, opt
 }
 
 func (c *CoreV1) DeleteService(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "services"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "services"}, namespace, name, opts)
 }
 
 func (c *CoreV1) ListService(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.ServiceList, error) {
@@ -1310,7 +1310,7 @@ func (c *CoreV1) ListService(ctx context.Context, namespace string, opts metav1.
 }
 
 func (c *CoreV1) WatchService(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "services"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "services"}, namespace, opts)
 }
 
 func (c *CoreV1) GetServiceAccount(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*corev1.ServiceAccount, error) {
@@ -1338,7 +1338,7 @@ func (c *CoreV1) UpdateServiceAccount(ctx context.Context, v *corev1.ServiceAcco
 }
 
 func (c *CoreV1) DeleteServiceAccount(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "serviceaccounts"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "serviceaccounts"}, namespace, name, opts)
 }
 
 func (c *CoreV1) ListServiceAccount(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.ServiceAccountList, error) {
@@ -1350,7 +1350,7 @@ func (c *CoreV1) ListServiceAccount(ctx context.Context, namespace string, opts 
 }
 
 func (c *CoreV1) WatchServiceAccount(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".", Version: "v1", Resource: "serviceaccounts"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "serviceaccounts"}, namespace, opts)
 }
 
 type AdmissionregistrationK8sIoV1 struct {

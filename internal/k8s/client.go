@@ -459,6 +459,10 @@ func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVe
 		writer.F("")
 
 		for _, m := range v {
+			group := m.Group
+			if group == "." {
+				group = ""
+			}
 			structNameWithPkg := fmt.Sprintf("%s.%s", m.Package.Alias, m.ShortName)
 			// GetXXX
 			if m.Scope == definition.ScopeTypeCluster {
@@ -549,12 +553,12 @@ func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVe
 			// DeleteXXX
 			if m.Scope == definition.ScopeTypeCluster {
 				writer.F("func (c *%s) Delete%s(ctx context.Context, name string, opts metav1.DeleteOptions) error {", clientName, m.ShortName)
-				writer.F("return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group:%q, Version:%q, Resource:%q}, name, opts)", m.Group, m.Version, strings.ToLower(stringsutil.Plural(m.ShortName)))
+				writer.F("return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group:%q, Version:%q, Resource:%q}, name, opts)", group, m.Version, strings.ToLower(stringsutil.Plural(m.ShortName)))
 				writer.F("}")
 				writer.F("")
 			} else {
 				writer.F("func (c *%s) Delete%s(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {", clientName, m.ShortName)
-				writer.F("return c.backend.Delete(ctx, schema.GroupVersionResource{Group:%q, Version:%q, Resource:%q}, namespace, name, opts)", m.Group, m.Version, strings.ToLower(stringsutil.Plural(m.ShortName)))
+				writer.F("return c.backend.Delete(ctx, schema.GroupVersionResource{Group:%q, Version:%q, Resource:%q}, namespace, name, opts)", group, m.Version, strings.ToLower(stringsutil.Plural(m.ShortName)))
 				writer.F("}")
 				writer.F("")
 			}
@@ -583,12 +587,12 @@ func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVe
 			// WatchXXX
 			if m.Scope == definition.ScopeTypeCluster {
 				writer.F("func (c *%s) Watch%s(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {", clientName, m.ShortName)
-				writer.F("return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group:%q, Version:%q, Resource:%q}, opts)", m.Group, m.Version, strings.ToLower(stringsutil.Plural(m.ShortName)))
+				writer.F("return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group:%q, Version:%q, Resource:%q}, opts)", group, m.Version, strings.ToLower(stringsutil.Plural(m.ShortName)))
 				writer.F("}")
 				writer.F("")
 			} else {
 				writer.F("func (c *%s) Watch%s(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {", clientName, m.ShortName)
-				writer.F("return c.backend.Watch(ctx, schema.GroupVersionResource{Group:%q, Version:%q, Resource:%q}, namespace, opts)", m.Group, m.Version, strings.ToLower(stringsutil.Plural(m.ShortName)))
+				writer.F("return c.backend.Watch(ctx, schema.GroupVersionResource{Group:%q, Version:%q, Resource:%q}, namespace, opts)", group, m.Version, strings.ToLower(stringsutil.Plural(m.ShortName)))
 				writer.F("}")
 				writer.F("")
 			}
