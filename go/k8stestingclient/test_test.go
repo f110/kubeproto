@@ -24,6 +24,10 @@ func TestTestingClient(t *testing.T) {
 	pods, err := s.CoreV1.ListPod(t.Context(), metav1.NamespaceDefault, metav1.ListOptions{})
 	assertion.MustNoError(t, err)
 	assertion.Len(t, pods.Items, 2)
+	err = s.CoreV1.DeletePod(t.Context(), metav1.NamespaceDefault, "test-1", metav1.DeleteOptions{})
+	assertion.MustNoError(t, err)
+	_, err = s.CoreV1.WatchPod(t.Context(), metav1.NamespaceDefault, metav1.ListOptions{})
+	assertion.MustNoError(t, err)
 
 	sharedInformerFactory := k8sclient.NewInformerFactory(&s.Set, k8sclient.NewInformerCache(), metav1.NamespaceAll, 30*time.Second)
 	err = sharedInformerFactory.InformerFor(&corev1.Pod{}).GetIndexer().Add(&corev1.Pod{ObjectMeta: metav1.ObjectMeta{Name: "test-1", Namespace: metav1.NamespaceDefault}})
