@@ -1,4 +1,4 @@
-load("@rules_go//go:def.bzl", "go_library")
+load("@rules_go//go:def.bzl", "go_library", "go_test")
 load("//bazel:def.bzl", "go_testing_client")
 
 go_testing_client(
@@ -40,11 +40,25 @@ go_library(
         "//go/apis/metav1",
         "//go/k8sclient",
         "@io_k8s_apimachinery//pkg/api/meta",
+        "@io_k8s_apimachinery//pkg/apis/meta/v1:meta",
         "@io_k8s_apimachinery//pkg/labels",
         "@io_k8s_apimachinery//pkg/runtime",
         "@io_k8s_apimachinery//pkg/runtime/schema",
         "@io_k8s_apimachinery//pkg/runtime/serializer",
         "@io_k8s_apimachinery//pkg/watch",
         "@io_k8s_client_go//testing",
+    ],
+)
+
+go_test(
+    name = "k8stestingclient_test",
+    srcs = ["test_test.go"],
+    embed = [":k8stestingclient"],
+    deps = [
+        "//go/apis/corev1",
+        "//go/apis/metav1",
+        "//go/internal/assertion",
+        "//go/k8sclient",
+        "@io_k8s_apimachinery//pkg/labels",
     ],
 )

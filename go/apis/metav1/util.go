@@ -139,10 +139,16 @@ func (in *Time) Equal(u *Time) bool {
 }
 
 func (in *Time) Time() time.Time {
+	if in == nil {
+		return time.Time{}
+	}
 	return time.Unix(in.Seconds, int64(in.Nanos))
 }
 
 func (in *Time) Unix() int64 {
+	if in == nil {
+		return 0
+	}
 	return in.Time().Unix()
 }
 
