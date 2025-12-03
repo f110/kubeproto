@@ -153,7 +153,7 @@ go_testing_client = rule(
     toolchains = ["@rules_go//go:toolchain"],
 )
 
-def _execute_protoc(ctx, compiler, compiler_name, suffix, srcs, opts = ""):
+def _execute_protoc(ctx, compiler, compiler_name, suffix, srcs, opts = "", env = None):
     args = ctx.actions.args()
     args.add("--plugin", ("protoc-gen-%s=%s" % (compiler_name, compiler.path)))
 
@@ -183,6 +183,7 @@ def _execute_protoc(ctx, compiler, compiler_name, suffix, srcs, opts = ""):
         outputs = [out],
         arguments = [args],
         use_default_shell_env = True,
+        env = env,
     )
 
     return out
@@ -190,12 +191,17 @@ def _execute_protoc(ctx, compiler, compiler_name, suffix, srcs, opts = ""):
 def _kubeproto_go_api(ctx):
     go = go_context(ctx)
 
+    env = None
+    if ctx.attr.all:
+        env = {"KUBEPROTO_OPTS": "all"}
+
     objectOut = _execute_protoc(
         ctx,
         ctx.executable._object_compiler,
         ctx.attr._object_compiler_name,
         "generated.object.go",
         ctx.attr.srcs,
+        env = env,
     )
     library = go.new_library(go, srcs = [objectOut])
     source = go.library_to_source(go, ctx.attr, library, False)
@@ -213,6 +219,7 @@ kubeproto_go_api = rule(
     attrs = {
         "srcs": attr.label_list(providers = [ProtoInfo]),
         "importpath": attr.string(mandatory = True),
+        "all": attr.bool(),
         "protoc": attr.label(
             executable = True,
             cfg = "host",
