@@ -564,7 +564,7 @@ func (r *restBackend) RESTClient() *rest.RESTClient {
 			// ListXXX
 			if m.Scope == definition.ScopeTypeCluster {
 				writer.F("func (c *%s) List%s(ctx context.Context, opts metav1.ListOptions) (*%s.%sList, error) {", clientName, m.ShortName, m.Package.Alias, m.ShortName)
-				writer.F("result, err := c.backend.ListClusterScoped(ctx, %q, opts, &%s.%s{})", strings.ToLower(stringsutil.Plural(m.ShortName)), m.Package.Alias, m.ShortName)
+				writer.F("result, err := c.backend.ListClusterScoped(ctx, %q, opts, &%s.%sList{})", strings.ToLower(stringsutil.Plural(m.ShortName)), m.Package.Alias, m.ShortName)
 				writer.F("if err != nil {")
 				writer.F("return nil, err")
 				writer.F("}")
@@ -573,7 +573,7 @@ func (r *restBackend) RESTClient() *rest.RESTClient {
 				writer.F("")
 			} else {
 				writer.F("func (c *%s) List%s(ctx context.Context, namespace string, opts metav1.ListOptions) (*%s.%sList, error) {", clientName, m.ShortName, m.Package.Alias, m.ShortName)
-				writer.F("result, err := c.backend.List(ctx, %q, namespace, opts, &%s.%s{})", strings.ToLower(stringsutil.Plural(m.ShortName)), m.Package.Alias, m.ShortName)
+				writer.F("result, err := c.backend.List(ctx, %q, namespace, opts, &%s.%sList{})", strings.ToLower(stringsutil.Plural(m.ShortName)), m.Package.Alias, m.ShortName)
 				writer.F("if err != nil {")
 				writer.F("return nil, err")
 				writer.F("}")

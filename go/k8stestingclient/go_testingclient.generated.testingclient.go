@@ -2,6 +2,7 @@ package k8stestingclient
 
 import (
 	"context"
+	"strings"
 
 	"k8s.io/apimachinery/pkg/api/meta"
 	k8smetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -91,6 +92,9 @@ func (f *fakerBackend) List(ctx context.Context, resourceName, namespace string,
 		return nil, err
 	}
 	gvk := gvks[0]
+	if strings.HasSuffix(gvk.Kind, "List") {
+		gvk.Kind = strings.TrimSuffix(gvk.Kind, "List")
+	}
 	k8sListOpt := k8smetav1.ListOptions{
 		LabelSelector:   opts.LabelSelector,
 		FieldSelector:   opts.FieldSelector,

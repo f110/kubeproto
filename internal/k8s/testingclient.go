@@ -34,6 +34,7 @@ func (g *FakeClientGenerator) Generate(out io.Writer, packageName, importPath, c
 	// The key is a package path. The value is an alias.
 	importPackages := map[string]string{
 		"context": "",
+		"strings": "",
 	}
 	for k, v := range importPackages {
 		g.packageNamespaceManager.Add(k, v)
@@ -183,6 +184,9 @@ type fakerBackend struct {
 		return nil, err
 	}
 	gvk := gvks[0]
+	if strings.HasSuffix(gvk.Kind, "List") {
+		gvk.Kind = strings.TrimSuffix(gvk.Kind, "List")
+	}
 	k8sListOpt := k8smetav1.ListOptions{
 		LabelSelector:   opts.LabelSelector,
 		FieldSelector:   opts.FieldSelector,
