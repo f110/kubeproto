@@ -10,6 +10,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apimachinery/pkg/watch"
+	"k8s.io/client-go/rest"
 	k8stesting "k8s.io/client-go/testing"
 
 	"go.f110.dev/kubeproto/go/apis/metav1"
@@ -39,23 +40,23 @@ func NewSet() *Set {
 		return true, w, nil
 	})
 
-	s.CoreV1 = k8sclient.NewCoreV1Client(&fakerBackend{fake: &s.fake})
-	s.AdmissionregistrationK8sIoV1 = k8sclient.NewAdmissionregistrationK8sIoV1Client(&fakerBackend{fake: &s.fake})
-	s.AppsV1 = k8sclient.NewAppsV1Client(&fakerBackend{fake: &s.fake})
-	s.AuthenticationK8sIoV1 = k8sclient.NewAuthenticationK8sIoV1Client(&fakerBackend{fake: &s.fake})
-	s.AuthorizationK8sIoV1 = k8sclient.NewAuthorizationK8sIoV1Client(&fakerBackend{fake: &s.fake})
-	s.AutoscalingV1 = k8sclient.NewAutoscalingV1Client(&fakerBackend{fake: &s.fake})
-	s.AutoscalingV2 = k8sclient.NewAutoscalingV2Client(&fakerBackend{fake: &s.fake})
-	s.BatchV1 = k8sclient.NewBatchV1Client(&fakerBackend{fake: &s.fake})
-	s.CertificatesK8sIoV1 = k8sclient.NewCertificatesK8sIoV1Client(&fakerBackend{fake: &s.fake})
-	s.CoordinationK8sIoV1 = k8sclient.NewCoordinationK8sIoV1Client(&fakerBackend{fake: &s.fake})
-	s.DiscoveryK8sIoV1 = k8sclient.NewDiscoveryK8sIoV1Client(&fakerBackend{fake: &s.fake})
-	s.EventsK8sIoV1 = k8sclient.NewEventsK8sIoV1Client(&fakerBackend{fake: &s.fake})
-	s.NetworkingK8sIoV1 = k8sclient.NewNetworkingK8sIoV1Client(&fakerBackend{fake: &s.fake})
-	s.PolicyV1 = k8sclient.NewPolicyV1Client(&fakerBackend{fake: &s.fake})
-	s.RbacAuthorizationK8sIoV1 = k8sclient.NewRbacAuthorizationK8sIoV1Client(&fakerBackend{fake: &s.fake})
-	s.SchedulingK8sIoV1 = k8sclient.NewSchedulingK8sIoV1Client(&fakerBackend{fake: &s.fake})
-	s.StorageK8sIoV1 = k8sclient.NewStorageK8sIoV1Client(&fakerBackend{fake: &s.fake})
+	s.CoreV1 = k8sclient.NewCoreV1Client(&fakerBackend{fake: &s.fake}, nil)
+	s.AdmissionregistrationK8sIoV1 = k8sclient.NewAdmissionregistrationK8sIoV1Client(&fakerBackend{fake: &s.fake}, nil)
+	s.AppsV1 = k8sclient.NewAppsV1Client(&fakerBackend{fake: &s.fake}, nil)
+	s.AuthenticationK8sIoV1 = k8sclient.NewAuthenticationK8sIoV1Client(&fakerBackend{fake: &s.fake}, nil)
+	s.AuthorizationK8sIoV1 = k8sclient.NewAuthorizationK8sIoV1Client(&fakerBackend{fake: &s.fake}, nil)
+	s.AutoscalingV1 = k8sclient.NewAutoscalingV1Client(&fakerBackend{fake: &s.fake}, nil)
+	s.AutoscalingV2 = k8sclient.NewAutoscalingV2Client(&fakerBackend{fake: &s.fake}, nil)
+	s.BatchV1 = k8sclient.NewBatchV1Client(&fakerBackend{fake: &s.fake}, nil)
+	s.CertificatesK8sIoV1 = k8sclient.NewCertificatesK8sIoV1Client(&fakerBackend{fake: &s.fake}, nil)
+	s.CoordinationK8sIoV1 = k8sclient.NewCoordinationK8sIoV1Client(&fakerBackend{fake: &s.fake}, nil)
+	s.DiscoveryK8sIoV1 = k8sclient.NewDiscoveryK8sIoV1Client(&fakerBackend{fake: &s.fake}, nil)
+	s.EventsK8sIoV1 = k8sclient.NewEventsK8sIoV1Client(&fakerBackend{fake: &s.fake}, nil)
+	s.NetworkingK8sIoV1 = k8sclient.NewNetworkingK8sIoV1Client(&fakerBackend{fake: &s.fake}, nil)
+	s.PolicyV1 = k8sclient.NewPolicyV1Client(&fakerBackend{fake: &s.fake}, nil)
+	s.RbacAuthorizationK8sIoV1 = k8sclient.NewRbacAuthorizationK8sIoV1Client(&fakerBackend{fake: &s.fake}, nil)
+	s.SchedulingK8sIoV1 = k8sclient.NewSchedulingK8sIoV1Client(&fakerBackend{fake: &s.fake}, nil)
+	s.StorageK8sIoV1 = k8sclient.NewStorageK8sIoV1Client(&fakerBackend{fake: &s.fake}, nil)
 	return s
 }
 
@@ -203,4 +204,8 @@ func (f *fakerBackend) DeleteClusterScoped(ctx context.Context, gvr schema.Group
 
 func (f *fakerBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, opts metav1.ListOptions) (watch.Interface, error) {
 	return f.Watch(ctx, gvr, "", opts)
+}
+
+func (f *fakerBackend) RESTClient() *rest.RESTClient {
+	return nil
 }

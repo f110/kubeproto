@@ -4,10 +4,9 @@ import (
 	"errors"
 	"fmt"
 
+	"go.f110.dev/kubeproto/go/apis/metav1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-
-	"go.f110.dev/kubeproto/go/apis/metav1"
 )
 
 const (

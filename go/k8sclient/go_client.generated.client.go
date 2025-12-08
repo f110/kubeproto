@@ -105,6 +105,8 @@ type Backend interface {
 	UpdateStatusClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	DeleteClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, name string, opts metav1.DeleteOptions) error
 	WatchClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, opts metav1.ListOptions) (watch.Interface, error)
+
+	RESTClient() *rest.RESTClient
 }
 
 type Set struct {
@@ -125,7 +127,6 @@ type Set struct {
 	RbacAuthorizationK8sIoV1     *RbacAuthorizationK8sIoV1
 	SchedulingK8sIoV1            *SchedulingK8sIoV1
 	StorageK8sIoV1               *StorageK8sIoV1
-	RESTClient                   *rest.RESTClient
 }
 
 func NewSet(cfg *rest.Config) (*Set, error) {
@@ -139,7 +140,7 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.CoreV1 = NewCoreV1Client(&restBackend{client: c})
+		s.CoreV1 = NewCoreV1Client(&restBackend{client: c}, &conf)
 	}
 	{
 		conf := *cfg
@@ -150,7 +151,7 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.AdmissionregistrationK8sIoV1 = NewAdmissionregistrationK8sIoV1Client(&restBackend{client: c})
+		s.AdmissionregistrationK8sIoV1 = NewAdmissionregistrationK8sIoV1Client(&restBackend{client: c}, &conf)
 	}
 	{
 		conf := *cfg
@@ -161,7 +162,7 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.AppsV1 = NewAppsV1Client(&restBackend{client: c})
+		s.AppsV1 = NewAppsV1Client(&restBackend{client: c}, &conf)
 	}
 	{
 		conf := *cfg
@@ -172,7 +173,7 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.AuthenticationK8sIoV1 = NewAuthenticationK8sIoV1Client(&restBackend{client: c})
+		s.AuthenticationK8sIoV1 = NewAuthenticationK8sIoV1Client(&restBackend{client: c}, &conf)
 	}
 	{
 		conf := *cfg
@@ -183,7 +184,7 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.AuthorizationK8sIoV1 = NewAuthorizationK8sIoV1Client(&restBackend{client: c})
+		s.AuthorizationK8sIoV1 = NewAuthorizationK8sIoV1Client(&restBackend{client: c}, &conf)
 	}
 	{
 		conf := *cfg
@@ -194,7 +195,7 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.AutoscalingV1 = NewAutoscalingV1Client(&restBackend{client: c})
+		s.AutoscalingV1 = NewAutoscalingV1Client(&restBackend{client: c}, &conf)
 	}
 	{
 		conf := *cfg
@@ -205,7 +206,7 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.AutoscalingV2 = NewAutoscalingV2Client(&restBackend{client: c})
+		s.AutoscalingV2 = NewAutoscalingV2Client(&restBackend{client: c}, &conf)
 	}
 	{
 		conf := *cfg
@@ -216,7 +217,7 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.BatchV1 = NewBatchV1Client(&restBackend{client: c})
+		s.BatchV1 = NewBatchV1Client(&restBackend{client: c}, &conf)
 	}
 	{
 		conf := *cfg
@@ -227,7 +228,7 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.CertificatesK8sIoV1 = NewCertificatesK8sIoV1Client(&restBackend{client: c})
+		s.CertificatesK8sIoV1 = NewCertificatesK8sIoV1Client(&restBackend{client: c}, &conf)
 	}
 	{
 		conf := *cfg
@@ -238,7 +239,7 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.CoordinationK8sIoV1 = NewCoordinationK8sIoV1Client(&restBackend{client: c})
+		s.CoordinationK8sIoV1 = NewCoordinationK8sIoV1Client(&restBackend{client: c}, &conf)
 	}
 	{
 		conf := *cfg
@@ -249,7 +250,7 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.DiscoveryK8sIoV1 = NewDiscoveryK8sIoV1Client(&restBackend{client: c})
+		s.DiscoveryK8sIoV1 = NewDiscoveryK8sIoV1Client(&restBackend{client: c}, &conf)
 	}
 	{
 		conf := *cfg
@@ -260,7 +261,7 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.EventsK8sIoV1 = NewEventsK8sIoV1Client(&restBackend{client: c})
+		s.EventsK8sIoV1 = NewEventsK8sIoV1Client(&restBackend{client: c}, &conf)
 	}
 	{
 		conf := *cfg
@@ -271,7 +272,7 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.NetworkingK8sIoV1 = NewNetworkingK8sIoV1Client(&restBackend{client: c})
+		s.NetworkingK8sIoV1 = NewNetworkingK8sIoV1Client(&restBackend{client: c}, &conf)
 	}
 	{
 		conf := *cfg
@@ -282,7 +283,7 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.PolicyV1 = NewPolicyV1Client(&restBackend{client: c})
+		s.PolicyV1 = NewPolicyV1Client(&restBackend{client: c}, &conf)
 	}
 	{
 		conf := *cfg
@@ -293,7 +294,7 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.RbacAuthorizationK8sIoV1 = NewRbacAuthorizationK8sIoV1Client(&restBackend{client: c})
+		s.RbacAuthorizationK8sIoV1 = NewRbacAuthorizationK8sIoV1Client(&restBackend{client: c}, &conf)
 	}
 	{
 		conf := *cfg
@@ -304,7 +305,7 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.SchedulingK8sIoV1 = NewSchedulingK8sIoV1Client(&restBackend{client: c})
+		s.SchedulingK8sIoV1 = NewSchedulingK8sIoV1Client(&restBackend{client: c}, &conf)
 	}
 	{
 		conf := *cfg
@@ -315,15 +316,7 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.StorageK8sIoV1 = NewStorageK8sIoV1Client(&restBackend{client: c})
-	}
-	{
-		conf := *cfg
-		c, err := rest.RESTClientFor(&conf)
-		if err != nil {
-			return nil, err
-		}
-		s.RESTClient = c
+		s.StorageK8sIoV1 = NewStorageK8sIoV1Client(&restBackend{client: c}, &conf)
 	}
 
 	return s, nil
@@ -513,12 +506,17 @@ func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVe
 		Watch(ctx)
 }
 
-type CoreV1 struct {
-	backend Backend
+func (r *restBackend) RESTClient() *rest.RESTClient {
+	return r.client
 }
 
-func NewCoreV1Client(b Backend) *CoreV1 {
-	return &CoreV1{backend: b}
+type CoreV1 struct {
+	backend Backend
+	config  *rest.Config
+}
+
+func NewCoreV1Client(b Backend, config *rest.Config) *CoreV1 {
+	return &CoreV1{backend: b, config: config}
 }
 
 func (c *CoreV1) GetBinding(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*corev1.Binding, error) {
@@ -1355,10 +1353,11 @@ func (c *CoreV1) WatchServiceAccount(ctx context.Context, namespace string, opts
 
 type AdmissionregistrationK8sIoV1 struct {
 	backend Backend
+	config  *rest.Config
 }
 
-func NewAdmissionregistrationK8sIoV1Client(b Backend) *AdmissionregistrationK8sIoV1 {
-	return &AdmissionregistrationK8sIoV1{backend: b}
+func NewAdmissionregistrationK8sIoV1Client(b Backend, config *rest.Config) *AdmissionregistrationK8sIoV1 {
+	return &AdmissionregistrationK8sIoV1{backend: b, config: config}
 }
 
 func (c *AdmissionregistrationK8sIoV1) GetMutatingWebhookConfiguration(ctx context.Context, name string, opts metav1.GetOptions) (*admissionregistrationv1.MutatingWebhookConfiguration, error) {
@@ -1531,10 +1530,11 @@ func (c *AdmissionregistrationK8sIoV1) WatchValidatingWebhookConfiguration(ctx c
 
 type AppsV1 struct {
 	backend Backend
+	config  *rest.Config
 }
 
-func NewAppsV1Client(b Backend) *AppsV1 {
-	return &AppsV1{backend: b}
+func NewAppsV1Client(b Backend, config *rest.Config) *AppsV1 {
+	return &AppsV1{backend: b, config: config}
 }
 
 func (c *AppsV1) GetControllerRevision(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*appsv1.ControllerRevision, error) {
@@ -1771,10 +1771,11 @@ func (c *AppsV1) WatchStatefulSet(ctx context.Context, namespace string, opts me
 
 type AuthenticationK8sIoV1 struct {
 	backend Backend
+	config  *rest.Config
 }
 
-func NewAuthenticationK8sIoV1Client(b Backend) *AuthenticationK8sIoV1 {
-	return &AuthenticationK8sIoV1{backend: b}
+func NewAuthenticationK8sIoV1Client(b Backend, config *rest.Config) *AuthenticationK8sIoV1 {
+	return &AuthenticationK8sIoV1{backend: b, config: config}
 }
 
 func (c *AuthenticationK8sIoV1) GetSelfSubjectReview(ctx context.Context, name string, opts metav1.GetOptions) (*authenticationv1.SelfSubjectReview, error) {
@@ -1923,10 +1924,11 @@ func (c *AuthenticationK8sIoV1) WatchTokenReview(ctx context.Context, opts metav
 
 type AuthorizationK8sIoV1 struct {
 	backend Backend
+	config  *rest.Config
 }
 
-func NewAuthorizationK8sIoV1Client(b Backend) *AuthorizationK8sIoV1 {
-	return &AuthorizationK8sIoV1{backend: b}
+func NewAuthorizationK8sIoV1Client(b Backend, config *rest.Config) *AuthorizationK8sIoV1 {
+	return &AuthorizationK8sIoV1{backend: b, config: config}
 }
 
 func (c *AuthorizationK8sIoV1) GetLocalSubjectAccessReview(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*authorizationv1.LocalSubjectAccessReview, error) {
@@ -2123,10 +2125,11 @@ func (c *AuthorizationK8sIoV1) WatchSubjectAccessReview(ctx context.Context, opt
 
 type AutoscalingV1 struct {
 	backend Backend
+	config  *rest.Config
 }
 
-func NewAutoscalingV1Client(b Backend) *AutoscalingV1 {
-	return &AutoscalingV1{backend: b}
+func NewAutoscalingV1Client(b Backend, config *rest.Config) *AutoscalingV1 {
+	return &AutoscalingV1{backend: b, config: config}
 }
 
 func (c *AutoscalingV1) GetHorizontalPodAutoscaler(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*autoscalingv1.HorizontalPodAutoscaler, error) {
@@ -2227,10 +2230,11 @@ func (c *AutoscalingV1) WatchScale(ctx context.Context, namespace string, opts m
 
 type AutoscalingV2 struct {
 	backend Backend
+	config  *rest.Config
 }
 
-func NewAutoscalingV2Client(b Backend) *AutoscalingV2 {
-	return &AutoscalingV2{backend: b}
+func NewAutoscalingV2Client(b Backend, config *rest.Config) *AutoscalingV2 {
+	return &AutoscalingV2{backend: b, config: config}
 }
 
 func (c *AutoscalingV2) GetHorizontalPodAutoscaler(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*autoscalingv2.HorizontalPodAutoscaler, error) {
@@ -2283,10 +2287,11 @@ func (c *AutoscalingV2) WatchHorizontalPodAutoscaler(ctx context.Context, namesp
 
 type BatchV1 struct {
 	backend Backend
+	config  *rest.Config
 }
 
-func NewBatchV1Client(b Backend) *BatchV1 {
-	return &BatchV1{backend: b}
+func NewBatchV1Client(b Backend, config *rest.Config) *BatchV1 {
+	return &BatchV1{backend: b, config: config}
 }
 
 func (c *BatchV1) GetCronJob(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*batchv1.CronJob, error) {
@@ -2387,10 +2392,11 @@ func (c *BatchV1) WatchJob(ctx context.Context, namespace string, opts metav1.Li
 
 type CertificatesK8sIoV1 struct {
 	backend Backend
+	config  *rest.Config
 }
 
-func NewCertificatesK8sIoV1Client(b Backend) *CertificatesK8sIoV1 {
-	return &CertificatesK8sIoV1{backend: b}
+func NewCertificatesK8sIoV1Client(b Backend, config *rest.Config) *CertificatesK8sIoV1 {
+	return &CertificatesK8sIoV1{backend: b, config: config}
 }
 
 func (c *CertificatesK8sIoV1) GetCertificateSigningRequest(ctx context.Context, name string, opts metav1.GetOptions) (*certificatesv1.CertificateSigningRequest, error) {
@@ -2443,10 +2449,11 @@ func (c *CertificatesK8sIoV1) WatchCertificateSigningRequest(ctx context.Context
 
 type CoordinationK8sIoV1 struct {
 	backend Backend
+	config  *rest.Config
 }
 
-func NewCoordinationK8sIoV1Client(b Backend) *CoordinationK8sIoV1 {
-	return &CoordinationK8sIoV1{backend: b}
+func NewCoordinationK8sIoV1Client(b Backend, config *rest.Config) *CoordinationK8sIoV1 {
+	return &CoordinationK8sIoV1{backend: b, config: config}
 }
 
 func (c *CoordinationK8sIoV1) GetLease(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*coordinationv1.Lease, error) {
@@ -2491,10 +2498,11 @@ func (c *CoordinationK8sIoV1) WatchLease(ctx context.Context, namespace string, 
 
 type DiscoveryK8sIoV1 struct {
 	backend Backend
+	config  *rest.Config
 }
 
-func NewDiscoveryK8sIoV1Client(b Backend) *DiscoveryK8sIoV1 {
-	return &DiscoveryK8sIoV1{backend: b}
+func NewDiscoveryK8sIoV1Client(b Backend, config *rest.Config) *DiscoveryK8sIoV1 {
+	return &DiscoveryK8sIoV1{backend: b, config: config}
 }
 
 func (c *DiscoveryK8sIoV1) GetEndpointSlice(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*discoveryv1.EndpointSlice, error) {
@@ -2539,10 +2547,11 @@ func (c *DiscoveryK8sIoV1) WatchEndpointSlice(ctx context.Context, namespace str
 
 type EventsK8sIoV1 struct {
 	backend Backend
+	config  *rest.Config
 }
 
-func NewEventsK8sIoV1Client(b Backend) *EventsK8sIoV1 {
-	return &EventsK8sIoV1{backend: b}
+func NewEventsK8sIoV1Client(b Backend, config *rest.Config) *EventsK8sIoV1 {
+	return &EventsK8sIoV1{backend: b, config: config}
 }
 
 func (c *EventsK8sIoV1) GetEvent(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*eventsv1.Event, error) {
@@ -2587,10 +2596,11 @@ func (c *EventsK8sIoV1) WatchEvent(ctx context.Context, namespace string, opts m
 
 type NetworkingK8sIoV1 struct {
 	backend Backend
+	config  *rest.Config
 }
 
-func NewNetworkingK8sIoV1Client(b Backend) *NetworkingK8sIoV1 {
-	return &NetworkingK8sIoV1{backend: b}
+func NewNetworkingK8sIoV1Client(b Backend, config *rest.Config) *NetworkingK8sIoV1 {
+	return &NetworkingK8sIoV1{backend: b, config: config}
 }
 
 func (c *NetworkingK8sIoV1) GetIngress(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*networkingv1.Ingress, error) {
@@ -2723,10 +2733,11 @@ func (c *NetworkingK8sIoV1) WatchNetworkPolicy(ctx context.Context, namespace st
 
 type PolicyV1 struct {
 	backend Backend
+	config  *rest.Config
 }
 
-func NewPolicyV1Client(b Backend) *PolicyV1 {
-	return &PolicyV1{backend: b}
+func NewPolicyV1Client(b Backend, config *rest.Config) *PolicyV1 {
+	return &PolicyV1{backend: b, config: config}
 }
 
 func (c *PolicyV1) GetEviction(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*policyv1.Eviction, error) {
@@ -2819,10 +2830,11 @@ func (c *PolicyV1) WatchPodDisruptionBudget(ctx context.Context, namespace strin
 
 type RbacAuthorizationK8sIoV1 struct {
 	backend Backend
+	config  *rest.Config
 }
 
-func NewRbacAuthorizationK8sIoV1Client(b Backend) *RbacAuthorizationK8sIoV1 {
-	return &RbacAuthorizationK8sIoV1{backend: b}
+func NewRbacAuthorizationK8sIoV1Client(b Backend, config *rest.Config) *RbacAuthorizationK8sIoV1 {
+	return &RbacAuthorizationK8sIoV1{backend: b, config: config}
 }
 
 func (c *RbacAuthorizationK8sIoV1) GetClusterRole(ctx context.Context, name string, opts metav1.GetOptions) (*rbacv1.ClusterRole, error) {
@@ -2987,10 +2999,11 @@ func (c *RbacAuthorizationK8sIoV1) WatchRoleBinding(ctx context.Context, namespa
 
 type SchedulingK8sIoV1 struct {
 	backend Backend
+	config  *rest.Config
 }
 
-func NewSchedulingK8sIoV1Client(b Backend) *SchedulingK8sIoV1 {
-	return &SchedulingK8sIoV1{backend: b}
+func NewSchedulingK8sIoV1Client(b Backend, config *rest.Config) *SchedulingK8sIoV1 {
+	return &SchedulingK8sIoV1{backend: b, config: config}
 }
 
 func (c *SchedulingK8sIoV1) GetPriorityClass(ctx context.Context, name string, opts metav1.GetOptions) (*schedulingv1.PriorityClass, error) {
@@ -3035,10 +3048,11 @@ func (c *SchedulingK8sIoV1) WatchPriorityClass(ctx context.Context, opts metav1.
 
 type StorageK8sIoV1 struct {
 	backend Backend
+	config  *rest.Config
 }
 
-func NewStorageK8sIoV1Client(b Backend) *StorageK8sIoV1 {
-	return &StorageK8sIoV1{backend: b}
+func NewStorageK8sIoV1Client(b Backend, config *rest.Config) *StorageK8sIoV1 {
+	return &StorageK8sIoV1{backend: b, config: config}
 }
 
 func (c *StorageK8sIoV1) GetCSIDriver(ctx context.Context, name string, opts metav1.GetOptions) (*storagev1.CSIDriver, error) {
