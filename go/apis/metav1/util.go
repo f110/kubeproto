@@ -382,6 +382,38 @@ func (in *ListMeta) GetListMeta() *ListMeta {
 	return in
 }
 
+func (in *ListMeta) GetResourceVersion() string {
+	return in.ResourceVersion
+}
+
+func (in *ListMeta) SetResourceVersion(version string) {
+	in.ResourceVersion = version
+}
+
+func (in *ListMeta) GetSelfLink() string {
+	return in.SelfLink
+}
+
+func (in *ListMeta) SetSelfLink(selfLink string) {
+	in.SelfLink = selfLink
+}
+
+func (in *ListMeta) GetContinue() string {
+	return in.Continue
+}
+
+func (in *ListMeta) SetContinue(c string) {
+	in.Continue = c
+}
+
+func (in *ListMeta) GetRemainingItemCount() *int64 {
+	return &in.RemainingItemCount
+}
+
+func (in *ListMeta) SetRemainingItemCount(c *int64) {
+	in.RemainingItemCount = *c
+}
+
 func LabelSelectorAsSelector(ps *LabelSelector) (labels.Selector, error) {
 	if ps == nil {
 		return labels.Nothing(), nil
