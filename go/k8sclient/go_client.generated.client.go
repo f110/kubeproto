@@ -134,7 +134,7 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 	{
 		conf := *cfg
 		conf.GroupVersion = &corev1.SchemaGroupVersion
-		conf.APIPath = "/apis"
+		conf.APIPath = "/api"
 		conf.NegotiatedSerializer = Codecs.WithoutConversion()
 		c, err := rest.RESTClientFor(&conf)
 		if err != nil {

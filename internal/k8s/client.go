@@ -126,7 +126,11 @@ type Backend interface {
 		writer.F("{")
 		writer.F("conf := *cfg")
 		writer.F("conf.GroupVersion = &%s.SchemaGroupVersion", m.Package.Alias)
-		writer.F("conf.APIPath = \"/apis\"")
+		if m.Package.Name == "corev1" {
+			writer.F("conf.APIPath = \"/api\"")
+		} else {
+			writer.F("conf.APIPath = \"/apis\"")
+		}
 		writer.F("conf.NegotiatedSerializer = Codecs.WithoutConversion()")
 		writer.F("c, err := rest.RESTClientFor(&conf)")
 		writer.F("if err != nil {")
