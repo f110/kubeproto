@@ -2200,7 +2200,30 @@ func (in *DaemonEndpoint) DeepCopy() *DaemonEndpoint {
 	return out
 }
 
-type DownwardAPIProjection []DownwardAPIVolumeFile
+type DownwardAPIProjection struct {
+	// Items is a list of DownwardAPIVolume file
+	Items []DownwardAPIVolumeFile `json:"items"`
+}
+
+func (in *DownwardAPIProjection) DeepCopyInto(out *DownwardAPIProjection) {
+	*out = *in
+	if in.Items != nil {
+		l := make([]DownwardAPIVolumeFile, len(in.Items))
+		for i := range in.Items {
+			in.Items[i].DeepCopyInto(&l[i])
+		}
+		out.Items = l
+	}
+}
+
+func (in *DownwardAPIProjection) DeepCopy() *DownwardAPIProjection {
+	if in == nil {
+		return nil
+	}
+	out := new(DownwardAPIProjection)
+	in.DeepCopyInto(out)
+	return out
+}
 
 type DownwardAPIVolumeFile struct {
 	// Required: Path is  the relative path name of the file to be created. Must not be absolute or contain the '..' path. Must be utf-8 encoded. The first item of the relative path must not start with '..'
@@ -10211,7 +10234,7 @@ func (in *VolumeProjection) DeepCopyInto(out *VolumeProjection) {
 	if in.DownwardAPI != nil {
 		in, out := &in.DownwardAPI, &out.DownwardAPI
 		*out = new(DownwardAPIProjection)
-		copy(**out, **in)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.ConfigMap != nil {
 		in, out := &in.ConfigMap, &out.ConfigMap

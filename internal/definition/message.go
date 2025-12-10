@@ -296,7 +296,7 @@ func (m *Message) IsDefinedSubResource() bool {
 }
 
 func (m *Message) IsList() bool {
-	if len(m.Fields) == 1 && m.Fields[0].Name == "Items" && m.Fields[0].Repeated {
+	if len(m.Fields) == 1 && m.Fields[0].Name == "Items" && m.Fields[0].Repeated && m.Fields[0].Kind != protoreflect.MessageKind {
 		return true
 	}
 	return false
