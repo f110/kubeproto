@@ -548,7 +548,7 @@ func (c *CoreV1) DeleteBinding(ctx context.Context, namespace, name string, opts
 }
 
 func (c *CoreV1) ListBinding(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.BindingList, error) {
-	result, err := c.backend.List(ctx, "bindings", namespace, opts, &corev1.Binding{})
+	result, err := c.backend.List(ctx, "bindings", namespace, opts, &corev1.BindingList{})
 	if err != nil {
 		return nil, err
 	}
@@ -588,7 +588,7 @@ func (c *CoreV1) DeleteComponentStatus(ctx context.Context, name string, opts me
 }
 
 func (c *CoreV1) ListComponentStatus(ctx context.Context, opts metav1.ListOptions) (*corev1.ComponentStatusList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "componentstatuses", opts, &corev1.ComponentStatus{})
+	result, err := c.backend.ListClusterScoped(ctx, "componentstatuses", opts, &corev1.ComponentStatusList{})
 	if err != nil {
 		return nil, err
 	}
@@ -628,7 +628,7 @@ func (c *CoreV1) DeleteConfigMap(ctx context.Context, namespace, name string, op
 }
 
 func (c *CoreV1) ListConfigMap(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.ConfigMapList, error) {
-	result, err := c.backend.List(ctx, "configmaps", namespace, opts, &corev1.ConfigMap{})
+	result, err := c.backend.List(ctx, "configmaps", namespace, opts, &corev1.ConfigMapList{})
 	if err != nil {
 		return nil, err
 	}
@@ -668,7 +668,7 @@ func (c *CoreV1) DeleteEndpoints(ctx context.Context, namespace, name string, op
 }
 
 func (c *CoreV1) ListEndpoints(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.EndpointsList, error) {
-	result, err := c.backend.List(ctx, "endpoints", namespace, opts, &corev1.Endpoints{})
+	result, err := c.backend.List(ctx, "endpoints", namespace, opts, &corev1.EndpointsList{})
 	if err != nil {
 		return nil, err
 	}
@@ -708,7 +708,7 @@ func (c *CoreV1) DeleteEvent(ctx context.Context, namespace, name string, opts m
 }
 
 func (c *CoreV1) ListEvent(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.EventList, error) {
-	result, err := c.backend.List(ctx, "events", namespace, opts, &corev1.Event{})
+	result, err := c.backend.List(ctx, "events", namespace, opts, &corev1.EventList{})
 	if err != nil {
 		return nil, err
 	}
@@ -748,7 +748,7 @@ func (c *CoreV1) DeleteLimitRange(ctx context.Context, namespace, name string, o
 }
 
 func (c *CoreV1) ListLimitRange(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.LimitRangeList, error) {
-	result, err := c.backend.List(ctx, "limitranges", namespace, opts, &corev1.LimitRange{})
+	result, err := c.backend.List(ctx, "limitranges", namespace, opts, &corev1.LimitRangeList{})
 	if err != nil {
 		return nil, err
 	}
@@ -796,7 +796,7 @@ func (c *CoreV1) DeleteNamespace(ctx context.Context, name string, opts metav1.D
 }
 
 func (c *CoreV1) ListNamespace(ctx context.Context, opts metav1.ListOptions) (*corev1.NamespaceList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "namespaces", opts, &corev1.Namespace{})
+	result, err := c.backend.ListClusterScoped(ctx, "namespaces", opts, &corev1.NamespaceList{})
 	if err != nil {
 		return nil, err
 	}
@@ -844,7 +844,7 @@ func (c *CoreV1) DeleteNode(ctx context.Context, name string, opts metav1.Delete
 }
 
 func (c *CoreV1) ListNode(ctx context.Context, opts metav1.ListOptions) (*corev1.NodeList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "nodes", opts, &corev1.Node{})
+	result, err := c.backend.ListClusterScoped(ctx, "nodes", opts, &corev1.NodeList{})
 	if err != nil {
 		return nil, err
 	}
@@ -892,7 +892,7 @@ func (c *CoreV1) DeletePersistentVolume(ctx context.Context, name string, opts m
 }
 
 func (c *CoreV1) ListPersistentVolume(ctx context.Context, opts metav1.ListOptions) (*corev1.PersistentVolumeList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "persistentvolumes", opts, &corev1.PersistentVolume{})
+	result, err := c.backend.ListClusterScoped(ctx, "persistentvolumes", opts, &corev1.PersistentVolumeList{})
 	if err != nil {
 		return nil, err
 	}
@@ -940,7 +940,7 @@ func (c *CoreV1) DeletePersistentVolumeClaim(ctx context.Context, namespace, nam
 }
 
 func (c *CoreV1) ListPersistentVolumeClaim(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.PersistentVolumeClaimList, error) {
-	result, err := c.backend.List(ctx, "persistentvolumeclaims", namespace, opts, &corev1.PersistentVolumeClaim{})
+	result, err := c.backend.List(ctx, "persistentvolumeclaims", namespace, opts, &corev1.PersistentVolumeClaimList{})
 	if err != nil {
 		return nil, err
 	}
@@ -988,7 +988,7 @@ func (c *CoreV1) DeletePod(ctx context.Context, namespace, name string, opts met
 }
 
 func (c *CoreV1) ListPod(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.PodList, error) {
-	result, err := c.backend.List(ctx, "pods", namespace, opts, &corev1.Pod{})
+	result, err := c.backend.List(ctx, "pods", namespace, opts, &corev1.PodList{})
 	if err != nil {
 		return nil, err
 	}
@@ -1036,7 +1036,7 @@ func (c *CoreV1) DeletePodStatusResult(ctx context.Context, namespace, name stri
 }
 
 func (c *CoreV1) ListPodStatusResult(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.PodStatusResultList, error) {
-	result, err := c.backend.List(ctx, "podstatusresults", namespace, opts, &corev1.PodStatusResult{})
+	result, err := c.backend.List(ctx, "podstatusresults", namespace, opts, &corev1.PodStatusResultList{})
 	if err != nil {
 		return nil, err
 	}
@@ -1076,7 +1076,7 @@ func (c *CoreV1) DeletePodTemplate(ctx context.Context, namespace, name string, 
 }
 
 func (c *CoreV1) ListPodTemplate(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.PodTemplateList, error) {
-	result, err := c.backend.List(ctx, "podtemplates", namespace, opts, &corev1.PodTemplate{})
+	result, err := c.backend.List(ctx, "podtemplates", namespace, opts, &corev1.PodTemplateList{})
 	if err != nil {
 		return nil, err
 	}
@@ -1116,7 +1116,7 @@ func (c *CoreV1) DeleteRangeAllocation(ctx context.Context, namespace, name stri
 }
 
 func (c *CoreV1) ListRangeAllocation(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.RangeAllocationList, error) {
-	result, err := c.backend.List(ctx, "rangeallocations", namespace, opts, &corev1.RangeAllocation{})
+	result, err := c.backend.List(ctx, "rangeallocations", namespace, opts, &corev1.RangeAllocationList{})
 	if err != nil {
 		return nil, err
 	}
@@ -1164,7 +1164,7 @@ func (c *CoreV1) DeleteReplicationController(ctx context.Context, namespace, nam
 }
 
 func (c *CoreV1) ListReplicationController(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.ReplicationControllerList, error) {
-	result, err := c.backend.List(ctx, "replicationcontrollers", namespace, opts, &corev1.ReplicationController{})
+	result, err := c.backend.List(ctx, "replicationcontrollers", namespace, opts, &corev1.ReplicationControllerList{})
 	if err != nil {
 		return nil, err
 	}
@@ -1212,7 +1212,7 @@ func (c *CoreV1) DeleteResourceQuota(ctx context.Context, namespace, name string
 }
 
 func (c *CoreV1) ListResourceQuota(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.ResourceQuotaList, error) {
-	result, err := c.backend.List(ctx, "resourcequotas", namespace, opts, &corev1.ResourceQuota{})
+	result, err := c.backend.List(ctx, "resourcequotas", namespace, opts, &corev1.ResourceQuotaList{})
 	if err != nil {
 		return nil, err
 	}
@@ -1252,7 +1252,7 @@ func (c *CoreV1) DeleteSecret(ctx context.Context, namespace, name string, opts 
 }
 
 func (c *CoreV1) ListSecret(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.SecretList, error) {
-	result, err := c.backend.List(ctx, "secrets", namespace, opts, &corev1.Secret{})
+	result, err := c.backend.List(ctx, "secrets", namespace, opts, &corev1.SecretList{})
 	if err != nil {
 		return nil, err
 	}
@@ -1300,7 +1300,7 @@ func (c *CoreV1) DeleteService(ctx context.Context, namespace, name string, opts
 }
 
 func (c *CoreV1) ListService(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.ServiceList, error) {
-	result, err := c.backend.List(ctx, "services", namespace, opts, &corev1.Service{})
+	result, err := c.backend.List(ctx, "services", namespace, opts, &corev1.ServiceList{})
 	if err != nil {
 		return nil, err
 	}
@@ -1340,7 +1340,7 @@ func (c *CoreV1) DeleteServiceAccount(ctx context.Context, namespace, name strin
 }
 
 func (c *CoreV1) ListServiceAccount(ctx context.Context, namespace string, opts metav1.ListOptions) (*corev1.ServiceAccountList, error) {
-	result, err := c.backend.List(ctx, "serviceaccounts", namespace, opts, &corev1.ServiceAccount{})
+	result, err := c.backend.List(ctx, "serviceaccounts", namespace, opts, &corev1.ServiceAccountList{})
 	if err != nil {
 		return nil, err
 	}
@@ -1389,7 +1389,7 @@ func (c *AdmissionregistrationK8sIoV1) DeleteMutatingWebhookConfiguration(ctx co
 }
 
 func (c *AdmissionregistrationK8sIoV1) ListMutatingWebhookConfiguration(ctx context.Context, opts metav1.ListOptions) (*admissionregistrationv1.MutatingWebhookConfigurationList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "mutatingwebhookconfigurations", opts, &admissionregistrationv1.MutatingWebhookConfiguration{})
+	result, err := c.backend.ListClusterScoped(ctx, "mutatingwebhookconfigurations", opts, &admissionregistrationv1.MutatingWebhookConfigurationList{})
 	if err != nil {
 		return nil, err
 	}
@@ -1437,7 +1437,7 @@ func (c *AdmissionregistrationK8sIoV1) DeleteValidatingAdmissionPolicy(ctx conte
 }
 
 func (c *AdmissionregistrationK8sIoV1) ListValidatingAdmissionPolicy(ctx context.Context, opts metav1.ListOptions) (*admissionregistrationv1.ValidatingAdmissionPolicyList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "validatingadmissionpolicies", opts, &admissionregistrationv1.ValidatingAdmissionPolicy{})
+	result, err := c.backend.ListClusterScoped(ctx, "validatingadmissionpolicies", opts, &admissionregistrationv1.ValidatingAdmissionPolicyList{})
 	if err != nil {
 		return nil, err
 	}
@@ -1477,7 +1477,7 @@ func (c *AdmissionregistrationK8sIoV1) DeleteValidatingAdmissionPolicyBinding(ct
 }
 
 func (c *AdmissionregistrationK8sIoV1) ListValidatingAdmissionPolicyBinding(ctx context.Context, opts metav1.ListOptions) (*admissionregistrationv1.ValidatingAdmissionPolicyBindingList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "validatingadmissionpolicybindings", opts, &admissionregistrationv1.ValidatingAdmissionPolicyBinding{})
+	result, err := c.backend.ListClusterScoped(ctx, "validatingadmissionpolicybindings", opts, &admissionregistrationv1.ValidatingAdmissionPolicyBindingList{})
 	if err != nil {
 		return nil, err
 	}
@@ -1517,7 +1517,7 @@ func (c *AdmissionregistrationK8sIoV1) DeleteValidatingWebhookConfiguration(ctx 
 }
 
 func (c *AdmissionregistrationK8sIoV1) ListValidatingWebhookConfiguration(ctx context.Context, opts metav1.ListOptions) (*admissionregistrationv1.ValidatingWebhookConfigurationList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "validatingwebhookconfigurations", opts, &admissionregistrationv1.ValidatingWebhookConfiguration{})
+	result, err := c.backend.ListClusterScoped(ctx, "validatingwebhookconfigurations", opts, &admissionregistrationv1.ValidatingWebhookConfigurationList{})
 	if err != nil {
 		return nil, err
 	}
@@ -1566,7 +1566,7 @@ func (c *AppsV1) DeleteControllerRevision(ctx context.Context, namespace, name s
 }
 
 func (c *AppsV1) ListControllerRevision(ctx context.Context, namespace string, opts metav1.ListOptions) (*appsv1.ControllerRevisionList, error) {
-	result, err := c.backend.List(ctx, "controllerrevisions", namespace, opts, &appsv1.ControllerRevision{})
+	result, err := c.backend.List(ctx, "controllerrevisions", namespace, opts, &appsv1.ControllerRevisionList{})
 	if err != nil {
 		return nil, err
 	}
@@ -1614,7 +1614,7 @@ func (c *AppsV1) DeleteDaemonSet(ctx context.Context, namespace, name string, op
 }
 
 func (c *AppsV1) ListDaemonSet(ctx context.Context, namespace string, opts metav1.ListOptions) (*appsv1.DaemonSetList, error) {
-	result, err := c.backend.List(ctx, "daemonsets", namespace, opts, &appsv1.DaemonSet{})
+	result, err := c.backend.List(ctx, "daemonsets", namespace, opts, &appsv1.DaemonSetList{})
 	if err != nil {
 		return nil, err
 	}
@@ -1662,7 +1662,7 @@ func (c *AppsV1) DeleteDeployment(ctx context.Context, namespace, name string, o
 }
 
 func (c *AppsV1) ListDeployment(ctx context.Context, namespace string, opts metav1.ListOptions) (*appsv1.DeploymentList, error) {
-	result, err := c.backend.List(ctx, "deployments", namespace, opts, &appsv1.Deployment{})
+	result, err := c.backend.List(ctx, "deployments", namespace, opts, &appsv1.DeploymentList{})
 	if err != nil {
 		return nil, err
 	}
@@ -1710,7 +1710,7 @@ func (c *AppsV1) DeleteReplicaSet(ctx context.Context, namespace, name string, o
 }
 
 func (c *AppsV1) ListReplicaSet(ctx context.Context, namespace string, opts metav1.ListOptions) (*appsv1.ReplicaSetList, error) {
-	result, err := c.backend.List(ctx, "replicasets", namespace, opts, &appsv1.ReplicaSet{})
+	result, err := c.backend.List(ctx, "replicasets", namespace, opts, &appsv1.ReplicaSetList{})
 	if err != nil {
 		return nil, err
 	}
@@ -1758,7 +1758,7 @@ func (c *AppsV1) DeleteStatefulSet(ctx context.Context, namespace, name string, 
 }
 
 func (c *AppsV1) ListStatefulSet(ctx context.Context, namespace string, opts metav1.ListOptions) (*appsv1.StatefulSetList, error) {
-	result, err := c.backend.List(ctx, "statefulsets", namespace, opts, &appsv1.StatefulSet{})
+	result, err := c.backend.List(ctx, "statefulsets", namespace, opts, &appsv1.StatefulSetList{})
 	if err != nil {
 		return nil, err
 	}
@@ -1815,7 +1815,7 @@ func (c *AuthenticationK8sIoV1) DeleteSelfSubjectReview(ctx context.Context, nam
 }
 
 func (c *AuthenticationK8sIoV1) ListSelfSubjectReview(ctx context.Context, opts metav1.ListOptions) (*authenticationv1.SelfSubjectReviewList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "selfsubjectreviews", opts, &authenticationv1.SelfSubjectReview{})
+	result, err := c.backend.ListClusterScoped(ctx, "selfsubjectreviews", opts, &authenticationv1.SelfSubjectReviewList{})
 	if err != nil {
 		return nil, err
 	}
@@ -1863,7 +1863,7 @@ func (c *AuthenticationK8sIoV1) DeleteTokenRequest(ctx context.Context, namespac
 }
 
 func (c *AuthenticationK8sIoV1) ListTokenRequest(ctx context.Context, namespace string, opts metav1.ListOptions) (*authenticationv1.TokenRequestList, error) {
-	result, err := c.backend.List(ctx, "tokenrequests", namespace, opts, &authenticationv1.TokenRequest{})
+	result, err := c.backend.List(ctx, "tokenrequests", namespace, opts, &authenticationv1.TokenRequestList{})
 	if err != nil {
 		return nil, err
 	}
@@ -1911,7 +1911,7 @@ func (c *AuthenticationK8sIoV1) DeleteTokenReview(ctx context.Context, name stri
 }
 
 func (c *AuthenticationK8sIoV1) ListTokenReview(ctx context.Context, opts metav1.ListOptions) (*authenticationv1.TokenReviewList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "tokenreviews", opts, &authenticationv1.TokenReview{})
+	result, err := c.backend.ListClusterScoped(ctx, "tokenreviews", opts, &authenticationv1.TokenReviewList{})
 	if err != nil {
 		return nil, err
 	}
@@ -1968,7 +1968,7 @@ func (c *AuthorizationK8sIoV1) DeleteLocalSubjectAccessReview(ctx context.Contex
 }
 
 func (c *AuthorizationK8sIoV1) ListLocalSubjectAccessReview(ctx context.Context, namespace string, opts metav1.ListOptions) (*authorizationv1.LocalSubjectAccessReviewList, error) {
-	result, err := c.backend.List(ctx, "localsubjectaccessreviews", namespace, opts, &authorizationv1.LocalSubjectAccessReview{})
+	result, err := c.backend.List(ctx, "localsubjectaccessreviews", namespace, opts, &authorizationv1.LocalSubjectAccessReviewList{})
 	if err != nil {
 		return nil, err
 	}
@@ -2016,7 +2016,7 @@ func (c *AuthorizationK8sIoV1) DeleteSelfSubjectAccessReview(ctx context.Context
 }
 
 func (c *AuthorizationK8sIoV1) ListSelfSubjectAccessReview(ctx context.Context, opts metav1.ListOptions) (*authorizationv1.SelfSubjectAccessReviewList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "selfsubjectaccessreviews", opts, &authorizationv1.SelfSubjectAccessReview{})
+	result, err := c.backend.ListClusterScoped(ctx, "selfsubjectaccessreviews", opts, &authorizationv1.SelfSubjectAccessReviewList{})
 	if err != nil {
 		return nil, err
 	}
@@ -2064,7 +2064,7 @@ func (c *AuthorizationK8sIoV1) DeleteSelfSubjectRulesReview(ctx context.Context,
 }
 
 func (c *AuthorizationK8sIoV1) ListSelfSubjectRulesReview(ctx context.Context, opts metav1.ListOptions) (*authorizationv1.SelfSubjectRulesReviewList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "selfsubjectrulesreviews", opts, &authorizationv1.SelfSubjectRulesReview{})
+	result, err := c.backend.ListClusterScoped(ctx, "selfsubjectrulesreviews", opts, &authorizationv1.SelfSubjectRulesReviewList{})
 	if err != nil {
 		return nil, err
 	}
@@ -2112,7 +2112,7 @@ func (c *AuthorizationK8sIoV1) DeleteSubjectAccessReview(ctx context.Context, na
 }
 
 func (c *AuthorizationK8sIoV1) ListSubjectAccessReview(ctx context.Context, opts metav1.ListOptions) (*authorizationv1.SubjectAccessReviewList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "subjectaccessreviews", opts, &authorizationv1.SubjectAccessReview{})
+	result, err := c.backend.ListClusterScoped(ctx, "subjectaccessreviews", opts, &authorizationv1.SubjectAccessReviewList{})
 	if err != nil {
 		return nil, err
 	}
@@ -2169,7 +2169,7 @@ func (c *AutoscalingV1) DeleteHorizontalPodAutoscaler(ctx context.Context, names
 }
 
 func (c *AutoscalingV1) ListHorizontalPodAutoscaler(ctx context.Context, namespace string, opts metav1.ListOptions) (*autoscalingv1.HorizontalPodAutoscalerList, error) {
-	result, err := c.backend.List(ctx, "horizontalpodautoscalers", namespace, opts, &autoscalingv1.HorizontalPodAutoscaler{})
+	result, err := c.backend.List(ctx, "horizontalpodautoscalers", namespace, opts, &autoscalingv1.HorizontalPodAutoscalerList{})
 	if err != nil {
 		return nil, err
 	}
@@ -2217,7 +2217,7 @@ func (c *AutoscalingV1) DeleteScale(ctx context.Context, namespace, name string,
 }
 
 func (c *AutoscalingV1) ListScale(ctx context.Context, namespace string, opts metav1.ListOptions) (*autoscalingv1.ScaleList, error) {
-	result, err := c.backend.List(ctx, "scales", namespace, opts, &autoscalingv1.Scale{})
+	result, err := c.backend.List(ctx, "scales", namespace, opts, &autoscalingv1.ScaleList{})
 	if err != nil {
 		return nil, err
 	}
@@ -2274,7 +2274,7 @@ func (c *AutoscalingV2) DeleteHorizontalPodAutoscaler(ctx context.Context, names
 }
 
 func (c *AutoscalingV2) ListHorizontalPodAutoscaler(ctx context.Context, namespace string, opts metav1.ListOptions) (*autoscalingv2.HorizontalPodAutoscalerList, error) {
-	result, err := c.backend.List(ctx, "horizontalpodautoscalers", namespace, opts, &autoscalingv2.HorizontalPodAutoscaler{})
+	result, err := c.backend.List(ctx, "horizontalpodautoscalers", namespace, opts, &autoscalingv2.HorizontalPodAutoscalerList{})
 	if err != nil {
 		return nil, err
 	}
@@ -2331,7 +2331,7 @@ func (c *BatchV1) DeleteCronJob(ctx context.Context, namespace, name string, opt
 }
 
 func (c *BatchV1) ListCronJob(ctx context.Context, namespace string, opts metav1.ListOptions) (*batchv1.CronJobList, error) {
-	result, err := c.backend.List(ctx, "cronjobs", namespace, opts, &batchv1.CronJob{})
+	result, err := c.backend.List(ctx, "cronjobs", namespace, opts, &batchv1.CronJobList{})
 	if err != nil {
 		return nil, err
 	}
@@ -2379,7 +2379,7 @@ func (c *BatchV1) DeleteJob(ctx context.Context, namespace, name string, opts me
 }
 
 func (c *BatchV1) ListJob(ctx context.Context, namespace string, opts metav1.ListOptions) (*batchv1.JobList, error) {
-	result, err := c.backend.List(ctx, "jobs", namespace, opts, &batchv1.Job{})
+	result, err := c.backend.List(ctx, "jobs", namespace, opts, &batchv1.JobList{})
 	if err != nil {
 		return nil, err
 	}
@@ -2436,7 +2436,7 @@ func (c *CertificatesK8sIoV1) DeleteCertificateSigningRequest(ctx context.Contex
 }
 
 func (c *CertificatesK8sIoV1) ListCertificateSigningRequest(ctx context.Context, opts metav1.ListOptions) (*certificatesv1.CertificateSigningRequestList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "certificatesigningrequests", opts, &certificatesv1.CertificateSigningRequest{})
+	result, err := c.backend.ListClusterScoped(ctx, "certificatesigningrequests", opts, &certificatesv1.CertificateSigningRequestList{})
 	if err != nil {
 		return nil, err
 	}
@@ -2485,7 +2485,7 @@ func (c *CoordinationK8sIoV1) DeleteLease(ctx context.Context, namespace, name s
 }
 
 func (c *CoordinationK8sIoV1) ListLease(ctx context.Context, namespace string, opts metav1.ListOptions) (*coordinationv1.LeaseList, error) {
-	result, err := c.backend.List(ctx, "leases", namespace, opts, &coordinationv1.Lease{})
+	result, err := c.backend.List(ctx, "leases", namespace, opts, &coordinationv1.LeaseList{})
 	if err != nil {
 		return nil, err
 	}
@@ -2534,7 +2534,7 @@ func (c *DiscoveryK8sIoV1) DeleteEndpointSlice(ctx context.Context, namespace, n
 }
 
 func (c *DiscoveryK8sIoV1) ListEndpointSlice(ctx context.Context, namespace string, opts metav1.ListOptions) (*discoveryv1.EndpointSliceList, error) {
-	result, err := c.backend.List(ctx, "endpointslices", namespace, opts, &discoveryv1.EndpointSlice{})
+	result, err := c.backend.List(ctx, "endpointslices", namespace, opts, &discoveryv1.EndpointSliceList{})
 	if err != nil {
 		return nil, err
 	}
@@ -2583,7 +2583,7 @@ func (c *EventsK8sIoV1) DeleteEvent(ctx context.Context, namespace, name string,
 }
 
 func (c *EventsK8sIoV1) ListEvent(ctx context.Context, namespace string, opts metav1.ListOptions) (*eventsv1.EventList, error) {
-	result, err := c.backend.List(ctx, "events", namespace, opts, &eventsv1.Event{})
+	result, err := c.backend.List(ctx, "events", namespace, opts, &eventsv1.EventList{})
 	if err != nil {
 		return nil, err
 	}
@@ -2640,7 +2640,7 @@ func (c *NetworkingK8sIoV1) DeleteIngress(ctx context.Context, namespace, name s
 }
 
 func (c *NetworkingK8sIoV1) ListIngress(ctx context.Context, namespace string, opts metav1.ListOptions) (*networkingv1.IngressList, error) {
-	result, err := c.backend.List(ctx, "ingresses", namespace, opts, &networkingv1.Ingress{})
+	result, err := c.backend.List(ctx, "ingresses", namespace, opts, &networkingv1.IngressList{})
 	if err != nil {
 		return nil, err
 	}
@@ -2680,7 +2680,7 @@ func (c *NetworkingK8sIoV1) DeleteIngressClass(ctx context.Context, name string,
 }
 
 func (c *NetworkingK8sIoV1) ListIngressClass(ctx context.Context, opts metav1.ListOptions) (*networkingv1.IngressClassList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "ingressclasses", opts, &networkingv1.IngressClass{})
+	result, err := c.backend.ListClusterScoped(ctx, "ingressclasses", opts, &networkingv1.IngressClassList{})
 	if err != nil {
 		return nil, err
 	}
@@ -2720,7 +2720,7 @@ func (c *NetworkingK8sIoV1) DeleteNetworkPolicy(ctx context.Context, namespace, 
 }
 
 func (c *NetworkingK8sIoV1) ListNetworkPolicy(ctx context.Context, namespace string, opts metav1.ListOptions) (*networkingv1.NetworkPolicyList, error) {
-	result, err := c.backend.List(ctx, "networkpolicies", namespace, opts, &networkingv1.NetworkPolicy{})
+	result, err := c.backend.List(ctx, "networkpolicies", namespace, opts, &networkingv1.NetworkPolicyList{})
 	if err != nil {
 		return nil, err
 	}
@@ -2769,7 +2769,7 @@ func (c *PolicyV1) DeleteEviction(ctx context.Context, namespace, name string, o
 }
 
 func (c *PolicyV1) ListEviction(ctx context.Context, namespace string, opts metav1.ListOptions) (*policyv1.EvictionList, error) {
-	result, err := c.backend.List(ctx, "evictions", namespace, opts, &policyv1.Eviction{})
+	result, err := c.backend.List(ctx, "evictions", namespace, opts, &policyv1.EvictionList{})
 	if err != nil {
 		return nil, err
 	}
@@ -2817,7 +2817,7 @@ func (c *PolicyV1) DeletePodDisruptionBudget(ctx context.Context, namespace, nam
 }
 
 func (c *PolicyV1) ListPodDisruptionBudget(ctx context.Context, namespace string, opts metav1.ListOptions) (*policyv1.PodDisruptionBudgetList, error) {
-	result, err := c.backend.List(ctx, "poddisruptionbudgets", namespace, opts, &policyv1.PodDisruptionBudget{})
+	result, err := c.backend.List(ctx, "poddisruptionbudgets", namespace, opts, &policyv1.PodDisruptionBudgetList{})
 	if err != nil {
 		return nil, err
 	}
@@ -2866,7 +2866,7 @@ func (c *RbacAuthorizationK8sIoV1) DeleteClusterRole(ctx context.Context, name s
 }
 
 func (c *RbacAuthorizationK8sIoV1) ListClusterRole(ctx context.Context, opts metav1.ListOptions) (*rbacv1.ClusterRoleList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "clusterroles", opts, &rbacv1.ClusterRole{})
+	result, err := c.backend.ListClusterScoped(ctx, "clusterroles", opts, &rbacv1.ClusterRoleList{})
 	if err != nil {
 		return nil, err
 	}
@@ -2906,7 +2906,7 @@ func (c *RbacAuthorizationK8sIoV1) DeleteClusterRoleBinding(ctx context.Context,
 }
 
 func (c *RbacAuthorizationK8sIoV1) ListClusterRoleBinding(ctx context.Context, opts metav1.ListOptions) (*rbacv1.ClusterRoleBindingList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "clusterrolebindings", opts, &rbacv1.ClusterRoleBinding{})
+	result, err := c.backend.ListClusterScoped(ctx, "clusterrolebindings", opts, &rbacv1.ClusterRoleBindingList{})
 	if err != nil {
 		return nil, err
 	}
@@ -2946,7 +2946,7 @@ func (c *RbacAuthorizationK8sIoV1) DeleteRole(ctx context.Context, namespace, na
 }
 
 func (c *RbacAuthorizationK8sIoV1) ListRole(ctx context.Context, namespace string, opts metav1.ListOptions) (*rbacv1.RoleList, error) {
-	result, err := c.backend.List(ctx, "roles", namespace, opts, &rbacv1.Role{})
+	result, err := c.backend.List(ctx, "roles", namespace, opts, &rbacv1.RoleList{})
 	if err != nil {
 		return nil, err
 	}
@@ -2986,7 +2986,7 @@ func (c *RbacAuthorizationK8sIoV1) DeleteRoleBinding(ctx context.Context, namesp
 }
 
 func (c *RbacAuthorizationK8sIoV1) ListRoleBinding(ctx context.Context, namespace string, opts metav1.ListOptions) (*rbacv1.RoleBindingList, error) {
-	result, err := c.backend.List(ctx, "rolebindings", namespace, opts, &rbacv1.RoleBinding{})
+	result, err := c.backend.List(ctx, "rolebindings", namespace, opts, &rbacv1.RoleBindingList{})
 	if err != nil {
 		return nil, err
 	}
@@ -3035,7 +3035,7 @@ func (c *SchedulingK8sIoV1) DeletePriorityClass(ctx context.Context, name string
 }
 
 func (c *SchedulingK8sIoV1) ListPriorityClass(ctx context.Context, opts metav1.ListOptions) (*schedulingv1.PriorityClassList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "priorityclasses", opts, &schedulingv1.PriorityClass{})
+	result, err := c.backend.ListClusterScoped(ctx, "priorityclasses", opts, &schedulingv1.PriorityClassList{})
 	if err != nil {
 		return nil, err
 	}
@@ -3084,7 +3084,7 @@ func (c *StorageK8sIoV1) DeleteCSIDriver(ctx context.Context, name string, opts 
 }
 
 func (c *StorageK8sIoV1) ListCSIDriver(ctx context.Context, opts metav1.ListOptions) (*storagev1.CSIDriverList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "csidrivers", opts, &storagev1.CSIDriver{})
+	result, err := c.backend.ListClusterScoped(ctx, "csidrivers", opts, &storagev1.CSIDriverList{})
 	if err != nil {
 		return nil, err
 	}
@@ -3124,7 +3124,7 @@ func (c *StorageK8sIoV1) DeleteCSINode(ctx context.Context, name string, opts me
 }
 
 func (c *StorageK8sIoV1) ListCSINode(ctx context.Context, opts metav1.ListOptions) (*storagev1.CSINodeList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "csinodes", opts, &storagev1.CSINode{})
+	result, err := c.backend.ListClusterScoped(ctx, "csinodes", opts, &storagev1.CSINodeList{})
 	if err != nil {
 		return nil, err
 	}
@@ -3164,7 +3164,7 @@ func (c *StorageK8sIoV1) DeleteCSIStorageCapacity(ctx context.Context, namespace
 }
 
 func (c *StorageK8sIoV1) ListCSIStorageCapacity(ctx context.Context, namespace string, opts metav1.ListOptions) (*storagev1.CSIStorageCapacityList, error) {
-	result, err := c.backend.List(ctx, "csistoragecapacities", namespace, opts, &storagev1.CSIStorageCapacity{})
+	result, err := c.backend.List(ctx, "csistoragecapacities", namespace, opts, &storagev1.CSIStorageCapacityList{})
 	if err != nil {
 		return nil, err
 	}
@@ -3204,7 +3204,7 @@ func (c *StorageK8sIoV1) DeleteStorageClass(ctx context.Context, name string, op
 }
 
 func (c *StorageK8sIoV1) ListStorageClass(ctx context.Context, opts metav1.ListOptions) (*storagev1.StorageClassList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "storageclasses", opts, &storagev1.StorageClass{})
+	result, err := c.backend.ListClusterScoped(ctx, "storageclasses", opts, &storagev1.StorageClassList{})
 	if err != nil {
 		return nil, err
 	}
@@ -3252,7 +3252,7 @@ func (c *StorageK8sIoV1) DeleteVolumeAttachment(ctx context.Context, name string
 }
 
 func (c *StorageK8sIoV1) ListVolumeAttachment(ctx context.Context, opts metav1.ListOptions) (*storagev1.VolumeAttachmentList, error) {
-	result, err := c.backend.ListClusterScoped(ctx, "volumeattachments", opts, &storagev1.VolumeAttachment{})
+	result, err := c.backend.ListClusterScoped(ctx, "volumeattachments", opts, &storagev1.VolumeAttachmentList{})
 	if err != nil {
 		return nil, err
 	}
