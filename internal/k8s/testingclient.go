@@ -104,6 +104,7 @@ func (g *restFakeClientGenerator) Import() map[string]string {
 		"k8s.io/apimachinery/pkg/runtime":            "",
 		"k8s.io/apimachinery/pkg/runtime/schema":     "",
 		"k8s.io/apimachinery/pkg/runtime/serializer": "",
+		"k8s.io/client-go/rest":                      "",
 		"k8s.io/client-go/testing":                   "k8stesting",
 		"go.f110.dev/kubeproto/go/apis/metav1":       "",
 		g.clientPath:                                 "",
@@ -142,7 +143,7 @@ func (g *restFakeClientGenerator) WriteTo(writer *codegeneration.Writer, fqdn bo
 	for _, k := range keys(g.groupVersions) {
 		m := g.groupVersions[k][0]
 		clientName := m.ClientName(fqdn)
-		writer.F("s.%s = %s.New%sClient(&fakerBackend{fake: &s.fake})", clientName, clientPackageName, clientName)
+		writer.F("s.%s = %s.New%sClient(&fakerBackend{fake: &s.fake}, nil)", clientName, clientPackageName, clientName)
 	}
 	writer.F("return s")
 	writer.F("}") // end of NewSet
@@ -303,6 +304,10 @@ func (f *fakerBackend) DeleteClusterScoped(ctx context.Context, gvr schema.Group
 
 func (f *fakerBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, opts metav1.ListOptions) (watch.Interface, error) {
 	return f.Watch(ctx, gvr, "", opts)
+}
+
+func (f *fakerBackend) RESTClient() *rest.RESTClient {
+	return nil
 }
 `)
 

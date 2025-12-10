@@ -105,6 +105,8 @@ type Backend interface {
 	UpdateStatusClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	DeleteClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, name string, opts metav1.DeleteOptions) error
 	WatchClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, opts metav1.ListOptions) (watch.Interface, error)
+
+	RESTClient() *rest.RESTClient
 }`)
 	writer.F("")
 
@@ -114,7 +116,6 @@ type Backend interface {
 		clientName := m.ClientName(fqdnSetName)
 		writer.F("%s *%s", clientName, clientName)
 	}
-	writer.F("RESTClient *rest.RESTClient")
 	writer.F("}")
 	writer.F("")
 	writer.F("func NewSet(cfg *rest.Config) (*Set,error) {")
@@ -131,17 +132,9 @@ type Backend interface {
 		writer.F("if err != nil {")
 		writer.F("return nil, err")
 		writer.F("}")
-		writer.F("s.%s = New%sClient(&restBackend{client: c})", clientName, clientName)
+		writer.F("s.%s = New%sClient(&restBackend{client: c}, &conf)", clientName, clientName)
 		writer.F("}")
 	}
-	writer.F("{")
-	writer.F("conf := *cfg")
-	writer.F("c, err := rest.RESTClientFor(&conf)")
-	writer.F("if err != nil {")
-	writer.F("return nil, err")
-	writer.F("}")
-	writer.F("s.RESTClient = c")
-	writer.F("}")
 	writer.F("")
 	writer.F("return s, nil")
 	writer.F("}") // end of NewSet
@@ -442,6 +435,10 @@ func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVe
 		Timeout(timeout).
 		Watch(ctx)
 }
+
+func (r *restBackend) RESTClient() *rest.RESTClient {
+	return r.client
+}
 `)
 
 	for _, k := range keys(g.groupVersions) {
@@ -450,11 +447,12 @@ func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVe
 		clientName := m.ClientName(fqdn)
 		writer.F(`type %s struct {
 	backend Backend
+	config *rest.Config
 }`, clientName)
 		writer.F("")
 
-		writer.F("func New%sClient(b Backend) *%s {", clientName, clientName)
-		writer.F("return &%s{backend: b}", clientName)
+		writer.F("func New%sClient(b Backend, config *rest.Config) *%s {", clientName, clientName)
+		writer.F("return &%s{backend: b, config: config}", clientName)
 		writer.F("}")
 		writer.F("")
 
