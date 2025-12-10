@@ -100,32 +100,14 @@ func Now() Time {
 }
 
 func NewTime(t time.Time) Time {
-	return Time{
-		Seconds: t.Unix(),
-		Nanos:   t.Nanosecond(),
-	}
+	return Time{Time: t}
 }
 
 func (in *Time) IsZero() bool {
 	if in == nil {
 		return true
 	}
-	t := time.Unix(in.Seconds, int64(in.Nanos))
-	return t.IsZero()
-}
-
-func (in *Time) Before(u *Time) bool {
-	if in != nil && u != nil {
-		return in.Time().Before(u.Time())
-	}
-	return false
-}
-
-func (in *Time) After(u *Time) bool {
-	if in != nil && u != nil {
-		return in.Time().After(u.Time())
-	}
-	return false
+	return in.Time.IsZero()
 }
 
 func (in *Time) Equal(u *Time) bool {
@@ -133,23 +115,9 @@ func (in *Time) Equal(u *Time) bool {
 		return true
 	}
 	if in != nil && u != nil {
-		return in.Time().Equal(u.Time())
+		return in.Time.Equal(u.Time)
 	}
 	return false
-}
-
-func (in *Time) Time() time.Time {
-	if in == nil {
-		return time.Time{}
-	}
-	return time.Unix(in.Seconds, int64(in.Nanos))
-}
-
-func (in *Time) Unix() int64 {
-	if in == nil {
-		return 0
-	}
-	return in.Time().Unix()
 }
 
 func (in *Duration) TimeDuration() time.Duration {
@@ -266,7 +234,10 @@ func (in *ObjectMeta) SetSelfLink(selfLink string) {
 }
 
 func (in *ObjectMeta) GetCreationTimestamp() k8smetav1.Time {
-	return k8smetav1.NewTime(in.CreationTimestamp.Time())
+	if in.CreationTimestamp == nil {
+		return k8smetav1.Time{}
+	}
+	return k8smetav1.NewTime(in.CreationTimestamp.Time)
 }
 
 func (in *ObjectMeta) SetCreationTimestamp(timestamp k8smetav1.Time) {
@@ -275,7 +246,10 @@ func (in *ObjectMeta) SetCreationTimestamp(timestamp k8smetav1.Time) {
 }
 
 func (in *ObjectMeta) GetDeletionTimestamp() *k8smetav1.Time {
-	ts := k8smetav1.NewTime(in.DeletionTimestamp.Time())
+	if in.DeletionTimestamp == nil {
+		return nil
+	}
+	ts := k8smetav1.NewTime(in.DeletionTimestamp.Time)
 	return &ts
 }
 
@@ -359,7 +333,7 @@ func (in *ObjectMeta) GetManagedFields() []k8smetav1.ManagedFieldsEntry {
 	for i := 0; i < len(in.ManagedFields); i++ {
 		var t *k8smetav1.Time
 		if in.ManagedFields[i].Time != nil {
-			ts := k8smetav1.NewTime(in.ManagedFields[i].Time.Time())
+			ts := k8smetav1.NewTime(in.ManagedFields[i].Time.Time)
 			t = &ts
 		}
 		var fields *k8smetav1.FieldsV1

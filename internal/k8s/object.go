@@ -139,57 +139,66 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 		} else {
 			// Struct definition
 			defW.F("type %s struct {", obj.ShortName)
-			for _, f := range obj.Fields {
-				switch f.Kind {
-				case protoreflect.MessageKind:
-					m := messages.Find(f.MessageName)
-					if m != nil {
-						if _, ok := mark[m.Name]; !ok && !m.Dep {
-							objs = append(objs, m)
-						}
-					}
 
-					if f.IsMap() {
-						key, value := f.MapKeyValue()
-						if key.Kind() == protoreflect.MessageKind {
-							m := messages.Find(string(key.Message().FullName()))
-							if m != nil {
-								if _, ok := mark[m.Name]; !ok && !m.Dep {
-									objs = append(objs, m)
+			// Special case for metav1.Time
+			switch obj.Name {
+			case "k8s.io.apimachinery.pkg.apis.meta.v1.Time":
+				importPackages["time"] = ""
+				defW.F("time.Time")
+			default:
+				for _, f := range obj.Fields {
+					switch f.Kind {
+					case protoreflect.MessageKind:
+						m := messages.Find(f.MessageName)
+						if m != nil {
+							if _, ok := mark[m.Name]; !ok && !m.Dep {
+								objs = append(objs, m)
+							}
+						}
+
+						if f.IsMap() {
+							key, value := f.MapKeyValue()
+							if key.Kind() == protoreflect.MessageKind {
+								m := messages.Find(string(key.Message().FullName()))
+								if m != nil {
+									if _, ok := mark[m.Name]; !ok && !m.Dep {
+										objs = append(objs, m)
+									}
+								}
+							}
+							if value.Kind() == protoreflect.MessageKind {
+								m := messages.Find(string(value.Message().FullName()))
+								if m != nil {
+									if _, ok := mark[m.Name]; !ok && !m.Dep {
+										objs = append(objs, m)
+									}
 								}
 							}
 						}
-						if value.Kind() == protoreflect.MessageKind {
-							m := messages.Find(string(value.Message().FullName()))
-							if m != nil {
-								if _, ok := mark[m.Name]; !ok && !m.Dep {
-									objs = append(objs, m)
-								}
-							}
+					}
+
+					var name string
+					if !f.Embed {
+						name = string(f.Name)
+					}
+					importPath, packageName, typ := g.lister.ResolveGoType(packageName, f)
+					if _, ok := importPackages[importPath]; !ok && importPath != "" {
+						importPackages[importPath] = packageName
+					}
+					tag := f.Tag()
+					if f.Description != "" {
+						d := strings.Replace(f.Description, string(f.Name), f.Name.CamelCase(), 1)
+						scanner := bufio.NewScanner(strings.NewReader(d))
+						for scanner.Scan() {
+							line := scanner.Text()
+							line = strings.TrimSpace(line)
+							defW.F("// %s", line)
 						}
 					}
+					defW.F("%s %s %s", name, typ, tag)
 				}
-
-				var name string
-				if !f.Embed {
-					name = string(f.Name)
-				}
-				importPath, packageName, typ := g.lister.ResolveGoType(packageName, f)
-				if _, ok := importPackages[importPath]; !ok && importPath != "" {
-					importPackages[importPath] = packageName
-				}
-				tag := f.Tag()
-				if f.Description != "" {
-					d := strings.Replace(f.Description, string(f.Name), f.Name.CamelCase(), 1)
-					scanner := bufio.NewScanner(strings.NewReader(d))
-					for scanner.Scan() {
-						line := scanner.Text()
-						line = strings.TrimSpace(line)
-						defW.F("// %s", line)
-					}
-				}
-				defW.F("%s %s %s", name, typ, tag)
 			}
+
 			defW.F("}")
 			defW.F("")
 
