@@ -267,9 +267,12 @@ func (g *CRDGenerator) messageToJSONSchemaProps(f *definition.Field) *apiextensi
 	}
 
 	switch f.MessageName {
-	case "k8s.io.apimachinery.pkg.apis.meta.v1.Time":
+	case "k8s.io.apimachinery.pkg.apis.meta.v1.Time", "google.protobuf.Timestamp":
 		props.Type = "string"
-		props.Format = "date-time"
+		props.Format = "datetime"
+	case "k8s.io.apimachinery.pkg.apis.meta.v1.Duration":
+		props.Type = "string"
+		props.Format = "duration"
 	default:
 		child := g.lister.GetMessages().Find(f.MessageName)
 		props = g.ToOpenAPISchema(child)

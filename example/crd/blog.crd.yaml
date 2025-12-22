@@ -260,7 +260,7 @@ spec:
                 format: int64
                 type: integer
               observedTime:
-                format: date-time
+                format: datetime
                 type: string
               ready:
                 type: boolean
@@ -354,11 +354,19 @@ spec:
                 items:
                   type: string
                 type: array
+              publishedAt:
+                format: datetime
+                type: string
               subject:
+                type: string
+              timeout:
+                format: duration
                 type: string
             required:
             - subject
             - authors
+            - publishedAt
+            - timeout
             type: object
           status:
             properties:
