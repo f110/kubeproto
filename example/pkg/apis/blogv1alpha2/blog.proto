@@ -7,6 +7,7 @@ option (dev.f110.kubeproto.k8s) = {
   version: "v1alpha2"
 };
 
+import "google/protobuf/timestamp.proto";
 import "kube.proto";
 import "k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto";
 import "k8s.io/api/core/v1/generated.proto";
@@ -63,9 +64,11 @@ message Post {
 }
 
 message PostSpec {
-  string          subject = 1;
-  repeated string authors = 2;
-  optional uint64 count   = 3;
+  string                                        subject      = 1;
+  repeated string                               authors      = 2;
+  optional uint64                               count        = 3;
+  google.protobuf.Timestamp                     published_at = 4;
+  k8s.io.apimachinery.pkg.apis.meta.v1.Duration timeout      = 5;
 }
 
 message PostStatus {
