@@ -10,7 +10,7 @@ def _crd_proto_manifest(ctx):
     import_path = []
     for src in ctx.attr.srcs:
         proto = src[ProtoInfo]
-        transitive_protos.append(proto.transitive_imports)
+        transitive_protos.append(proto.transitive_sources)
         import_path.append(proto.transitive_proto_path)
         for s in proto.direct_sources:
             args.add(s.path)
@@ -161,7 +161,7 @@ def _execute_protoc(ctx, compiler, compiler_name, suffix, srcs, opts = "", env =
     transitive_protos = []
     for src in srcs:
         proto = src[ProtoInfo]
-        transitive_protos.append(proto.transitive_imports)
+        transitive_protos.append(proto.transitive_sources)
         args.add_all(proto.transitive_proto_path, format_each = "--proto_path=%s")
 
         for s in proto.direct_sources:
