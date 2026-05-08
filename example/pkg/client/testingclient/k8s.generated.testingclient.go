@@ -2,13 +2,16 @@ package testingclient
 
 import (
 	"context"
+	"strings"
 
 	"k8s.io/apimachinery/pkg/api/meta"
+	k8smetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apimachinery/pkg/watch"
+	"k8s.io/client-go/rest"
 	k8stesting "k8s.io/client-go/testing"
 
 	"go.f110.dev/kubeproto/example/pkg/client"
@@ -38,8 +41,8 @@ func NewSet() *Set {
 		return true, w, nil
 	})
 
-	s.BlogV1alpha1 = client.NewBlogV1alpha1Client(&fakerBackend{fake: &s.fake})
-	s.BlogV1alpha2 = client.NewBlogV1alpha2Client(&fakerBackend{fake: &s.fake})
+	s.BlogV1alpha1 = client.NewBlogV1alpha1Client(&fakerBackend{fake: &s.fake}, nil)
+	s.BlogV1alpha2 = client.NewBlogV1alpha2Client(&fakerBackend{fake: &s.fake}, nil)
 	return s
 }
 
@@ -49,6 +52,10 @@ func (s *Set) Tracker() k8stesting.ObjectTracker {
 
 func (s *Set) Actions() []k8stesting.Action {
 	return s.fake.Actions()
+}
+
+func (s *Set) ClearActions() {
+	s.fake.ClearActions()
 }
 
 type fakerBackend struct {
@@ -74,13 +81,21 @@ func (f *fakerBackend) List(ctx context.Context, resourceName, namespace string,
 		return nil, err
 	}
 	gvk := gvks[0]
-	obj, err := f.fake.Invokes(k8stesting.NewListAction(gvk.GroupVersion().WithResource(resourceName), gvk, namespace, opts), result)
+	if strings.HasSuffix(gvk.Kind, "List") {
+		gvk.Kind = strings.TrimSuffix(gvk.Kind, "List")
+	}
+	k8sListOpt := k8smetav1.ListOptions{
+		LabelSelector:   opts.LabelSelector,
+		FieldSelector:   opts.FieldSelector,
+		ResourceVersion: opts.ResourceVersion,
+	}
+	obj, err := f.fake.Invokes(k8stesting.NewListAction(gvk.GroupVersion().WithResource(resourceName), gvk, namespace, k8sListOpt), result)
 
 	if obj == nil {
 		return nil, err
 	}
 
-	label, _, _ := k8stesting.ExtractFromListOptions(opts)
+	label, _, _ := k8stesting.ExtractFromListOptions(k8sListOpt)
 	if label == nil {
 		label = labels.Everything()
 	}
@@ -182,4 +197,8 @@ func (f *fakerBackend) DeleteClusterScoped(ctx context.Context, gvr schema.Group
 
 func (f *fakerBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, opts metav1.ListOptions) (watch.Interface, error) {
 	return f.Watch(ctx, gvr, "", opts)
+}
+
+func (f *fakerBackend) RESTClient() *rest.RESTClient {
+	return nil
 }

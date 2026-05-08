@@ -1,9 +1,10 @@
 package blogv1alpha2
 
 import (
-	metav1_1 "github.com/cert-manager/cert-manager/pkg/apis/meta/v1"
+	metav1_1 "go.f110.dev/kubeproto/example/proto/github.com/cert-manager/cert-manager/apis/metav1"
 	"go.f110.dev/kubeproto/go/apis/corev1"
 	"go.f110.dev/kubeproto/go/apis/metav1"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
@@ -340,9 +341,11 @@ func (in *BlogStatus) DeepCopy() *BlogStatus {
 }
 
 type PostSpec struct {
-	Subject string   `json:"subject"`
-	Authors []string `json:"authors"`
-	Count   uint64   `json:"count,omitempty"`
+	Subject     string                `json:"subject"`
+	Authors     []string              `json:"authors"`
+	Count       uint64                `json:"count,omitempty"`
+	PublishedAt timestamppb.Timestamp `json:"publishedAt"`
+	Timeout     metav1.Duration       `json:"timeout"`
 }
 
 func (in *PostSpec) DeepCopyInto(out *PostSpec) {
@@ -352,6 +355,8 @@ func (in *PostSpec) DeepCopyInto(out *PostSpec) {
 		copy(t, in.Authors)
 		out.Authors = t
 	}
+	in.PublishedAt.DeepCopyInto(&out.PublishedAt)
+	in.Timeout.DeepCopyInto(&out.Timeout)
 }
 
 func (in *PostSpec) DeepCopy() *PostSpec {
