@@ -157,6 +157,10 @@ func (g *restFakeClientGenerator) WriteTo(writer *codegeneration.Writer, fqdn bo
 	writer.F("return s.fake.Actions()")
 	writer.F("}")
 	writer.F("")
+	writer.F("func (s *Set) ClearActions() {")
+	writer.F("s.fake.ClearActions()")
+	writer.F("}")
+	writer.F("")
 
 	writer.F(`
 type fakerBackend struct {
