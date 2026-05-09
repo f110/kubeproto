@@ -453,3 +453,16 @@ func LabelSelectorAsSelector(ps *LabelSelector) (labels.Selector, error) {
 	selector = selector.Add(requirements...)
 	return selector, nil
 }
+
+func FormatLabelSelector(labelSelector *LabelSelector) string {
+	selector, err := LabelSelectorAsSelector(labelSelector)
+	if err != nil {
+		return "<error>"
+	}
+
+	l := selector.String()
+	if len(l) == 0 {
+		l = "<none>"
+	}
+	return l
+}
