@@ -60,12 +60,13 @@ type Backend interface {
 	UpdateStatusClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	DeleteClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, name string, opts metav1.DeleteOptions) error
 	WatchClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, opts metav1.ListOptions) (watch.Interface, error)
+
+	RESTClient() *rest.RESTClient
 }
 
 type Set struct {
 	BlogV1alpha1 *BlogV1alpha1
 	BlogV1alpha2 *BlogV1alpha2
-	RESTClient   *rest.RESTClient
 }
 
 func NewSet(cfg *rest.Config) (*Set, error) {
@@ -79,7 +80,7 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.BlogV1alpha1 = NewBlogV1alpha1Client(&restBackend{client: c})
+		s.BlogV1alpha1 = NewBlogV1alpha1Client(&restBackend{client: c}, &conf)
 	}
 	{
 		conf := *cfg
@@ -90,15 +91,7 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.BlogV1alpha2 = NewBlogV1alpha2Client(&restBackend{client: c})
-	}
-	{
-		conf := *cfg
-		c, err := rest.RESTClientFor(&conf)
-		if err != nil {
-			return nil, err
-		}
-		s.RESTClient = c
+		s.BlogV1alpha2 = NewBlogV1alpha2Client(&restBackend{client: c}, &conf)
 	}
 
 	return s, nil
@@ -288,12 +281,17 @@ func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVe
 		Watch(ctx)
 }
 
-type BlogV1alpha1 struct {
-	backend Backend
+func (r *restBackend) RESTClient() *rest.RESTClient {
+	return r.client
 }
 
-func NewBlogV1alpha1Client(b Backend) *BlogV1alpha1 {
-	return &BlogV1alpha1{backend: b}
+type BlogV1alpha1 struct {
+	backend Backend
+	config  *rest.Config
+}
+
+func NewBlogV1alpha1Client(b Backend, config *rest.Config) *BlogV1alpha1 {
+	return &BlogV1alpha1{backend: b, config: config}
 }
 
 func (c *BlogV1alpha1) GetBlog(ctx context.Context, name string, opts metav1.GetOptions) (*blogv1alpha1.Blog, error) {
@@ -378,10 +376,11 @@ func (c *BlogV1alpha1) WatchPost(ctx context.Context, namespace string, opts met
 
 type BlogV1alpha2 struct {
 	backend Backend
+	config  *rest.Config
 }
 
-func NewBlogV1alpha2Client(b Backend) *BlogV1alpha2 {
-	return &BlogV1alpha2{backend: b}
+func NewBlogV1alpha2Client(b Backend, config *rest.Config) *BlogV1alpha2 {
+	return &BlogV1alpha2{backend: b, config: config}
 }
 
 func (c *BlogV1alpha2) GetAuthor(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*blogv1alpha2.Author, error) {
