@@ -13,6 +13,12 @@ import (
 	"go.f110.dev/kubeproto/go/apis/corev1"
 )
 
+func init() {
+	// PodLogOptions is not in corev1.AddToScheme's known types, but
+	// VersionedParams requires the scheme to know the type.
+	Scheme.AddKnownTypes(corev1.SchemaGroupVersion, &corev1.PodLogOptions{})
+}
+
 func (c *CoreV1) PortForward(ctx context.Context, pod *corev1.Pod, port int) (*portforward.PortForwarder, uint16, error) {
 	req := c.backend.RESTClient().Post().Resource("pods").Namespace(pod.Namespace).Name(pod.Name).SubResource("portforward")
 	transport, upgrader, err := spdy.RoundTripperFor(c.config)
@@ -50,4 +56,15 @@ func (c *CoreV1) PortForward(ctx context.Context, pod *corev1.Pod, port int) (*p
 	}
 
 	return pf, ports[0].Local, nil
+}
+
+// GetPodLogs retrieves the logs of a pod.
+func (c *CoreV1) GetPodLogs(ctx context.Context, namespace, name string, opts *corev1.PodLogOptions) ([]byte, error) {
+	return c.backend.RESTClient().Get().
+		Namespace(namespace).
+		Resource("pods").
+		Name(name).
+		SubResource("log").
+		VersionedParams(opts, ParameterCodec).
+		DoRaw(ctx)
 }

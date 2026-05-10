@@ -31,9 +31,9 @@ go_client(
 go_library(
     name = "k8sclient",
     srcs = [
+        "core.go",
         "discovery.go",
         "go_client.generated.client.go",
-        "portforward.go",
     ],
     importpath = "go.f110.dev/kubeproto/go/k8sclient",
     visibility = ["//visibility:public"],
