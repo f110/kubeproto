@@ -21,7 +21,7 @@ gen-proto: k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto \
 	k8s.io/apimachinery/pkg/util/intstr/generated.proto \
 	k8s.io/apimachinery/pkg/runtime/generated.proto \
 	k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto \
-	sigs.k8s.io/gateway-api/apis/v1alpha2/generated.proto \
+	sigs.k8s.io/gateway-api/apis/v1/generated.proto \
 	k8s.io/api/apps/v1/generated.proto \
 	k8s.io/api/core/v1/generated.proto \
 	k8s.io/api/batch/v1/generated.proto \
@@ -40,7 +40,8 @@ gen-proto: k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto \
 	k8s.io/api/events/v1/generated.proto \
 	k8s.io/api/scheduling/v1/generated.proto \
 	k8s.io/api/storage/v1/generated.proto \
-	k8s.io/api/apidiscovery/v2beta1/generated.proto
+	k8s.io/api/apidiscovery/v2beta1/generated.proto \
+	k8s.io/api/resource/v1/generated.proto
 
 .PHONY: gen-object
 gen-object: go/apis/metav1/metav1_kubeproto.generated.object.go \
@@ -62,7 +63,8 @@ gen-object: go/apis/metav1/metav1_kubeproto.generated.object.go \
 	go/apis/eventsv1/eventsv1_kubeproto.generated.object.go \
 	go/apis/schedulingv1/schedulingv1_kubeproto.generated.object.go \
 	go/apis/storagev1/storagev1_kubeproto.generated.object.go \
-	go/apis/apidiscoveryv2beta1/apidiscoveryv2beta1_kubeproto.generated.object.go
+	go/apis/apidiscoveryv2beta1/apidiscoveryv2beta1_kubeproto.generated.object.go \
+	go/apis/resourcev1/resourcev1_kubeproto.generated.object.go
 
 .PHONY: gen-go
 gen-go: gen-object \
@@ -221,14 +223,20 @@ k8s.io/api/apidiscovery/v2beta1/generated.proto:
 	mkdir -p $(@D)
 	cp ./bazel-bin/$@ $(@D)
 
+.PHONY: k8s.io/api/resource/v1/generated.proto
+k8s.io/api/resource/v1/generated.proto:
+	$(BAZEL) build //$(@D):gen
+	mkdir -p $(@D)
+	cp ./bazel-bin/$@ $(@D)
+
 .PHONY: k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto
 k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto:
 	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
 	cp ./bazel-bin/$@ $(@D)
 
-.PHONY: sigs.k8s.io/gateway-api/apis/v1alpha2/generated.proto
-sigs.k8s.io/gateway-api/apis/v1alpha2/generated.proto:
+.PHONY: sigs.k8s.io/gateway-api/apis/v1/generated.proto
+sigs.k8s.io/gateway-api/apis/v1/generated.proto:
 	$(BAZEL) build //$(@D):gen
 	mkdir -p $(@D)
 	cp ./bazel-bin/$@ $(@D)
@@ -370,5 +378,12 @@ go/apis/storagev1/storagev1_kubeproto.generated.object.go: k8s.io/api/storage/v1
 go/apis/apidiscoveryv2beta1/apidiscoveryv2beta1_kubeproto.generated.object.go: k8s.io/api/apidiscovery/v2beta1/generated.proto
 	@mkdir -p $(@D)
 	$(BAZEL) build //$(<D):apidiscoveryv2beta1_kubeproto
+	cp ./bazel-bin/$(<D)/$(@F) $(@D)
+	@chmod 0644 $@
+
+.PHONY: go/apis/resourcev1/resourcev1_kubeproto.generated.object.go
+go/apis/resourcev1/resourcev1_kubeproto.generated.object.go: k8s.io/api/resource/v1/generated.proto
+	@mkdir -p $(@D)
+	$(BAZEL) build //$(<D):resourcev1_kubeproto
 	cp ./bazel-bin/$(<D)/$(@F) $(@D)
 	@chmod 0644 $@

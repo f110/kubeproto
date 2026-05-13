@@ -352,11 +352,10 @@ type JobSpec struct {
 	// only when the number of succeeded pods equals to the completions.
 	// When the field is specified, it must be immutable and works only for the Indexed Jobs.
 	// Once the Job meets the SuccessPolicy, the lingering pods are terminated.
-	// This field is beta-level. To use this field, you must enable the
-	// `JobSuccessPolicy` feature gate (enabled by default).
 	SuccessPolicy *SuccessPolicy `json:"successPolicy,omitempty"`
 	// Specifies the number of retries before marking this job failed.
-	// Defaults to 6
+	// Defaults to 6, unless backoffLimitPerIndex (only Indexed Job) is specified.
+	// When backoffLimitPerIndex is specified, backoffLimit defaults to 2147483647.
 	BackoffLimit int `json:"backoffLimit,omitempty"`
 	// Specifies the limit for the number of retries within an
 	// index before marking this index as failed. When enabled the number of
@@ -364,8 +363,6 @@ type JobSpec struct {
 	// batch.kubernetes.io/job-index-failure-count annotation. It can only
 	// be set when Job's completionMode=Indexed, and the Pod's restart
 	// policy is Never. The field is immutable.
-	// This field is beta-level. It can be used when the `JobBackoffLimitPerIndex`
-	// feature gate is enabled (enabled by default).
 	BackoffLimitPerIndex int `json:"backoffLimitPerIndex,omitempty"`
 	// Specifies the maximal number of failed indexes before marking the Job as
 	// failed, when backoffLimitPerIndex is set. Once the number of failed
@@ -375,8 +372,6 @@ type JobSpec struct {
 	// It can only be specified when backoffLimitPerIndex is set.
 	// It can be null or up to completions. It is required and must be
 	// less than or equal to 10^4 when is completions greater than 10^5.
-	// This field is beta-level. It can be used when the `JobBackoffLimitPerIndex`
-	// feature gate is enabled (enabled by default).
 	MaxFailedIndexes int `json:"maxFailedIndexes,omitempty"`
 	// A label query over pods that should match the pod count.
 	// Normally, the system sets this field for you.
@@ -441,8 +436,6 @@ type JobSpec struct {
 	// Failed or Succeeded) before creating a replacement Pod.
 	// When using podFailurePolicy, Failed is the the only allowed value.
 	// TerminatingOrFailed and Failed are allowed values when podFailurePolicy is not in use.
-	// This is an beta field. To use this, enable the JobPodReplacementPolicy feature toggle.
-	// This is on by default.
 	PodReplacementPolicy PodReplacementPolicy `json:"podReplacementPolicy,omitempty"`
 	// ManagedBy field indicates the controller that manages a Job. The k8s Job
 	// controller reconciles jobs which don't have this field at all or the field
@@ -453,8 +446,6 @@ type JobSpec struct {
 	// by RFC 1123. All characters trailing the first "/" must be valid HTTP Path
 	// characters as defined by RFC 3986. The value cannot exceed 63 characters.
 	// This field is immutable.
-	// This field is beta-level. The job controller accepts setting the field
-	// when the feature gate JobManagedBy is enabled (enabled by default).
 	ManagedBy string `json:"managedBy,omitempty"`
 }
 
@@ -547,8 +538,6 @@ type JobStatus struct {
 	// For example, if the failed indexes are 1, 3, 4, 5 and 7, they are
 	// represented as "1,3-5,7".
 	// The set of failed indexes cannot overlap with the set of completed indexes.
-	// This field is beta-level. It can be used when the `JobBackoffLimitPerIndex`
-	// feature gate is enabled (enabled by default).
 	FailedIndexes string `json:"failedIndexes,omitempty"`
 	// uncountedTerminatedPods holds the UIDs of Pods that have terminated but
 	// the job controller hasn't yet accounted for in the status counters.
@@ -667,7 +656,7 @@ func (in *PodFailurePolicy) DeepCopy() *PodFailurePolicy {
 type SuccessPolicy struct {
 	// rules represents the list of alternative rules for the declaring the Jobs
 	// as successful before `.status.succeeded >= .spec.completions`. Once any of the rules are met,
-	// the "SucceededCriteriaMet" condition is added, and the lingering pods are removed.
+	// the "SuccessCriteriaMet" condition is added, and the lingering pods are removed.
 	// The terminal state for such a Job has the "Complete" condition.
 	// Additionally, these rules are evaluated in order; Once the Job meets one of the rules,
 	// other rules are ignored. At most 20 elements are allowed.
@@ -769,8 +758,6 @@ type PodFailurePolicyRule struct {
 	// running pods are terminated.
 	// - FailIndex: indicates that the pod's index is marked as Failed and will
 	// not be restarted.
-	// This value is beta-level. It can be used when the
-	// `JobBackoffLimitPerIndex` feature gate is enabled (enabled by default).
 	// - Ignore: indicates that the counter towards the .backoffLimit is not
 	// incremented and a replacement pod is created.
 	// - Count: indicates that the pod is handled in the default way - the

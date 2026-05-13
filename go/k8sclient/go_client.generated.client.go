@@ -33,6 +33,7 @@ import (
 	"go.f110.dev/kubeproto/go/apis/networkingv1"
 	"go.f110.dev/kubeproto/go/apis/policyv1"
 	"go.f110.dev/kubeproto/go/apis/rbacv1"
+	"go.f110.dev/kubeproto/go/apis/resourcev1"
 	"go.f110.dev/kubeproto/go/apis/schedulingv1"
 	"go.f110.dev/kubeproto/go/apis/storagev1"
 )
@@ -60,6 +61,7 @@ var localSchemeBuilder = runtime.SchemeBuilder{
 	networkingv1.AddToScheme,
 	policyv1.AddToScheme,
 	rbacv1.AddToScheme,
+	resourcev1.AddToScheme,
 	schedulingv1.AddToScheme,
 	storagev1.AddToScheme,
 }
@@ -81,6 +83,7 @@ func init() {
 		networkingv1.AddToScheme,
 		policyv1.AddToScheme,
 		rbacv1.AddToScheme,
+		resourcev1.AddToScheme,
 		schedulingv1.AddToScheme,
 		storagev1.AddToScheme,
 	} {
@@ -125,6 +128,7 @@ type Set struct {
 	NetworkingK8sIoV1            *NetworkingK8sIoV1
 	PolicyV1                     *PolicyV1
 	RbacAuthorizationK8sIoV1     *RbacAuthorizationK8sIoV1
+	ResourceV1                   *ResourceV1
 	SchedulingK8sIoV1            *SchedulingK8sIoV1
 	StorageK8sIoV1               *StorageK8sIoV1
 }
@@ -295,6 +299,17 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 			return nil, err
 		}
 		s.RbacAuthorizationK8sIoV1 = NewRbacAuthorizationK8sIoV1Client(&restBackend{client: c}, &conf)
+	}
+	{
+		conf := *cfg
+		conf.GroupVersion = &resourcev1.SchemaGroupVersion
+		conf.APIPath = "/apis"
+		conf.NegotiatedSerializer = Codecs.WithoutConversion()
+		c, err := rest.RESTClientFor(&conf)
+		if err != nil {
+			return nil, err
+		}
+		s.ResourceV1 = NewResourceV1Client(&restBackend{client: c}, &conf)
 	}
 	{
 		conf := *cfg
@@ -1358,6 +1373,86 @@ type AdmissionregistrationK8sIoV1 struct {
 
 func NewAdmissionregistrationK8sIoV1Client(b Backend, config *rest.Config) *AdmissionregistrationK8sIoV1 {
 	return &AdmissionregistrationK8sIoV1{backend: b, config: config}
+}
+
+func (c *AdmissionregistrationK8sIoV1) GetMutatingAdmissionPolicy(ctx context.Context, name string, opts metav1.GetOptions) (*admissionregistrationv1.MutatingAdmissionPolicy, error) {
+	result, err := c.backend.GetClusterScoped(ctx, "mutatingadmissionpolicies", name, opts, &admissionregistrationv1.MutatingAdmissionPolicy{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*admissionregistrationv1.MutatingAdmissionPolicy), nil
+}
+
+func (c *AdmissionregistrationK8sIoV1) CreateMutatingAdmissionPolicy(ctx context.Context, v *admissionregistrationv1.MutatingAdmissionPolicy, opts metav1.CreateOptions) (*admissionregistrationv1.MutatingAdmissionPolicy, error) {
+	result, err := c.backend.CreateClusterScoped(ctx, "mutatingadmissionpolicies", v, opts, &admissionregistrationv1.MutatingAdmissionPolicy{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*admissionregistrationv1.MutatingAdmissionPolicy), nil
+}
+
+func (c *AdmissionregistrationK8sIoV1) UpdateMutatingAdmissionPolicy(ctx context.Context, v *admissionregistrationv1.MutatingAdmissionPolicy, opts metav1.UpdateOptions) (*admissionregistrationv1.MutatingAdmissionPolicy, error) {
+	result, err := c.backend.UpdateClusterScoped(ctx, "mutatingadmissionpolicies", v, opts, &admissionregistrationv1.MutatingAdmissionPolicy{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*admissionregistrationv1.MutatingAdmissionPolicy), nil
+}
+
+func (c *AdmissionregistrationK8sIoV1) DeleteMutatingAdmissionPolicy(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".admissionregistration.k8s.io", Version: "v1", Resource: "mutatingadmissionpolicies"}, name, opts)
+}
+
+func (c *AdmissionregistrationK8sIoV1) ListMutatingAdmissionPolicy(ctx context.Context, opts metav1.ListOptions) (*admissionregistrationv1.MutatingAdmissionPolicyList, error) {
+	result, err := c.backend.ListClusterScoped(ctx, "mutatingadmissionpolicies", opts, &admissionregistrationv1.MutatingAdmissionPolicyList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*admissionregistrationv1.MutatingAdmissionPolicyList), nil
+}
+
+func (c *AdmissionregistrationK8sIoV1) WatchMutatingAdmissionPolicy(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".admissionregistration.k8s.io", Version: "v1", Resource: "mutatingadmissionpolicies"}, opts)
+}
+
+func (c *AdmissionregistrationK8sIoV1) GetMutatingAdmissionPolicyBinding(ctx context.Context, name string, opts metav1.GetOptions) (*admissionregistrationv1.MutatingAdmissionPolicyBinding, error) {
+	result, err := c.backend.GetClusterScoped(ctx, "mutatingadmissionpolicybindings", name, opts, &admissionregistrationv1.MutatingAdmissionPolicyBinding{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*admissionregistrationv1.MutatingAdmissionPolicyBinding), nil
+}
+
+func (c *AdmissionregistrationK8sIoV1) CreateMutatingAdmissionPolicyBinding(ctx context.Context, v *admissionregistrationv1.MutatingAdmissionPolicyBinding, opts metav1.CreateOptions) (*admissionregistrationv1.MutatingAdmissionPolicyBinding, error) {
+	result, err := c.backend.CreateClusterScoped(ctx, "mutatingadmissionpolicybindings", v, opts, &admissionregistrationv1.MutatingAdmissionPolicyBinding{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*admissionregistrationv1.MutatingAdmissionPolicyBinding), nil
+}
+
+func (c *AdmissionregistrationK8sIoV1) UpdateMutatingAdmissionPolicyBinding(ctx context.Context, v *admissionregistrationv1.MutatingAdmissionPolicyBinding, opts metav1.UpdateOptions) (*admissionregistrationv1.MutatingAdmissionPolicyBinding, error) {
+	result, err := c.backend.UpdateClusterScoped(ctx, "mutatingadmissionpolicybindings", v, opts, &admissionregistrationv1.MutatingAdmissionPolicyBinding{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*admissionregistrationv1.MutatingAdmissionPolicyBinding), nil
+}
+
+func (c *AdmissionregistrationK8sIoV1) DeleteMutatingAdmissionPolicyBinding(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".admissionregistration.k8s.io", Version: "v1", Resource: "mutatingadmissionpolicybindings"}, name, opts)
+}
+
+func (c *AdmissionregistrationK8sIoV1) ListMutatingAdmissionPolicyBinding(ctx context.Context, opts metav1.ListOptions) (*admissionregistrationv1.MutatingAdmissionPolicyBindingList, error) {
+	result, err := c.backend.ListClusterScoped(ctx, "mutatingadmissionpolicybindings", opts, &admissionregistrationv1.MutatingAdmissionPolicyBindingList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*admissionregistrationv1.MutatingAdmissionPolicyBindingList), nil
+}
+
+func (c *AdmissionregistrationK8sIoV1) WatchMutatingAdmissionPolicyBinding(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".admissionregistration.k8s.io", Version: "v1", Resource: "mutatingadmissionpolicybindings"}, opts)
 }
 
 func (c *AdmissionregistrationK8sIoV1) GetMutatingWebhookConfiguration(ctx context.Context, name string, opts metav1.GetOptions) (*admissionregistrationv1.MutatingWebhookConfiguration, error) {
@@ -2603,6 +2698,46 @@ func NewNetworkingK8sIoV1Client(b Backend, config *rest.Config) *NetworkingK8sIo
 	return &NetworkingK8sIoV1{backend: b, config: config}
 }
 
+func (c *NetworkingK8sIoV1) GetIPAddress(ctx context.Context, name string, opts metav1.GetOptions) (*networkingv1.IPAddress, error) {
+	result, err := c.backend.GetClusterScoped(ctx, "ipaddresses", name, opts, &networkingv1.IPAddress{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*networkingv1.IPAddress), nil
+}
+
+func (c *NetworkingK8sIoV1) CreateIPAddress(ctx context.Context, v *networkingv1.IPAddress, opts metav1.CreateOptions) (*networkingv1.IPAddress, error) {
+	result, err := c.backend.CreateClusterScoped(ctx, "ipaddresses", v, opts, &networkingv1.IPAddress{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*networkingv1.IPAddress), nil
+}
+
+func (c *NetworkingK8sIoV1) UpdateIPAddress(ctx context.Context, v *networkingv1.IPAddress, opts metav1.UpdateOptions) (*networkingv1.IPAddress, error) {
+	result, err := c.backend.UpdateClusterScoped(ctx, "ipaddresses", v, opts, &networkingv1.IPAddress{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*networkingv1.IPAddress), nil
+}
+
+func (c *NetworkingK8sIoV1) DeleteIPAddress(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".networking.k8s.io", Version: "v1", Resource: "ipaddresses"}, name, opts)
+}
+
+func (c *NetworkingK8sIoV1) ListIPAddress(ctx context.Context, opts metav1.ListOptions) (*networkingv1.IPAddressList, error) {
+	result, err := c.backend.ListClusterScoped(ctx, "ipaddresses", opts, &networkingv1.IPAddressList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*networkingv1.IPAddressList), nil
+}
+
+func (c *NetworkingK8sIoV1) WatchIPAddress(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".networking.k8s.io", Version: "v1", Resource: "ipaddresses"}, opts)
+}
+
 func (c *NetworkingK8sIoV1) GetIngress(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*networkingv1.Ingress, error) {
 	result, err := c.backend.Get(ctx, "ingresses", namespace, name, opts, &networkingv1.Ingress{})
 	if err != nil {
@@ -2729,6 +2864,54 @@ func (c *NetworkingK8sIoV1) ListNetworkPolicy(ctx context.Context, namespace str
 
 func (c *NetworkingK8sIoV1) WatchNetworkPolicy(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
 	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".networking.k8s.io", Version: "v1", Resource: "networkpolicies"}, namespace, opts)
+}
+
+func (c *NetworkingK8sIoV1) GetServiceCIDR(ctx context.Context, name string, opts metav1.GetOptions) (*networkingv1.ServiceCIDR, error) {
+	result, err := c.backend.GetClusterScoped(ctx, "servicecidrs", name, opts, &networkingv1.ServiceCIDR{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*networkingv1.ServiceCIDR), nil
+}
+
+func (c *NetworkingK8sIoV1) CreateServiceCIDR(ctx context.Context, v *networkingv1.ServiceCIDR, opts metav1.CreateOptions) (*networkingv1.ServiceCIDR, error) {
+	result, err := c.backend.CreateClusterScoped(ctx, "servicecidrs", v, opts, &networkingv1.ServiceCIDR{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*networkingv1.ServiceCIDR), nil
+}
+
+func (c *NetworkingK8sIoV1) UpdateServiceCIDR(ctx context.Context, v *networkingv1.ServiceCIDR, opts metav1.UpdateOptions) (*networkingv1.ServiceCIDR, error) {
+	result, err := c.backend.UpdateClusterScoped(ctx, "servicecidrs", v, opts, &networkingv1.ServiceCIDR{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*networkingv1.ServiceCIDR), nil
+}
+
+func (c *NetworkingK8sIoV1) UpdateStatusServiceCIDR(ctx context.Context, v *networkingv1.ServiceCIDR, opts metav1.UpdateOptions) (*networkingv1.ServiceCIDR, error) {
+	result, err := c.backend.UpdateStatusClusterScoped(ctx, "servicecidrs", v, opts, &networkingv1.ServiceCIDR{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*networkingv1.ServiceCIDR), nil
+}
+
+func (c *NetworkingK8sIoV1) DeleteServiceCIDR(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".networking.k8s.io", Version: "v1", Resource: "servicecidrs"}, name, opts)
+}
+
+func (c *NetworkingK8sIoV1) ListServiceCIDR(ctx context.Context, opts metav1.ListOptions) (*networkingv1.ServiceCIDRList, error) {
+	result, err := c.backend.ListClusterScoped(ctx, "servicecidrs", opts, &networkingv1.ServiceCIDRList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*networkingv1.ServiceCIDRList), nil
+}
+
+func (c *NetworkingK8sIoV1) WatchServiceCIDR(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".networking.k8s.io", Version: "v1", Resource: "servicecidrs"}, opts)
 }
 
 type PolicyV1 struct {
@@ -2997,6 +3180,183 @@ func (c *RbacAuthorizationK8sIoV1) WatchRoleBinding(ctx context.Context, namespa
 	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".rbac.authorization.k8s.io", Version: "v1", Resource: "rolebindings"}, namespace, opts)
 }
 
+type ResourceV1 struct {
+	backend Backend
+	config  *rest.Config
+}
+
+func NewResourceV1Client(b Backend, config *rest.Config) *ResourceV1 {
+	return &ResourceV1{backend: b, config: config}
+}
+
+func (c *ResourceV1) GetDeviceClass(ctx context.Context, name string, opts metav1.GetOptions) (*resourcev1.DeviceClass, error) {
+	result, err := c.backend.GetClusterScoped(ctx, "deviceclasses", name, opts, &resourcev1.DeviceClass{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*resourcev1.DeviceClass), nil
+}
+
+func (c *ResourceV1) CreateDeviceClass(ctx context.Context, v *resourcev1.DeviceClass, opts metav1.CreateOptions) (*resourcev1.DeviceClass, error) {
+	result, err := c.backend.CreateClusterScoped(ctx, "deviceclasses", v, opts, &resourcev1.DeviceClass{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*resourcev1.DeviceClass), nil
+}
+
+func (c *ResourceV1) UpdateDeviceClass(ctx context.Context, v *resourcev1.DeviceClass, opts metav1.UpdateOptions) (*resourcev1.DeviceClass, error) {
+	result, err := c.backend.UpdateClusterScoped(ctx, "deviceclasses", v, opts, &resourcev1.DeviceClass{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*resourcev1.DeviceClass), nil
+}
+
+func (c *ResourceV1) DeleteDeviceClass(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".resource", Version: "v1", Resource: "deviceclasses"}, name, opts)
+}
+
+func (c *ResourceV1) ListDeviceClass(ctx context.Context, opts metav1.ListOptions) (*resourcev1.DeviceClassList, error) {
+	result, err := c.backend.ListClusterScoped(ctx, "deviceclasses", opts, &resourcev1.DeviceClassList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*resourcev1.DeviceClassList), nil
+}
+
+func (c *ResourceV1) WatchDeviceClass(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".resource", Version: "v1", Resource: "deviceclasses"}, opts)
+}
+
+func (c *ResourceV1) GetResourceClaim(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*resourcev1.ResourceClaim, error) {
+	result, err := c.backend.Get(ctx, "resourceclaims", namespace, name, opts, &resourcev1.ResourceClaim{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*resourcev1.ResourceClaim), nil
+}
+
+func (c *ResourceV1) CreateResourceClaim(ctx context.Context, v *resourcev1.ResourceClaim, opts metav1.CreateOptions) (*resourcev1.ResourceClaim, error) {
+	result, err := c.backend.Create(ctx, "resourceclaims", v, opts, &resourcev1.ResourceClaim{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*resourcev1.ResourceClaim), nil
+}
+
+func (c *ResourceV1) UpdateResourceClaim(ctx context.Context, v *resourcev1.ResourceClaim, opts metav1.UpdateOptions) (*resourcev1.ResourceClaim, error) {
+	result, err := c.backend.Update(ctx, "resourceclaims", v, opts, &resourcev1.ResourceClaim{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*resourcev1.ResourceClaim), nil
+}
+
+func (c *ResourceV1) UpdateStatusResourceClaim(ctx context.Context, v *resourcev1.ResourceClaim, opts metav1.UpdateOptions) (*resourcev1.ResourceClaim, error) {
+	result, err := c.backend.UpdateStatus(ctx, "resourceclaims", v, opts, &resourcev1.ResourceClaim{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*resourcev1.ResourceClaim), nil
+}
+
+func (c *ResourceV1) DeleteResourceClaim(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".resource", Version: "v1", Resource: "resourceclaims"}, namespace, name, opts)
+}
+
+func (c *ResourceV1) ListResourceClaim(ctx context.Context, namespace string, opts metav1.ListOptions) (*resourcev1.ResourceClaimList, error) {
+	result, err := c.backend.List(ctx, "resourceclaims", namespace, opts, &resourcev1.ResourceClaimList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*resourcev1.ResourceClaimList), nil
+}
+
+func (c *ResourceV1) WatchResourceClaim(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".resource", Version: "v1", Resource: "resourceclaims"}, namespace, opts)
+}
+
+func (c *ResourceV1) GetResourceClaimTemplate(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*resourcev1.ResourceClaimTemplate, error) {
+	result, err := c.backend.Get(ctx, "resourceclaimtemplates", namespace, name, opts, &resourcev1.ResourceClaimTemplate{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*resourcev1.ResourceClaimTemplate), nil
+}
+
+func (c *ResourceV1) CreateResourceClaimTemplate(ctx context.Context, v *resourcev1.ResourceClaimTemplate, opts metav1.CreateOptions) (*resourcev1.ResourceClaimTemplate, error) {
+	result, err := c.backend.Create(ctx, "resourceclaimtemplates", v, opts, &resourcev1.ResourceClaimTemplate{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*resourcev1.ResourceClaimTemplate), nil
+}
+
+func (c *ResourceV1) UpdateResourceClaimTemplate(ctx context.Context, v *resourcev1.ResourceClaimTemplate, opts metav1.UpdateOptions) (*resourcev1.ResourceClaimTemplate, error) {
+	result, err := c.backend.Update(ctx, "resourceclaimtemplates", v, opts, &resourcev1.ResourceClaimTemplate{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*resourcev1.ResourceClaimTemplate), nil
+}
+
+func (c *ResourceV1) DeleteResourceClaimTemplate(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".resource", Version: "v1", Resource: "resourceclaimtemplates"}, namespace, name, opts)
+}
+
+func (c *ResourceV1) ListResourceClaimTemplate(ctx context.Context, namespace string, opts metav1.ListOptions) (*resourcev1.ResourceClaimTemplateList, error) {
+	result, err := c.backend.List(ctx, "resourceclaimtemplates", namespace, opts, &resourcev1.ResourceClaimTemplateList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*resourcev1.ResourceClaimTemplateList), nil
+}
+
+func (c *ResourceV1) WatchResourceClaimTemplate(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".resource", Version: "v1", Resource: "resourceclaimtemplates"}, namespace, opts)
+}
+
+func (c *ResourceV1) GetResourceSlice(ctx context.Context, name string, opts metav1.GetOptions) (*resourcev1.ResourceSlice, error) {
+	result, err := c.backend.GetClusterScoped(ctx, "resourceslices", name, opts, &resourcev1.ResourceSlice{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*resourcev1.ResourceSlice), nil
+}
+
+func (c *ResourceV1) CreateResourceSlice(ctx context.Context, v *resourcev1.ResourceSlice, opts metav1.CreateOptions) (*resourcev1.ResourceSlice, error) {
+	result, err := c.backend.CreateClusterScoped(ctx, "resourceslices", v, opts, &resourcev1.ResourceSlice{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*resourcev1.ResourceSlice), nil
+}
+
+func (c *ResourceV1) UpdateResourceSlice(ctx context.Context, v *resourcev1.ResourceSlice, opts metav1.UpdateOptions) (*resourcev1.ResourceSlice, error) {
+	result, err := c.backend.UpdateClusterScoped(ctx, "resourceslices", v, opts, &resourcev1.ResourceSlice{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*resourcev1.ResourceSlice), nil
+}
+
+func (c *ResourceV1) DeleteResourceSlice(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".resource", Version: "v1", Resource: "resourceslices"}, name, opts)
+}
+
+func (c *ResourceV1) ListResourceSlice(ctx context.Context, opts metav1.ListOptions) (*resourcev1.ResourceSliceList, error) {
+	result, err := c.backend.ListClusterScoped(ctx, "resourceslices", opts, &resourcev1.ResourceSliceList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*resourcev1.ResourceSliceList), nil
+}
+
+func (c *ResourceV1) WatchResourceSlice(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".resource", Version: "v1", Resource: "resourceslices"}, opts)
+}
+
 type SchedulingK8sIoV1 struct {
 	backend Backend
 	config  *rest.Config
@@ -3263,6 +3623,46 @@ func (c *StorageK8sIoV1) WatchVolumeAttachment(ctx context.Context, opts metav1.
 	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "volumeattachments"}, opts)
 }
 
+func (c *StorageK8sIoV1) GetVolumeAttributesClass(ctx context.Context, name string, opts metav1.GetOptions) (*storagev1.VolumeAttributesClass, error) {
+	result, err := c.backend.GetClusterScoped(ctx, "volumeattributesclasses", name, opts, &storagev1.VolumeAttributesClass{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.VolumeAttributesClass), nil
+}
+
+func (c *StorageK8sIoV1) CreateVolumeAttributesClass(ctx context.Context, v *storagev1.VolumeAttributesClass, opts metav1.CreateOptions) (*storagev1.VolumeAttributesClass, error) {
+	result, err := c.backend.CreateClusterScoped(ctx, "volumeattributesclasses", v, opts, &storagev1.VolumeAttributesClass{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.VolumeAttributesClass), nil
+}
+
+func (c *StorageK8sIoV1) UpdateVolumeAttributesClass(ctx context.Context, v *storagev1.VolumeAttributesClass, opts metav1.UpdateOptions) (*storagev1.VolumeAttributesClass, error) {
+	result, err := c.backend.UpdateClusterScoped(ctx, "volumeattributesclasses", v, opts, &storagev1.VolumeAttributesClass{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.VolumeAttributesClass), nil
+}
+
+func (c *StorageK8sIoV1) DeleteVolumeAttributesClass(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "volumeattributesclasses"}, name, opts)
+}
+
+func (c *StorageK8sIoV1) ListVolumeAttributesClass(ctx context.Context, opts metav1.ListOptions) (*storagev1.VolumeAttributesClassList, error) {
+	result, err := c.backend.ListClusterScoped(ctx, "volumeattributesclasses", opts, &storagev1.VolumeAttributesClassList{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*storagev1.VolumeAttributesClassList), nil
+}
+
+func (c *StorageK8sIoV1) WatchVolumeAttributesClass(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "volumeattributesclasses"}, opts)
+}
+
 type InformerCache struct {
 	mu        sync.Mutex
 	informers map[reflect.Type]cache.SharedIndexInformer
@@ -3354,6 +3754,10 @@ func (f *InformerFactory) InformerFor(obj runtime.Object) cache.SharedIndexInfor
 		return NewCoreV1Informer(f.cache, f.set.CoreV1, f.namespace, f.resyncPeriod).ServiceInformer()
 	case *corev1.ServiceAccount:
 		return NewCoreV1Informer(f.cache, f.set.CoreV1, f.namespace, f.resyncPeriod).ServiceAccountInformer()
+	case *admissionregistrationv1.MutatingAdmissionPolicy:
+		return NewAdmissionregistrationK8sIoV1Informer(f.cache, f.set.AdmissionregistrationK8sIoV1, f.namespace, f.resyncPeriod).MutatingAdmissionPolicyInformer()
+	case *admissionregistrationv1.MutatingAdmissionPolicyBinding:
+		return NewAdmissionregistrationK8sIoV1Informer(f.cache, f.set.AdmissionregistrationK8sIoV1, f.namespace, f.resyncPeriod).MutatingAdmissionPolicyBindingInformer()
 	case *admissionregistrationv1.MutatingWebhookConfiguration:
 		return NewAdmissionregistrationK8sIoV1Informer(f.cache, f.set.AdmissionregistrationK8sIoV1, f.namespace, f.resyncPeriod).MutatingWebhookConfigurationInformer()
 	case *admissionregistrationv1.ValidatingAdmissionPolicy:
@@ -3404,12 +3808,16 @@ func (f *InformerFactory) InformerFor(obj runtime.Object) cache.SharedIndexInfor
 		return NewDiscoveryK8sIoV1Informer(f.cache, f.set.DiscoveryK8sIoV1, f.namespace, f.resyncPeriod).EndpointSliceInformer()
 	case *eventsv1.Event:
 		return NewEventsK8sIoV1Informer(f.cache, f.set.EventsK8sIoV1, f.namespace, f.resyncPeriod).EventInformer()
+	case *networkingv1.IPAddress:
+		return NewNetworkingK8sIoV1Informer(f.cache, f.set.NetworkingK8sIoV1, f.namespace, f.resyncPeriod).IPAddressInformer()
 	case *networkingv1.Ingress:
 		return NewNetworkingK8sIoV1Informer(f.cache, f.set.NetworkingK8sIoV1, f.namespace, f.resyncPeriod).IngressInformer()
 	case *networkingv1.IngressClass:
 		return NewNetworkingK8sIoV1Informer(f.cache, f.set.NetworkingK8sIoV1, f.namespace, f.resyncPeriod).IngressClassInformer()
 	case *networkingv1.NetworkPolicy:
 		return NewNetworkingK8sIoV1Informer(f.cache, f.set.NetworkingK8sIoV1, f.namespace, f.resyncPeriod).NetworkPolicyInformer()
+	case *networkingv1.ServiceCIDR:
+		return NewNetworkingK8sIoV1Informer(f.cache, f.set.NetworkingK8sIoV1, f.namespace, f.resyncPeriod).ServiceCIDRInformer()
 	case *policyv1.Eviction:
 		return NewPolicyV1Informer(f.cache, f.set.PolicyV1, f.namespace, f.resyncPeriod).EvictionInformer()
 	case *policyv1.PodDisruptionBudget:
@@ -3422,6 +3830,14 @@ func (f *InformerFactory) InformerFor(obj runtime.Object) cache.SharedIndexInfor
 		return NewRbacAuthorizationK8sIoV1Informer(f.cache, f.set.RbacAuthorizationK8sIoV1, f.namespace, f.resyncPeriod).RoleInformer()
 	case *rbacv1.RoleBinding:
 		return NewRbacAuthorizationK8sIoV1Informer(f.cache, f.set.RbacAuthorizationK8sIoV1, f.namespace, f.resyncPeriod).RoleBindingInformer()
+	case *resourcev1.DeviceClass:
+		return NewResourceV1Informer(f.cache, f.set.ResourceV1, f.namespace, f.resyncPeriod).DeviceClassInformer()
+	case *resourcev1.ResourceClaim:
+		return NewResourceV1Informer(f.cache, f.set.ResourceV1, f.namespace, f.resyncPeriod).ResourceClaimInformer()
+	case *resourcev1.ResourceClaimTemplate:
+		return NewResourceV1Informer(f.cache, f.set.ResourceV1, f.namespace, f.resyncPeriod).ResourceClaimTemplateInformer()
+	case *resourcev1.ResourceSlice:
+		return NewResourceV1Informer(f.cache, f.set.ResourceV1, f.namespace, f.resyncPeriod).ResourceSliceInformer()
 	case *schedulingv1.PriorityClass:
 		return NewSchedulingK8sIoV1Informer(f.cache, f.set.SchedulingK8sIoV1, f.namespace, f.resyncPeriod).PriorityClassInformer()
 	case *storagev1.CSIDriver:
@@ -3434,6 +3850,8 @@ func (f *InformerFactory) InformerFor(obj runtime.Object) cache.SharedIndexInfor
 		return NewStorageK8sIoV1Informer(f.cache, f.set.StorageK8sIoV1, f.namespace, f.resyncPeriod).StorageClassInformer()
 	case *storagev1.VolumeAttachment:
 		return NewStorageK8sIoV1Informer(f.cache, f.set.StorageK8sIoV1, f.namespace, f.resyncPeriod).VolumeAttachmentInformer()
+	case *storagev1.VolumeAttributesClass:
+		return NewStorageK8sIoV1Informer(f.cache, f.set.StorageK8sIoV1, f.namespace, f.resyncPeriod).VolumeAttributesClassInformer()
 	default:
 		return nil
 	}
@@ -3479,6 +3897,10 @@ func (f *InformerFactory) InformerForResource(gvr schema.GroupVersionResource) c
 		return NewCoreV1Informer(f.cache, f.set.CoreV1, f.namespace, f.resyncPeriod).ServiceInformer()
 	case corev1.SchemaGroupVersion.WithResource("serviceaccounts"):
 		return NewCoreV1Informer(f.cache, f.set.CoreV1, f.namespace, f.resyncPeriod).ServiceAccountInformer()
+	case admissionregistrationv1.SchemaGroupVersion.WithResource("mutatingadmissionpolicies"):
+		return NewAdmissionregistrationK8sIoV1Informer(f.cache, f.set.AdmissionregistrationK8sIoV1, f.namespace, f.resyncPeriod).MutatingAdmissionPolicyInformer()
+	case admissionregistrationv1.SchemaGroupVersion.WithResource("mutatingadmissionpolicybindings"):
+		return NewAdmissionregistrationK8sIoV1Informer(f.cache, f.set.AdmissionregistrationK8sIoV1, f.namespace, f.resyncPeriod).MutatingAdmissionPolicyBindingInformer()
 	case admissionregistrationv1.SchemaGroupVersion.WithResource("mutatingwebhookconfigurations"):
 		return NewAdmissionregistrationK8sIoV1Informer(f.cache, f.set.AdmissionregistrationK8sIoV1, f.namespace, f.resyncPeriod).MutatingWebhookConfigurationInformer()
 	case admissionregistrationv1.SchemaGroupVersion.WithResource("validatingadmissionpolicies"):
@@ -3529,12 +3951,16 @@ func (f *InformerFactory) InformerForResource(gvr schema.GroupVersionResource) c
 		return NewDiscoveryK8sIoV1Informer(f.cache, f.set.DiscoveryK8sIoV1, f.namespace, f.resyncPeriod).EndpointSliceInformer()
 	case eventsv1.SchemaGroupVersion.WithResource("events"):
 		return NewEventsK8sIoV1Informer(f.cache, f.set.EventsK8sIoV1, f.namespace, f.resyncPeriod).EventInformer()
+	case networkingv1.SchemaGroupVersion.WithResource("ipaddresses"):
+		return NewNetworkingK8sIoV1Informer(f.cache, f.set.NetworkingK8sIoV1, f.namespace, f.resyncPeriod).IPAddressInformer()
 	case networkingv1.SchemaGroupVersion.WithResource("ingresses"):
 		return NewNetworkingK8sIoV1Informer(f.cache, f.set.NetworkingK8sIoV1, f.namespace, f.resyncPeriod).IngressInformer()
 	case networkingv1.SchemaGroupVersion.WithResource("ingressclasses"):
 		return NewNetworkingK8sIoV1Informer(f.cache, f.set.NetworkingK8sIoV1, f.namespace, f.resyncPeriod).IngressClassInformer()
 	case networkingv1.SchemaGroupVersion.WithResource("networkpolicies"):
 		return NewNetworkingK8sIoV1Informer(f.cache, f.set.NetworkingK8sIoV1, f.namespace, f.resyncPeriod).NetworkPolicyInformer()
+	case networkingv1.SchemaGroupVersion.WithResource("servicecidrs"):
+		return NewNetworkingK8sIoV1Informer(f.cache, f.set.NetworkingK8sIoV1, f.namespace, f.resyncPeriod).ServiceCIDRInformer()
 	case policyv1.SchemaGroupVersion.WithResource("evictions"):
 		return NewPolicyV1Informer(f.cache, f.set.PolicyV1, f.namespace, f.resyncPeriod).EvictionInformer()
 	case policyv1.SchemaGroupVersion.WithResource("poddisruptionbudgets"):
@@ -3547,6 +3973,14 @@ func (f *InformerFactory) InformerForResource(gvr schema.GroupVersionResource) c
 		return NewRbacAuthorizationK8sIoV1Informer(f.cache, f.set.RbacAuthorizationK8sIoV1, f.namespace, f.resyncPeriod).RoleInformer()
 	case rbacv1.SchemaGroupVersion.WithResource("rolebindings"):
 		return NewRbacAuthorizationK8sIoV1Informer(f.cache, f.set.RbacAuthorizationK8sIoV1, f.namespace, f.resyncPeriod).RoleBindingInformer()
+	case resourcev1.SchemaGroupVersion.WithResource("deviceclasses"):
+		return NewResourceV1Informer(f.cache, f.set.ResourceV1, f.namespace, f.resyncPeriod).DeviceClassInformer()
+	case resourcev1.SchemaGroupVersion.WithResource("resourceclaims"):
+		return NewResourceV1Informer(f.cache, f.set.ResourceV1, f.namespace, f.resyncPeriod).ResourceClaimInformer()
+	case resourcev1.SchemaGroupVersion.WithResource("resourceclaimtemplates"):
+		return NewResourceV1Informer(f.cache, f.set.ResourceV1, f.namespace, f.resyncPeriod).ResourceClaimTemplateInformer()
+	case resourcev1.SchemaGroupVersion.WithResource("resourceslices"):
+		return NewResourceV1Informer(f.cache, f.set.ResourceV1, f.namespace, f.resyncPeriod).ResourceSliceInformer()
 	case schedulingv1.SchemaGroupVersion.WithResource("priorityclasses"):
 		return NewSchedulingK8sIoV1Informer(f.cache, f.set.SchedulingK8sIoV1, f.namespace, f.resyncPeriod).PriorityClassInformer()
 	case storagev1.SchemaGroupVersion.WithResource("csidrivers"):
@@ -3559,6 +3993,8 @@ func (f *InformerFactory) InformerForResource(gvr schema.GroupVersionResource) c
 		return NewStorageK8sIoV1Informer(f.cache, f.set.StorageK8sIoV1, f.namespace, f.resyncPeriod).StorageClassInformer()
 	case storagev1.SchemaGroupVersion.WithResource("volumeattachments"):
 		return NewStorageK8sIoV1Informer(f.cache, f.set.StorageK8sIoV1, f.namespace, f.resyncPeriod).VolumeAttachmentInformer()
+	case storagev1.SchemaGroupVersion.WithResource("volumeattributesclasses"):
+		return NewStorageK8sIoV1Informer(f.cache, f.set.StorageK8sIoV1, f.namespace, f.resyncPeriod).VolumeAttributesClassInformer()
 	default:
 		return nil
 	}
@@ -4022,6 +4458,50 @@ func NewAdmissionregistrationK8sIoV1Informer(c *InformerCache, client *Admission
 		resyncPeriod: resyncPeriod,
 		indexers:     cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
 	}
+}
+
+func (f *AdmissionregistrationK8sIoV1Informer) MutatingAdmissionPolicyInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&admissionregistrationv1.MutatingAdmissionPolicy{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListMutatingAdmissionPolicy(context.TODO(), metav1.ListOptions{})
+				},
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchMutatingAdmissionPolicy(context.TODO(), metav1.ListOptions{})
+				},
+			},
+			&admissionregistrationv1.MutatingAdmissionPolicy{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *AdmissionregistrationK8sIoV1Informer) MutatingAdmissionPolicyLister() *AdmissionregistrationK8sIoV1MutatingAdmissionPolicyLister {
+	return NewAdmissionregistrationK8sIoV1MutatingAdmissionPolicyLister(f.MutatingAdmissionPolicyInformer().GetIndexer())
+}
+
+func (f *AdmissionregistrationK8sIoV1Informer) MutatingAdmissionPolicyBindingInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&admissionregistrationv1.MutatingAdmissionPolicyBinding{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListMutatingAdmissionPolicyBinding(context.TODO(), metav1.ListOptions{})
+				},
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchMutatingAdmissionPolicyBinding(context.TODO(), metav1.ListOptions{})
+				},
+			},
+			&admissionregistrationv1.MutatingAdmissionPolicyBinding{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *AdmissionregistrationK8sIoV1Informer) MutatingAdmissionPolicyBindingLister() *AdmissionregistrationK8sIoV1MutatingAdmissionPolicyBindingLister {
+	return NewAdmissionregistrationK8sIoV1MutatingAdmissionPolicyBindingLister(f.MutatingAdmissionPolicyBindingInformer().GetIndexer())
 }
 
 func (f *AdmissionregistrationK8sIoV1Informer) MutatingWebhookConfigurationInformer() cache.SharedIndexInformer {
@@ -4772,6 +5252,28 @@ func NewNetworkingK8sIoV1Informer(c *InformerCache, client *NetworkingK8sIoV1, n
 	}
 }
 
+func (f *NetworkingK8sIoV1Informer) IPAddressInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&networkingv1.IPAddress{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListIPAddress(context.TODO(), metav1.ListOptions{})
+				},
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchIPAddress(context.TODO(), metav1.ListOptions{})
+				},
+			},
+			&networkingv1.IPAddress{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *NetworkingK8sIoV1Informer) IPAddressLister() *NetworkingK8sIoV1IPAddressLister {
+	return NewNetworkingK8sIoV1IPAddressLister(f.IPAddressInformer().GetIndexer())
+}
+
 func (f *NetworkingK8sIoV1Informer) IngressInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&networkingv1.Ingress{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
@@ -4836,6 +5338,28 @@ func (f *NetworkingK8sIoV1Informer) NetworkPolicyInformer() cache.SharedIndexInf
 
 func (f *NetworkingK8sIoV1Informer) NetworkPolicyLister() *NetworkingK8sIoV1NetworkPolicyLister {
 	return NewNetworkingK8sIoV1NetworkPolicyLister(f.NetworkPolicyInformer().GetIndexer())
+}
+
+func (f *NetworkingK8sIoV1Informer) ServiceCIDRInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&networkingv1.ServiceCIDR{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListServiceCIDR(context.TODO(), metav1.ListOptions{})
+				},
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchServiceCIDR(context.TODO(), metav1.ListOptions{})
+				},
+			},
+			&networkingv1.ServiceCIDR{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *NetworkingK8sIoV1Informer) ServiceCIDRLister() *NetworkingK8sIoV1ServiceCIDRLister {
+	return NewNetworkingK8sIoV1ServiceCIDRLister(f.ServiceCIDRInformer().GetIndexer())
 }
 
 type PolicyV1Informer struct {
@@ -5006,6 +5530,112 @@ func (f *RbacAuthorizationK8sIoV1Informer) RoleBindingLister() *RbacAuthorizatio
 	return NewRbacAuthorizationK8sIoV1RoleBindingLister(f.RoleBindingInformer().GetIndexer())
 }
 
+type ResourceV1Informer struct {
+	cache        *InformerCache
+	client       *ResourceV1
+	namespace    string
+	resyncPeriod time.Duration
+	indexers     cache.Indexers
+}
+
+func NewResourceV1Informer(c *InformerCache, client *ResourceV1, namespace string, resyncPeriod time.Duration) *ResourceV1Informer {
+	return &ResourceV1Informer{
+		cache:        c,
+		client:       client,
+		namespace:    namespace,
+		resyncPeriod: resyncPeriod,
+		indexers:     cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
+	}
+}
+
+func (f *ResourceV1Informer) DeviceClassInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&resourcev1.DeviceClass{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListDeviceClass(context.TODO(), metav1.ListOptions{})
+				},
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchDeviceClass(context.TODO(), metav1.ListOptions{})
+				},
+			},
+			&resourcev1.DeviceClass{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *ResourceV1Informer) DeviceClassLister() *ResourceV1DeviceClassLister {
+	return NewResourceV1DeviceClassLister(f.DeviceClassInformer().GetIndexer())
+}
+
+func (f *ResourceV1Informer) ResourceClaimInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&resourcev1.ResourceClaim{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListResourceClaim(context.TODO(), f.namespace, metav1.ListOptions{})
+				},
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchResourceClaim(context.TODO(), f.namespace, metav1.ListOptions{})
+				},
+			},
+			&resourcev1.ResourceClaim{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *ResourceV1Informer) ResourceClaimLister() *ResourceV1ResourceClaimLister {
+	return NewResourceV1ResourceClaimLister(f.ResourceClaimInformer().GetIndexer())
+}
+
+func (f *ResourceV1Informer) ResourceClaimTemplateInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&resourcev1.ResourceClaimTemplate{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListResourceClaimTemplate(context.TODO(), f.namespace, metav1.ListOptions{})
+				},
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchResourceClaimTemplate(context.TODO(), f.namespace, metav1.ListOptions{})
+				},
+			},
+			&resourcev1.ResourceClaimTemplate{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *ResourceV1Informer) ResourceClaimTemplateLister() *ResourceV1ResourceClaimTemplateLister {
+	return NewResourceV1ResourceClaimTemplateLister(f.ResourceClaimTemplateInformer().GetIndexer())
+}
+
+func (f *ResourceV1Informer) ResourceSliceInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&resourcev1.ResourceSlice{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListResourceSlice(context.TODO(), metav1.ListOptions{})
+				},
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchResourceSlice(context.TODO(), metav1.ListOptions{})
+				},
+			},
+			&resourcev1.ResourceSlice{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *ResourceV1Informer) ResourceSliceLister() *ResourceV1ResourceSliceLister {
+	return NewResourceV1ResourceSliceLister(f.ResourceSliceInformer().GetIndexer())
+}
+
 type SchedulingK8sIoV1Informer struct {
 	cache        *InformerCache
 	client       *SchedulingK8sIoV1
@@ -5172,6 +5802,28 @@ func (f *StorageK8sIoV1Informer) VolumeAttachmentInformer() cache.SharedIndexInf
 
 func (f *StorageK8sIoV1Informer) VolumeAttachmentLister() *StorageK8sIoV1VolumeAttachmentLister {
 	return NewStorageK8sIoV1VolumeAttachmentLister(f.VolumeAttachmentInformer().GetIndexer())
+}
+
+func (f *StorageK8sIoV1Informer) VolumeAttributesClassInformer() cache.SharedIndexInformer {
+	return f.cache.Write(&storagev1.VolumeAttributesClass{}, func() cache.SharedIndexInformer {
+		return cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
+					return f.client.ListVolumeAttributesClass(context.TODO(), metav1.ListOptions{})
+				},
+				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
+					return f.client.WatchVolumeAttributesClass(context.TODO(), metav1.ListOptions{})
+				},
+			},
+			&storagev1.VolumeAttributesClass{},
+			f.resyncPeriod,
+			f.indexers,
+		)
+	})
+}
+
+func (f *StorageK8sIoV1Informer) VolumeAttributesClassLister() *StorageK8sIoV1VolumeAttributesClassLister {
+	return NewStorageK8sIoV1VolumeAttributesClassLister(f.VolumeAttributesClassInformer().GetIndexer())
 }
 
 type CoreV1BindingLister struct {
@@ -5685,6 +6337,60 @@ func (x *CoreV1ServiceAccountLister) Get(namespace, name string) (*corev1.Servic
 		return nil, k8serrors.NewNotFound(corev1.SchemaGroupVersion.WithResource("serviceaccount").GroupResource(), name)
 	}
 	return obj.(*corev1.ServiceAccount).DeepCopy(), nil
+}
+
+type AdmissionregistrationK8sIoV1MutatingAdmissionPolicyLister struct {
+	indexer cache.Indexer
+}
+
+func NewAdmissionregistrationK8sIoV1MutatingAdmissionPolicyLister(indexer cache.Indexer) *AdmissionregistrationK8sIoV1MutatingAdmissionPolicyLister {
+	return &AdmissionregistrationK8sIoV1MutatingAdmissionPolicyLister{indexer: indexer}
+}
+
+func (x *AdmissionregistrationK8sIoV1MutatingAdmissionPolicyLister) List(selector labels.Selector) ([]*admissionregistrationv1.MutatingAdmissionPolicy, error) {
+	var ret []*admissionregistrationv1.MutatingAdmissionPolicy
+	err := cache.ListAll(x.indexer, selector, func(m interface{}) {
+		ret = append(ret, m.(*admissionregistrationv1.MutatingAdmissionPolicy).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *AdmissionregistrationK8sIoV1MutatingAdmissionPolicyLister) Get(name string) (*admissionregistrationv1.MutatingAdmissionPolicy, error) {
+	obj, exists, err := x.indexer.GetByKey("/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(admissionregistrationv1.SchemaGroupVersion.WithResource("mutatingadmissionpolicy").GroupResource(), name)
+	}
+	return obj.(*admissionregistrationv1.MutatingAdmissionPolicy).DeepCopy(), nil
+}
+
+type AdmissionregistrationK8sIoV1MutatingAdmissionPolicyBindingLister struct {
+	indexer cache.Indexer
+}
+
+func NewAdmissionregistrationK8sIoV1MutatingAdmissionPolicyBindingLister(indexer cache.Indexer) *AdmissionregistrationK8sIoV1MutatingAdmissionPolicyBindingLister {
+	return &AdmissionregistrationK8sIoV1MutatingAdmissionPolicyBindingLister{indexer: indexer}
+}
+
+func (x *AdmissionregistrationK8sIoV1MutatingAdmissionPolicyBindingLister) List(selector labels.Selector) ([]*admissionregistrationv1.MutatingAdmissionPolicyBinding, error) {
+	var ret []*admissionregistrationv1.MutatingAdmissionPolicyBinding
+	err := cache.ListAll(x.indexer, selector, func(m interface{}) {
+		ret = append(ret, m.(*admissionregistrationv1.MutatingAdmissionPolicyBinding).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *AdmissionregistrationK8sIoV1MutatingAdmissionPolicyBindingLister) Get(name string) (*admissionregistrationv1.MutatingAdmissionPolicyBinding, error) {
+	obj, exists, err := x.indexer.GetByKey("/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(admissionregistrationv1.SchemaGroupVersion.WithResource("mutatingadmissionpolicybinding").GroupResource(), name)
+	}
+	return obj.(*admissionregistrationv1.MutatingAdmissionPolicyBinding).DeepCopy(), nil
 }
 
 type AdmissionregistrationK8sIoV1MutatingWebhookConfigurationLister struct {
@@ -6362,6 +7068,33 @@ func (x *EventsK8sIoV1EventLister) Get(namespace, name string) (*eventsv1.Event,
 	return obj.(*eventsv1.Event).DeepCopy(), nil
 }
 
+type NetworkingK8sIoV1IPAddressLister struct {
+	indexer cache.Indexer
+}
+
+func NewNetworkingK8sIoV1IPAddressLister(indexer cache.Indexer) *NetworkingK8sIoV1IPAddressLister {
+	return &NetworkingK8sIoV1IPAddressLister{indexer: indexer}
+}
+
+func (x *NetworkingK8sIoV1IPAddressLister) List(selector labels.Selector) ([]*networkingv1.IPAddress, error) {
+	var ret []*networkingv1.IPAddress
+	err := cache.ListAll(x.indexer, selector, func(m interface{}) {
+		ret = append(ret, m.(*networkingv1.IPAddress).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *NetworkingK8sIoV1IPAddressLister) Get(name string) (*networkingv1.IPAddress, error) {
+	obj, exists, err := x.indexer.GetByKey("/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(networkingv1.SchemaGroupVersion.WithResource("ipaddress").GroupResource(), name)
+	}
+	return obj.(*networkingv1.IPAddress).DeepCopy(), nil
+}
+
 type NetworkingK8sIoV1IngressLister struct {
 	indexer cache.Indexer
 }
@@ -6441,6 +7174,33 @@ func (x *NetworkingK8sIoV1NetworkPolicyLister) Get(namespace, name string) (*net
 		return nil, k8serrors.NewNotFound(networkingv1.SchemaGroupVersion.WithResource("networkpolicy").GroupResource(), name)
 	}
 	return obj.(*networkingv1.NetworkPolicy).DeepCopy(), nil
+}
+
+type NetworkingK8sIoV1ServiceCIDRLister struct {
+	indexer cache.Indexer
+}
+
+func NewNetworkingK8sIoV1ServiceCIDRLister(indexer cache.Indexer) *NetworkingK8sIoV1ServiceCIDRLister {
+	return &NetworkingK8sIoV1ServiceCIDRLister{indexer: indexer}
+}
+
+func (x *NetworkingK8sIoV1ServiceCIDRLister) List(selector labels.Selector) ([]*networkingv1.ServiceCIDR, error) {
+	var ret []*networkingv1.ServiceCIDR
+	err := cache.ListAll(x.indexer, selector, func(m interface{}) {
+		ret = append(ret, m.(*networkingv1.ServiceCIDR).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *NetworkingK8sIoV1ServiceCIDRLister) Get(name string) (*networkingv1.ServiceCIDR, error) {
+	obj, exists, err := x.indexer.GetByKey("/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(networkingv1.SchemaGroupVersion.WithResource("servicecidr").GroupResource(), name)
+	}
+	return obj.(*networkingv1.ServiceCIDR).DeepCopy(), nil
 }
 
 type PolicyV1EvictionLister struct {
@@ -6605,6 +7365,114 @@ func (x *RbacAuthorizationK8sIoV1RoleBindingLister) Get(namespace, name string) 
 	return obj.(*rbacv1.RoleBinding).DeepCopy(), nil
 }
 
+type ResourceV1DeviceClassLister struct {
+	indexer cache.Indexer
+}
+
+func NewResourceV1DeviceClassLister(indexer cache.Indexer) *ResourceV1DeviceClassLister {
+	return &ResourceV1DeviceClassLister{indexer: indexer}
+}
+
+func (x *ResourceV1DeviceClassLister) List(selector labels.Selector) ([]*resourcev1.DeviceClass, error) {
+	var ret []*resourcev1.DeviceClass
+	err := cache.ListAll(x.indexer, selector, func(m interface{}) {
+		ret = append(ret, m.(*resourcev1.DeviceClass).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *ResourceV1DeviceClassLister) Get(name string) (*resourcev1.DeviceClass, error) {
+	obj, exists, err := x.indexer.GetByKey("/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(resourcev1.SchemaGroupVersion.WithResource("deviceclass").GroupResource(), name)
+	}
+	return obj.(*resourcev1.DeviceClass).DeepCopy(), nil
+}
+
+type ResourceV1ResourceClaimLister struct {
+	indexer cache.Indexer
+}
+
+func NewResourceV1ResourceClaimLister(indexer cache.Indexer) *ResourceV1ResourceClaimLister {
+	return &ResourceV1ResourceClaimLister{indexer: indexer}
+}
+
+func (x *ResourceV1ResourceClaimLister) List(namespace string, selector labels.Selector) ([]*resourcev1.ResourceClaim, error) {
+	var ret []*resourcev1.ResourceClaim
+	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
+		ret = append(ret, m.(*resourcev1.ResourceClaim).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *ResourceV1ResourceClaimLister) Get(namespace, name string) (*resourcev1.ResourceClaim, error) {
+	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(resourcev1.SchemaGroupVersion.WithResource("resourceclaim").GroupResource(), name)
+	}
+	return obj.(*resourcev1.ResourceClaim).DeepCopy(), nil
+}
+
+type ResourceV1ResourceClaimTemplateLister struct {
+	indexer cache.Indexer
+}
+
+func NewResourceV1ResourceClaimTemplateLister(indexer cache.Indexer) *ResourceV1ResourceClaimTemplateLister {
+	return &ResourceV1ResourceClaimTemplateLister{indexer: indexer}
+}
+
+func (x *ResourceV1ResourceClaimTemplateLister) List(namespace string, selector labels.Selector) ([]*resourcev1.ResourceClaimTemplate, error) {
+	var ret []*resourcev1.ResourceClaimTemplate
+	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
+		ret = append(ret, m.(*resourcev1.ResourceClaimTemplate).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *ResourceV1ResourceClaimTemplateLister) Get(namespace, name string) (*resourcev1.ResourceClaimTemplate, error) {
+	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(resourcev1.SchemaGroupVersion.WithResource("resourceclaimtemplate").GroupResource(), name)
+	}
+	return obj.(*resourcev1.ResourceClaimTemplate).DeepCopy(), nil
+}
+
+type ResourceV1ResourceSliceLister struct {
+	indexer cache.Indexer
+}
+
+func NewResourceV1ResourceSliceLister(indexer cache.Indexer) *ResourceV1ResourceSliceLister {
+	return &ResourceV1ResourceSliceLister{indexer: indexer}
+}
+
+func (x *ResourceV1ResourceSliceLister) List(selector labels.Selector) ([]*resourcev1.ResourceSlice, error) {
+	var ret []*resourcev1.ResourceSlice
+	err := cache.ListAll(x.indexer, selector, func(m interface{}) {
+		ret = append(ret, m.(*resourcev1.ResourceSlice).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *ResourceV1ResourceSliceLister) Get(name string) (*resourcev1.ResourceSlice, error) {
+	obj, exists, err := x.indexer.GetByKey("/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(resourcev1.SchemaGroupVersion.WithResource("resourceslice").GroupResource(), name)
+	}
+	return obj.(*resourcev1.ResourceSlice).DeepCopy(), nil
+}
+
 type SchedulingK8sIoV1PriorityClassLister struct {
 	indexer cache.Indexer
 }
@@ -6765,4 +7633,31 @@ func (x *StorageK8sIoV1VolumeAttachmentLister) Get(name string) (*storagev1.Volu
 		return nil, k8serrors.NewNotFound(storagev1.SchemaGroupVersion.WithResource("volumeattachment").GroupResource(), name)
 	}
 	return obj.(*storagev1.VolumeAttachment).DeepCopy(), nil
+}
+
+type StorageK8sIoV1VolumeAttributesClassLister struct {
+	indexer cache.Indexer
+}
+
+func NewStorageK8sIoV1VolumeAttributesClassLister(indexer cache.Indexer) *StorageK8sIoV1VolumeAttributesClassLister {
+	return &StorageK8sIoV1VolumeAttributesClassLister{indexer: indexer}
+}
+
+func (x *StorageK8sIoV1VolumeAttributesClassLister) List(selector labels.Selector) ([]*storagev1.VolumeAttributesClass, error) {
+	var ret []*storagev1.VolumeAttributesClass
+	err := cache.ListAll(x.indexer, selector, func(m interface{}) {
+		ret = append(ret, m.(*storagev1.VolumeAttributesClass).DeepCopy())
+	})
+	return ret, err
+}
+
+func (x *StorageK8sIoV1VolumeAttributesClassLister) Get(name string) (*storagev1.VolumeAttributesClass, error) {
+	obj, exists, err := x.indexer.GetByKey("/" + name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, k8serrors.NewNotFound(storagev1.SchemaGroupVersion.WithResource("volumeattributesclass").GroupResource(), name)
+	}
+	return obj.(*storagev1.VolumeAttributesClass).DeepCopy(), nil
 }

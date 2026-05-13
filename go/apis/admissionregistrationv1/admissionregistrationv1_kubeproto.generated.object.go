@@ -17,6 +17,10 @@ var (
 
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemaGroupVersion,
+		&MutatingAdmissionPolicy{},
+		&MutatingAdmissionPolicyBinding{},
+		&MutatingAdmissionPolicyBindingList{},
+		&MutatingAdmissionPolicyList{},
 		&MutatingWebhookConfiguration{},
 		&MutatingWebhookConfigurationList{},
 		&ValidatingAdmissionPolicy{},
@@ -61,6 +65,13 @@ const (
 	ParameterNotFoundActionTypeDeny  ParameterNotFoundActionType = "Deny"
 )
 
+type PatchType string
+
+const (
+	PatchTypeApplyConfiguration PatchType = "ApplyConfiguration"
+	PatchTypeJSONPatch          PatchType = "JSONPatch"
+)
+
 type ReinvocationPolicyType string
 
 const (
@@ -93,10 +104,148 @@ const (
 	ValidationActionAudit ValidationAction = "Audit"
 )
 
+type MutatingAdmissionPolicy struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata"`
+	// spec defines the desired behavior of the MutatingAdmissionPolicy.
+	Spec *MutatingAdmissionPolicySpec `json:"spec,omitempty"`
+}
+
+func (in *MutatingAdmissionPolicy) DeepCopyInto(out *MutatingAdmissionPolicy) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
+	if in.Spec != nil {
+		in, out := &in.Spec, &out.Spec
+		*out = new(MutatingAdmissionPolicySpec)
+		(*in).DeepCopyInto(*out)
+	}
+}
+
+func (in *MutatingAdmissionPolicy) DeepCopy() *MutatingAdmissionPolicy {
+	if in == nil {
+		return nil
+	}
+	out := new(MutatingAdmissionPolicy)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *MutatingAdmissionPolicy) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	}
+	return nil
+}
+
+type MutatingAdmissionPolicyBinding struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata"`
+	// spec defines the desired behavior of the MutatingAdmissionPolicyBinding.
+	Spec *MutatingAdmissionPolicyBindingSpec `json:"spec,omitempty"`
+}
+
+func (in *MutatingAdmissionPolicyBinding) DeepCopyInto(out *MutatingAdmissionPolicyBinding) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
+	if in.Spec != nil {
+		in, out := &in.Spec, &out.Spec
+		*out = new(MutatingAdmissionPolicyBindingSpec)
+		(*in).DeepCopyInto(*out)
+	}
+}
+
+func (in *MutatingAdmissionPolicyBinding) DeepCopy() *MutatingAdmissionPolicyBinding {
+	if in == nil {
+		return nil
+	}
+	out := new(MutatingAdmissionPolicyBinding)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *MutatingAdmissionPolicyBinding) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	}
+	return nil
+}
+
+type MutatingAdmissionPolicyBindingList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata"`
+	Items           []MutatingAdmissionPolicyBinding `json:"items"`
+}
+
+func (in *MutatingAdmissionPolicyBindingList) DeepCopyInto(out *MutatingAdmissionPolicyBindingList) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
+	if in.Items != nil {
+		l := make([]MutatingAdmissionPolicyBinding, len(in.Items))
+		for i := range in.Items {
+			in.Items[i].DeepCopyInto(&l[i])
+		}
+		out.Items = l
+	}
+}
+
+func (in *MutatingAdmissionPolicyBindingList) DeepCopy() *MutatingAdmissionPolicyBindingList {
+	if in == nil {
+		return nil
+	}
+	out := new(MutatingAdmissionPolicyBindingList)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *MutatingAdmissionPolicyBindingList) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	}
+	return nil
+}
+
+type MutatingAdmissionPolicyList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata"`
+	Items           []MutatingAdmissionPolicy `json:"items"`
+}
+
+func (in *MutatingAdmissionPolicyList) DeepCopyInto(out *MutatingAdmissionPolicyList) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
+	if in.Items != nil {
+		l := make([]MutatingAdmissionPolicy, len(in.Items))
+		for i := range in.Items {
+			in.Items[i].DeepCopyInto(&l[i])
+		}
+		out.Items = l
+	}
+}
+
+func (in *MutatingAdmissionPolicyList) DeepCopy() *MutatingAdmissionPolicyList {
+	if in == nil {
+		return nil
+	}
+	out := new(MutatingAdmissionPolicyList)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *MutatingAdmissionPolicyList) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	}
+	return nil
+}
+
 type MutatingWebhookConfiguration struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
-	// Webhooks is a list of webhooks and the affected resources and operations.
+	// webhooks is a list of webhooks and the affected resources and operations.
 	Webhooks []MutatingWebhook `json:"webhooks"`
 }
 
@@ -167,9 +316,9 @@ func (in *MutatingWebhookConfigurationList) DeepCopyObject() runtime.Object {
 type ValidatingAdmissionPolicy struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
-	// Specification of the desired behavior of the ValidatingAdmissionPolicy.
+	// spec defines the desired behavior of the ValidatingAdmissionPolicy.
 	Spec *ValidatingAdmissionPolicySpec `json:"spec,omitempty"`
-	// The status of the ValidatingAdmissionPolicy, including warnings that are useful to determine if the policy
+	// status represents the current status of the ValidatingAdmissionPolicy, including warnings that are useful to determine if the policy
 	// behaves in the expected way.
 	// Populated by the system.
 	// Read-only.
@@ -211,7 +360,7 @@ func (in *ValidatingAdmissionPolicy) DeepCopyObject() runtime.Object {
 type ValidatingAdmissionPolicyBinding struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
-	// Specification of the desired behavior of the ValidatingAdmissionPolicyBinding.
+	// spec defines the desired behavior of the ValidatingAdmissionPolicyBinding.
 	Spec *ValidatingAdmissionPolicyBindingSpec `json:"spec,omitempty"`
 }
 
@@ -315,7 +464,7 @@ func (in *ValidatingAdmissionPolicyList) DeepCopyObject() runtime.Object {
 type ValidatingWebhookConfiguration struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
-	// Webhooks is a list of webhooks and the affected resources and operations.
+	// webhooks is a list of webhooks and the affected resources and operations.
 	Webhooks []ValidatingWebhook `json:"webhooks"`
 }
 
@@ -383,24 +532,173 @@ func (in *ValidatingWebhookConfigurationList) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+type MutatingAdmissionPolicySpec struct {
+	// paramKind specifies the kind of resources used to parameterize this policy.
+	// If absent, there are no parameters for this policy and the param CEL variable will not be provided to validation expressions.
+	// If paramKind refers to a non-existent kind, this policy definition is mis-configured and the FailurePolicy is applied.
+	// If paramKind is specified but paramRef is unset in MutatingAdmissionPolicyBinding, the params variable will be null.
+	ParamKind *ParamKind `json:"paramKind,omitempty"`
+	// matchConstraints specifies what resources this policy is designed to validate.
+	// The MutatingAdmissionPolicy cares about a request if it matches _all_ Constraints.
+	// However, in order to prevent clusters from being put into an unstable state that cannot be recovered from via the API
+	// MutatingAdmissionPolicy cannot match MutatingAdmissionPolicy and MutatingAdmissionPolicyBinding.
+	// The CREATE, UPDATE and CONNECT operations are allowed.  The DELETE operation may not be matched.
+	// '*' matches CREATE, UPDATE and CONNECT.
+	// Required.
+	MatchConstraints *MatchResources `json:"matchConstraints,omitempty"`
+	// variables contain definitions of variables that can be used in composition of other expressions.
+	// Each variable is defined as a named CEL expression.
+	// The variables defined here will be available under `variables` in other expressions of the policy
+	// except matchConditions because matchConditions are evaluated before the rest of the policy.
+	// The expression of a variable can refer to other variables defined earlier in the list but not those after.
+	// Thus, variables must be sorted by the order of first appearance and acyclic.
+	Variables []Variable `json:"variables"`
+	// mutations contain operations to perform on matching objects.
+	// mutations may not be empty; a minimum of one mutation is required.
+	// mutations are evaluated in order, and are reinvoked according to
+	// the reinvocationPolicy.
+	// The mutations of a policy are invoked for each binding of this policy
+	// and reinvocation of mutations occurs on a per binding basis.
+	Mutations []Mutation `json:"mutations"`
+	// failurePolicy defines how to handle failures for the admission policy. Failures can
+	// occur from CEL expression parse errors, type check errors, runtime errors and invalid
+	// or mis-configured policy definitions or bindings.
+	// A policy is invalid if paramKind refers to a non-existent Kind.
+	// A binding is invalid if paramRef.name refers to a non-existent resource.
+	// failurePolicy does not define how validations that evaluate to false are handled.
+	// Allowed values are Ignore or Fail. Defaults to Fail.
+	FailurePolicy FailurePolicyType `json:"failurePolicy,omitempty"`
+	// matchConditions is a list of conditions that must be met for a request to be validated.
+	// Match conditions filter requests that have already been matched by the matchConstraints.
+	// An empty list of matchConditions matches all requests.
+	// There are a maximum of 64 match conditions allowed.
+	// If a parameter object is provided, it can be accessed via the `params` handle in the same
+	// manner as validation expressions.
+	// The exact matching logic is (in order):
+	// 1. If ANY matchCondition evaluates to FALSE, the policy is skipped.
+	// 2. If ALL matchConditions evaluate to TRUE, the policy is evaluated.
+	// 3. If any matchCondition evaluates to an error (but none are FALSE):
+	// - If failurePolicy=Fail, reject the request
+	// - If failurePolicy=Ignore, the policy is skipped
+	MatchConditions []MatchCondition `json:"matchConditions"`
+	// reinvocationPolicy indicates whether mutations may be called multiple times per MutatingAdmissionPolicyBinding
+	// as part of a single admission evaluation.
+	// Allowed values are "Never" and "IfNeeded".
+	// Never: These mutations will not be called more than once per binding in a single admission evaluation.
+	// IfNeeded: These mutations may be invoked more than once per binding for a single admission request and there is no guarantee of
+	// order with respect to other admission plugins, admission webhooks, bindings of this policy and admission policies.  Mutations are only
+	// reinvoked when mutations change the object after this mutation is invoked.
+	// Required.
+	ReinvocationPolicy ReinvocationPolicyType `json:"reinvocationPolicy,omitempty"`
+}
+
+func (in *MutatingAdmissionPolicySpec) DeepCopyInto(out *MutatingAdmissionPolicySpec) {
+	*out = *in
+	if in.ParamKind != nil {
+		in, out := &in.ParamKind, &out.ParamKind
+		*out = new(ParamKind)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.MatchConstraints != nil {
+		in, out := &in.MatchConstraints, &out.MatchConstraints
+		*out = new(MatchResources)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.Variables != nil {
+		l := make([]Variable, len(in.Variables))
+		for i := range in.Variables {
+			in.Variables[i].DeepCopyInto(&l[i])
+		}
+		out.Variables = l
+	}
+	if in.Mutations != nil {
+		l := make([]Mutation, len(in.Mutations))
+		for i := range in.Mutations {
+			in.Mutations[i].DeepCopyInto(&l[i])
+		}
+		out.Mutations = l
+	}
+	if in.MatchConditions != nil {
+		l := make([]MatchCondition, len(in.MatchConditions))
+		for i := range in.MatchConditions {
+			in.MatchConditions[i].DeepCopyInto(&l[i])
+		}
+		out.MatchConditions = l
+	}
+}
+
+func (in *MutatingAdmissionPolicySpec) DeepCopy() *MutatingAdmissionPolicySpec {
+	if in == nil {
+		return nil
+	}
+	out := new(MutatingAdmissionPolicySpec)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type MutatingAdmissionPolicyBindingSpec struct {
+	// policyName references a MutatingAdmissionPolicy name which the MutatingAdmissionPolicyBinding binds to.
+	// If the referenced resource does not exist, this binding is considered invalid and will be ignored
+	// Required.
+	PolicyName string `json:"policyName,omitempty"`
+	// paramRef specifies the parameter resource used to configure the admission control policy.
+	// It should point to a resource of the type specified in spec.ParamKind of the bound MutatingAdmissionPolicy.
+	// If the policy specifies a ParamKind and the resource referred to by ParamRef does not exist, this binding is considered mis-configured and the FailurePolicy of the MutatingAdmissionPolicy applied.
+	// If the policy does not specify a ParamKind then this field is ignored, and the rules are evaluated without a param.
+	ParamRef *ParamRef `json:"paramRef,omitempty"`
+	// matchResources limits what resources match this binding and may be mutated by it.
+	// Note that if matchResources matches a resource, the resource must also match a policy's matchConstraints and
+	// matchConditions before the resource may be mutated.
+	// When matchResources is unset, it does not constrain resource matching, and only the policy's matchConstraints
+	// and matchConditions must match for the resource to be mutated.
+	// Additionally, matchResources.resourceRules are optional and do not constraint matching when unset.
+	// Note that this is differs from MutatingAdmissionPolicy matchConstraints, where resourceRules are required.
+	// The CREATE, UPDATE and CONNECT operations are allowed.  The DELETE operation may not be matched.
+	// '*' matches CREATE, UPDATE and CONNECT.
+	MatchResources *MatchResources `json:"matchResources,omitempty"`
+}
+
+func (in *MutatingAdmissionPolicyBindingSpec) DeepCopyInto(out *MutatingAdmissionPolicyBindingSpec) {
+	*out = *in
+	if in.ParamRef != nil {
+		in, out := &in.ParamRef, &out.ParamRef
+		*out = new(ParamRef)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.MatchResources != nil {
+		in, out := &in.MatchResources, &out.MatchResources
+		*out = new(MatchResources)
+		(*in).DeepCopyInto(*out)
+	}
+}
+
+func (in *MutatingAdmissionPolicyBindingSpec) DeepCopy() *MutatingAdmissionPolicyBindingSpec {
+	if in == nil {
+		return nil
+	}
+	out := new(MutatingAdmissionPolicyBindingSpec)
+	in.DeepCopyInto(out)
+	return out
+}
+
 type MutatingWebhook struct {
-	// The name of the admission webhook.
+	// name is the name of the admission webhook.
 	// Name should be fully qualified, e.g., imagepolicy.kubernetes.io, where
 	// "imagepolicy" is the name of the webhook, and kubernetes.io is the name
 	// of the organization.
 	// Required.
 	Name string `json:"name"`
-	// ClientConfig defines how to communicate with the hook.
+	// clientConfig defines how to communicate with the hook.
 	// Required
 	ClientConfig WebhookClientConfig `json:"clientConfig"`
-	// Rules describes what operations on what resources/subresources the webhook cares about.
+	// rules describes what operations on what resources/subresources the webhook cares about.
 	// The webhook cares about an operation if it matches _any_ Rule.
 	// However, in order to prevent ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks
 	// from putting the cluster in a state which cannot be recovered from without completely
 	// disabling the plugin, ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks are never called
 	// on admission requests for ValidatingWebhookConfiguration and MutatingWebhookConfiguration objects.
 	Rules []RuleWithOperations `json:"rules"`
-	// FailurePolicy defines how unrecognized errors from the admission endpoint are handled -
+	// failurePolicy defines how unrecognized errors from the admission endpoint are handled -
 	// allowed values are Ignore or Fail. Defaults to Fail.
 	FailurePolicy FailurePolicyType `json:"failurePolicy,omitempty"`
 	// matchPolicy defines how the "rules" list is used to match incoming requests.
@@ -415,7 +713,7 @@ type MutatingWebhook struct {
 	// a request to apps/v1beta1 or extensions/v1beta1 would be converted to apps/v1 and sent to the webhook.
 	// Defaults to "Equivalent"
 	MatchPolicy MatchPolicyType `json:"matchPolicy,omitempty"`
-	// NamespaceSelector decides whether to run the webhook on an object based
+	// namespaceSelector decides whether to run the webhook on an object based
 	// on whether the namespace for that object matches the selector. If the
 	// object itself is a namespace, the matching is performed on
 	// object.metadata.labels. If the object is another cluster scoped resource,
@@ -455,7 +753,7 @@ type MutatingWebhook struct {
 	// for more examples of label selectors.
 	// Default to the empty LabelSelector, which matches everything.
 	NamespaceSelector *metav1.LabelSelector `json:"namespaceSelector,omitempty"`
-	// ObjectSelector decides whether to run the webhook based on if the
+	// objectSelector decides whether to run the webhook based on if the
 	// object has matching labels. objectSelector is evaluated against both
 	// the oldObject and newObject that would be sent to the webhook, and
 	// is considered to match if either object matches the selector. A null
@@ -467,20 +765,20 @@ type MutatingWebhook struct {
 	// users may skip the admission webhook by setting the labels.
 	// Default to the empty LabelSelector, which matches everything.
 	ObjectSelector *metav1.LabelSelector `json:"objectSelector,omitempty"`
-	// SideEffects states whether this webhook has side effects.
+	// sideEffects states whether this webhook has side effects.
 	// Acceptable values are: None, NoneOnDryRun (webhooks created via v1beta1 may also specify Some or Unknown).
 	// Webhooks with side effects MUST implement a reconciliation system, since a request may be
 	// rejected by a future step in the admission chain and the side effects therefore need to be undone.
 	// Requests with the dryRun attribute will be auto-rejected if they match a webhook with
 	// sideEffects == Unknown or Some.
 	SideEffects SideEffectClass `json:"sideEffects,omitempty"`
-	// TimeoutSeconds specifies the timeout for this webhook. After the timeout passes,
+	// timeoutSeconds specifies the timeout for this webhook. After the timeout passes,
 	// the webhook call will be ignored or the API call will fail based on the
 	// failure policy.
 	// The timeout value must be between 1 and 30 seconds.
 	// Default to 10 seconds.
 	TimeoutSeconds int `json:"timeoutSeconds,omitempty"`
-	// AdmissionReviewVersions is an ordered list of preferred `AdmissionReview`
+	// admissionReviewVersions is an ordered list of preferred `AdmissionReview`
 	// versions the Webhook expects. API server will try to use first version in
 	// the list which it supports. If none of the versions specified in this list
 	// supported by API server, validation will fail for this object.
@@ -501,7 +799,7 @@ type MutatingWebhook struct {
 	// * to validate an object after all mutations are guaranteed complete, use a validating admission webhook instead.
 	// Defaults to "Never".
 	ReinvocationPolicy ReinvocationPolicyType `json:"reinvocationPolicy,omitempty"`
-	// MatchConditions is a list of conditions that must be met for a request to be sent to this
+	// matchConditions is a list of conditions that must be met for a request to be sent to this
 	// webhook. Match conditions filter requests that have already been matched by the rules,
 	// namespaceSelector, and objectSelector. An empty list of matchConditions matches all requests.
 	// There are a maximum of 64 match conditions allowed.
@@ -558,18 +856,18 @@ func (in *MutatingWebhook) DeepCopy() *MutatingWebhook {
 }
 
 type ValidatingAdmissionPolicySpec struct {
-	// ParamKind specifies the kind of resources used to parameterize this policy.
+	// paramKind specifies the kind of resources used to parameterize this policy.
 	// If absent, there are no parameters for this policy and the param CEL variable will not be provided to validation expressions.
 	// If ParamKind refers to a non-existent kind, this policy definition is mis-configured and the FailurePolicy is applied.
 	// If paramKind is specified but paramRef is unset in ValidatingAdmissionPolicyBinding, the params variable will be null.
 	ParamKind *ParamKind `json:"paramKind,omitempty"`
-	// MatchConstraints specifies what resources this policy is designed to validate.
+	// matchConstraints specifies what resources this policy is designed to validate.
 	// The AdmissionPolicy cares about a request if it matches _all_ Constraints.
 	// However, in order to prevent clusters from being put into an unstable state that cannot be recovered from via the API
 	// ValidatingAdmissionPolicy cannot match ValidatingAdmissionPolicy and ValidatingAdmissionPolicyBinding.
 	// Required.
 	MatchConstraints *MatchResources `json:"matchConstraints,omitempty"`
-	// Validations contain CEL expressions which is used to apply the validation.
+	// validations contain CEL expressions which is used to apply the validation.
 	// Validations and AuditAnnotations may not both be empty; a minimum of one Validations or AuditAnnotations is
 	// required.
 	Validations []Validation `json:"validations"`
@@ -588,7 +886,7 @@ type ValidatingAdmissionPolicySpec struct {
 	// validations and auditAnnotations may not both be empty; a least one of validations or auditAnnotations is
 	// required.
 	AuditAnnotations []AuditAnnotation `json:"auditAnnotations"`
-	// MatchConditions is a list of conditions that must be met for a request to be validated.
+	// matchConditions is a list of conditions that must be met for a request to be validated.
 	// Match conditions filter requests that have already been matched by the rules,
 	// namespaceSelector, and objectSelector. An empty list of matchConditions matches all requests.
 	// There are a maximum of 64 match conditions allowed.
@@ -601,7 +899,7 @@ type ValidatingAdmissionPolicySpec struct {
 	// - If failurePolicy=Fail, reject the request
 	// - If failurePolicy=Ignore, the policy is skipped
 	MatchConditions []MatchCondition `json:"matchConditions"`
-	// Variables contain definitions of variables that can be used in composition of other expressions.
+	// variables contain definitions of variables that can be used in composition of other expressions.
 	// Each variable is defined as a named CEL expression.
 	// The variables defined here will be available under `variables` in other expressions of the policy
 	// except MatchConditions because MatchConditions are evaluated before the rest of the policy.
@@ -662,12 +960,12 @@ func (in *ValidatingAdmissionPolicySpec) DeepCopy() *ValidatingAdmissionPolicySp
 }
 
 type ValidatingAdmissionPolicyStatus struct {
-	// The generation observed by the controller.
+	// observedGeneration is the generation observed by the controller.
 	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
-	// The results of type checking for each expression.
+	// typeChecking contains the results of type checking for each expression.
 	// Presence of this field indicates the completion of the type checking.
 	TypeChecking *TypeChecking `json:"typeChecking,omitempty"`
-	// The conditions represent the latest available observations of a policy's current state.
+	// conditions represent the latest available observations of a policy's current state.
 	Conditions []metav1.Condition `json:"conditions"`
 }
 
@@ -697,7 +995,7 @@ func (in *ValidatingAdmissionPolicyStatus) DeepCopy() *ValidatingAdmissionPolicy
 }
 
 type ValidatingAdmissionPolicyBindingSpec struct {
-	// PolicyName references a ValidatingAdmissionPolicy name which the ValidatingAdmissionPolicyBinding binds to.
+	// policyName references a ValidatingAdmissionPolicy name which the ValidatingAdmissionPolicyBinding binds to.
 	// If the referenced resource does not exist, this binding is considered invalid and will be ignored
 	// Required.
 	PolicyName string `json:"policyName,omitempty"`
@@ -706,7 +1004,7 @@ type ValidatingAdmissionPolicyBindingSpec struct {
 	// If the policy specifies a ParamKind and the resource referred to by ParamRef does not exist, this binding is considered mis-configured and the FailurePolicy of the ValidatingAdmissionPolicy applied.
 	// If the policy does not specify a ParamKind then this field is ignored, and the rules are evaluated without a param.
 	ParamRef *ParamRef `json:"paramRef,omitempty"`
-	// MatchResources declares what resources match this binding and will be validated by it.
+	// matchResources declares what resources match this binding and will be validated by it.
 	// Note that this is intersected with the policy's matchConstraints, so only requests that are matched by the policy can be selected by this.
 	// If this is unset, all resources matched by the policy are validated by this binding
 	// When resourceRules is unset, it does not constrain resource matching. If a resource is matched by the other fields of this object, it will be validated.
@@ -774,23 +1072,23 @@ func (in *ValidatingAdmissionPolicyBindingSpec) DeepCopy() *ValidatingAdmissionP
 }
 
 type ValidatingWebhook struct {
-	// The name of the admission webhook.
+	// name is the name of the admission webhook.
 	// Name should be fully qualified, e.g., imagepolicy.kubernetes.io, where
 	// "imagepolicy" is the name of the webhook, and kubernetes.io is the name
 	// of the organization.
 	// Required.
 	Name string `json:"name"`
-	// ClientConfig defines how to communicate with the hook.
+	// clientConfig defines how to communicate with the hook.
 	// Required
 	ClientConfig WebhookClientConfig `json:"clientConfig"`
-	// Rules describes what operations on what resources/subresources the webhook cares about.
+	// rules describes what operations on what resources/subresources the webhook cares about.
 	// The webhook cares about an operation if it matches _any_ Rule.
 	// However, in order to prevent ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks
 	// from putting the cluster in a state which cannot be recovered from without completely
 	// disabling the plugin, ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks are never called
 	// on admission requests for ValidatingWebhookConfiguration and MutatingWebhookConfiguration objects.
 	Rules []RuleWithOperations `json:"rules"`
-	// FailurePolicy defines how unrecognized errors from the admission endpoint are handled -
+	// failurePolicy defines how unrecognized errors from the admission endpoint are handled -
 	// allowed values are Ignore or Fail. Defaults to Fail.
 	FailurePolicy FailurePolicyType `json:"failurePolicy,omitempty"`
 	// matchPolicy defines how the "rules" list is used to match incoming requests.
@@ -805,7 +1103,7 @@ type ValidatingWebhook struct {
 	// a request to apps/v1beta1 or extensions/v1beta1 would be converted to apps/v1 and sent to the webhook.
 	// Defaults to "Equivalent"
 	MatchPolicy MatchPolicyType `json:"matchPolicy,omitempty"`
-	// NamespaceSelector decides whether to run the webhook on an object based
+	// namespaceSelector decides whether to run the webhook on an object based
 	// on whether the namespace for that object matches the selector. If the
 	// object itself is a namespace, the matching is performed on
 	// object.metadata.labels. If the object is another cluster scoped resource,
@@ -845,7 +1143,7 @@ type ValidatingWebhook struct {
 	// for more examples of label selectors.
 	// Default to the empty LabelSelector, which matches everything.
 	NamespaceSelector *metav1.LabelSelector `json:"namespaceSelector,omitempty"`
-	// ObjectSelector decides whether to run the webhook based on if the
+	// objectSelector decides whether to run the webhook based on if the
 	// object has matching labels. objectSelector is evaluated against both
 	// the oldObject and newObject that would be sent to the webhook, and
 	// is considered to match if either object matches the selector. A null
@@ -857,20 +1155,20 @@ type ValidatingWebhook struct {
 	// users may skip the admission webhook by setting the labels.
 	// Default to the empty LabelSelector, which matches everything.
 	ObjectSelector *metav1.LabelSelector `json:"objectSelector,omitempty"`
-	// SideEffects states whether this webhook has side effects.
+	// sideEffects states whether this webhook has side effects.
 	// Acceptable values are: None, NoneOnDryRun (webhooks created via v1beta1 may also specify Some or Unknown).
 	// Webhooks with side effects MUST implement a reconciliation system, since a request may be
 	// rejected by a future step in the admission chain and the side effects therefore need to be undone.
 	// Requests with the dryRun attribute will be auto-rejected if they match a webhook with
 	// sideEffects == Unknown or Some.
 	SideEffects SideEffectClass `json:"sideEffects,omitempty"`
-	// TimeoutSeconds specifies the timeout for this webhook. After the timeout passes,
+	// timeoutSeconds specifies the timeout for this webhook. After the timeout passes,
 	// the webhook call will be ignored or the API call will fail based on the
 	// failure policy.
 	// The timeout value must be between 1 and 30 seconds.
 	// Default to 10 seconds.
 	TimeoutSeconds int `json:"timeoutSeconds,omitempty"`
-	// AdmissionReviewVersions is an ordered list of preferred `AdmissionReview`
+	// admissionReviewVersions is an ordered list of preferred `AdmissionReview`
 	// versions the Webhook expects. API server will try to use first version in
 	// the list which it supports. If none of the versions specified in this list
 	// supported by API server, validation will fail for this object.
@@ -878,7 +1176,7 @@ type ValidatingWebhook struct {
 	// include any versions known to the API Server, calls to the webhook will fail
 	// and be subject to the failure policy.
 	AdmissionReviewVersions []string `json:"admissionReviewVersions"`
-	// MatchConditions is a list of conditions that must be met for a request to be sent to this
+	// matchConditions is a list of conditions that must be met for a request to be sent to this
 	// webhook. Match conditions filter requests that have already been matched by the rules,
 	// namespaceSelector, and objectSelector. An empty list of matchConditions matches all requests.
 	// There are a maximum of 64 match conditions allowed.
@@ -934,128 +1232,12 @@ func (in *ValidatingWebhook) DeepCopy() *ValidatingWebhook {
 	return out
 }
 
-type WebhookClientConfig struct {
-	// `url` gives the location of the webhook, in standard URL form
-	// (`scheme://host:port/path`). Exactly one of `url` or `service`
-	// must be specified.
-	// The `host` should not refer to a service running in the cluster; use
-	// the `service` field instead. The host might be resolved via external
-	// DNS in some apiservers (e.g., `kube-apiserver` cannot resolve
-	// in-cluster DNS as that would be a layering violation). `host` may
-	// also be an IP address.
-	// Please note that using `localhost` or `127.0.0.1` as a `host` is
-	// risky unless you take great care to run this webhook on all hosts
-	// which run an apiserver which might need to make calls to this
-	// webhook. Such installs are likely to be non-portable, i.e., not easy
-	// to turn up in a new cluster.
-	// The scheme must be "https"; the URL must begin with "https://".
-	// A path is optional, and if present may be any string permissible in
-	// a URL. You may use the path to pass an arbitrary string to the
-	// webhook, for example, a cluster identifier.
-	// Attempting to use a user or basic auth e.g. "user:password@" is not
-	// allowed. Fragments ("#...") and query parameters ("?...") are not
-	// allowed, either.
-	URL string `json:"url,omitempty"`
-	// `service` is a reference to the service for this webhook. Either
-	// `service` or `url` must be specified.
-	// If the webhook is running within the cluster, then you should use `service`.
-	Service *ServiceReference `json:"service,omitempty"`
-	// `caBundle` is a PEM encoded CA bundle which will be used to validate the webhook's server certificate.
-	// If unspecified, system trust roots on the apiserver are used.
-	CABundle []byte `json:"caBundle,omitempty"`
-}
-
-func (in *WebhookClientConfig) DeepCopyInto(out *WebhookClientConfig) {
-	*out = *in
-	if in.Service != nil {
-		in, out := &in.Service, &out.Service
-		*out = new(ServiceReference)
-		(*in).DeepCopyInto(*out)
-	}
-}
-
-func (in *WebhookClientConfig) DeepCopy() *WebhookClientConfig {
-	if in == nil {
-		return nil
-	}
-	out := new(WebhookClientConfig)
-	in.DeepCopyInto(out)
-	return out
-}
-
-type RuleWithOperations struct {
-	// Operations is the operations the admission hook cares about - CREATE, UPDATE, DELETE, CONNECT or *
-	// for all of those operations and any future admission operations that are added.
-	// If '*' is present, the length of the slice must be one.
-	// Required.
-	Operations []OperationType `json:"operations"`
-	// Rule is embedded, it describes other criteria of the rule, like
-	// APIGroups, APIVersions, Resources, etc.
-	Rule `json:",inline"`
-}
-
-func (in *RuleWithOperations) DeepCopyInto(out *RuleWithOperations) {
-	*out = *in
-	if in.Operations != nil {
-		t := make([]OperationType, len(in.Operations))
-		copy(t, in.Operations)
-		out.Operations = t
-	}
-	out.Rule = in.Rule
-}
-
-func (in *RuleWithOperations) DeepCopy() *RuleWithOperations {
-	if in == nil {
-		return nil
-	}
-	out := new(RuleWithOperations)
-	in.DeepCopyInto(out)
-	return out
-}
-
-type MatchCondition struct {
-	// Name is an identifier for this match condition, used for strategic merging of MatchConditions,
-	// as well as providing an identifier for logging purposes. A good name should be descriptive of
-	// the associated expression.
-	// Name must be a qualified name consisting of alphanumeric characters, '-', '_' or '.', and
-	// must start and end with an alphanumeric character (e.g. 'MyName',  or 'my.name',  or
-	// '123-abc', regex used for validation is '([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]') with an
-	// optional DNS subdomain prefix and '/' (e.g. 'example.com/MyName')
-	// Required.
-	Name string `json:"name"`
-	// Expression represents the expression which will be evaluated by CEL. Must evaluate to bool.
-	// CEL expressions have access to the contents of the AdmissionRequest and Authorizer, organized into CEL variables:
-	// 'object' - The object from the incoming request. The value is null for DELETE requests.
-	// 'oldObject' - The existing object. The value is null for CREATE requests.
-	// 'request' - Attributes of the admission request(/pkg/apis/admission/types.go#AdmissionRequest).
-	// 'authorizer' - A CEL Authorizer. May be used to perform authorization checks for the principal (user or service account) of the request.
-	// See https://pkg.go.dev/k8s.io/apiserver/pkg/cel/library#Authz
-	// 'authorizer.requestResource' - A CEL ResourceCheck constructed from the 'authorizer' and configured with the
-	// request resource.
-	// Documentation on CEL: https://kubernetes.io/docs/reference/using-api/cel/
-	// Required.
-	Expression string `json:"expression"`
-}
-
-func (in *MatchCondition) DeepCopyInto(out *MatchCondition) {
-	*out = *in
-}
-
-func (in *MatchCondition) DeepCopy() *MatchCondition {
-	if in == nil {
-		return nil
-	}
-	out := new(MatchCondition)
-	in.DeepCopyInto(out)
-	return out
-}
-
 type ParamKind struct {
-	// APIVersion is the API group version the resources belong to.
+	// apiVersion is the API group version the resources belong to.
 	// In format of "group/version".
 	// Required.
 	APIVersion string `json:"apiVersion,omitempty"`
-	// Kind is the API kind the resources belong to.
+	// kind is the API kind the resources belong to.
 	// Required.
 	Kind string `json:"kind,omitempty"`
 }
@@ -1074,7 +1256,7 @@ func (in *ParamKind) DeepCopy() *ParamKind {
 }
 
 type MatchResources struct {
-	// NamespaceSelector decides whether to run the admission control policy on an object based
+	// namespaceSelector decides whether to run the admission control policy on an object based
 	// on whether the namespace for that object matches the selector. If the
 	// object itself is a namespace, the matching is performed on
 	// object.metadata.labels. If the object is another cluster scoped resource,
@@ -1114,7 +1296,7 @@ type MatchResources struct {
 	// for more examples of label selectors.
 	// Default to the empty LabelSelector, which matches everything.
 	NamespaceSelector *metav1.LabelSelector `json:"namespaceSelector,omitempty"`
-	// ObjectSelector decides whether to run the validation based on if the
+	// objectSelector decides whether to run the validation based on if the
 	// object has matching labels. objectSelector is evaluated against both
 	// the oldObject and newObject that would be sent to the cel validation, and
 	// is considered to match if either object matches the selector. A null
@@ -1126,10 +1308,10 @@ type MatchResources struct {
 	// users may skip the admission webhook by setting the labels.
 	// Default to the empty LabelSelector, which matches everything.
 	ObjectSelector *metav1.LabelSelector `json:"objectSelector,omitempty"`
-	// ResourceRules describes what operations on what resources/subresources the ValidatingAdmissionPolicy matches.
+	// resourceRules describes what operations on what resources/subresources the ValidatingAdmissionPolicy matches.
 	// The policy cares about an operation if it matches _any_ Rule.
 	ResourceRules []NamedRuleWithOperations `json:"resourceRules"`
-	// ExcludeResourceRules describes what operations on what resources/subresources the ValidatingAdmissionPolicy should not care about.
+	// excludeResourceRules describes what operations on what resources/subresources the ValidatingAdmissionPolicy should not care about.
 	// The exclude rules take precedence over include rules (if a resource matches both, it is excluded)
 	ExcludeResourceRules []NamedRuleWithOperations `json:"excludeResourceRules"`
 	// matchPolicy defines how the "MatchResources" list is used to match incoming requests.
@@ -1183,8 +1365,241 @@ func (in *MatchResources) DeepCopy() *MatchResources {
 	return out
 }
 
+type Variable struct {
+	// name is the name of the variable. The name must be a valid CEL identifier and unique among all variables.
+	// The variable can be accessed in other expressions through `variables`
+	// For example, if name is "foo", the variable will be available as `variables.foo`
+	Name string `json:"name"`
+	// expression is the expression that will be evaluated as the value of the variable.
+	// The CEL expression has access to the same identifiers as the CEL expressions in Validation.
+	Expression string `json:"expression"`
+}
+
+func (in *Variable) DeepCopyInto(out *Variable) {
+	*out = *in
+}
+
+func (in *Variable) DeepCopy() *Variable {
+	if in == nil {
+		return nil
+	}
+	out := new(Variable)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type Mutation struct {
+	// patchType indicates the patch strategy used.
+	// Allowed values are "ApplyConfiguration" and "JSONPatch".
+	// Required.
+	PatchType PatchType `json:"patchType"`
+	// applyConfiguration defines the desired configuration values of an object.
+	// The configuration is applied to the admission object using
+	// [structured merge diff](https://github.com/kubernetes-sigs/structured-merge-diff).
+	// A CEL expression is used to create apply configuration.
+	ApplyConfiguration *ApplyConfiguration `json:"applyConfiguration,omitempty"`
+	// jsonPatch defines a [JSON patch](https://jsonpatch.com/) operation to perform a mutation to the object.
+	// A CEL expression is used to create the JSON patch.
+	JSONPatch *JSONPatch `json:"jsonPatch,omitempty"`
+}
+
+func (in *Mutation) DeepCopyInto(out *Mutation) {
+	*out = *in
+	if in.ApplyConfiguration != nil {
+		in, out := &in.ApplyConfiguration, &out.ApplyConfiguration
+		*out = new(ApplyConfiguration)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.JSONPatch != nil {
+		in, out := &in.JSONPatch, &out.JSONPatch
+		*out = new(JSONPatch)
+		(*in).DeepCopyInto(*out)
+	}
+}
+
+func (in *Mutation) DeepCopy() *Mutation {
+	if in == nil {
+		return nil
+	}
+	out := new(Mutation)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type MatchCondition struct {
+	// name is an identifier for this match condition, used for strategic merging of MatchConditions,
+	// as well as providing an identifier for logging purposes. A good name should be descriptive of
+	// the associated expression.
+	// Name must be a qualified name consisting of alphanumeric characters, '-', '_' or '.', and
+	// must start and end with an alphanumeric character (e.g. 'MyName',  or 'my.name',  or
+	// '123-abc', regex used for validation is '([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]') with an
+	// optional DNS subdomain prefix and '/' (e.g. 'example.com/MyName')
+	// Required.
+	Name string `json:"name"`
+	// expression represents the expression which will be evaluated by CEL. Must evaluate to bool.
+	// CEL expressions have access to the contents of the AdmissionRequest and Authorizer, organized into CEL variables:
+	// 'object' - The object from the incoming request. The value is null for DELETE requests.
+	// 'oldObject' - The existing object. The value is null for CREATE requests.
+	// 'request' - Attributes of the admission request(/pkg/apis/admission/types.go#AdmissionRequest).
+	// 'authorizer' - A CEL Authorizer. May be used to perform authorization checks for the principal (user or service account) of the request.
+	// See https://pkg.go.dev/k8s.io/apiserver/pkg/cel/library#Authz
+	// 'authorizer.requestResource' - A CEL ResourceCheck constructed from the 'authorizer' and configured with the
+	// request resource.
+	// Documentation on CEL: https://kubernetes.io/docs/reference/using-api/cel/
+	// Required.
+	Expression string `json:"expression"`
+}
+
+func (in *MatchCondition) DeepCopyInto(out *MatchCondition) {
+	*out = *in
+}
+
+func (in *MatchCondition) DeepCopy() *MatchCondition {
+	if in == nil {
+		return nil
+	}
+	out := new(MatchCondition)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type ParamRef struct {
+	// name is the name of the resource being referenced.
+	// One of `name` or `selector` must be set, but `name` and `selector` are
+	// mutually exclusive properties. If one is set, the other must be unset.
+	// A single parameter used for all admission requests can be configured
+	// by setting the `name` field, leaving `selector` blank, and setting namespace
+	// if `paramKind` is namespace-scoped.
+	Name string `json:"name,omitempty"`
+	// namespace is the namespace of the referenced resource. Allows limiting
+	// the search for params to a specific namespace. Applies to both `name` and
+	// `selector` fields.
+	// A per-namespace parameter may be used by specifying a namespace-scoped
+	// `paramKind` in the policy and leaving this field empty.
+	// - If `paramKind` is cluster-scoped, this field MUST be unset. Setting this
+	// field results in a configuration error.
+	// - If `paramKind` is namespace-scoped, the namespace of the object being
+	// evaluated for admission will be used when this field is left unset. Take
+	// care that if this is left empty the binding must not match any cluster-scoped
+	// resources, which will result in an error.
+	Namespace string `json:"namespace,omitempty"`
+	// selector can be used to match multiple param objects based on their labels.
+	// Supply selector: {} to match all resources of the ParamKind.
+	// If multiple params are found, they are all evaluated with the policy expressions
+	// and the results are ANDed together.
+	// One of `name` or `selector` must be set, but `name` and `selector` are
+	// mutually exclusive properties. If one is set, the other must be unset.
+	Selector *metav1.LabelSelector `json:"selector,omitempty"`
+	// parameterNotFoundAction controls the behavior of the binding when the resource
+	// exists, and name or selector is valid, but there are no parameters
+	// matched by the binding. If the value is set to `Allow`, then no
+	// matched parameters will be treated as successful validation by the binding.
+	// If set to `Deny`, then no matched parameters will be subject to the
+	// `failurePolicy` of the policy.
+	// Allowed values are `Allow` or `Deny`
+	// Required
+	ParameterNotFoundAction ParameterNotFoundActionType `json:"parameterNotFoundAction,omitempty"`
+}
+
+func (in *ParamRef) DeepCopyInto(out *ParamRef) {
+	*out = *in
+	if in.Selector != nil {
+		in, out := &in.Selector, &out.Selector
+		*out = new(metav1.LabelSelector)
+		(*in).DeepCopyInto(*out)
+	}
+}
+
+func (in *ParamRef) DeepCopy() *ParamRef {
+	if in == nil {
+		return nil
+	}
+	out := new(ParamRef)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type WebhookClientConfig struct {
+	// url gives the location of the webhook, in standard URL form
+	// (`scheme://host:port/path`). Exactly one of `url` or `service`
+	// must be specified.
+	// The `host` should not refer to a service running in the cluster; use
+	// the `service` field instead. The host might be resolved via external
+	// DNS in some apiservers (e.g., `kube-apiserver` cannot resolve
+	// in-cluster DNS as that would be a layering violation). `host` may
+	// also be an IP address.
+	// Please note that using `localhost` or `127.0.0.1` as a `host` is
+	// risky unless you take great care to run this webhook on all hosts
+	// which run an apiserver which might need to make calls to this
+	// webhook. Such installs are likely to be non-portable, i.e., not easy
+	// to turn up in a new cluster.
+	// The scheme must be "https"; the URL must begin with "https://".
+	// A path is optional, and if present may be any string permissible in
+	// a URL. You may use the path to pass an arbitrary string to the
+	// webhook, for example, a cluster identifier.
+	// Attempting to use a user or basic auth e.g. "user:password@" is not
+	// allowed. Fragments ("#...") and query parameters ("?...") are not
+	// allowed, either.
+	URL string `json:"url,omitempty"`
+	// service is a reference to the service for this webhook. Either
+	// `service` or `url` must be specified.
+	// If the webhook is running within the cluster, then you should use `service`.
+	Service *ServiceReference `json:"service,omitempty"`
+	// caBundle is a PEM encoded CA bundle which will be used to validate the webhook's server certificate.
+	// If unspecified, system trust roots on the apiserver are used.
+	CABundle []byte `json:"caBundle,omitempty"`
+}
+
+func (in *WebhookClientConfig) DeepCopyInto(out *WebhookClientConfig) {
+	*out = *in
+	if in.Service != nil {
+		in, out := &in.Service, &out.Service
+		*out = new(ServiceReference)
+		(*in).DeepCopyInto(*out)
+	}
+}
+
+func (in *WebhookClientConfig) DeepCopy() *WebhookClientConfig {
+	if in == nil {
+		return nil
+	}
+	out := new(WebhookClientConfig)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type RuleWithOperations struct {
+	// operations is the operations the admission hook cares about - CREATE, UPDATE, DELETE, CONNECT or *
+	// for all of those operations and any future admission operations that are added.
+	// If '*' is present, the length of the slice must be one.
+	// Required.
+	Operations []OperationType `json:"operations"`
+	// Rule is embedded, it describes other criteria of the rule, like
+	// APIGroups, APIVersions, Resources, etc.
+	Rule `json:",inline"`
+}
+
+func (in *RuleWithOperations) DeepCopyInto(out *RuleWithOperations) {
+	*out = *in
+	if in.Operations != nil {
+		t := make([]OperationType, len(in.Operations))
+		copy(t, in.Operations)
+		out.Operations = t
+	}
+	out.Rule = in.Rule
+}
+
+func (in *RuleWithOperations) DeepCopy() *RuleWithOperations {
+	if in == nil {
+		return nil
+	}
+	out := new(RuleWithOperations)
+	in.DeepCopyInto(out)
+	return out
+}
+
 type Validation struct {
-	// Expression represents the expression which will be evaluated by CEL.
+	// expression represents the expression which will be evaluated by CEL.
 	// ref: https://github.com/google/cel-spec
 	// CEL expressions have access to the contents of the API request/response, organized into CEL variables as well as some other useful variables:
 	// - 'object' - The object from the incoming request. The value is null for DELETE requests.
@@ -1222,7 +1637,7 @@ type Validation struct {
 	// non-intersecting keys are appended, retaining their partial order.
 	// Required.
 	Expression string `json:"expression"`
-	// Message represents the message displayed when validation fails. The message is required if the Expression contains
+	// message represents the message displayed when validation fails. The message is required if the Expression contains
 	// line breaks. The message must not contain line breaks.
 	// If unset, the message is "failed rule: {Rule}".
 	// e.g. "must be a URL with the host matching spec.host"
@@ -1230,7 +1645,7 @@ type Validation struct {
 	// The message must not contain line breaks.
 	// If unset, the message is "failed Expression: {Expression}".
 	Message string `json:"message,omitempty"`
-	// Reason represents a machine-readable description of why this validation failed.
+	// reason represents a machine-readable description of why this validation failed.
 	// If this is the first validation in the list to fail, this reason, as well as the
 	// corresponding HTTP response code, are used in the
 	// HTTP response to the client.
@@ -1306,31 +1721,8 @@ func (in *AuditAnnotation) DeepCopy() *AuditAnnotation {
 	return out
 }
 
-type Variable struct {
-	// Name is the name of the variable. The name must be a valid CEL identifier and unique among all variables.
-	// The variable can be accessed in other expressions through `variables`
-	// For example, if name is "foo", the variable will be available as `variables.foo`
-	Name string `json:"name"`
-	// Expression is the expression that will be evaluated as the value of the variable.
-	// The CEL expression has access to the same identifiers as the CEL expressions in Validation.
-	Expression string `json:"expression"`
-}
-
-func (in *Variable) DeepCopyInto(out *Variable) {
-	*out = *in
-}
-
-func (in *Variable) DeepCopy() *Variable {
-	if in == nil {
-		return nil
-	}
-	out := new(Variable)
-	in.DeepCopyInto(out)
-	return out
-}
-
 type TypeChecking struct {
-	// The type checking warnings for each expression.
+	// expressionWarnings contains the type checking warnings for each expression.
 	ExpressionWarnings []ExpressionWarning `json:"expressionWarnings"`
 }
 
@@ -1354,73 +1746,158 @@ func (in *TypeChecking) DeepCopy() *TypeChecking {
 	return out
 }
 
-type ParamRef struct {
-	// name is the name of the resource being referenced.
-	// One of `name` or `selector` must be set, but `name` and `selector` are
-	// mutually exclusive properties. If one is set, the other must be unset.
-	// A single parameter used for all admission requests can be configured
-	// by setting the `name` field, leaving `selector` blank, and setting namespace
-	// if `paramKind` is namespace-scoped.
-	Name string `json:"name,omitempty"`
-	// namespace is the namespace of the referenced resource. Allows limiting
-	// the search for params to a specific namespace. Applies to both `name` and
-	// `selector` fields.
-	// A per-namespace parameter may be used by specifying a namespace-scoped
-	// `paramKind` in the policy and leaving this field empty.
-	// - If `paramKind` is cluster-scoped, this field MUST be unset. Setting this
-	// field results in a configuration error.
-	// - If `paramKind` is namespace-scoped, the namespace of the object being
-	// evaluated for admission will be used when this field is left unset. Take
-	// care that if this is left empty the binding must not match any cluster-scoped
-	// resources, which will result in an error.
-	Namespace string `json:"namespace,omitempty"`
-	// selector can be used to match multiple param objects based on their labels.
-	// Supply selector: {} to match all resources of the ParamKind.
-	// If multiple params are found, they are all evaluated with the policy expressions
-	// and the results are ANDed together.
-	// One of `name` or `selector` must be set, but `name` and `selector` are
-	// mutually exclusive properties. If one is set, the other must be unset.
-	Selector *metav1.LabelSelector `json:"selector,omitempty"`
-	// `parameterNotFoundAction` controls the behavior of the binding when the resource
-	// exists, and name or selector is valid, but there are no parameters
-	// matched by the binding. If the value is set to `Allow`, then no
-	// matched parameters will be treated as successful validation by the binding.
-	// If set to `Deny`, then no matched parameters will be subject to the
-	// `failurePolicy` of the policy.
-	// Allowed values are `Allow` or `Deny`
-	// Required
-	ParameterNotFoundAction ParameterNotFoundActionType `json:"parameterNotFoundAction,omitempty"`
+type NamedRuleWithOperations struct {
+	// resourceNames is an optional white list of names that the rule applies to.  An empty set means that everything is allowed.
+	ResourceNames []string `json:"resourceNames"`
+	// RuleWithOperations is a tuple of Operations and Resources.
+	RuleWithOperations `json:",inline"`
 }
 
-func (in *ParamRef) DeepCopyInto(out *ParamRef) {
+func (in *NamedRuleWithOperations) DeepCopyInto(out *NamedRuleWithOperations) {
 	*out = *in
-	if in.Selector != nil {
-		in, out := &in.Selector, &out.Selector
-		*out = new(metav1.LabelSelector)
-		(*in).DeepCopyInto(*out)
+	if in.ResourceNames != nil {
+		t := make([]string, len(in.ResourceNames))
+		copy(t, in.ResourceNames)
+		out.ResourceNames = t
 	}
+	out.RuleWithOperations = in.RuleWithOperations
 }
 
-func (in *ParamRef) DeepCopy() *ParamRef {
+func (in *NamedRuleWithOperations) DeepCopy() *NamedRuleWithOperations {
 	if in == nil {
 		return nil
 	}
-	out := new(ParamRef)
+	out := new(NamedRuleWithOperations)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type ApplyConfiguration struct {
+	// expression will be evaluated by CEL to create an apply configuration.
+	// ref: https://github.com/google/cel-spec
+	// Apply configurations are declared in CEL using object initialization. For example, this CEL expression
+	// returns an apply configuration to set a single field:
+	// Object{
+	// spec: Object.spec{
+	// serviceAccountName: "example"
+	// }
+	// }
+	// Apply configurations may not modify atomic structs, maps or arrays due to the risk of accidental deletion of
+	// values not included in the apply configuration.
+	// CEL expressions have access to the object types needed to create apply configurations:
+	// - 'Object' - CEL type of the resource object.
+	// - 'Object.<fieldName>' - CEL type of object field (such as 'Object.spec')
+	// - 'Object.<fieldName1>.<fieldName2>...<fieldNameN>` - CEL type of nested field (such as 'Object.spec.containers')
+	// CEL expressions have access to the contents of the API request, organized into CEL variables as well as some other useful variables:
+	// - 'object' - The object from the incoming request. The value is null for DELETE requests.
+	// - 'oldObject' - The existing object. The value is null for CREATE requests.
+	// - 'request' - Attributes of the API request([ref](/pkg/apis/admission/types.go#AdmissionRequest)).
+	// - 'params' - Parameter resource referred to by the policy binding being evaluated. Only populated if the policy has a ParamKind.
+	// - 'namespaceObject' - The namespace object that the incoming object belongs to. The value is null for cluster-scoped resources.
+	// - 'variables' - Map of composited variables, from its name to its lazily evaluated value.
+	// For example, a variable named 'foo' can be accessed as 'variables.foo'.
+	// - 'authorizer' - A CEL Authorizer. May be used to perform authorization checks for the principal (user or service account) of the request.
+	// See https://pkg.go.dev/k8s.io/apiserver/pkg/cel/library#Authz
+	// - 'authorizer.requestResource' - A CEL ResourceCheck constructed from the 'authorizer' and configured with the
+	// request resource.
+	// The `apiVersion`, `kind`, `metadata.name` and `metadata.generateName` are always accessible from the root of the
+	// object. No other metadata properties are accessible.
+	// Only property names of the form `[a-zA-Z_.-/][a-zA-Z0-9_.-/]*` are accessible.
+	// Required.
+	Expression string `json:"expression,omitempty"`
+}
+
+func (in *ApplyConfiguration) DeepCopyInto(out *ApplyConfiguration) {
+	*out = *in
+}
+
+func (in *ApplyConfiguration) DeepCopy() *ApplyConfiguration {
+	if in == nil {
+		return nil
+	}
+	out := new(ApplyConfiguration)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type JSONPatch struct {
+	// expression will be evaluated by CEL to create a [JSON patch](https://jsonpatch.com/).
+	// ref: https://github.com/google/cel-spec
+	// expression must return an array of JSONPatch values.
+	// For example, this CEL expression returns a JSON patch to conditionally modify a value:
+	// [
+	// JSONPatch{op: "test", path: "/spec/example", value: "Red"},
+	// JSONPatch{op: "replace", path: "/spec/example", value: "Green"}
+	// ]
+	// To define an object for the patch value, use Object types. For example:
+	// [
+	// JSONPatch{
+	// op: "add",
+	// path: "/spec/selector",
+	// value: Object.spec.selector{matchLabels: {"environment": "test"}}
+	// }
+	// ]
+	// To use strings containing '/' and '~' as JSONPatch path keys, use "jsonpatch.escapeKey". For example:
+	// [
+	// JSONPatch{
+	// op: "add",
+	// path: "/metadata/labels/" + jsonpatch.escapeKey("example.com/environment"),
+	// value: "test"
+	// },
+	// ]
+	// CEL expressions have access to the types needed to create JSON patches and objects:
+	// - 'JSONPatch' - CEL type of JSON Patch operations. JSONPatch has the fields 'op', 'from', 'path' and 'value'.
+	// See [JSON patch](https://jsonpatch.com/) for more details. The 'value' field may be set to any of: string,
+	// integer, array, map or object.  If set, the 'path' and 'from' fields must be set to a
+	// [JSON pointer](https://datatracker.ietf.org/doc/html/rfc6901/) string, where the 'jsonpatch.escapeKey()' CEL
+	// function may be used to escape path keys containing '/' and '~'.
+	// - 'Object' - CEL type of the resource object.
+	// - 'Object.<fieldName>' - CEL type of object field (such as 'Object.spec')
+	// - 'Object.<fieldName1>.<fieldName2>...<fieldNameN>` - CEL type of nested field (such as 'Object.spec.containers')
+	// CEL expressions have access to the contents of the API request, organized into CEL variables as well as some other useful variables:
+	// - 'object' - The object from the incoming request. The value is null for DELETE requests.
+	// - 'oldObject' - The existing object. The value is null for CREATE requests.
+	// - 'request' - Attributes of the API request([ref](/pkg/apis/admission/types.go#AdmissionRequest)).
+	// - 'params' - Parameter resource referred to by the policy binding being evaluated. Only populated if the policy has a ParamKind.
+	// - 'namespaceObject' - The namespace object that the incoming object belongs to. The value is null for cluster-scoped resources.
+	// - 'variables' - Map of composited variables, from its name to its lazily evaluated value.
+	// For example, a variable named 'foo' can be accessed as 'variables.foo'.
+	// - 'authorizer' - A CEL Authorizer. May be used to perform authorization checks for the principal (user or service account) of the request.
+	// See https://pkg.go.dev/k8s.io/apiserver/pkg/cel/library#Authz
+	// - 'authorizer.requestResource' - A CEL ResourceCheck constructed from the 'authorizer' and configured with the
+	// request resource.
+	// CEL expressions have access to [Kubernetes CEL function libraries](https://kubernetes.io/docs/reference/using-api/cel/#cel-options-language-features-and-libraries)
+	// as well as:
+	// - 'jsonpatch.escapeKey' - Performs JSONPatch key escaping. '~' and  '/' are escaped as '~0' and `~1' respectively).
+	// Only property names of the form `[a-zA-Z_.-/][a-zA-Z0-9_.-/]*` are accessible.
+	// Required.
+	Expression string `json:"expression,omitempty"`
+}
+
+func (in *JSONPatch) DeepCopyInto(out *JSONPatch) {
+	*out = *in
+}
+
+func (in *JSONPatch) DeepCopy() *JSONPatch {
+	if in == nil {
+		return nil
+	}
+	out := new(JSONPatch)
 	in.DeepCopyInto(out)
 	return out
 }
 
 type ServiceReference struct {
-	// `namespace` is the namespace of the service.
+	// namespace is the namespace of the service.
 	// Required
 	Namespace string `json:"namespace"`
-	// `name` is the name of the service.
+	// name is the name of the service.
 	// Required
 	Name string `json:"name"`
-	// `path` is an optional URL path which will be sent in any request to
+	// path is an optional URL path which will be sent in any request to
 	// this service.
 	Path string `json:"path,omitempty"`
-	// If specified, the port on the service that hosting webhook.
+	// port is the port on the service that hosts the webhook.
 	// Default to 443 for backward compatibility.
 	// `port` should be a valid port number (1-65535, inclusive).
 	Port int `json:"port,omitempty"`
@@ -1440,15 +1917,15 @@ func (in *ServiceReference) DeepCopy() *ServiceReference {
 }
 
 type Rule struct {
-	// APIGroups is the API groups the resources belong to. '*' is all groups.
+	// apiGroups is the API groups the resources belong to. '*' is all groups.
 	// If '*' is present, the length of the slice must be one.
 	// Required.
 	APIGroups []string `json:"apiGroups"`
-	// APIVersions is the API versions the resources belong to. '*' is all versions.
+	// apiVersions is the API versions the resources belong to. '*' is all versions.
 	// If '*' is present, the length of the slice must be one.
 	// Required.
 	APIVersions []string `json:"apiVersions"`
-	// Resources is a list of resources this rule applies to.
+	// resources is a list of resources this rule applies to.
 	// For example:
 	// 'pods' means pods.
 	// 'pods/log' means the log subresource of pods.
@@ -1500,38 +1977,12 @@ func (in *Rule) DeepCopy() *Rule {
 	return out
 }
 
-type NamedRuleWithOperations struct {
-	// ResourceNames is an optional white list of names that the rule applies to.  An empty set means that everything is allowed.
-	ResourceNames []string `json:"resourceNames"`
-	// RuleWithOperations is a tuple of Operations and Resources.
-	RuleWithOperations `json:",inline"`
-}
-
-func (in *NamedRuleWithOperations) DeepCopyInto(out *NamedRuleWithOperations) {
-	*out = *in
-	if in.ResourceNames != nil {
-		t := make([]string, len(in.ResourceNames))
-		copy(t, in.ResourceNames)
-		out.ResourceNames = t
-	}
-	out.RuleWithOperations = in.RuleWithOperations
-}
-
-func (in *NamedRuleWithOperations) DeepCopy() *NamedRuleWithOperations {
-	if in == nil {
-		return nil
-	}
-	out := new(NamedRuleWithOperations)
-	in.DeepCopyInto(out)
-	return out
-}
-
 type ExpressionWarning struct {
-	// The path to the field that refers the expression.
+	// fieldRef is the path to the field that refers to the expression.
 	// For example, the reference to the expression of the first item of
 	// validations is "spec.validations[0].expression"
 	FieldRef string `json:"fieldRef"`
-	// The content of type checking information in a human-readable form.
+	// warning contains the content of type checking information in a human-readable form.
 	// Each line of the warning contains the type that the expression is checked
 	// against, followed by the type check error from the compiler.
 	Warning string `json:"warning"`

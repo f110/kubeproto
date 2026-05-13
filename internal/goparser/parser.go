@@ -94,9 +94,9 @@ var preDefinedPackages = []packageInformation{
 		ImportPath:      "k8s.io/api/admission/v1",
 	},
 	{
-		GoPackage:       "sigs.k8s.io/gateway-api/apis/v1alpha2",
-		ProtobufPackage: "sigs.k8s.io.gateway_api.apis.v1alpha2",
-		ImportPath:      "sigs.k8s.io/gateway-api/apis/v1alpha2",
+		GoPackage:       "sigs.k8s.io/gateway-api/apis/v1",
+		ProtobufPackage: "sigs.k8s.io.gateway_api.apis.v1",
+		ImportPath:      "sigs.k8s.io/gateway-api/apis/v1",
 	},
 }
 
@@ -239,6 +239,27 @@ func (g *Generator) AddDir(dir string, allStructs bool) error {
 	for _, v := range g.typeDeclaration {
 		typeMap[v.Name] = v
 	}
+	// Resolve transitive type aliases (e.g. type HTTPHeaderName HeaderName -> string)
+	for _, v := range typeMap {
+		seen := map[string]bool{v.Name: true}
+		for v.ProtobufKind != "" {
+			next, ok := typeMap[v.ProtobufKind]
+			if !ok || seen[next.Name] {
+				break
+			}
+			seen[next.Name] = true
+			if next.ProtobufKind != "" {
+				v.ProtobufKind = next.ProtobufKind
+			} else if next.ProtobufMapKeyKind != "" {
+				v.ProtobufMapKeyKind = next.ProtobufMapKeyKind
+				v.ProtobufMapValueKind = next.ProtobufMapValueKind
+				v.ProtobufKind = ""
+				break
+			} else {
+				break
+			}
+		}
+	}
 	for _, v := range typeMap {
 		if v.ProtobufMapKeyKind != "" {
 			switch v.ProtobufMapKeyKind {
@@ -258,6 +279,10 @@ func (g *Generator) AddDir(dir string, allStructs bool) error {
 			if f.IsMap {
 				if v, ok := typeMap[f.MapKeyKind]; ok {
 					f.MapKeyKind = v.ProtobufTypeDeclaration()
+				} else if strings.HasPrefix(f.MapKeyKind, ".") {
+					// Map keys must be string or integer types in protobuf.
+					// External references in k8s APIs are string-typed enums.
+					f.MapKeyKind = "string"
 				}
 				if v, ok := typeMap[f.MapValueKind]; ok {
 					f.MapValueKind = v.ProtobufTypeDeclaration()
@@ -400,12 +425,12 @@ func (g *Generator) WriteFile(outputFilePath string) error {
 				enumName = strings.TrimPrefix(values[i].Name, name)
 			}
 			enumName = stringsutil.Letterize(stringsutil.ToUpperSnakeCase(enumName))
+			for _, v := range []string{"-", ".", "/", " ", "+"} {
+				enumName = strings.Replace(enumName, v, "_", -1)
+			}
 			if stringsutil.ToUpperCamelCase(enumName) == values[i].Value {
 				w.F("%s_%s = %d;", stringsutil.ToUpperSnakeCase(name), enumName, i)
 			} else {
-				for _, v := range []string{"-", ".", "/", " "} {
-					enumName = strings.Replace(enumName, v, "_", -1)
-				}
 				w.F(
 					"%s_%s = %d [(dev.f110.kubeproto.value) = {value: %q}];",
 					stringsutil.ToUpperSnakeCase(name),
@@ -651,11 +676,12 @@ func (g *Generator) structToProtobufMessage(v *ast.GenDecl, comment *ast.Comment
 			}
 
 			s := strings.Split(tag.Get("json"), ",")
-			if len(s) == 2 {
-				if strings.Contains(s[1], "inline") {
+			if len(s) >= 2 {
+				opts := strings.Join(s[1:], ",")
+				if strings.Contains(opts, "inline") {
 					inline = true
 				}
-				if strings.Contains(s[1], "omitempty") {
+				if strings.Contains(opts, "omitempty") {
 					optional = true
 				}
 			}
@@ -759,9 +785,13 @@ func (g *Generator) goTypeToProtobufKind(in ast.Expr) string {
 	switch v := in.(type) {
 	case *ast.Ident:
 		switch v.Name {
-		case "string", "int64", "int32", "bool":
+		case "string", "int64", "int32", "bool", "uint32", "uint64":
 			return v.Name
 		case "int":
+			return "int32"
+		case "uint", "uint16", "uint8":
+			return "uint32"
+		case "int16", "int8":
 			return "int32"
 		case "float64":
 			return "float"

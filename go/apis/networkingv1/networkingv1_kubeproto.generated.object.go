@@ -19,12 +19,16 @@ var (
 
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemaGroupVersion,
+		&IPAddress{},
+		&IPAddressList{},
 		&Ingress{},
 		&IngressClass{},
 		&IngressClassList{},
 		&IngressList{},
 		&NetworkPolicy{},
 		&NetworkPolicyList{},
+		&ServiceCIDR{},
+		&ServiceCIDRList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemaGroupVersion)
 	return nil
@@ -44,6 +48,76 @@ const (
 	PolicyTypeIngress PolicyType = "Ingress"
 	PolicyTypeEgress  PolicyType = "Egress"
 )
+
+type IPAddress struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata"`
+	// spec is the desired state of the IPAddress.
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+	Spec *IPAddressSpec `json:"spec,omitempty"`
+}
+
+func (in *IPAddress) DeepCopyInto(out *IPAddress) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
+	if in.Spec != nil {
+		in, out := &in.Spec, &out.Spec
+		*out = new(IPAddressSpec)
+		(*in).DeepCopyInto(*out)
+	}
+}
+
+func (in *IPAddress) DeepCopy() *IPAddress {
+	if in == nil {
+		return nil
+	}
+	out := new(IPAddress)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *IPAddress) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	}
+	return nil
+}
+
+type IPAddressList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata"`
+	Items           []IPAddress `json:"items"`
+}
+
+func (in *IPAddressList) DeepCopyInto(out *IPAddressList) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
+	if in.Items != nil {
+		l := make([]IPAddress, len(in.Items))
+		for i := range in.Items {
+			in.Items[i].DeepCopyInto(&l[i])
+		}
+		out.Items = l
+	}
+}
+
+func (in *IPAddressList) DeepCopy() *IPAddressList {
+	if in == nil {
+		return nil
+	}
+	out := new(IPAddressList)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *IPAddressList) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	}
+	return nil
+}
 
 type Ingress struct {
 	metav1.TypeMeta   `json:",inline"`
@@ -262,6 +336,108 @@ func (in *NetworkPolicyList) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+type ServiceCIDR struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata"`
+	// spec is the desired state of the ServiceCIDR.
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+	Spec *ServiceCIDRSpec `json:"spec,omitempty"`
+	// status represents the current state of the ServiceCIDR.
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+	Status *ServiceCIDRStatus `json:"status,omitempty"`
+}
+
+func (in *ServiceCIDR) DeepCopyInto(out *ServiceCIDR) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
+	if in.Spec != nil {
+		in, out := &in.Spec, &out.Spec
+		*out = new(ServiceCIDRSpec)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.Status != nil {
+		in, out := &in.Status, &out.Status
+		*out = new(ServiceCIDRStatus)
+		(*in).DeepCopyInto(*out)
+	}
+}
+
+func (in *ServiceCIDR) DeepCopy() *ServiceCIDR {
+	if in == nil {
+		return nil
+	}
+	out := new(ServiceCIDR)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *ServiceCIDR) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	}
+	return nil
+}
+
+type ServiceCIDRList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata"`
+	Items           []ServiceCIDR `json:"items"`
+}
+
+func (in *ServiceCIDRList) DeepCopyInto(out *ServiceCIDRList) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
+	if in.Items != nil {
+		l := make([]ServiceCIDR, len(in.Items))
+		for i := range in.Items {
+			in.Items[i].DeepCopyInto(&l[i])
+		}
+		out.Items = l
+	}
+}
+
+func (in *ServiceCIDRList) DeepCopy() *ServiceCIDRList {
+	if in == nil {
+		return nil
+	}
+	out := new(ServiceCIDRList)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *ServiceCIDRList) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	}
+	return nil
+}
+
+type IPAddressSpec struct {
+	// ParentRef references the resource that an IPAddress is attached to.
+	// An IPAddress must reference a parent object.
+	ParentRef *ParentReference `json:"parentRef,omitempty"`
+}
+
+func (in *IPAddressSpec) DeepCopyInto(out *IPAddressSpec) {
+	*out = *in
+	if in.ParentRef != nil {
+		in, out := &in.ParentRef, &out.ParentRef
+		*out = new(ParentReference)
+		(*in).DeepCopyInto(*out)
+	}
+}
+
+func (in *IPAddressSpec) DeepCopy() *IPAddressSpec {
+	if in == nil {
+		return nil
+	}
+	out := new(IPAddressSpec)
+	in.DeepCopyInto(out)
+	return out
+}
+
 type IngressSpec struct {
 	// ingressClassName is the name of an IngressClass cluster resource. Ingress
 	// controller implementations use this field to know whether they should be
@@ -379,11 +555,11 @@ func (in *IngressClassSpec) DeepCopy() *IngressClassSpec {
 
 type NetworkPolicySpec struct {
 	// podSelector selects the pods to which this NetworkPolicy object applies.
-	// The array of ingress rules is applied to any pods selected by this field.
+	// The array of rules is applied to any pods selected by this field. An empty
+	// selector matches all pods in the policy's namespace.
 	// Multiple network policies can select the same set of pods. In this case,
 	// the ingress rules for each are combined additively.
-	// This field is NOT optional and follows standard label selector semantics.
-	// An empty podSelector matches all pods in this namespace.
+	// This field is optional. If it is not specified, it defaults to an empty selector.
 	PodSelector metav1.LabelSelector `json:"podSelector"`
 	// ingress is a list of ingress rules to be applied to the selected pods.
 	// Traffic is allowed to a pod if there are no NetworkPolicies selecting the pod
@@ -443,6 +619,81 @@ func (in *NetworkPolicySpec) DeepCopy() *NetworkPolicySpec {
 		return nil
 	}
 	out := new(NetworkPolicySpec)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type ServiceCIDRSpec struct {
+	// CIDRs defines the IP blocks in CIDR notation (e.g. "192.168.0.0/24" or "2001:db8::/64")
+	// from which to assign service cluster IPs. Max of two CIDRs is allowed, one of each IP family.
+	// This field is immutable.
+	CIDRs []string `json:"cidrs"`
+}
+
+func (in *ServiceCIDRSpec) DeepCopyInto(out *ServiceCIDRSpec) {
+	*out = *in
+	if in.CIDRs != nil {
+		t := make([]string, len(in.CIDRs))
+		copy(t, in.CIDRs)
+		out.CIDRs = t
+	}
+}
+
+func (in *ServiceCIDRSpec) DeepCopy() *ServiceCIDRSpec {
+	if in == nil {
+		return nil
+	}
+	out := new(ServiceCIDRSpec)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type ServiceCIDRStatus struct {
+	// conditions holds an array of metav1.Condition that describe the state of the ServiceCIDR.
+	// Current service state
+	Conditions []metav1.Condition `json:"conditions"`
+}
+
+func (in *ServiceCIDRStatus) DeepCopyInto(out *ServiceCIDRStatus) {
+	*out = *in
+	if in.Conditions != nil {
+		l := make([]metav1.Condition, len(in.Conditions))
+		for i := range in.Conditions {
+			in.Conditions[i].DeepCopyInto(&l[i])
+		}
+		out.Conditions = l
+	}
+}
+
+func (in *ServiceCIDRStatus) DeepCopy() *ServiceCIDRStatus {
+	if in == nil {
+		return nil
+	}
+	out := new(ServiceCIDRStatus)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type ParentReference struct {
+	// Group is the group of the object being referenced.
+	Group string `json:"group,omitempty"`
+	// Resource is the resource of the object being referenced.
+	Resource string `json:"resource,omitempty"`
+	// Namespace is the namespace of the object being referenced.
+	Namespace string `json:"namespace,omitempty"`
+	// Name is the name of the object being referenced.
+	Name string `json:"name,omitempty"`
+}
+
+func (in *ParentReference) DeepCopyInto(out *ParentReference) {
+	*out = *in
+}
+
+func (in *ParentReference) DeepCopy() *ParentReference {
+	if in == nil {
+		return nil
+	}
+	out := new(ParentReference)
 	in.DeepCopyInto(out)
 	return out
 }

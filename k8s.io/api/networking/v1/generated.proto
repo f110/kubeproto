@@ -55,6 +55,31 @@ message HTTPIngressRuleValue {
   repeated HTTPIngressPath paths = 1 [(dev.f110.kubeproto.field) = { go_name: "Paths", api_field_name: "paths", inline: false }];
 }
 
+message IPAddress {
+  // spec is the desired state of the IPAddress.
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+  optional IPAddressSpec spec = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
+
+  option (dev.f110.kubeproto.kind) = {
+    scope: SCOPE_CLUSTER
+  };
+}
+
+message IPAddressList {
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  // Standard object's metadata.
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  // items is the list of IPAddresses.
+  repeated IPAddress items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+}
+
+message IPAddressSpec {
+  // ParentRef references the resource that an IPAddress is attached to.
+  // An IPAddress must reference a parent object.
+  optional ParentReference parent_ref = 1 [(dev.f110.kubeproto.field) = { go_name: "ParentRef", api_field_name: "parentRef", inline: false }];
+}
+
 message IPBlock {
   // cidr is a string representing the IPBlock
   // Valid examples are "192.168.1.0/24" or "2001:db8::/64"
@@ -352,11 +377,11 @@ message NetworkPolicyPort {
 
 message NetworkPolicySpec {
   // podSelector selects the pods to which this NetworkPolicy object applies.
-  // The array of ingress rules is applied to any pods selected by this field.
+  // The array of rules is applied to any pods selected by this field. An empty
+  // selector matches all pods in the policy's namespace.
   // Multiple network policies can select the same set of pods. In this case,
   // the ingress rules for each are combined additively.
-  // This field is NOT optional and follows standard label selector semantics.
-  // An empty podSelector matches all pods in this namespace.
+  // This field is optional. If it is not specified, it defaults to an empty selector.
   .k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector pod_selector = 1 [(dev.f110.kubeproto.field) = { go_name: "PodSelector", api_field_name: "podSelector", inline: false }];
   // ingress is a list of ingress rules to be applied to the selected pods.
   // Traffic is allowed to a pod if there are no NetworkPolicies selecting the pod
@@ -387,6 +412,17 @@ message NetworkPolicySpec {
   repeated PolicyType policy_types = 4 [(dev.f110.kubeproto.field) = { go_name: "PolicyTypes", api_field_name: "policyTypes", inline: false }];
 }
 
+message ParentReference {
+  // Group is the group of the object being referenced.
+  optional string group = 1 [(dev.f110.kubeproto.field) = { go_name: "Group", api_field_name: "group", inline: false }];
+  // Resource is the resource of the object being referenced.
+  optional string resource = 2 [(dev.f110.kubeproto.field) = { go_name: "Resource", api_field_name: "resource", inline: false }];
+  // Namespace is the namespace of the object being referenced.
+  optional string namespace = 3 [(dev.f110.kubeproto.field) = { go_name: "Namespace", api_field_name: "namespace", inline: false }];
+  // Name is the name of the object being referenced.
+  optional string name = 4 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+}
+
 message ServiceBackendPort {
   // name is the name of the port on the Service.
   // This is a mutually exclusive setting with "Number".
@@ -394,4 +430,39 @@ message ServiceBackendPort {
   // number is the numerical port number (e.g. 80) on the Service.
   // This is a mutually exclusive setting with "Name".
   optional int32 number = 2 [(dev.f110.kubeproto.field) = { go_name: "Number", api_field_name: "number", inline: false }];
+}
+
+message ServiceCIDR {
+  // spec is the desired state of the ServiceCIDR.
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+  optional ServiceCIDRSpec spec = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
+  // status represents the current state of the ServiceCIDR.
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+  optional ServiceCIDRStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", sub_resource: true, inline: false }];
+
+  option (dev.f110.kubeproto.kind) = {
+    scope: SCOPE_CLUSTER
+  };
+}
+
+message ServiceCIDRList {
+  .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
+  // Standard object's metadata.
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  // items is the list of ServiceCIDRs.
+  repeated ServiceCIDR items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+}
+
+message ServiceCIDRSpec {
+  // CIDRs defines the IP blocks in CIDR notation (e.g. "192.168.0.0/24" or "2001:db8::/64")
+  // from which to assign service cluster IPs. Max of two CIDRs is allowed, one of each IP family.
+  // This field is immutable.
+  repeated string cidrs = 1 [(dev.f110.kubeproto.field) = { go_name: "CIDRs", api_field_name: "cidrs", inline: false }];
+}
+
+message ServiceCIDRStatus {
+  // conditions holds an array of metav1.Condition that describe the state of the ServiceCIDR.
+  // Current service state
+  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 1 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
 }

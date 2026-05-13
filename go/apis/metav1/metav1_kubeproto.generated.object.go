@@ -614,6 +614,7 @@ func (in *FieldSelectorRequirement) DeepCopy() *FieldSelectorRequirement {
 
 type FieldsV1 struct {
 	// Raw is the underlying serialization of this object.
+	// Deprecated: Direct access to this field is deprecated. Use GetRawBytes, GetRawString, SetRawBytes, SetRawString, GetRawReader, NewFieldsV1 instead.
 	Raw []byte `json:"-,omitempty"`
 }
 
@@ -910,10 +911,22 @@ type ListMeta struct {
 	// The intended use of the remainingItemCount is *estimating* the size of a collection. Clients
 	// should not rely on the remainingItemCount to be set or to be exact.
 	RemainingItemCount int64 `json:"remainingItemCount,omitempty"`
+	// shardInfo is set when the list is a filtered subset of the full collection,
+	// as selected by a shard selector on the request. It echoes back the selector
+	// so clients can verify which shard they received and merge sharded responses.
+	// Clients should not cache sharded list responses as a full representation
+	// of the collection.
+	// This is an alpha field and requires enabling the ShardedListAndWatch feature gate.
+	ShardInfo *ShardInfo `json:"shardInfo,omitempty"`
 }
 
 func (in *ListMeta) DeepCopyInto(out *ListMeta) {
 	*out = *in
+	if in.ShardInfo != nil {
+		in, out := &in.ShardInfo, &out.ShardInfo
+		*out = new(ShardInfo)
+		(*in).DeepCopyInto(*out)
+	}
 }
 
 func (in *ListMeta) DeepCopy() *ListMeta {
@@ -1010,6 +1023,30 @@ type ListOptions struct {
 	// Defaults to true if `resourceVersion=""` or `resourceVersion="0"` (for backward
 	// compatibility reasons) and to false otherwise.
 	SendInitialEvents bool `json:"sendInitialEvents,omitempty"`
+	// shardSelector restricts the list of returned objects using a CEL-based
+	// shard selector expression. The format uses the shardRange() function
+	// combined with || (logical OR) to specify one or more hash ranges:
+	// shardRange(object.metadata.uid, '0x0', '0x8000000000000000')
+	// shardRange(object.metadata.uid, '0x0', '0x8000000000000000') || shardRange(object.metadata.uid, '0x8000000000000000', '0x10000000000000000')
+	// Field paths use CEL-style object-rooted syntax (e.g. "object.metadata.uid"),
+	// NOT the fieldSelector format ("metadata.uid"). Currently supported paths:
+	// - object.metadata.uid
+	// - object.metadata.namespace
+	// hexStart and hexEnd are single-quoted CEL string literals with a '0x' prefix,
+	// defining the inclusive lower and exclusive upper bounds over the 64-bit FNV-1a
+	// hash space. The full range is [0x0, 0x10000000000000000), where the exclusive
+	// upper bound equals 2^64.
+	// Examples:
+	// 2-shard split:
+	// shard 0: shardRange(object.metadata.uid, '0x0000000000000000', '0x8000000000000000')
+	// shard 1: shardRange(object.metadata.uid, '0x8000000000000000', '0x10000000000000000')
+	// 4-shard split:
+	// shard 0: shardRange(object.metadata.uid, '0x0000000000000000', '0x4000000000000000')
+	// shard 1: shardRange(object.metadata.uid, '0x4000000000000000', '0x8000000000000000')
+	// shard 2: shardRange(object.metadata.uid, '0x8000000000000000', '0xc000000000000000')
+	// shard 3: shardRange(object.metadata.uid, '0xc000000000000000', '0x10000000000000000')
+	// This is an alpha field and requires enabling the ShardedListAndWatch feature gate.
+	ShardSelector string `json:"shardSelector,omitempty"`
 }
 
 func (in *ListOptions) DeepCopyInto(out *ListOptions) {
@@ -1529,6 +1566,25 @@ func (in *ServerAddressByClientCIDR) DeepCopy() *ServerAddressByClientCIDR {
 		return nil
 	}
 	out := new(ServerAddressByClientCIDR)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type ShardInfo struct {
+	// selector is the shard selector string from the request, echoed back so clients
+	// can verify which shard they received and merge responses from multiple shards.
+	Selector string `json:"selector"`
+}
+
+func (in *ShardInfo) DeepCopyInto(out *ShardInfo) {
+	*out = *in
+}
+
+func (in *ShardInfo) DeepCopy() *ShardInfo {
+	if in == nil {
+		return nil
+	}
+	out := new(ShardInfo)
 	in.DeepCopyInto(out)
 	return out
 }

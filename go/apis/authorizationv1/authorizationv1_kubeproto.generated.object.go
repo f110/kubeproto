@@ -33,10 +33,10 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 type LocalSubjectAccessReview struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
-	// Spec holds information about the request being evaluated.  spec.namespace must be equal to the namespace
+	// spec holds information about the request being evaluated.  spec.namespace must be equal to the namespace
 	// you made the request against.  If empty, it is defaulted.
 	Spec SubjectAccessReviewSpec `json:"spec"`
-	// Status is filled in by the server and indicates whether the request is allowed or not
+	// status is filled in by the server and indicates whether the request is allowed or not
 	Status *SubjectAccessReviewStatus `json:"status,omitempty"`
 }
 
@@ -106,9 +106,9 @@ func (in *LocalSubjectAccessReviewList) DeepCopyObject() runtime.Object {
 type SelfSubjectAccessReview struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
-	// Spec holds information about the request being evaluated.  user and groups must be empty
+	// spec holds information about the request being evaluated.  user and groups must be empty
 	Spec SelfSubjectAccessReviewSpec `json:"spec"`
-	// Status is filled in by the server and indicates whether the request is allowed or not
+	// status is filled in by the server and indicates whether the request is allowed or not
 	Status *SubjectAccessReviewStatus `json:"status,omitempty"`
 }
 
@@ -178,9 +178,9 @@ func (in *SelfSubjectAccessReviewList) DeepCopyObject() runtime.Object {
 type SelfSubjectRulesReview struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
-	// Spec holds information about the request being evaluated.
+	// spec holds information about the request being evaluated.
 	Spec SelfSubjectRulesReviewSpec `json:"spec"`
-	// Status is filled in by the server and indicates the set of actions a user can perform.
+	// status is filled in by the server and indicates the set of actions a user can perform.
 	Status *SubjectRulesReviewStatus `json:"status,omitempty"`
 }
 
@@ -250,9 +250,9 @@ func (in *SelfSubjectRulesReviewList) DeepCopyObject() runtime.Object {
 type SubjectAccessReview struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
-	// Spec holds information about the request being evaluated
+	// spec holds information about the request being evaluated
 	Spec SubjectAccessReviewSpec `json:"spec"`
-	// Status is filled in by the server and indicates whether the request is allowed or not
+	// status is filled in by the server and indicates whether the request is allowed or not
 	Status *SubjectAccessReviewStatus `json:"status,omitempty"`
 }
 
@@ -320,19 +320,19 @@ func (in *SubjectAccessReviewList) DeepCopyObject() runtime.Object {
 }
 
 type SubjectAccessReviewSpec struct {
-	// ResourceAuthorizationAttributes describes information for a resource access request
+	// resourceAttributes describes information for a resource access request
 	ResourceAttributes *ResourceAttributes `json:"resourceAttributes,omitempty"`
-	// NonResourceAttributes describes information for a non-resource access request
+	// nonResourceAttributes describes information for a non-resource access request
 	NonResourceAttributes *NonResourceAttributes `json:"nonResourceAttributes,omitempty"`
-	// User is the user you're testing for.
+	// user is the user you're testing for.
 	// If you specify "User" but not "Groups", then is it interpreted as "What if User were not a member of any groups
 	User string `json:"user,omitempty"`
-	// Groups is the groups you're testing for.
+	// groups is the groups you're testing for.
 	Groups []string `json:"groups"`
-	// Extra corresponds to the user.Info.GetExtra() method from the authenticator.  Since that is input to the authorizer
+	// extra corresponds to the user.Info.GetExtra() method from the authenticator.  Since that is input to the authorizer
 	// it needs a reflection here.
 	Extra map[string]ExtraValue `json:"extra,omitempty"`
-	// UID information about the requesting user.
+	// uid information about the requesting user.
 	UID string `json:"uid,omitempty"`
 }
 
@@ -372,16 +372,16 @@ func (in *SubjectAccessReviewSpec) DeepCopy() *SubjectAccessReviewSpec {
 }
 
 type SubjectAccessReviewStatus struct {
-	// Allowed is required. True if the action would be allowed, false otherwise.
+	// allowed is required. True if the action would be allowed, false otherwise.
 	Allowed bool `json:"allowed"`
-	// Denied is optional. True if the action would be denied, otherwise
+	// denied is optional. True if the action would be denied, otherwise
 	// false. If both allowed is false and denied is false, then the
 	// authorizer has no opinion on whether to authorize the action. Denied
 	// may not be true if Allowed is true.
 	Denied bool `json:"denied,omitempty"`
-	// Reason is optional.  It indicates why a request was allowed or denied.
+	// reason is optional.  It indicates why a request was allowed or denied.
 	Reason string `json:"reason,omitempty"`
-	// EvaluationError is an indication that some error occurred during the authorization check.
+	// evaluationError is an indication that some error occurred during the authorization check.
 	// It is entirely possible to get an error and be able to continue determine authorization status in spite of it.
 	// For instance, RBAC can be missing a role, but enough roles are still present and bound to reason about the request.
 	EvaluationError string `json:"evaluationError,omitempty"`
@@ -401,9 +401,9 @@ func (in *SubjectAccessReviewStatus) DeepCopy() *SubjectAccessReviewStatus {
 }
 
 type SelfSubjectAccessReviewSpec struct {
-	// ResourceAuthorizationAttributes describes information for a resource access request
+	// resourceAttributes describes information for a resource access request
 	ResourceAttributes *ResourceAttributes `json:"resourceAttributes,omitempty"`
-	// NonResourceAttributes describes information for a non-resource access request
+	// nonResourceAttributes describes information for a non-resource access request
 	NonResourceAttributes *NonResourceAttributes `json:"nonResourceAttributes,omitempty"`
 }
 
@@ -431,7 +431,7 @@ func (in *SelfSubjectAccessReviewSpec) DeepCopy() *SelfSubjectAccessReviewSpec {
 }
 
 type SelfSubjectRulesReviewSpec struct {
-	// Namespace to evaluate rules for. Required.
+	// namespace to evaluate rules for. Required.
 	Namespace string `json:"namespace,omitempty"`
 }
 
@@ -449,16 +449,16 @@ func (in *SelfSubjectRulesReviewSpec) DeepCopy() *SelfSubjectRulesReviewSpec {
 }
 
 type SubjectRulesReviewStatus struct {
-	// ResourceRules is the list of actions the subject is allowed to perform on resources.
+	// resourceRules is the list of actions the subject is allowed to perform on resources.
 	// The list ordering isn't significant, may contain duplicates, and possibly be incomplete.
 	ResourceRules []ResourceRule `json:"resourceRules"`
-	// NonResourceRules is the list of actions the subject is allowed to perform on non-resources.
+	// nonResourceRules is the list of actions the subject is allowed to perform on non-resources.
 	// The list ordering isn't significant, may contain duplicates, and possibly be incomplete.
 	NonResourceRules []NonResourceRule `json:"nonResourceRules"`
-	// Incomplete is true when the rules returned by this call are incomplete. This is most commonly
+	// incomplete is true when the rules returned by this call are incomplete. This is most commonly
 	// encountered when an authorizer, such as an external authorizer, doesn't support rules evaluation.
 	Incomplete bool `json:"incomplete"`
-	// EvaluationError can appear in combination with Rules. It indicates an error occurred during
+	// evaluationError can appear in combination with Rules. It indicates an error occurred during
 	// rule evaluation, such as an authorizer that doesn't support rule evaluation, and that
 	// ResourceRules and/or NonResourceRules may be incomplete.
 	EvaluationError string `json:"evaluationError,omitempty"`
@@ -492,30 +492,26 @@ func (in *SubjectRulesReviewStatus) DeepCopy() *SubjectRulesReviewStatus {
 }
 
 type ResourceAttributes struct {
-	// Namespace is the namespace of the action being requested.  Currently, there is no distinction between no namespace and all namespaces
+	// namespace is the namespace of the action being requested.  Currently, there is no distinction between no namespace and all namespaces
 	// "" (empty) is defaulted for LocalSubjectAccessReviews
 	// "" (empty) is empty for cluster-scoped resources
 	// "" (empty) means "all" for namespace scoped resources from a SubjectAccessReview or SelfSubjectAccessReview
 	Namespace string `json:"namespace,omitempty"`
-	// Verb is a kubernetes resource API verb, like: get, list, watch, create, update, delete, proxy.  "*" means all.
+	// verb is a kubernetes resource API verb, like: get, list, watch, create, update, delete, proxy.  "*" means all.
 	Verb string `json:"verb,omitempty"`
-	// Group is the API Group of the Resource.  "*" means all.
+	// group is the API Group of the Resource.  "*" means all.
 	Group string `json:"group,omitempty"`
-	// Version is the API Version of the Resource.  "*" means all.
+	// version is the API Version of the Resource.  "*" means all.
 	Version string `json:"version,omitempty"`
-	// Resource is one of the existing resource types.  "*" means all.
+	// resource is one of the existing resource types.  "*" means all.
 	Resource string `json:"resource,omitempty"`
-	// Subresource is one of the existing resource types.  "" means none.
+	// subresource is one of the existing resource types.  "" means none.
 	Subresource string `json:"subresource,omitempty"`
-	// Name is the name of the resource being requested for a "get" or deleted for a "delete". "" (empty) means all.
+	// name is the name of the resource being requested for a "get" or deleted for a "delete". "" (empty) means all.
 	Name string `json:"name,omitempty"`
 	// fieldSelector describes the limitation on access based on field.  It can only limit access, not broaden it.
-	// This field  is alpha-level. To use this field, you must enable the
-	// `AuthorizeWithSelectors` feature gate (disabled by default).
 	FieldSelector *FieldSelectorAttributes `json:"fieldSelector,omitempty"`
 	// labelSelector describes the limitation on access based on labels.  It can only limit access, not broaden it.
-	// This field  is alpha-level. To use this field, you must enable the
-	// `AuthorizeWithSelectors` feature gate (disabled by default).
 	LabelSelector *LabelSelectorAttributes `json:"labelSelector,omitempty"`
 }
 
@@ -543,9 +539,9 @@ func (in *ResourceAttributes) DeepCopy() *ResourceAttributes {
 }
 
 type NonResourceAttributes struct {
-	// Path is the URL path of the request
+	// path is the URL path of the request
 	Path string `json:"path,omitempty"`
-	// Verb is the standard HTTP verb
+	// verb is the standard HTTP verb
 	Verb string `json:"verb,omitempty"`
 }
 
@@ -565,15 +561,15 @@ func (in *NonResourceAttributes) DeepCopy() *NonResourceAttributes {
 type ExtraValue []string
 
 type ResourceRule struct {
-	// Verb is a list of kubernetes resource API verbs, like: get, list, watch, create, update, delete, proxy.  "*" means all.
+	// verbs is a list of kubernetes resource API verbs, like: get, list, watch, create, update, delete, proxy.  "*" means all.
 	Verbs []string `json:"verbs"`
-	// APIGroups is the name of the APIGroup that contains the resources.  If multiple API groups are specified, any action requested against one of
+	// apiGroups is the name of the APIGroup that contains the resources.  If multiple API groups are specified, any action requested against one of
 	// the enumerated resources in any API group will be allowed.  "*" means all.
 	APIGroups []string `json:"apiGroups"`
-	// Resources is a list of resources this rule applies to.  "*" means all in the specified apiGroups.
+	// resources is a list of resources this rule applies to.  "*" means all in the specified apiGroups.
 	// "*/foo" represents the subresource 'foo' for all resources in the specified apiGroups.
 	Resources []string `json:"resources"`
-	// ResourceNames is an optional white list of names that the rule applies to.  An empty set means that everything is allowed.  "*" means all.
+	// resourceNames is an optional white list of names that the rule applies to.  An empty set means that everything is allowed.  "*" means all.
 	ResourceNames []string `json:"resourceNames"`
 }
 
@@ -611,9 +607,9 @@ func (in *ResourceRule) DeepCopy() *ResourceRule {
 }
 
 type NonResourceRule struct {
-	// Verb is a list of kubernetes non-resource API verbs, like: get, post, put, delete, patch, head, options.  "*" means all.
+	// verbs is a list of kubernetes non-resource API verbs, like: get, post, put, delete, patch, head, options.  "*" means all.
 	Verbs []string `json:"verbs"`
-	// NonResourceURLs is a set of partial urls that a user should have access to.  *s are allowed, but only as the full,
+	// nonResourceURLs is a set of partial urls that a user should have access to.  *s are allowed, but only as the full,
 	// final step in the path.  "*" means all.
 	NonResourceURLs []string `json:"nonResourceURLs"`
 }
