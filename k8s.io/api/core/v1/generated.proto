@@ -49,7 +49,19 @@ enum ConditionStatus {
 }
 
 enum ContainerRestartPolicy {
-  CONTAINER_RESTART_POLICY_ALWAYS = 0 [(dev.f110.kubeproto.value) = { value: "Always" }];
+  CONTAINER_RESTART_POLICY_ALWAYS     = 0 [(dev.f110.kubeproto.value) = { value: "Always" }];
+  CONTAINER_RESTART_POLICY_NEVER      = 1 [(dev.f110.kubeproto.value) = { value: "Never" }];
+  CONTAINER_RESTART_POLICY_ON_FAILURE = 2;
+}
+
+enum ContainerRestartRuleAction {
+  CONTAINER_RESTART_RULE_ACTION_RESTART                = 0 [(dev.f110.kubeproto.value) = { value: "Restart" }];
+  CONTAINER_RESTART_RULE_ACTION_RESTART_ALL_CONTAINERS = 1;
+}
+
+enum ContainerRestartRuleOnExitCodesOperator {
+  CONTAINER_RESTART_RULE_ON_EXIT_CODES_OPERATOR_IN     = 0 [(dev.f110.kubeproto.value) = { value: "In" }];
+  CONTAINER_RESTART_RULE_ON_EXIT_CODES_OPERATOR_NOT_IN = 1;
 }
 
 enum DNSPolicy {
@@ -171,6 +183,7 @@ enum PersistentVolumeClaimConditionType {
   PERSISTENT_VOLUME_CLAIM_CONDITION_TYPE_NODE_RESIZE_ERROR          = 3;
   PERSISTENT_VOLUME_CLAIM_CONDITION_TYPE_MODIFY_VOLUME_ERROR        = 4;
   PERSISTENT_VOLUME_CLAIM_CONDITION_TYPE_MODIFYING_VOLUME           = 5;
+  PERSISTENT_VOLUME_CLAIM_CONDITION_TYPE_UNUSED                     = 6 [(dev.f110.kubeproto.value) = { value: "Unused" }];
 }
 
 enum PersistentVolumeClaimModifyVolumeStatus {
@@ -211,6 +224,9 @@ enum PodConditionType {
   POD_CONDITION_TYPE_POD_SCHEDULED                 = 3;
   POD_CONDITION_TYPE_DISRUPTION_TARGET             = 4;
   POD_CONDITION_TYPE_POD_READY_TO_START_CONTAINERS = 5;
+  POD_CONDITION_TYPE_POD_RESIZE_PENDING            = 6;
+  POD_CONDITION_TYPE_POD_RESIZE_IN_PROGRESS        = 7;
+  POD_CONDITION_TYPE_ALL_CONTAINERS_RESTARTING     = 8;
 }
 
 enum PodFSGroupChangePolicy {
@@ -233,10 +249,9 @@ enum PodQOSClass {
 }
 
 enum PodResizeStatus {
-  POD_RESIZE_STATUS_PROPOSED    = 0 [(dev.f110.kubeproto.value) = { value: "Proposed" }];
-  POD_RESIZE_STATUS_IN_PROGRESS = 1;
-  POD_RESIZE_STATUS_DEFERRED    = 2 [(dev.f110.kubeproto.value) = { value: "Deferred" }];
-  POD_RESIZE_STATUS_INFEASIBLE  = 3 [(dev.f110.kubeproto.value) = { value: "Infeasible" }];
+  POD_RESIZE_STATUS_IN_PROGRESS = 0;
+  POD_RESIZE_STATUS_DEFERRED    = 1 [(dev.f110.kubeproto.value) = { value: "Deferred" }];
+  POD_RESIZE_STATUS_INFEASIBLE  = 2 [(dev.f110.kubeproto.value) = { value: "Infeasible" }];
 }
 
 enum PodSELinuxChangePolicy {
@@ -312,6 +327,7 @@ enum ResourceQuotaScope {
   RESOURCE_QUOTA_SCOPE_NOT_BEST_EFFORT              = 3;
   RESOURCE_QUOTA_SCOPE_PRIORITY_CLASS               = 4;
   RESOURCE_QUOTA_SCOPE_CROSS_NAMESPACE_POD_AFFINITY = 5;
+  RESOURCE_QUOTA_SCOPE_VOLUME_ATTRIBUTES_CLASS      = 6;
 }
 
 enum ResourceResizeRestartPolicy {
@@ -371,6 +387,74 @@ enum ServiceType {
   SERVICE_TYPE_EXTERNAL_NAME = 3;
 }
 
+enum Signal {
+  SIGNAL_S_I_G_A_B_R_T      = 0;
+  SIGNAL_S_I_G_A_L_R_M      = 1;
+  SIGNAL_S_I_G_B_U_S        = 2;
+  SIGNAL_S_I_G_C_H_L_D      = 3;
+  SIGNAL_S_I_G_C_L_D        = 4;
+  SIGNAL_S_I_G_C_O_N_T      = 5;
+  SIGNAL_S_I_G_F_P_E        = 6;
+  SIGNAL_S_I_G_H_U_P        = 7;
+  SIGNAL_S_I_G_I_L_L        = 8;
+  SIGNAL_S_I_G_I_N_T        = 9;
+  SIGNAL_S_I_G_IO           = 10 [(dev.f110.kubeproto.value) = { value: "SIGIO" }];
+  SIGNAL_S_I_G_IO_T         = 11 [(dev.f110.kubeproto.value) = { value: "SIGIOT" }];
+  SIGNAL_S_I_G_K_I_L_L      = 12;
+  SIGNAL_S_I_G_P_IP_E       = 13 [(dev.f110.kubeproto.value) = { value: "SIGPIPE" }];
+  SIGNAL_S_I_G_P_O_L_L      = 14;
+  SIGNAL_S_I_G_P_R_O_F      = 15;
+  SIGNAL_S_I_G_P_W_R        = 16;
+  SIGNAL_S_I_G_Q_U_I_T      = 17;
+  SIGNAL_S_I_G_S_E_G_V      = 18;
+  SIGNAL_S_I_G_S_T_K_F_L_T  = 19;
+  SIGNAL_S_I_G_S_T_O_P      = 20;
+  SIGNAL_S_I_G_S_Y_S        = 21;
+  SIGNAL_S_I_G_T_E_R_M      = 22;
+  SIGNAL_S_I_G_T_R_A_P      = 23;
+  SIGNAL_S_I_G_T_S_T_P      = 24;
+  SIGNAL_S_I_G_T_T_I_N      = 25;
+  SIGNAL_S_I_G_T_T_O_U      = 26;
+  SIGNAL_S_I_G_U_R_G        = 27;
+  SIGNAL_S_I_G_U_S_R1       = 28;
+  SIGNAL_S_I_G_U_S_R2       = 29;
+  SIGNAL_S_I_G_V_T_A_L_R_M  = 30;
+  SIGNAL_S_I_G_W_I_N_C_H    = 31;
+  SIGNAL_S_I_G_X_C_P_U      = 32;
+  SIGNAL_S_I_G_X_FS_Z       = 33 [(dev.f110.kubeproto.value) = { value: "SIGXFSZ" }];
+  SIGNAL_S_I_G_R_T_M_I_N    = 34;
+  SIGNAL_S_I_G_R_T_M_I_N_1  = 35 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+1" }];
+  SIGNAL_S_I_G_R_T_M_I_N_2  = 36 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+2" }];
+  SIGNAL_S_I_G_R_T_M_I_N_3  = 37 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+3" }];
+  SIGNAL_S_I_G_R_T_M_I_N_4  = 38 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+4" }];
+  SIGNAL_S_I_G_R_T_M_I_N_5  = 39 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+5" }];
+  SIGNAL_S_I_G_R_T_M_I_N_6  = 40 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+6" }];
+  SIGNAL_S_I_G_R_T_M_I_N_7  = 41 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+7" }];
+  SIGNAL_S_I_G_R_T_M_I_N_8  = 42 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+8" }];
+  SIGNAL_S_I_G_R_T_M_I_N_9  = 43 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+9" }];
+  SIGNAL_S_I_G_R_T_M_I_N_10 = 44 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+10" }];
+  SIGNAL_S_I_G_R_T_M_I_N_11 = 45 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+11" }];
+  SIGNAL_S_I_G_R_T_M_I_N_12 = 46 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+12" }];
+  SIGNAL_S_I_G_R_T_M_I_N_13 = 47 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+13" }];
+  SIGNAL_S_I_G_R_T_M_I_N_14 = 48 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+14" }];
+  SIGNAL_S_I_G_R_T_M_I_N_15 = 49 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+15" }];
+  SIGNAL_S_I_G_R_T_M_A_X_14 = 50 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-14" }];
+  SIGNAL_S_I_G_R_T_M_A_X_13 = 51 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-13" }];
+  SIGNAL_S_I_G_R_T_M_A_X_12 = 52 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-12" }];
+  SIGNAL_S_I_G_R_T_M_A_X_11 = 53 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-11" }];
+  SIGNAL_S_I_G_R_T_M_A_X_10 = 54 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-10" }];
+  SIGNAL_S_I_G_R_T_M_A_X_9  = 55 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-9" }];
+  SIGNAL_S_I_G_R_T_M_A_X_8  = 56 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-8" }];
+  SIGNAL_S_I_G_R_T_M_A_X_7  = 57 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-7" }];
+  SIGNAL_S_I_G_R_T_M_A_X_6  = 58 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-6" }];
+  SIGNAL_S_I_G_R_T_M_A_X_5  = 59 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-5" }];
+  SIGNAL_S_I_G_R_T_M_A_X_4  = 60 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-4" }];
+  SIGNAL_S_I_G_R_T_M_A_X_3  = 61 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-3" }];
+  SIGNAL_S_I_G_R_T_M_A_X_2  = 62 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-2" }];
+  SIGNAL_S_I_G_R_T_M_A_X_1  = 63 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-1" }];
+  SIGNAL_S_I_G_R_T_M_A_X    = 64;
+}
+
 enum StorageMedium {
   STORAGE_MEDIUM_DEFAULT    = 0 [(dev.f110.kubeproto.value) = { value: "" }];
   STORAGE_MEDIUM_MEMORY     = 1 [(dev.f110.kubeproto.value) = { value: "Memory" }];
@@ -396,6 +480,8 @@ enum TerminationMessagePolicy {
 enum TolerationOperator {
   TOLERATION_OPERATOR_EXISTS = 0 [(dev.f110.kubeproto.value) = { value: "Exists" }];
   TOLERATION_OPERATOR_EQUAL  = 1 [(dev.f110.kubeproto.value) = { value: "Equal" }];
+  TOLERATION_OPERATOR_LT     = 2 [(dev.f110.kubeproto.value) = { value: "Lt" }];
+  TOLERATION_OPERATOR_GT     = 3 [(dev.f110.kubeproto.value) = { value: "Gt" }];
 }
 
 enum URIScheme {
@@ -875,8 +961,8 @@ message Container {
   // Cannot be updated.
   repeated ContainerPort ports = 6 [(dev.f110.kubeproto.field) = { go_name: "Ports", api_field_name: "ports", inline: false }];
   // List of sources to populate environment variables in the container.
-  // The keys defined within a source must be a C_IDENTIFIER. All invalid keys
-  // will be reported as an event when the container is starting. When a key exists in multiple
+  // The keys defined within a source may consist of any printable ASCII characters except '='.
+  // When a key exists in multiple
   // sources, the value associated with the last source will take precedence.
   // Values defined by an Env with a duplicate key will take precedence.
   // Cannot be updated.
@@ -889,12 +975,13 @@ message Container {
   // More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
   optional ResourceRequirements resources = 9 [(dev.f110.kubeproto.field) = { go_name: "Resources", api_field_name: "resources", inline: false }];
   // Resources resize policy for the container.
+  // This field cannot be set on ephemeral containers.
   repeated ContainerResizePolicy resize_policy = 10 [(dev.f110.kubeproto.field) = { go_name: "ResizePolicy", api_field_name: "resizePolicy", inline: false }];
   // RestartPolicy defines the restart behavior of individual containers in a pod.
-  // This field may only be set for init containers, and the only allowed value is "Always".
-  // For non-init containers or when this field is not specified,
+  // This overrides the pod-level restart policy. When this field is not specified,
   // the restart behavior is defined by the Pod's restart policy and the container type.
-  // Setting the RestartPolicy as "Always" for the init container will have the following effect:
+  // Additionally, setting the RestartPolicy as "Always" for the init container will
+  // have the following effect:
   // this init container will be continually restarted on
   // exit until all regular containers have terminated. Once all regular
   // containers have completed, all init containers with restartPolicy "Always"
@@ -906,21 +993,33 @@ message Container {
   // init container is started, or after any startupProbe has successfully
   // completed.
   optional ContainerRestartPolicy restart_policy = 11 [(dev.f110.kubeproto.field) = { go_name: "RestartPolicy", api_field_name: "restartPolicy", inline: false }];
+  // Represents a list of rules to be checked to determine if the
+  // container should be restarted on exit. The rules are evaluated in
+  // order. Once a rule matches a container exit condition, the remaining
+  // rules are ignored. If no rule matches the container exit condition,
+  // the Container-level restart policy determines the whether the container
+  // is restarted or not. Constraints on the rules:
+  // - At most 20 rules are allowed.
+  // - Rules can have the same action.
+  // - Identical rules are not forbidden in validations.
+  // When rules are specified, container MUST set RestartPolicy explicitly
+  // even it if matches the Pod's RestartPolicy.
+  repeated ContainerRestartRule restart_policy_rules = 12 [(dev.f110.kubeproto.field) = { go_name: "RestartPolicyRules", api_field_name: "restartPolicyRules", inline: false }];
   // Pod volumes to mount into the container's filesystem.
   // Cannot be updated.
-  repeated VolumeMount volume_mounts = 12 [(dev.f110.kubeproto.field) = { go_name: "VolumeMounts", api_field_name: "volumeMounts", inline: false }];
+  repeated VolumeMount volume_mounts = 13 [(dev.f110.kubeproto.field) = { go_name: "VolumeMounts", api_field_name: "volumeMounts", inline: false }];
   // volumeDevices is the list of block devices to be used by the container.
-  repeated VolumeDevice volume_devices = 13 [(dev.f110.kubeproto.field) = { go_name: "VolumeDevices", api_field_name: "volumeDevices", inline: false }];
+  repeated VolumeDevice volume_devices = 14 [(dev.f110.kubeproto.field) = { go_name: "VolumeDevices", api_field_name: "volumeDevices", inline: false }];
   // Periodic probe of container liveness.
   // Container will be restarted if the probe fails.
   // Cannot be updated.
   // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
-  optional Probe liveness_probe = 14 [(dev.f110.kubeproto.field) = { go_name: "LivenessProbe", api_field_name: "livenessProbe", inline: false }];
+  optional Probe liveness_probe = 15 [(dev.f110.kubeproto.field) = { go_name: "LivenessProbe", api_field_name: "livenessProbe", inline: false }];
   // Periodic probe of container service readiness.
   // Container will be removed from service endpoints if the probe fails.
   // Cannot be updated.
   // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
-  optional Probe readiness_probe = 15 [(dev.f110.kubeproto.field) = { go_name: "ReadinessProbe", api_field_name: "readinessProbe", inline: false }];
+  optional Probe readiness_probe = 16 [(dev.f110.kubeproto.field) = { go_name: "ReadinessProbe", api_field_name: "readinessProbe", inline: false }];
   // StartupProbe indicates that the Pod has successfully initialized.
   // If specified, no other probes are executed until this completes successfully.
   // If this probe fails, the Pod will be restarted, just as if the livenessProbe failed.
@@ -928,10 +1027,10 @@ message Container {
   // when it might take a long time to load data or warm a cache, than during steady-state operation.
   // This cannot be updated.
   // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
-  optional Probe startup_probe = 16 [(dev.f110.kubeproto.field) = { go_name: "StartupProbe", api_field_name: "startupProbe", inline: false }];
+  optional Probe startup_probe = 17 [(dev.f110.kubeproto.field) = { go_name: "StartupProbe", api_field_name: "startupProbe", inline: false }];
   // Actions that the management system should take in response to container lifecycle events.
   // Cannot be updated.
-  optional Lifecycle lifecycle = 17 [(dev.f110.kubeproto.field) = { go_name: "Lifecycle", api_field_name: "lifecycle", inline: false }];
+  optional Lifecycle lifecycle = 18 [(dev.f110.kubeproto.field) = { go_name: "Lifecycle", api_field_name: "lifecycle", inline: false }];
   // Optional: Path at which the file to which the container's termination message
   // will be written is mounted into the container's filesystem.
   // Message written is intended to be brief final status, such as an assertion failure message.
@@ -939,7 +1038,7 @@ message Container {
   // all containers will be limited to 12kb.
   // Defaults to /dev/termination-log.
   // Cannot be updated.
-  optional string termination_message_path = 18 [(dev.f110.kubeproto.field) = { go_name: "TerminationMessagePath", api_field_name: "terminationMessagePath", inline: false }];
+  optional string termination_message_path = 19 [(dev.f110.kubeproto.field) = { go_name: "TerminationMessagePath", api_field_name: "terminationMessagePath", inline: false }];
   // Indicate how the termination message should be populated. File will use the contents of
   // terminationMessagePath to populate the container status message on both success and failure.
   // FallbackToLogsOnError will use the last chunk of container log output if the termination
@@ -947,21 +1046,21 @@ message Container {
   // The log output is limited to 2048 bytes or 80 lines, whichever is smaller.
   // Defaults to File.
   // Cannot be updated.
-  optional TerminationMessagePolicy termination_message_policy = 19 [(dev.f110.kubeproto.field) = { go_name: "TerminationMessagePolicy", api_field_name: "terminationMessagePolicy", inline: false }];
+  optional TerminationMessagePolicy termination_message_policy = 20 [(dev.f110.kubeproto.field) = { go_name: "TerminationMessagePolicy", api_field_name: "terminationMessagePolicy", inline: false }];
   // Image pull policy.
   // One of Always, Never, IfNotPresent.
   // Defaults to Always if :latest tag is specified, or IfNotPresent otherwise.
   // Cannot be updated.
   // More info: https://kubernetes.io/docs/concepts/containers/images#updating-images
-  optional PullPolicy image_pull_policy = 20 [(dev.f110.kubeproto.field) = { go_name: "ImagePullPolicy", api_field_name: "imagePullPolicy", inline: false }];
+  optional PullPolicy image_pull_policy = 21 [(dev.f110.kubeproto.field) = { go_name: "ImagePullPolicy", api_field_name: "imagePullPolicy", inline: false }];
   // SecurityContext defines the security options the container should be run with.
   // If set, the fields of SecurityContext override the equivalent fields of PodSecurityContext.
   // More info: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-  optional SecurityContext security_context = 21 [(dev.f110.kubeproto.field) = { go_name: "SecurityContext", api_field_name: "securityContext", inline: false }];
+  optional SecurityContext security_context = 22 [(dev.f110.kubeproto.field) = { go_name: "SecurityContext", api_field_name: "securityContext", inline: false }];
   // Whether this container should allocate a buffer for stdin in the container runtime. If this
   // is not set, reads from stdin in the container will always result in EOF.
   // Default is false.
-  optional bool stdin = 22 [(dev.f110.kubeproto.field) = { go_name: "Stdin", api_field_name: "stdin", inline: false }];
+  optional bool stdin = 23 [(dev.f110.kubeproto.field) = { go_name: "Stdin", api_field_name: "stdin", inline: false }];
   // Whether the container runtime should close the stdin channel after it has been opened by
   // a single attach. When stdin is true the stdin stream will remain open across multiple attach
   // sessions. If stdinOnce is set to true, stdin is opened on container start, is empty until the
@@ -969,10 +1068,19 @@ message Container {
   // at which time stdin is closed and remains closed until the container is restarted. If this
   // flag is false, a container processes that reads from stdin will never receive an EOF.
   // Default is false
-  optional bool stdin_once = 23 [(dev.f110.kubeproto.field) = { go_name: "StdinOnce", api_field_name: "stdinOnce", inline: false }];
+  optional bool stdin_once = 24 [(dev.f110.kubeproto.field) = { go_name: "StdinOnce", api_field_name: "stdinOnce", inline: false }];
   // Whether this container should allocate a TTY for itself, also requires 'stdin' to be true.
   // Default is false.
-  optional bool tty = 24 [(dev.f110.kubeproto.field) = { go_name: "TTY", api_field_name: "tty", inline: false }];
+  optional bool tty = 25 [(dev.f110.kubeproto.field) = { go_name: "TTY", api_field_name: "tty", inline: false }];
+}
+
+message ContainerExtendedResourceRequest {
+  // The name of the container requesting resources.
+  string container_name = 1 [(dev.f110.kubeproto.field) = { go_name: "ContainerName", api_field_name: "containerName", inline: false }];
+  // The name of the extended resource in that container which gets backed by DRA.
+  string resource_name = 2 [(dev.f110.kubeproto.field) = { go_name: "ResourceName", api_field_name: "resourceName", inline: false }];
+  // The name of the request in the special ResourceClaim which corresponds to the extended resource.
+  string request_name = 3 [(dev.f110.kubeproto.field) = { go_name: "RequestName", api_field_name: "requestName", inline: false }];
 }
 
 message ContainerImage {
@@ -1010,6 +1118,28 @@ message ContainerResizePolicy {
   // Restart policy to apply when specified resource is resized.
   // If not specified, it defaults to NotRequired.
   ResourceResizeRestartPolicy restart_policy = 2 [(dev.f110.kubeproto.field) = { go_name: "RestartPolicy", api_field_name: "restartPolicy", inline: false }];
+}
+
+message ContainerRestartRule {
+  // Specifies the action taken on a container exit if the requirements
+  // are satisfied. The only possible value is "Restart" to restart the
+  // container.
+  optional ContainerRestartRuleAction action = 1 [(dev.f110.kubeproto.field) = { go_name: "Action", api_field_name: "action", inline: false }];
+  // Represents the exit codes to check on container exits.
+  optional ContainerRestartRuleOnExitCodes exit_codes = 2 [(dev.f110.kubeproto.field) = { go_name: "ExitCodes", api_field_name: "exitCodes", inline: false }];
+}
+
+message ContainerRestartRuleOnExitCodes {
+  // Represents the relationship between the container exit code(s) and the
+  // specified values. Possible values are:
+  // - In: the requirement is satisfied if the container exit code is in the
+  //   set of specified values.
+  // - NotIn: the requirement is satisfied if the container exit code is
+  //   not in the set of specified values.
+  optional ContainerRestartRuleOnExitCodesOperator operator = 1 [(dev.f110.kubeproto.field) = { go_name: "Operator", api_field_name: "operator", inline: false }];
+  // Specifies the set of values to check for container exit codes.
+  // At most 255 elements are allowed.
+  repeated int32 values = 2 [(dev.f110.kubeproto.field) = { go_name: "Values", api_field_name: "values", inline: false }];
 }
 
 message ContainerState {
@@ -1109,6 +1239,8 @@ message ContainerStatus {
   // AllocatedResourcesStatus represents the status of various resources
   // allocated for this Pod.
   repeated ResourceStatus allocated_resources_status = 14 [(dev.f110.kubeproto.field) = { go_name: "AllocatedResourcesStatus", api_field_name: "allocatedResourcesStatus", inline: false }];
+  // StopSignal reports the effective stop signal for this container
+  optional Signal stop_signal = 15 [(dev.f110.kubeproto.field) = { go_name: "StopSignal", api_field_name: "stopSignal", inline: false }];
 }
 
 message ContainerUser {
@@ -1249,7 +1381,8 @@ message EndpointsList {
 }
 
 message EnvFromSource {
-  // An optional identifier to prepend to each key in the ConfigMap. Must be a C_IDENTIFIER.
+  // Optional text to prepend to the name of each environment variable.
+  // May consist of any printable ASCII characters except '='.
   optional string prefix = 1 [(dev.f110.kubeproto.field) = { go_name: "Prefix", api_field_name: "prefix", inline: false }];
   // The ConfigMap to select from
   optional ConfigMapEnvSource config_map_ref = 2 [(dev.f110.kubeproto.field) = { go_name: "ConfigMapRef", api_field_name: "configMapRef", inline: false }];
@@ -1258,7 +1391,8 @@ message EnvFromSource {
 }
 
 message EnvVar {
-  // Name of the environment variable. Must be a C_IDENTIFIER.
+  // Name of the environment variable.
+  // May consist of any printable ASCII characters except '='.
   string name = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
   // Variable references $(VAR_NAME) are expanded
   // using the previously defined environment variables in the container and
@@ -1285,6 +1419,9 @@ message EnvVarSource {
   optional ConfigMapKeySelector config_map_key_ref = 3 [(dev.f110.kubeproto.field) = { go_name: "ConfigMapKeyRef", api_field_name: "configMapKeyRef", inline: false }];
   // Selects a key of a secret in the pod's namespace
   optional SecretKeySelector secret_key_ref = 4 [(dev.f110.kubeproto.field) = { go_name: "SecretKeyRef", api_field_name: "secretKeyRef", inline: false }];
+  // FileKeyRef selects a key of the env file.
+  // Requires the EnvFiles feature gate to be enabled.
+  optional FileKeySelector file_key_ref = 5 [(dev.f110.kubeproto.field) = { go_name: "FileKeyRef", api_field_name: "fileKeyRef", inline: false }];
 }
 
 message EphemeralContainer {
@@ -1334,8 +1471,8 @@ message EphemeralContainerCommon {
   // Ports are not allowed for ephemeral containers.
   repeated ContainerPort ports = 6 [(dev.f110.kubeproto.field) = { go_name: "Ports", api_field_name: "ports", inline: false }];
   // List of sources to populate environment variables in the container.
-  // The keys defined within a source must be a C_IDENTIFIER. All invalid keys
-  // will be reported as an event when the container is starting. When a key exists in multiple
+  // The keys defined within a source may consist of any printable ASCII characters except '='.
+  // When a key exists in multiple
   // sources, the value associated with the last source will take precedence.
   // Values defined by an Env with a duplicate key will take precedence.
   // Cannot be updated.
@@ -1350,22 +1487,25 @@ message EphemeralContainerCommon {
   repeated ContainerResizePolicy resize_policy = 10 [(dev.f110.kubeproto.field) = { go_name: "ResizePolicy", api_field_name: "resizePolicy", inline: false }];
   // Restart policy for the container to manage the restart behavior of each
   // container within a pod.
-  // This may only be set for init containers. You cannot set this field on
-  // ephemeral containers.
+  // You cannot set this field on ephemeral containers.
   optional ContainerRestartPolicy restart_policy = 11 [(dev.f110.kubeproto.field) = { go_name: "RestartPolicy", api_field_name: "restartPolicy", inline: false }];
+  // Represents a list of rules to be checked to determine if the
+  // container should be restarted on exit. You cannot set this field on
+  // ephemeral containers.
+  repeated ContainerRestartRule restart_policy_rules = 12 [(dev.f110.kubeproto.field) = { go_name: "RestartPolicyRules", api_field_name: "restartPolicyRules", inline: false }];
   // Pod volumes to mount into the container's filesystem. Subpath mounts are not allowed for ephemeral containers.
   // Cannot be updated.
-  repeated VolumeMount volume_mounts = 12 [(dev.f110.kubeproto.field) = { go_name: "VolumeMounts", api_field_name: "volumeMounts", inline: false }];
+  repeated VolumeMount volume_mounts = 13 [(dev.f110.kubeproto.field) = { go_name: "VolumeMounts", api_field_name: "volumeMounts", inline: false }];
   // volumeDevices is the list of block devices to be used by the container.
-  repeated VolumeDevice volume_devices = 13 [(dev.f110.kubeproto.field) = { go_name: "VolumeDevices", api_field_name: "volumeDevices", inline: false }];
+  repeated VolumeDevice volume_devices = 14 [(dev.f110.kubeproto.field) = { go_name: "VolumeDevices", api_field_name: "volumeDevices", inline: false }];
   // Probes are not allowed for ephemeral containers.
-  optional Probe liveness_probe = 14 [(dev.f110.kubeproto.field) = { go_name: "LivenessProbe", api_field_name: "livenessProbe", inline: false }];
+  optional Probe liveness_probe = 15 [(dev.f110.kubeproto.field) = { go_name: "LivenessProbe", api_field_name: "livenessProbe", inline: false }];
   // Probes are not allowed for ephemeral containers.
-  optional Probe readiness_probe = 15 [(dev.f110.kubeproto.field) = { go_name: "ReadinessProbe", api_field_name: "readinessProbe", inline: false }];
+  optional Probe readiness_probe = 16 [(dev.f110.kubeproto.field) = { go_name: "ReadinessProbe", api_field_name: "readinessProbe", inline: false }];
   // Probes are not allowed for ephemeral containers.
-  optional Probe startup_probe = 16 [(dev.f110.kubeproto.field) = { go_name: "StartupProbe", api_field_name: "startupProbe", inline: false }];
+  optional Probe startup_probe = 17 [(dev.f110.kubeproto.field) = { go_name: "StartupProbe", api_field_name: "startupProbe", inline: false }];
   // Lifecycle is not allowed for ephemeral containers.
-  optional Lifecycle lifecycle = 17 [(dev.f110.kubeproto.field) = { go_name: "Lifecycle", api_field_name: "lifecycle", inline: false }];
+  optional Lifecycle lifecycle = 18 [(dev.f110.kubeproto.field) = { go_name: "Lifecycle", api_field_name: "lifecycle", inline: false }];
   // Optional: Path at which the file to which the container's termination message
   // will be written is mounted into the container's filesystem.
   // Message written is intended to be brief final status, such as an assertion failure message.
@@ -1373,7 +1513,7 @@ message EphemeralContainerCommon {
   // all containers will be limited to 12kb.
   // Defaults to /dev/termination-log.
   // Cannot be updated.
-  optional string termination_message_path = 18 [(dev.f110.kubeproto.field) = { go_name: "TerminationMessagePath", api_field_name: "terminationMessagePath", inline: false }];
+  optional string termination_message_path = 19 [(dev.f110.kubeproto.field) = { go_name: "TerminationMessagePath", api_field_name: "terminationMessagePath", inline: false }];
   // Indicate how the termination message should be populated. File will use the contents of
   // terminationMessagePath to populate the container status message on both success and failure.
   // FallbackToLogsOnError will use the last chunk of container log output if the termination
@@ -1381,20 +1521,20 @@ message EphemeralContainerCommon {
   // The log output is limited to 2048 bytes or 80 lines, whichever is smaller.
   // Defaults to File.
   // Cannot be updated.
-  optional TerminationMessagePolicy termination_message_policy = 19 [(dev.f110.kubeproto.field) = { go_name: "TerminationMessagePolicy", api_field_name: "terminationMessagePolicy", inline: false }];
+  optional TerminationMessagePolicy termination_message_policy = 20 [(dev.f110.kubeproto.field) = { go_name: "TerminationMessagePolicy", api_field_name: "terminationMessagePolicy", inline: false }];
   // Image pull policy.
   // One of Always, Never, IfNotPresent.
   // Defaults to Always if :latest tag is specified, or IfNotPresent otherwise.
   // Cannot be updated.
   // More info: https://kubernetes.io/docs/concepts/containers/images#updating-images
-  optional PullPolicy image_pull_policy = 20 [(dev.f110.kubeproto.field) = { go_name: "ImagePullPolicy", api_field_name: "imagePullPolicy", inline: false }];
+  optional PullPolicy image_pull_policy = 21 [(dev.f110.kubeproto.field) = { go_name: "ImagePullPolicy", api_field_name: "imagePullPolicy", inline: false }];
   // Optional: SecurityContext defines the security options the ephemeral container should be run with.
   // If set, the fields of SecurityContext override the equivalent fields of PodSecurityContext.
-  optional SecurityContext security_context = 21 [(dev.f110.kubeproto.field) = { go_name: "SecurityContext", api_field_name: "securityContext", inline: false }];
+  optional SecurityContext security_context = 22 [(dev.f110.kubeproto.field) = { go_name: "SecurityContext", api_field_name: "securityContext", inline: false }];
   // Whether this container should allocate a buffer for stdin in the container runtime. If this
   // is not set, reads from stdin in the container will always result in EOF.
   // Default is false.
-  optional bool stdin = 22 [(dev.f110.kubeproto.field) = { go_name: "Stdin", api_field_name: "stdin", inline: false }];
+  optional bool stdin = 23 [(dev.f110.kubeproto.field) = { go_name: "Stdin", api_field_name: "stdin", inline: false }];
   // Whether the container runtime should close the stdin channel after it has been opened by
   // a single attach. When stdin is true the stdin stream will remain open across multiple attach
   // sessions. If stdinOnce is set to true, stdin is opened on container start, is empty until the
@@ -1402,10 +1542,10 @@ message EphemeralContainerCommon {
   // at which time stdin is closed and remains closed until the container is restarted. If this
   // flag is false, a container processes that reads from stdin will never receive an EOF.
   // Default is false
-  optional bool stdin_once = 23 [(dev.f110.kubeproto.field) = { go_name: "StdinOnce", api_field_name: "stdinOnce", inline: false }];
+  optional bool stdin_once = 24 [(dev.f110.kubeproto.field) = { go_name: "StdinOnce", api_field_name: "stdinOnce", inline: false }];
   // Whether this container should allocate a TTY for itself, also requires 'stdin' to be true.
   // Default is false.
-  optional bool tty = 24 [(dev.f110.kubeproto.field) = { go_name: "TTY", api_field_name: "tty", inline: false }];
+  optional bool tty = 25 [(dev.f110.kubeproto.field) = { go_name: "TTY", api_field_name: "tty", inline: false }];
 }
 
 message EphemeralVolumeSource {
@@ -1512,6 +1652,25 @@ message FCVolumeSource {
   // wwids Optional: FC volume world wide identifiers (wwids)
   // Either wwids or combination of targetWWNs and lun must be set, but not both simultaneously.
   repeated string wwids = 5 [(dev.f110.kubeproto.field) = { go_name: "WWIDs", api_field_name: "wwids", inline: false }];
+}
+
+message FileKeySelector {
+  // The name of the volume mount containing the env file.
+  string volume_name = 1 [(dev.f110.kubeproto.field) = { go_name: "VolumeName", api_field_name: "volumeName", inline: false }];
+  // The path within the volume from which to select the file.
+  // Must be relative and may not contain the '..' path or start with '..'.
+  string path = 2 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
+  // The key within the env file. An invalid key will prevent the pod from starting.
+  // The keys defined within a source may consist of any printable ASCII characters except '='.
+  // During Alpha stage of the EnvFiles feature gate, the key size is limited to 128 characters.
+  string key = 3 [(dev.f110.kubeproto.field) = { go_name: "Key", api_field_name: "key", inline: false }];
+  // Specify whether the file or its key must be defined. If the file or key
+  // does not exist, then the env var is not published.
+  // If optional is set to true and the specified key does not exist,
+  // the environment variable will not be set in the Pod's containers.
+  // If optional is set to false and the specified key does not exist,
+  // an error will be returned during Pod creation.
+  optional bool optional = 4 [(dev.f110.kubeproto.field) = { go_name: "Optional", api_field_name: "optional", inline: false }];
 }
 
 message FlexPersistentVolumeSource {
@@ -1623,7 +1782,6 @@ message GlusterfsPersistentVolumeSource {
 
 message GlusterfsVolumeSource {
   // endpoints is the endpoint name that details Glusterfs topology.
-  // More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
   string endpoints_name = 1 [(dev.f110.kubeproto.field) = { go_name: "EndpointsName", api_field_name: "endpoints", inline: false }];
   // path is the Glusterfs volume path.
   // More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
@@ -1766,6 +1924,13 @@ message ImageVolumeSource {
   optional PullPolicy pull_policy = 2 [(dev.f110.kubeproto.field) = { go_name: "PullPolicy", api_field_name: "pullPolicy", inline: false }];
 }
 
+message ImageVolumeStatus {
+  // ImageRef is the digest of the image used for this volume.
+  // It should have a value that's similar to the pod's status.containerStatuses[i].imageID.
+  // The ImageRef length should not exceed 256 characters.
+  optional string image_ref = 1 [(dev.f110.kubeproto.field) = { go_name: "ImageRef", api_field_name: "imageRef", inline: false }];
+}
+
 message KeyToPath {
   // key is the key to project.
   string key = 1 [(dev.f110.kubeproto.field) = { go_name: "Key", api_field_name: "key", inline: false }];
@@ -1799,6 +1964,10 @@ message Lifecycle {
   // or until the termination grace period is reached.
   // More info: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#container-hooks
   optional LifecycleHandler pre_stop = 2 [(dev.f110.kubeproto.field) = { go_name: "PreStop", api_field_name: "preStop", inline: false }];
+  // StopSignal defines which signal will be sent to a container when it is being stopped.
+  // If not specified, the default is defined by the container runtime in use.
+  // StopSignal can only be set for Pods with a non-empty .spec.os.name
+  optional Signal stop_signal = 3 [(dev.f110.kubeproto.field) = { go_name: "StopSignal", api_field_name: "stopSignal", inline: false }];
 }
 
 message LifecycleHandler {
@@ -2027,6 +2196,15 @@ message NodeAffinity {
   repeated PreferredSchedulingTerm preferred_during_scheduling_ignored_during_execution = 2 [(dev.f110.kubeproto.field) = { go_name: "PreferredDuringSchedulingIgnoredDuringExecution", api_field_name: "preferredDuringSchedulingIgnoredDuringExecution", inline: false }];
 }
 
+message NodeAllocatableResourceClaimStatus {
+  // ResourceClaimName is the resource claim referenced by the pod that resulted in this node allocatable resource allocation.
+  string resource_claim_name = 1 [(dev.f110.kubeproto.field) = { go_name: "ResourceClaimName", api_field_name: "resourceClaimName", inline: false }];
+  // Containers lists the names of all containers in this pod that reference the claim.
+  repeated string containers = 2 [(dev.f110.kubeproto.field) = { go_name: "Containers", api_field_name: "containers", inline: false }];
+  // Resources is a map of the node-allocatable resource name to the aggregate quantity allocated to the claim.
+  map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> resources = 3 [(dev.f110.kubeproto.field) = { go_name: "Resources", api_field_name: "resources", inline: false }];
+}
+
 message NodeCondition {
   // Type of node condition.
   NodeConditionType type = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
@@ -2218,6 +2396,13 @@ message NodeStatus {
   repeated NodeRuntimeHandler runtime_handlers = 12 [(dev.f110.kubeproto.field) = { go_name: "RuntimeHandlers", api_field_name: "runtimeHandlers", inline: false }];
   // Features describes the set of features implemented by the CRI implementation.
   optional NodeFeatures features = 13 [(dev.f110.kubeproto.field) = { go_name: "Features", api_field_name: "features", inline: false }];
+  // DeclaredFeatures represents the features related to feature gates that are declared by the node.
+  repeated string declared_features = 14 [(dev.f110.kubeproto.field) = { go_name: "DeclaredFeatures", api_field_name: "declaredFeatures", inline: false }];
+}
+
+message NodeSwapStatus {
+  // Total amount of swap memory in bytes.
+  optional int64 capacity = 1 [(dev.f110.kubeproto.field) = { go_name: "Capacity", api_field_name: "capacity", inline: false }];
 }
 
 message NodeSystemInfo {
@@ -2245,6 +2430,8 @@ message NodeSystemInfo {
   string operating_system = 9 [(dev.f110.kubeproto.field) = { go_name: "OperatingSystem", api_field_name: "operatingSystem", inline: false }];
   // The Architecture reported by the node
   string architecture = 10 [(dev.f110.kubeproto.field) = { go_name: "Architecture", api_field_name: "architecture", inline: false }];
+  // Swap Info reported by the node.
+  optional NodeSwapStatus swap = 11 [(dev.f110.kubeproto.field) = { go_name: "Swap", api_field_name: "swap", inline: false }];
 }
 
 message ObjectFieldSelector {
@@ -2348,7 +2535,7 @@ message PersistentVolumeClaimSpec {
   // selector is a label query over volumes to consider for binding.
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector selector = 2 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", inline: false }];
   // resources represents the minimum resources the volume should have.
-  // If RecoverVolumeExpansionFailure feature is enabled users are allowed to specify resource requirements
+  // Users are allowed to specify resource requirements
   // that are lower than previous value but must still be higher than capacity recorded in the
   // status field of the claim.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources
@@ -2397,15 +2584,13 @@ message PersistentVolumeClaimSpec {
   // volumeAttributesClassName may be used to set the VolumeAttributesClass used by this claim.
   // If specified, the CSI driver will create or update the volume with the attributes defined
   // in the corresponding VolumeAttributesClass. This has a different purpose than storageClassName,
-  // it can be changed after the claim is created. An empty string value means that no VolumeAttributesClass
-  // will be applied to the claim but it's not allowed to reset this field to empty string once it is set.
-  // If unspecified and the PersistentVolumeClaim is unbound, the default VolumeAttributesClass
-  // will be set by the persistentvolume controller if it exists.
+  // it can be changed after the claim is created. An empty string or nil value indicates that no
+  // VolumeAttributesClass will be applied to the claim. If the claim enters an Infeasible error state,
+  // this field can be reset to its previous value (including nil) to cancel the modification.
   // If the resource referred to by volumeAttributesClass does not exist, this PersistentVolumeClaim will be
   // set to a Pending state, as reflected by the modifyVolumeStatus field, until such as a resource
   // exists.
   // More info: https://kubernetes.io/docs/concepts/storage/volume-attributes-classes/
-  // (Beta) Using this field requires the VolumeAttributesClass feature gate to be enabled (off by default).
   optional string volume_attributes_class_name = 9 [(dev.f110.kubeproto.field) = { go_name: "VolumeAttributesClassName", api_field_name: "volumeAttributesClassName", inline: false }];
 }
 
@@ -2438,7 +2623,6 @@ message PersistentVolumeClaimStatus {
   // should ignore the update for the purpose it was designed. For example - a controller that
   // only is responsible for resizing capacity of the volume, should ignore PVC updates that change other valid
   // resources associated with PVC.
-  // This is an alpha field and requires enabling RecoverVolumeExpansionFailure feature.
   map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> allocated_resources = 5 [(dev.f110.kubeproto.field) = { go_name: "AllocatedResources", api_field_name: "allocatedResources", inline: false }];
   // allocatedResourceStatuses stores status of resource being resized for the given PVC.
   // Key names follow standard Kubernetes label syntax. Valid values are either:
@@ -2471,15 +2655,12 @@ message PersistentVolumeClaimStatus {
   // should ignore the update for the purpose it was designed. For example - a controller that
   // only is responsible for resizing capacity of the volume, should ignore PVC updates that change other valid
   // resources associated with PVC.
-  // This is an alpha field and requires enabling RecoverVolumeExpansionFailure feature.
   map<string, string> allocated_resource_statuses = 6 [(dev.f110.kubeproto.field) = { go_name: "AllocatedResourceStatuses", api_field_name: "allocatedResourceStatuses", inline: false }];
   // currentVolumeAttributesClassName is the current name of the VolumeAttributesClass the PVC is using.
   // When unset, there is no VolumeAttributeClass applied to this PersistentVolumeClaim
-  // This is a beta field and requires enabling VolumeAttributesClass feature (off by default).
   optional string current_volume_attributes_class_name = 7 [(dev.f110.kubeproto.field) = { go_name: "CurrentVolumeAttributesClassName", api_field_name: "currentVolumeAttributesClassName", inline: false }];
   // ModifyVolumeStatus represents the status object of ControllerModifyVolume operation.
   // When this is unset, there is no ModifyVolume operation being attempted.
-  // This is a beta field and requires enabling VolumeAttributesClass feature (off by default).
   optional ModifyVolumeStatus modify_volume_status = 8 [(dev.f110.kubeproto.field) = { go_name: "ModifyVolumeStatus", api_field_name: "modifyVolumeStatus", inline: false }];
 }
 
@@ -2585,8 +2766,7 @@ message PersistentVolumeSource {
   optional PhotonPersistentDiskVolumeSource photon_persistent_disk = 17 [(dev.f110.kubeproto.field) = { go_name: "PhotonPersistentDisk", api_field_name: "photonPersistentDisk", inline: false }];
   // portworxVolume represents a portworx volume attached and mounted on kubelets host machine.
   // Deprecated: PortworxVolume is deprecated. All operations for the in-tree portworxVolume type
-  // are redirected to the pxd.portworx.com CSI driver when the CSIMigrationPortworx feature-gate
-  // is on.
+  // are redirected to the pxd.portworx.com CSI driver.
   optional PortworxVolumeSource portworx_volume = 18 [(dev.f110.kubeproto.field) = { go_name: "PortworxVolume", api_field_name: "portworxVolume", inline: false }];
   // scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes.
   // Deprecated: ScaleIO is deprecated and the in-tree scaleIO type is no longer supported.
@@ -2633,6 +2813,7 @@ message PersistentVolumeSpec {
   optional PersistentVolumeMode volume_mode = 8 [(dev.f110.kubeproto.field) = { go_name: "VolumeMode", api_field_name: "volumeMode", inline: false }];
   // nodeAffinity defines constraints that limit what nodes this volume can be accessed from.
   // This field influences the scheduling of pods that use this volume.
+  // This field is mutable if MutablePVNodeAffinity feature gate is enabled.
   optional VolumeNodeAffinity node_affinity = 9 [(dev.f110.kubeproto.field) = { go_name: "NodeAffinity", api_field_name: "nodeAffinity", inline: false }];
   // Name of VolumeAttributesClass to which this persistent volume belongs. Empty value
   // is not allowed. When this field is not set, it indicates that this volume does not belong to any
@@ -2640,7 +2821,6 @@ message PersistentVolumeSpec {
   // after a volume has been updated successfully to a new class.
   // For an unbound PersistentVolume, the volumeAttributesClassName will be matched with unbound
   // PersistentVolumeClaims during the binding process.
-  // This is a beta field and requires enabling VolumeAttributesClass feature (off by default).
   optional string volume_attributes_class_name = 10 [(dev.f110.kubeproto.field) = { go_name: "VolumeAttributesClassName", api_field_name: "volumeAttributesClassName", inline: false }];
 }
 
@@ -2732,7 +2912,6 @@ message PodAffinityTerm {
   // pod labels will be ignored. The default value is empty.
   // The same key is forbidden to exist in both matchLabelKeys and labelSelector.
   // Also, matchLabelKeys cannot be set when labelSelector isn't set.
-  // This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
   repeated string match_label_keys = 5 [(dev.f110.kubeproto.field) = { go_name: "MatchLabelKeys", api_field_name: "matchLabelKeys", inline: false }];
   // MismatchLabelKeys is a set of pod label keys to select which pods will
   // be taken into consideration. The keys are used to lookup values from the
@@ -2742,7 +2921,6 @@ message PodAffinityTerm {
   // pod labels will be ignored. The default value is empty.
   // The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
   // Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-  // This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
   repeated string mismatch_label_keys = 6 [(dev.f110.kubeproto.field) = { go_name: "MismatchLabelKeys", api_field_name: "mismatchLabelKeys", inline: false }];
 }
 
@@ -2761,8 +2939,8 @@ message PodAntiAffinity {
   // most preferred is the one with the greatest sum of weights, i.e.
   // for each node that meets all of the scheduling requirements (resource
   // request, requiredDuringScheduling anti-affinity expressions, etc.),
-  // compute a sum by iterating through the elements of this field and adding
-  // "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the
+  // compute a sum by iterating through the elements of this field and subtracting
+  // "weight" from the sum if the node has pods which matches the corresponding podAffinityTerm; the
   // node(s) with the highest sum are the most preferred.
   repeated WeightedPodAffinityTerm preferred_during_scheduling_ignored_during_execution = 2 [(dev.f110.kubeproto.field) = { go_name: "PreferredDuringSchedulingIgnoredDuringExecution", api_field_name: "preferredDuringSchedulingIgnoredDuringExecution", inline: false }];
 }
@@ -2788,22 +2966,80 @@ message PodAttachOptions {
   optional string container = 6 [(dev.f110.kubeproto.field) = { go_name: "Container", api_field_name: "container", inline: false }];
 }
 
+message PodCertificateProjection {
+  // Kubelet's generated CSRs will be addressed to this signer.
+  optional string signer_name = 1 [(dev.f110.kubeproto.field) = { go_name: "SignerName", api_field_name: "signerName", inline: false }];
+  // The type of keypair Kubelet will generate for the pod.
+  // Valid values are "RSA3072", "RSA4096", "ECDSAP256", "ECDSAP384",
+  // "ECDSAP521", and "ED25519".
+  optional string key_type = 2 [(dev.f110.kubeproto.field) = { go_name: "KeyType", api_field_name: "keyType", inline: false }];
+  // maxExpirationSeconds is the maximum lifetime permitted for the
+  // certificate.
+  // Kubelet copies this value verbatim into the PodCertificateRequests it
+  // generates for this projection.
+  // If omitted, kube-apiserver will set it to 86400(24 hours). kube-apiserver
+  // will reject values shorter than 3600 (1 hour).  The maximum allowable
+  // value is 7862400 (91 days).
+  // The signer implementation is then free to issue a certificate with any
+  // lifetime *shorter* than MaxExpirationSeconds, but no shorter than 3600
+  // seconds (1 hour).  This constraint is enforced by kube-apiserver.
+  // `kubernetes.io` signers will never issue certificates with a lifetime
+  // longer than 24 hours.
+  optional int32 max_expiration_seconds = 3 [(dev.f110.kubeproto.field) = { go_name: "MaxExpirationSeconds", api_field_name: "maxExpirationSeconds", inline: false }];
+  // Write the credential bundle at this path in the projected volume.
+  // The credential bundle is a single file that contains multiple PEM blocks.
+  // The first PEM block is a PRIVATE KEY block, containing a PKCS#8 private
+  // key.
+  // The remaining blocks are CERTIFICATE blocks, containing the issued
+  // certificate chain from the signer (leaf and any intermediates).
+  // Using credentialBundlePath lets your Pod's application code make a single
+  // atomic read that retrieves a consistent key and certificate chain.  If you
+  // project them to separate files, your application code will need to
+  // additionally check that the leaf certificate was issued to the key.
+  optional string credential_bundle_path = 4 [(dev.f110.kubeproto.field) = { go_name: "CredentialBundlePath", api_field_name: "credentialBundlePath", inline: false }];
+  // Write the key at this path in the projected volume.
+  // Most applications should use credentialBundlePath.  When using keyPath
+  // and certificateChainPath, your application needs to check that the key
+  // and leaf certificate are consistent, because it is possible to read the
+  // files mid-rotation.
+  optional string key_path = 5 [(dev.f110.kubeproto.field) = { go_name: "KeyPath", api_field_name: "keyPath", inline: false }];
+  // Write the certificate chain at this path in the projected volume.
+  // Most applications should use credentialBundlePath.  When using keyPath
+  // and certificateChainPath, your application needs to check that the key
+  // and leaf certificate are consistent, because it is possible to read the
+  // files mid-rotation.
+  optional string certificate_chain_path = 6 [(dev.f110.kubeproto.field) = { go_name: "CertificateChainPath", api_field_name: "certificateChainPath", inline: false }];
+  // userAnnotations allow pod authors to pass additional information to
+  // the signer implementation.  Kubernetes does not restrict or validate this
+  // metadata in any way.
+  // These values are copied verbatim into the `spec.unverifiedUserAnnotations` field of
+  // the PodCertificateRequest objects that Kubelet creates.
+  // Entries are subject to the same validation as object metadata annotations,
+  // with the addition that all keys must be domain-prefixed. No restrictions
+  // are placed on values, except an overall size limitation on the entire field.
+  // Signers should document the keys and values they support. Signers should
+  // deny requests that contain keys they do not recognize.
+  map<string, string> user_annotations = 7 [(dev.f110.kubeproto.field) = { go_name: "UserAnnotations", api_field_name: "userAnnotations", inline: false }];
+}
+
 message PodCondition {
   // Type is the type of the condition.
   // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-conditions
   PodConditionType type = 1 [(dev.f110.kubeproto.field) = { go_name: "Type", api_field_name: "type", inline: false }];
+  // If set, this represents the .metadata.generation that the pod condition was set based upon.
+  optional int64 observed_generation = 2 [(dev.f110.kubeproto.field) = { go_name: "ObservedGeneration", api_field_name: "observedGeneration", inline: false }];
   // Status is the status of the condition.
   // Can be True, False, Unknown.
   // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-conditions
-  ConditionStatus status = 2 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
+  ConditionStatus status = 3 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", inline: false }];
   // Last time we probed the condition.
-  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time last_probe_time = 3 [(dev.f110.kubeproto.field) = { go_name: "LastProbeTime", api_field_name: "lastProbeTime", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time last_probe_time = 4 [(dev.f110.kubeproto.field) = { go_name: "LastProbeTime", api_field_name: "lastProbeTime", inline: false }];
   // Last time the condition transitioned from one status to another.
-  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 4 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time last_transition_time = 5 [(dev.f110.kubeproto.field) = { go_name: "LastTransitionTime", api_field_name: "lastTransitionTime", inline: false }];
   // Unique, one-word, CamelCase reason for the condition's last transition.
-  optional string reason = 5 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
+  optional string reason = 6 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
   // Human-readable message indicating details about last transition.
-  optional string message = 6 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
+  optional string message = 7 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
 }
 
 message PodDNSConfig {
@@ -2847,6 +3083,15 @@ message PodExecOptions {
   optional string container = 6 [(dev.f110.kubeproto.field) = { go_name: "Container", api_field_name: "container", inline: false }];
   // Command is the remote command to execute. argv array. Not executed within a shell.
   repeated string command = 7 [(dev.f110.kubeproto.field) = { go_name: "Command", api_field_name: "command", inline: false }];
+}
+
+message PodExtendedResourceClaimStatus {
+  // RequestMappings identifies the mapping of <container, extended resource backed by DRA> to  device request
+  // in the generated ResourceClaim.
+  repeated ContainerExtendedResourceRequest request_mappings = 1 [(dev.f110.kubeproto.field) = { go_name: "RequestMappings", api_field_name: "requestMappings", inline: false }];
+  // ResourceClaimName is the name of the ResourceClaim that was
+  // generated for the Pod in the namespace of the Pod.
+  string resource_claim_name = 2 [(dev.f110.kubeproto.field) = { go_name: "ResourceClaimName", api_field_name: "resourceClaimName", inline: false }];
 }
 
 message PodIP {
@@ -2949,6 +3194,15 @@ message PodResourceClaim {
   // will also be deleted. The pod name and resource name, along with a
   // generated component, will be used to form a unique name for the
   // ResourceClaim, which will be recorded in pod.status.resourceClaimStatuses.
+  // When the DRAWorkloadResourceClaims feature gate is enabled and the pod
+  // belongs to a PodGroup that defines a PodGroupResourceClaim with the same
+  // Name and ResourceClaimTemplateName, this PodResourceClaim resolves to the
+  // ResourceClaim generated for the PodGroup. All pods in the group that
+  // define an equivalent PodResourceClaim matching the
+  // PodGroupResourceClaim's Name and ResourceClaimTemplateName share the same
+  // generated ResourceClaim. ResourceClaims generated for a PodGroup are
+  // owned by the PodGroup and their lifecycles are tied to the PodGroup
+  // instead of any individual pod.
   // This field is immutable and no changes will be made to the
   // corresponding ResourceClaim by the control plane after creating the
   // ResourceClaim.
@@ -2963,9 +3217,14 @@ message PodResourceClaimStatus {
   // which implies that the string must be a DNS_LABEL.
   string name = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
   // ResourceClaimName is the name of the ResourceClaim that was
-  // generated for the Pod in the namespace of the Pod. If this is
-  // unset, then generating a ResourceClaim was not necessary. The
-  // pod.spec.resourceClaims entry can be ignored in this case.
+  // generated for the Pod in the namespace of the Pod.
+  // When the DRAWorkloadResourceClaims feature is enabled and the
+  // corresponding PodResourceClaim matches a PodGroupResourceClaim
+  // made by the Pod's PodGroup, then this is the name of the
+  // ResourceClaim generated and reserved for the PodGroup.
+  // If this is unset, then generating a ResourceClaim was not
+  // necessary. The pod.spec.resourceClaims entry can be ignored in
+  // this case.
   optional string resource_claim_name = 2 [(dev.f110.kubeproto.field) = { go_name: "ResourceClaimName", api_field_name: "resourceClaimName", inline: false }];
 }
 
@@ -2973,6 +3232,13 @@ message PodSchedulingGate {
   // Name of the scheduling gate.
   // Each scheduling gate must have a unique name field.
   string name = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+}
+
+message PodSchedulingGroup {
+  // PodGroupName specifies the name of the standalone PodGroup object
+  // that represents the runtime instance of this group.
+  // Must be a DNS subdomain.
+  optional string pod_group_name = 1 [(dev.f110.kubeproto.field) = { go_name: "PodGroupName", api_field_name: "podGroupName", inline: false }];
 }
 
 message PodSecurityContext {
@@ -3090,7 +3356,7 @@ message PodSpec {
   // Init containers may not have Lifecycle actions, Readiness probes, Liveness probes, or Startup probes.
   // The resourceRequirements of an init container are taken into account during scheduling
   // by finding the highest request/limit for each resource type, and then using the max of
-  // of that value or the sum of the normal containers. Limits are applied to init containers
+  // that value or the sum of the normal containers. Limits are applied to init containers
   // in a similar fashion.
   // Init containers cannot currently be added or removed.
   // Cannot be updated.
@@ -3150,7 +3416,9 @@ message PodSpec {
   // https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodename
   optional string node_name = 13 [(dev.f110.kubeproto.field) = { go_name: "NodeName", api_field_name: "nodeName", inline: false }];
   // Host networking requested for this pod. Use the host's network namespace.
-  // If this option is set, the ports that will be used must be specified.
+  // When using HostNetwork you should specify ports so the scheduler is aware.
+  // When `hostNetwork` is true, specified `hostPort` fields in port definitions must match `containerPort`,
+  // and unspecified `hostPort` fields in port definitions are defaulted to match `containerPort`.
   // Default to false.
   optional bool host_network = 14 [(dev.f110.kubeproto.field) = { go_name: "HostNetwork", api_field_name: "hostNetwork", inline: false }];
   // Use the host's pid namespace.
@@ -3250,6 +3518,7 @@ message PodSpec {
   // - spec.hostPID
   // - spec.hostIPC
   // - spec.hostUsers
+  // - spec.resources
   // - spec.securityContext.appArmorProfile
   // - spec.securityContext.seLinuxOptions
   // - spec.securityContext.seccompProfile
@@ -3280,7 +3549,6 @@ message PodSpec {
   // When set to false, a new userns is created for the pod. Setting false is useful for
   // mitigating container breakout vulnerabilities even allowing users to run their
   // containers as root without actually having root privileges on the host.
-  // This field is alpha-level and is only honored by servers that enable the UserNamespacesSupport feature.
   optional bool host_users = 37 [(dev.f110.kubeproto.field) = { go_name: "HostUsers", api_field_name: "hostUsers", inline: false }];
   // SchedulingGates is an opaque list of values that if specified will block scheduling the pod.
   // If schedulingGates is not empty, the pod will stay in the SchedulingGated state and the
@@ -3291,21 +3559,47 @@ message PodSpec {
   // and reserved before the Pod is allowed to start. The resources
   // will be made available to those containers which consume them
   // by name.
-  // This is an alpha field and requires enabling the
-  // DynamicResourceAllocation feature gate.
+  // This is a stable field but requires that the
+  // DynamicResourceAllocation feature gate is enabled.
   // This field is immutable.
   repeated PodResourceClaim resource_claims = 39 [(dev.f110.kubeproto.field) = { go_name: "ResourceClaims", api_field_name: "resourceClaims", inline: false }];
   // Resources is the total amount of CPU and Memory resources required by all
   // containers in the pod. It supports specifying Requests and Limits for
-  // "cpu" and "memory" resource names only. ResourceClaims are not supported.
+  // "cpu", "memory" and "hugepages-" resource names only. ResourceClaims are not supported.
   // This field enables fine-grained control over resource allocation for the
   // entire pod, allowing resource sharing among containers in a pod.
   // This is an alpha field and requires enabling the PodLevelResources feature
   // gate.
   optional ResourceRequirements resources = 40 [(dev.f110.kubeproto.field) = { go_name: "Resources", api_field_name: "resources", inline: false }];
+  // HostnameOverride specifies an explicit override for the pod's hostname as perceived by the pod.
+  // This field only specifies the pod's hostname and does not affect its DNS records.
+  // When this field is set to a non-empty string:
+  // - It takes precedence over the values set in `hostname` and `subdomain`.
+  // - The Pod's hostname will be set to this value.
+  // - `setHostnameAsFQDN` must be nil or set to false.
+  // - `hostNetwork` must be set to false.
+  // This field must be a valid DNS subdomain as defined in RFC 1123 and contain at most 64 characters.
+  // Requires the HostnameOverride feature gate to be enabled.
+  optional string hostname_override = 41 [(dev.f110.kubeproto.field) = { go_name: "HostnameOverride", api_field_name: "hostnameOverride", inline: false }];
+  // SchedulingGroup provides a reference to the immediate scheduling runtime
+  // grouping object that this Pod belongs to.
+  // This field is used by the scheduler to identify the group and apply the
+  // correct group scheduling policies. The association with a group also
+  // impacts other lifecycle aspects of a Pod that are relevant in a wider context
+  // of scheduling like preemption, resource attachment, etc. If not specified,
+  // the Pod is treated as a single unit in all of these aspects.
+  // The group object referenced by this field may not exist at the time the
+  // Pod is created.
+  // This field is immutable, but a group object with the same name may be
+  // recreated with different policies. Doing this during pod scheduling
+  // may result in the placement not conforming to the expected policies.
+  optional PodSchedulingGroup scheduling_group = 42 [(dev.f110.kubeproto.field) = { go_name: "SchedulingGroup", api_field_name: "schedulingGroup", inline: false }];
 }
 
 message PodStatus {
+  // If set, this represents the .metadata.generation that the pod status was set based upon.
+  // The PodObservedGenerationTracking feature gate must be enabled to use this field.
+  optional int64 observed_generation = 1 [(dev.f110.kubeproto.field) = { go_name: "ObservedGeneration", api_field_name: "observedGeneration", inline: false }];
   // The phase of a Pod is a simple, high-level summary of where the Pod is in its lifecycle.
   // The conditions array, the reason and message fields, and the individual container status
   // arrays contain more detail about the pod's status.
@@ -3322,15 +3616,15 @@ message PodStatus {
   // Unknown: For some reason the state of the pod could not be obtained, typically due to an
   // error in communicating with the host of the pod.
   // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-phase
-  optional PodPhase phase = 1 [(dev.f110.kubeproto.field) = { go_name: "Phase", api_field_name: "phase", inline: false }];
+  optional PodPhase phase = 2 [(dev.f110.kubeproto.field) = { go_name: "Phase", api_field_name: "phase", inline: false }];
   // Current service state of pod.
   // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-conditions
-  repeated PodCondition conditions = 2 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated PodCondition conditions = 3 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
   // A human readable message indicating details about why the pod is in this condition.
-  optional string message = 3 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
+  optional string message = 4 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
   // A brief CamelCase message indicating details about why the pod is in this state.
   // e.g. 'Evicted'
-  optional string reason = 4 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
+  optional string reason = 5 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
   // nominatedNodeName is set only when this pod preempts other pods on the node, but it cannot be
   // scheduled right away as preemption victims receive their graceful termination periods.
   // This field does not guarantee that the pod will be scheduled on this node. Scheduler may decide
@@ -3338,26 +3632,26 @@ message PodStatus {
   // give the resources on this node to a higher priority pod that is created after preemption.
   // As a result, this field may be different than PodSpec.nodeName when the pod is
   // scheduled.
-  optional string nominated_node_name = 5 [(dev.f110.kubeproto.field) = { go_name: "NominatedNodeName", api_field_name: "nominatedNodeName", inline: false }];
+  optional string nominated_node_name = 6 [(dev.f110.kubeproto.field) = { go_name: "NominatedNodeName", api_field_name: "nominatedNodeName", inline: false }];
   // hostIP holds the IP address of the host to which the pod is assigned. Empty if the pod has not started yet.
   // A pod can be assigned to a node that has a problem in kubelet which in turns mean that HostIP will
   // not be updated even if there is a node is assigned to pod
-  optional string host_ip = 6 [(dev.f110.kubeproto.field) = { go_name: "HostIP", api_field_name: "hostIP", inline: false }];
+  optional string host_ip = 7 [(dev.f110.kubeproto.field) = { go_name: "HostIP", api_field_name: "hostIP", inline: false }];
   // hostIPs holds the IP addresses allocated to the host. If this field is specified, the first entry must
   // match the hostIP field. This list is empty if the pod has not started yet.
   // A pod can be assigned to a node that has a problem in kubelet which in turns means that HostIPs will
   // not be updated even if there is a node is assigned to this pod.
-  repeated HostIP host_ips = 7 [(dev.f110.kubeproto.field) = { go_name: "HostIPs", api_field_name: "hostIPs", inline: false }];
+  repeated HostIP host_ips = 8 [(dev.f110.kubeproto.field) = { go_name: "HostIPs", api_field_name: "hostIPs", inline: false }];
   // podIP address allocated to the pod. Routable at least within the cluster.
   // Empty if not yet allocated.
-  optional string pod_ip = 8 [(dev.f110.kubeproto.field) = { go_name: "PodIP", api_field_name: "podIP", inline: false }];
+  optional string pod_ip = 9 [(dev.f110.kubeproto.field) = { go_name: "PodIP", api_field_name: "podIP", inline: false }];
   // podIPs holds the IP addresses allocated to the pod. If this field is specified, the 0th entry must
   // match the podIP field. Pods may be allocated at most 1 value for each of IPv4 and IPv6. This list
   // is empty if no IPs have been allocated yet.
-  repeated PodIP pod_ips = 9 [(dev.f110.kubeproto.field) = { go_name: "PodIPs", api_field_name: "podIPs", inline: false }];
+  repeated PodIP pod_ips = 10 [(dev.f110.kubeproto.field) = { go_name: "PodIPs", api_field_name: "podIPs", inline: false }];
   // RFC 3339 date and time at which the object was acknowledged by the Kubelet.
   // This is before the Kubelet pulled the container image(s) for the pod.
-  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time start_time = 10 [(dev.f110.kubeproto.field) = { go_name: "StartTime", api_field_name: "startTime", inline: false }];
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time start_time = 11 [(dev.f110.kubeproto.field) = { go_name: "StartTime", api_field_name: "startTime", inline: false }];
   // Statuses of init containers in this pod. The most recent successful non-restartable
   // init container will have ready = true, the most recently started container will have
   // startTime set.
@@ -3368,7 +3662,7 @@ message PodStatus {
   // the behavior of various Kubernetes components is not defined and those statuses might be
   // ignored.
   // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-and-container-status
-  repeated ContainerStatus init_container_statuses = 11 [(dev.f110.kubeproto.field) = { go_name: "InitContainerStatuses", api_field_name: "initContainerStatuses", inline: false }];
+  repeated ContainerStatus init_container_statuses = 12 [(dev.f110.kubeproto.field) = { go_name: "InitContainerStatuses", api_field_name: "initContainerStatuses", inline: false }];
   // Statuses of containers in this pod.
   // Each container in the pod should have at most one status in this list,
   // and all statuses should be for containers in the pod.
@@ -3377,11 +3671,11 @@ message PodStatus {
   // the behavior of various Kubernetes components is not defined and those statuses might be
   // ignored.
   // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
-  repeated ContainerStatus container_statuses = 12 [(dev.f110.kubeproto.field) = { go_name: "ContainerStatuses", api_field_name: "containerStatuses", inline: false }];
+  repeated ContainerStatus container_statuses = 13 [(dev.f110.kubeproto.field) = { go_name: "ContainerStatuses", api_field_name: "containerStatuses", inline: false }];
   // The Quality of Service (QOS) classification assigned to the pod based on resource requirements
   // See PodQOSClass type for available QOS classes
   // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-qos/#quality-of-service-classes
-  optional PodQOSClass qos_class = 13 [(dev.f110.kubeproto.field) = { go_name: "QOSClass", api_field_name: "qosClass", inline: false }];
+  optional PodQOSClass qos_class = 14 [(dev.f110.kubeproto.field) = { go_name: "QOSClass", api_field_name: "qosClass", inline: false }];
   // Statuses for any ephemeral containers that have run in this pod.
   // Each ephemeral container in the pod should have at most one status in this list,
   // and all statuses should be for containers in the pod.
@@ -3390,13 +3684,32 @@ message PodStatus {
   // the behavior of various Kubernetes components is not defined and those statuses might be
   // ignored.
   // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
-  repeated ContainerStatus ephemeral_container_statuses = 14 [(dev.f110.kubeproto.field) = { go_name: "EphemeralContainerStatuses", api_field_name: "ephemeralContainerStatuses", inline: false }];
+  repeated ContainerStatus ephemeral_container_statuses = 15 [(dev.f110.kubeproto.field) = { go_name: "EphemeralContainerStatuses", api_field_name: "ephemeralContainerStatuses", inline: false }];
   // Status of resources resize desired for pod's containers.
   // It is empty if no resources resize is pending.
   // Any changes to container resources will automatically set this to "Proposed"
-  optional PodResizeStatus resize = 15 [(dev.f110.kubeproto.field) = { go_name: "Resize", api_field_name: "resize", inline: false }];
+  // Deprecated: Resize status is moved to two pod conditions PodResizePending and PodResizeInProgress.
+  // PodResizePending will track states where the spec has been resized, but the Kubelet has not yet allocated the resources.
+  // PodResizeInProgress will track in-progress resizes, and should be present whenever allocated resources != acknowledged resources.
+  optional PodResizeStatus resize = 16 [(dev.f110.kubeproto.field) = { go_name: "Resize", api_field_name: "resize", inline: false }];
   // Status of resource claims.
-  repeated PodResourceClaimStatus resource_claim_statuses = 16 [(dev.f110.kubeproto.field) = { go_name: "ResourceClaimStatuses", api_field_name: "resourceClaimStatuses", inline: false }];
+  repeated PodResourceClaimStatus resource_claim_statuses = 17 [(dev.f110.kubeproto.field) = { go_name: "ResourceClaimStatuses", api_field_name: "resourceClaimStatuses", inline: false }];
+  // Status of extended resource claim backed by DRA.
+  optional PodExtendedResourceClaimStatus extended_resource_claim_status = 18 [(dev.f110.kubeproto.field) = { go_name: "ExtendedResourceClaimStatus", api_field_name: "extendedResourceClaimStatus", inline: false }];
+  // AllocatedResources is the total requests allocated for this pod by the node.
+  // If pod-level requests are not set, this will be the total requests aggregated
+  // across containers in the pod.
+  map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> allocated_resources = 19 [(dev.f110.kubeproto.field) = { go_name: "AllocatedResources", api_field_name: "allocatedResources", inline: false }];
+  // Resources represents the compute resource requests and limits that have been
+  // applied at the pod level if pod-level requests or limits are set in
+  // PodSpec.Resources
+  optional ResourceRequirements resources = 20 [(dev.f110.kubeproto.field) = { go_name: "Resources", api_field_name: "resources", inline: false }];
+  // NodeAllocatableResourceClaimStatuses contains the status of node-allocatable resources
+  // that were allocated for this pod through DRA claims. This includes resources currently
+  // reported in v1.Node `status.allocatable` that are not extended resources
+  // (see https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#extended-resources).
+  // Examples include "cpu", "memory", "ephemeral-storage", and hugepages.
+  repeated NodeAllocatableResourceClaimStatus node_allocatable_resource_claim_statuses = 21 [(dev.f110.kubeproto.field) = { go_name: "NodeAllocatableResourceClaimStatuses", api_field_name: "nodeAllocatableResourceClaimStatuses", inline: false }];
 }
 
 message PodStatusResult {
@@ -3757,6 +4070,9 @@ message ResourceHealth {
   //             For example, Device Plugin got unregistered and hasn't been re-registered since.
   // In future we may want to introduce the PermanentlyUnhealthy Status.
   optional ResourceHealthStatus health = 2 [(dev.f110.kubeproto.field) = { go_name: "Health", api_field_name: "health", inline: false }];
+  // Message provides human-readable context for Health (e.g. "ECC error count exceeded threshold").
+  // This field is populated by the kubelet when ResourceHealthStatusMessage is enabled if the DRA plugin returns a message, and is null otherwise.
+  optional string message = 3 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
 }
 
 message ResourceQuota {
@@ -3813,7 +4129,7 @@ message ResourceRequirements {
   map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> requests = 2 [(dev.f110.kubeproto.field) = { go_name: "Requests", api_field_name: "requests", inline: false }];
   // Claims lists the names of resources, defined in spec.resourceClaims,
   // that are used by this container.
-  // This is an alpha field and requires enabling the
+  // This field depends on the
   // DynamicResourceAllocation feature gate.
   // This field is immutable. It can only be set for containers.
   repeated ResourceClaim claims = 3 [(dev.f110.kubeproto.field) = { go_name: "Claims", api_field_name: "claims", inline: false }];
@@ -4084,7 +4400,6 @@ message SecurityContext {
   // procMount denotes the type of proc mount to use for the containers.
   // The default value is Default which uses the container runtime defaults for
   // readonly paths and masked paths.
-  // This requires the ProcMountType feature flag to be enabled.
   // Note that this field cannot be set when spec.os.name is windows.
   optional ProcMountType proc_mount = 10 [(dev.f110.kubeproto.field) = { go_name: "ProcMount", api_field_name: "procMount", inline: false }];
   // The seccomp options to use by this container. If seccomp options are
@@ -4417,13 +4732,12 @@ message ServiceSpec {
   // "Cluster", uses the standard behavior of routing to all endpoints evenly
   // (possibly modified by topology and other features).
   optional ServiceInternalTrafficPolicy internal_traffic_policy = 19 [(dev.f110.kubeproto.field) = { go_name: "InternalTrafficPolicy", api_field_name: "internalTrafficPolicy", inline: false }];
-  // TrafficDistribution offers a way to express preferences for how traffic is
-  // distributed to Service endpoints. Implementations can use this field as a
-  // hint, but are not required to guarantee strict adherence. If the field is
-  // not set, the implementation will apply its default routing strategy. If set
-  // to "PreferClose", implementations should prioritize endpoints that are
-  // topologically close (e.g., same zone).
-  // This is a beta field and requires enabling ServiceTrafficDistribution feature.
+  // TrafficDistribution offers a way to express preferences for how traffic
+  // is distributed to Service endpoints. Implementations can use this field
+  // as a hint, but are not required to guarantee strict adherence. If the
+  // field is not set, the implementation will apply its default routing
+  // strategy. If set to "PreferClose", implementations should prioritize
+  // endpoints that are in the same zone.
   optional string traffic_distribution = 20 [(dev.f110.kubeproto.field) = { go_name: "TrafficDistribution", api_field_name: "trafficDistribution", inline: false }];
 }
 
@@ -4517,7 +4831,6 @@ message Taint {
   // Valid effects are NoSchedule, PreferNoSchedule and NoExecute.
   TaintEffect effect = 3 [(dev.f110.kubeproto.field) = { go_name: "Effect", api_field_name: "effect", inline: false }];
   // TimeAdded represents the time at which the taint was added.
-  // It is only written for NoExecute taints.
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time time_added = 4 [(dev.f110.kubeproto.field) = { go_name: "TimeAdded", api_field_name: "timeAdded", inline: false }];
 }
 
@@ -4526,9 +4839,10 @@ message Toleration {
   // If the key is empty, operator must be Exists; this combination means to match all values and all keys.
   optional string key = 1 [(dev.f110.kubeproto.field) = { go_name: "Key", api_field_name: "key", inline: false }];
   // Operator represents a key's relationship to the value.
-  // Valid operators are Exists and Equal. Defaults to Equal.
+  // Valid operators are Exists, Equal, Lt, and Gt. Defaults to Equal.
   // Exists is equivalent to wildcard for value, so that a pod can
   // tolerate all taints of a particular category.
+  // Lt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).
   optional TolerationOperator operator = 2 [(dev.f110.kubeproto.field) = { go_name: "Operator", api_field_name: "operator", inline: false }];
   // Value is the taint value the toleration matches to.
   // If the operator is Exists, the value should be empty, otherwise just a regular string.
@@ -4633,7 +4947,6 @@ message TopologySpreadConstraint {
   // - Honor: only nodes matching nodeAffinity/nodeSelector are included in the calculations.
   // - Ignore: nodeAffinity/nodeSelector are ignored. All nodes are included in the calculations.
   // If this value is nil, the behavior is equivalent to the Honor policy.
-  // This is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.
   optional NodeInclusionPolicy node_affinity_policy = 6 [(dev.f110.kubeproto.field) = { go_name: "NodeAffinityPolicy", api_field_name: "nodeAffinityPolicy", inline: false }];
   // NodeTaintsPolicy indicates how we will treat node taints when calculating
   // pod topology spread skew. Options are:
@@ -4641,7 +4954,6 @@ message TopologySpreadConstraint {
   // has a toleration, are included.
   // - Ignore: node taints are ignored. All nodes are included.
   // If this value is nil, the behavior is equivalent to the Ignore policy.
-  // This is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.
   optional NodeInclusionPolicy node_taints_policy = 7 [(dev.f110.kubeproto.field) = { go_name: "NodeTaintsPolicy", api_field_name: "nodeTaintsPolicy", inline: false }];
   // MatchLabelKeys is a set of pod label keys to select the pods over which
   // spreading will be calculated. The keys are used to lookup values from the
@@ -4749,6 +5061,9 @@ message VolumeMountStatus {
   // An IfPossible value in the original VolumeMount must be translated to Disabled or Enabled,
   // depending on the mount result.
   optional RecursiveReadOnlyMode recursive_read_only = 4 [(dev.f110.kubeproto.field) = { go_name: "RecursiveReadOnly", api_field_name: "recursiveReadOnly", inline: false }];
+  // volumeStatus represents volume-type-specific status about the mounted
+  // volume.
+  optional VolumeStatus volume_status = 5 [(dev.f110.kubeproto.field) = { go_name: "VolumeStatus", api_field_name: "volumeStatus", inline: false }];
 }
 
 message VolumeNodeAffinity {
@@ -4776,6 +5091,35 @@ message VolumeProjection {
   // The ordering of certificates within the file is arbitrary, and Kubelet
   // may change the order over time.
   optional ClusterTrustBundleProjection cluster_trust_bundle = 5 [(dev.f110.kubeproto.field) = { go_name: "ClusterTrustBundle", api_field_name: "clusterTrustBundle", inline: false }];
+  // Projects an auto-rotating credential bundle (private key and certificate
+  // chain) that the pod can use either as a TLS client or server.
+  // Kubelet generates a private key and uses it to send a
+  // PodCertificateRequest to the named signer.  Once the signer approves the
+  // request and issues a certificate chain, Kubelet writes the key and
+  // certificate chain to the pod filesystem.  The pod does not start until
+  // certificates have been issued for each podCertificate projected volume
+  // source in its spec.
+  // Kubelet will begin trying to rotate the certificate at the time indicated
+  // by the signer using the PodCertificateRequest.Status.BeginRefreshAt
+  // timestamp.
+  // Kubelet can write a single file, indicated by the credentialBundlePath
+  // field, or separate files, indicated by the keyPath and
+  // certificateChainPath fields.
+  // The credential bundle is a single file in PEM format.  The first PEM
+  // entry is the private key (in PKCS#8 format), and the remaining PEM
+  // entries are the certificate chain issued by the signer (typically,
+  // signers will return their certificate chain in leaf-to-root order).
+  // Prefer using the credential bundle format, since your application code
+  // can read it atomically.  If you use keyPath and certificateChainPath,
+  // your application must make two separate file reads. If these coincide
+  // with a certificate rotation, it is possible that the private key and leaf
+  // certificate you read may not correspond to each other.  Your application
+  // will need to check for this condition, and re-read until they are
+  // consistent.
+  // The named signer controls chooses the format of the certificate it
+  // issues; consult the signer implementation's documentation to learn how to
+  // use the certificates it issues.
+  optional PodCertificateProjection pod_certificate = 6 [(dev.f110.kubeproto.field) = { go_name: "PodCertificate", api_field_name: "podCertificate", inline: false }];
 }
 
 message VolumeResourceRequirements {
@@ -4827,11 +5171,10 @@ message VolumeSource {
   optional NFSVolumeSource nfs = 7 [(dev.f110.kubeproto.field) = { go_name: "NFS", api_field_name: "nfs", inline: false }];
   // iscsi represents an ISCSI Disk resource that is attached to a
   // kubelet's host machine and then exposed to the pod.
-  // More info: https://examples.k8s.io/volumes/iscsi/README.md
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes/#iscsi
   optional ISCSIVolumeSource iscsi = 8 [(dev.f110.kubeproto.field) = { go_name: "ISCSI", api_field_name: "iscsi", inline: false }];
   // glusterfs represents a Glusterfs mount on the host that shares a pod's lifetime.
   // Deprecated: Glusterfs is deprecated and the in-tree glusterfs type is no longer supported.
-  // More info: https://examples.k8s.io/volumes/glusterfs/README.md
   optional GlusterfsVolumeSource glusterfs = 9 [(dev.f110.kubeproto.field) = { go_name: "Glusterfs", api_field_name: "glusterfs", inline: false }];
   // persistentVolumeClaimVolumeSource represents a reference to a
   // PersistentVolumeClaim in the same namespace.
@@ -4839,7 +5182,6 @@ message VolumeSource {
   optional PersistentVolumeClaimVolumeSource persistent_volume_claim = 10 [(dev.f110.kubeproto.field) = { go_name: "PersistentVolumeClaim", api_field_name: "persistentVolumeClaim", inline: false }];
   // rbd represents a Rados Block Device mount on the host that shares a pod's lifetime.
   // Deprecated: RBD is deprecated and the in-tree rbd type is no longer supported.
-  // More info: https://examples.k8s.io/volumes/rbd/README.md
   optional RBDVolumeSource rbd = 11 [(dev.f110.kubeproto.field) = { go_name: "RBD", api_field_name: "rbd", inline: false }];
   // flexVolume represents a generic volume resource that is
   // provisioned/attached using an exec based plugin.
@@ -4884,8 +5226,7 @@ message VolumeSource {
   optional ProjectedVolumeSource projected = 24 [(dev.f110.kubeproto.field) = { go_name: "Projected", api_field_name: "projected", inline: false }];
   // portworxVolume represents a portworx volume attached and mounted on kubelets host machine.
   // Deprecated: PortworxVolume is deprecated. All operations for the in-tree portworxVolume type
-  // are redirected to the pxd.portworx.com CSI driver when the CSIMigrationPortworx feature-gate
-  // is on.
+  // are redirected to the pxd.portworx.com CSI driver.
   optional PortworxVolumeSource portworx_volume = 25 [(dev.f110.kubeproto.field) = { go_name: "PortworxVolume", api_field_name: "portworxVolume", inline: false }];
   // scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes.
   // Deprecated: ScaleIO is deprecated and the in-tree scaleIO type is no longer supported.
@@ -4925,10 +5266,15 @@ message VolumeSource {
   // A failure to resolve or pull the image during pod startup will block containers from starting and may add significant latency. Failures will be retried using normal volume backoff and will be reported on the pod reason and message.
   // The types of objects that may be mounted by this volume are defined by the container runtime implementation on a host machine and at minimum must include all valid types supported by the container image field.
   // The OCI object gets mounted in a single directory (spec.containers[*].volumeMounts.mountPath) by merging the manifest layers in the same way as for container images.
-  // The volume will be mounted read-only (ro) and non-executable files (noexec).
-  // Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath).
+  // The volume will be mounted read-only (ro).
+  // Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath) before 1.33.
   // The field spec.securityContext.fsGroupChangePolicy has no effect on this volume type.
   optional ImageVolumeSource image = 30 [(dev.f110.kubeproto.field) = { go_name: "Image", api_field_name: "image", inline: false }];
+}
+
+message VolumeStatus {
+  // image represents an OCI object (a container image or artifact) pulled and mounted on the kubelet's host machine.
+  optional ImageVolumeStatus image = 1 [(dev.f110.kubeproto.field) = { go_name: "Image", api_field_name: "image", inline: false }];
 }
 
 message VsphereVirtualDiskVolumeSource {

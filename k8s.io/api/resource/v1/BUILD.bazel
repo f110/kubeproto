@@ -1,0 +1,33 @@
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
+load("//bazel:def.bzl", "kubeproto_go_api")
+load("//bazel:protobuf.bzl", "gen_protobuf")
+
+gen_protobuf(
+    name = "gen",
+    srcs = ["@io_k8s_api//resource/v1:resource"],
+    all = True,
+    api_domain = "resource",
+    api_version = "v1",
+    importpath = "k8s.io/api/resource/v1",
+    kubeproto_importpath = "go.f110.dev/kubeproto/go/apis/resourcev1",
+    proto_package_name = "k8s.io.api.resource.v1",
+)
+
+proto_library(
+    name = "resourcev1_proto",
+    srcs = ["generated.proto"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:kubeproto",
+        "//k8s.io/api/core/v1:corev1_proto",
+        "//k8s.io/apimachinery/pkg/api/resource:resource_proto",
+        "//k8s.io/apimachinery/pkg/apis/meta/v1:metav1_proto",
+        "//k8s.io/apimachinery/pkg/runtime:runtime_proto",
+    ],
+)
+
+kubeproto_go_api(
+    name = "resourcev1_kubeproto",
+    srcs = [":resourcev1_proto"],
+    importpath = "go.f110.dev/kubeproto/go/apis/resourcev1",
+)

@@ -31,7 +31,7 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 type SelfSubjectReview struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
-	// Status is filled in by the server with the user attributes.
+	// status is filled in by the server with the user attributes.
 	Status *SelfSubjectReviewStatus `json:"status,omitempty"`
 }
 
@@ -100,9 +100,9 @@ func (in *SelfSubjectReviewList) DeepCopyObject() runtime.Object {
 type TokenRequest struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
-	// Spec holds information about the request being evaluated
+	// spec holds information about the request being evaluated
 	Spec TokenRequestSpec `json:"spec"`
-	// Status is filled in by the server and indicates whether the token can be authenticated.
+	// status is filled in by the server and indicates whether the token can be authenticated.
 	Status *TokenRequestStatus `json:"status,omitempty"`
 }
 
@@ -172,9 +172,9 @@ func (in *TokenRequestList) DeepCopyObject() runtime.Object {
 type TokenReview struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
-	// Spec holds information about the request being evaluated
+	// spec holds information about the request being evaluated
 	Spec TokenReviewSpec `json:"spec"`
-	// Status is filled in by the server and indicates whether the request can be authenticated.
+	// status is filled in by the server and indicates whether the request can be authenticated.
 	Status *TokenReviewStatus `json:"status,omitempty"`
 }
 
@@ -242,7 +242,7 @@ func (in *TokenReviewList) DeepCopyObject() runtime.Object {
 }
 
 type SelfSubjectReviewStatus struct {
-	// User attributes of the user making this request.
+	// userInfo is a set of attributes belonging to the user making this request.
 	UserInfo *UserInfo `json:"userInfo,omitempty"`
 }
 
@@ -265,18 +265,18 @@ func (in *SelfSubjectReviewStatus) DeepCopy() *SelfSubjectReviewStatus {
 }
 
 type TokenRequestSpec struct {
-	// Audiences are the intendend audiences of the token. A recipient of a
+	// audiences are the intendend audiences of the token. A recipient of a
 	// token must identify themself with an identifier in the list of
 	// audiences of the token, and otherwise should reject the token. A
 	// token issued for multiple audiences may be used to authenticate
 	// against any of the audiences listed but implies a high degree of
 	// trust between the target audiences.
 	Audiences []string `json:"audiences"`
-	// ExpirationSeconds is the requested duration of validity of the request. The
+	// expirationSeconds is the requested duration of validity of the request. The
 	// token issuer may return a token with a different validity duration so a
 	// client needs to check the 'expiration' field in a response.
 	ExpirationSeconds int64 `json:"expirationSeconds,omitempty"`
-	// BoundObjectRef is a reference to an object that the token will be bound to.
+	// boundObjectRef is a reference to an object that the token will be bound to.
 	// The token will only be valid for as long as the bound object exists.
 	// NOTE: The API server's TokenReview endpoint will validate the
 	// BoundObjectRef, but other audiences may not. Keep ExpirationSeconds
@@ -308,9 +308,9 @@ func (in *TokenRequestSpec) DeepCopy() *TokenRequestSpec {
 }
 
 type TokenRequestStatus struct {
-	// Token is the opaque bearer token.
+	// token is the opaque bearer token.
 	Token string `json:"token"`
-	// ExpirationTimestamp is the time of expiration of the returned token.
+	// expirationTimestamp is the time of expiration of the returned token.
 	ExpirationTimestamp metav1.Time `json:"expirationTimestamp"`
 }
 
@@ -329,9 +329,9 @@ func (in *TokenRequestStatus) DeepCopy() *TokenRequestStatus {
 }
 
 type TokenReviewSpec struct {
-	// Token is the opaque bearer token.
+	// token is the opaque bearer token.
 	Token string `json:"token,omitempty"`
-	// Audiences is a list of the identifiers that the resource server presented
+	// audiences is a list of the identifiers that the resource server presented
 	// with the token identifies as. Audience-aware token authenticators will
 	// verify that the token was intended for at least one of the audiences in
 	// this list. If no audiences are provided, the audience will default to the
@@ -358,11 +358,11 @@ func (in *TokenReviewSpec) DeepCopy() *TokenReviewSpec {
 }
 
 type TokenReviewStatus struct {
-	// Authenticated indicates that the token was associated with a known user.
+	// authenticated indicates that the token was associated with a known user.
 	Authenticated bool `json:"authenticated,omitempty"`
-	// User is the UserInfo associated with the provided token.
+	// user is the UserInfo associated with the provided token.
 	User *UserInfo `json:"user,omitempty"`
-	// Audiences are audience identifiers chosen by the authenticator that are
+	// audiences are audience identifiers chosen by the authenticator that are
 	// compatible with both the TokenReview and token. An identifier is any
 	// identifier in the intersection of the TokenReviewSpec audiences and the
 	// token's audiences. A client of the TokenReview API that sets the
@@ -372,7 +372,7 @@ type TokenReviewStatus struct {
 	// status.audience field where status.authenticated is "true", the token is
 	// valid against the audience of the Kubernetes API server.
 	Audiences []string `json:"audiences"`
-	// Error indicates that the token couldn't be checked
+	// error indicates that the token couldn't be checked
 	Error string `json:"error,omitempty"`
 }
 
@@ -400,15 +400,15 @@ func (in *TokenReviewStatus) DeepCopy() *TokenReviewStatus {
 }
 
 type UserInfo struct {
-	// The name that uniquely identifies this user among all active users.
+	// username is the name that uniquely identifies this user among all active users.
 	Username string `json:"username,omitempty"`
-	// A unique value that identifies this user across time. If this user is
+	// uid is a unique value that identifies this user across time. If this user is
 	// deleted and another user by the same name is added, they will have
 	// different UIDs.
 	UID string `json:"uid,omitempty"`
-	// The names of groups this user is a part of.
+	// groups is the names of groups this user is a part of.
 	Groups []string `json:"groups"`
-	// Any additional information provided by the authenticator.
+	// extra is any additional information provided by the authenticator.
 	Extra map[string]ExtraValue `json:"extra,omitempty"`
 }
 
@@ -438,13 +438,13 @@ func (in *UserInfo) DeepCopy() *UserInfo {
 }
 
 type BoundObjectReference struct {
-	// Kind of the referent. Valid kinds are 'Pod' and 'Secret'.
+	// kind of the referent. Valid kinds are 'Pod' and 'Secret'.
 	Kind string `json:"kind,omitempty"`
-	// API version of the referent.
+	// apiVersion is API version of the referent.
 	APIVersion string `json:"apiVersion,omitempty"`
-	// Name of the referent.
+	// name of the referent.
 	Name string `json:"name,omitempty"`
-	// UID of the referent.
+	// uid of the referent.
 	UID string `json:"uid,omitempty"`
 }
 

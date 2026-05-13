@@ -39,6 +39,7 @@ const (
 	HorizontalPodAutoscalerConditionTypeScalingActive  HorizontalPodAutoscalerConditionType = "ScalingActive"
 	HorizontalPodAutoscalerConditionTypeAbleToScale    HorizontalPodAutoscalerConditionType = "AbleToScale"
 	HorizontalPodAutoscalerConditionTypeScalingLimited HorizontalPodAutoscalerConditionType = "ScalingLimited"
+	HorizontalPodAutoscalerConditionTypeScaledToZero   HorizontalPodAutoscalerConditionType = "ScaledToZero"
 )
 
 type MetricSourceType string
@@ -604,8 +605,20 @@ type HPAScalingRules struct {
 	// If not set, the default value Max is used.
 	SelectPolicy ScalingPolicySelect `json:"selectPolicy,omitempty"`
 	// policies is a list of potential scaling polices which can be used during scaling.
-	// At least one policy must be specified, otherwise the HPAScalingRules will be discarded as invalid
+	// If not set, use the default values:
+	// - For scale up: allow doubling the number of pods, or an absolute change of 4 pods in a 15s window.
+	// - For scale down: allow all pods to be removed in a 15s window.
 	Policies []HPAScalingPolicy `json:"policies"`
+	// tolerance is the tolerance on the ratio between the current and desired
+	// metric value under which no updates are made to the desired number of
+	// replicas (e.g. 0.01 for 1%). Must be greater than or equal to zero. If not
+	// set, the default cluster-wide tolerance is applied (by default 10%).
+	// For example, if autoscaling is configured with a memory consumption target of 100Mi,
+	// and scale-down and scale-up tolerances of 5% and 1% respectively, scaling will be
+	// triggered when the actual consumption falls below 95Mi or exceeds 101Mi.
+	// This is an beta field and requires the HPAConfigurableTolerance feature
+	// gate to be enabled.
+	Tolerance *apiresource.Quantity `json:"tolerance,omitempty"`
 }
 
 func (in *HPAScalingRules) DeepCopyInto(out *HPAScalingRules) {
@@ -616,6 +629,11 @@ func (in *HPAScalingRules) DeepCopyInto(out *HPAScalingRules) {
 			in.Policies[i].DeepCopyInto(&l[i])
 		}
 		out.Policies = l
+	}
+	if in.Tolerance != nil {
+		in, out := &in.Tolerance, &out.Tolerance
+		*out = new(apiresource.Quantity)
+		(*in).DeepCopyInto(*out)
 	}
 }
 

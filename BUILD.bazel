@@ -32,6 +32,7 @@ proto_library(
         "//k8s.io/api/networking/v1:networkingv1_proto",
         "//k8s.io/api/policy/v1:policyv1_proto",
         "//k8s.io/api/rbac/v1:rbacv1_proto",
+        "//k8s.io/api/resource/v1:resourcev1_proto",
         "//k8s.io/api/scheduling/v1:schedulingv1_proto",
         "//k8s.io/api/storage/v1:storagev1_proto",
         "//k8s.io/apimachinery/pkg/apis/meta/v1:metav1_proto",
@@ -44,7 +45,7 @@ proto_library(
     visibility = ["//visibility:public"],
     deps = [
         ":kubeproto",
-        "//sigs.k8s.io/gateway-api/apis/v1alpha2:v1alpha2_proto",
+        "//sigs.k8s.io/gateway-api/apis/v1:v1_proto",
     ],
 )
 

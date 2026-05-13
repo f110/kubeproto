@@ -28,6 +28,7 @@ enum CustomResourceDefinitionConditionType {
   CUSTOM_RESOURCE_DEFINITION_CONDITION_TYPE_NON_STRUCTURAL_SCHEMA                     = 2;
   CUSTOM_RESOURCE_DEFINITION_CONDITION_TYPE_TERMINATING                               = 3 [(dev.f110.kubeproto.value) = { value: "Terminating" }];
   CUSTOM_RESOURCE_DEFINITION_CONDITION_TYPE_KUBERNETES_API_APPROVAL_POLICY_CONFORMANT = 4 [(dev.f110.kubeproto.value) = { value: "KubernetesAPIApprovalPolicyConformant" }];
+  CUSTOM_RESOURCE_DEFINITION_CONDITION_TYPE_STORAGE_MIGRATING                         = 5;
 }
 
 enum FieldValueErrorReason {
@@ -133,6 +134,10 @@ message CustomResourceDefinitionCondition {
   optional string reason = 4 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
   // message is a human-readable message indicating details about last transition.
   optional string message = 5 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
+  // observedGeneration represents the .metadata.generation that the condition was set based upon.
+  // For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+  // with respect to the current state of the instance.
+  optional int64 observed_generation = 6 [(dev.f110.kubeproto.field) = { go_name: "ObservedGeneration", api_field_name: "observedGeneration", inline: false }];
 }
 
 message CustomResourceDefinitionList {
@@ -209,6 +214,8 @@ message CustomResourceDefinitionStatus {
   // versions from this list.
   // Versions may not be removed from `spec.versions` while they exist in this list.
   repeated string stored_versions = 3 [(dev.f110.kubeproto.field) = { go_name: "StoredVersions", api_field_name: "storedVersions", inline: false }];
+  // The generation observed by the CRD controller.
+  optional int64 observed_generation = 4 [(dev.f110.kubeproto.field) = { go_name: "ObservedGeneration", api_field_name: "observedGeneration", inline: false }];
 }
 
 message CustomResourceDefinitionVersion {

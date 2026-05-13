@@ -22,9 +22,10 @@ go_library(
         "@io_k8s_api//networking/v1:networking",
         "@io_k8s_api//policy/v1:policy",
         "@io_k8s_api//rbac/v1:rbac",
+        "@io_k8s_api//resource/v1:resource",
         "@io_k8s_api//scheduling/v1:scheduling",
         "@io_k8s_api//storage/v1:storage",
         "@io_k8s_apiextensions_apiserver//pkg/apis/apiextensions/v1:apiextensions",
-        "@io_k8s_sigs_gateway_api//apis/v1alpha2",
+        "@io_k8s_sigs_gateway_api//apis/v1:apis",
     ],
 )

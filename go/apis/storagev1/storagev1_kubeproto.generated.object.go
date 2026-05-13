@@ -29,6 +29,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&StorageClassList{},
 		&VolumeAttachment{},
 		&VolumeAttachmentList{},
+		&VolumeAttributesClass{},
+		&VolumeAttributesClassList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemaGroupVersion)
 	return nil
@@ -473,6 +475,91 @@ func (in *VolumeAttachmentList) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+type VolumeAttributesClass struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata"`
+	// Name of the CSI driver
+	// This field is immutable.
+	DriverName string `json:"driverName"`
+	// parameters hold volume attributes defined by the CSI driver. These values
+	// are opaque to the Kubernetes and are passed directly to the CSI driver.
+	// The underlying storage provider supports changing these attributes on an
+	// existing volume, however the parameters field itself is immutable. To
+	// invoke a volume update, a new VolumeAttributesClass should be created with
+	// new parameters, and the PersistentVolumeClaim should be updated to reference
+	// the new VolumeAttributesClass.
+	// This field is required and must contain at least one key/value pair.
+	// The keys cannot be empty, and the maximum number of parameters is 512, with
+	// a cumulative max size of 256K. If the CSI driver rejects invalid parameters,
+	// the target PersistentVolumeClaim will be set to an "Infeasible" state in the
+	// modifyVolumeStatus field.
+	Parameters map[string]string `json:"parameters,omitempty"`
+}
+
+func (in *VolumeAttributesClass) DeepCopyInto(out *VolumeAttributesClass) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
+	if in.Parameters != nil {
+		in, out := &in.Parameters, &out.Parameters
+		*out = make(map[string]string, len(*in))
+		for k, v := range *in {
+			(*out)[k] = v
+		}
+	}
+}
+
+func (in *VolumeAttributesClass) DeepCopy() *VolumeAttributesClass {
+	if in == nil {
+		return nil
+	}
+	out := new(VolumeAttributesClass)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *VolumeAttributesClass) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	}
+	return nil
+}
+
+type VolumeAttributesClassList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata"`
+	Items           []VolumeAttributesClass `json:"items"`
+}
+
+func (in *VolumeAttributesClassList) DeepCopyInto(out *VolumeAttributesClassList) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
+	if in.Items != nil {
+		l := make([]VolumeAttributesClass, len(in.Items))
+		for i := range in.Items {
+			in.Items[i].DeepCopyInto(&l[i])
+		}
+		out.Items = l
+	}
+}
+
+func (in *VolumeAttributesClassList) DeepCopy() *VolumeAttributesClassList {
+	if in == nil {
+		return nil
+	}
+	out := new(VolumeAttributesClassList)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *VolumeAttributesClassList) DeepCopyObject() runtime.Object {
+	if c := in.DeepCopy(); c != nil {
+		return c
+	}
+	return nil
+}
+
 type CSIDriverSpec struct {
 	// attachRequired indicates this CSI volume driver requires an attach
 	// operation (because it implements the CSI ControllerPublishVolume()
@@ -481,8 +568,7 @@ type CSIDriverSpec struct {
 	// and waits until the volume is attached before proceeding to mounting.
 	// The CSI external-attacher coordinates with CSI volume driver and updates
 	// the volumeattachment status when the attach operation is complete.
-	// If the CSIDriverRegistry feature gate is enabled and the value is
-	// specified to false, the attach operation will be skipped.
+	// If the value is specified to false, the attach operation will be skipped.
 	// Otherwise the attach operation will be called.
 	// This field is immutable.
 	AttachRequired bool `json:"attachRequired,omitempty"`
@@ -578,6 +664,45 @@ type CSIDriverSpec struct {
 	// This is typical for volumes that represent subdirectories of a bigger shared filesystem.
 	// Default is "false".
 	SELinuxMount bool `json:"seLinuxMount,omitempty"`
+	// nodeAllocatableUpdatePeriodSeconds specifies the interval between periodic updates of
+	// the CSINode allocatable capacity for this driver. When set, both periodic updates and
+	// updates triggered by capacity-related failures are enabled. If not set, no updates
+	// occur (neither periodic nor upon detecting capacity-related failures), and the
+	// allocatable.count remains static. The minimum allowed value for this field is 10 seconds.
+	// This feature requires the MutableCSINodeAllocatableCount feature gate to be enabled.
+	// This field is mutable.
+	NodeAllocatableUpdatePeriodSeconds int64 `json:"nodeAllocatableUpdatePeriodSeconds,omitempty"`
+	// serviceAccountTokenInSecrets is an opt-in for CSI drivers to indicate that
+	// service account tokens should be passed via the Secrets field in NodePublishVolumeRequest
+	// instead of the VolumeContext field. The CSI specification provides a dedicated Secrets
+	// field for sensitive information like tokens, which is the appropriate mechanism for
+	// handling credentials. This addresses security concerns where sensitive tokens were being
+	// logged as part of volume context.
+	// When "true", kubelet will pass the tokens only in the Secrets field with the key
+	// "csi.storage.k8s.io/serviceAccount.tokens". The CSI driver must be updated to read
+	// tokens from the Secrets field instead of VolumeContext.
+	// When "false" or not set, kubelet will pass the tokens in VolumeContext with the key
+	// "csi.storage.k8s.io/serviceAccount.tokens" (existing behavior). This maintains backward
+	// compatibility with existing CSI drivers.
+	// This field can only be set when TokenRequests is configured. The API server will reject
+	// CSIDriver specs that set this field without TokenRequests.
+	// Default behavior if unset is to pass tokens in the VolumeContext field.
+	ServiceAccountTokenInSecrets bool `json:"serviceAccountTokenInSecrets,omitempty"`
+	// PreventPodSchedulingIfMissing indicates that the CSI driver wants to prevent pod
+	// scheduling if the CSI driver on the node is missing.
+	// Enabling this option will prevent the scheduler (or any other
+	// component which embeds default scheduler such as cluster-autoscaler) from
+	// scheduling pods to nodes where CSI driver is not installed.
+	// For components(such as cluster-autoscaler) that embed the scheduler and run
+	// pod placement simulations using scheduler plugins, they MUST be aware of
+	// CSI driver registration information via CSINode object. They must create simulated
+	// CSINode objects in addition to Node objects during scheduling simulation, otherwise
+	// if PreventPodSchedulingIfMissing is enabled globally for CSIDriver object, any
+	// newly created node may be rejected by the scheduler because of missing CSI driver
+	// information from the node.
+	// This is an alpha feature and requires the VolumeLimitScaling feature gate to be enabled.
+	// Default is "false".
+	PreventPodSchedulingIfMissing bool `json:"preventPodSchedulingIfMissing,omitempty"`
 }
 
 func (in *CSIDriverSpec) DeepCopyInto(out *CSIDriverSpec) {
@@ -819,6 +944,9 @@ type VolumeError struct {
 	// This string may be logged, so it should not contain sensitive
 	// information.
 	Message string `json:"message,omitempty"`
+	// errorCode is a numeric gRPC code representing the error encountered during Attach or Detach operations.
+	// This field requires the MutableCSINodeAllocatableCount feature gate being enabled to be set.
+	ErrorCode int `json:"errorCode,omitempty"`
 }
 
 func (in *VolumeError) DeepCopyInto(out *VolumeError) {

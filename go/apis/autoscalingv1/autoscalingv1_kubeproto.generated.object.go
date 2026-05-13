@@ -32,6 +32,7 @@ const (
 	HorizontalPodAutoscalerConditionTypeScalingActive  HorizontalPodAutoscalerConditionType = "ScalingActive"
 	HorizontalPodAutoscalerConditionTypeAbleToScale    HorizontalPodAutoscalerConditionType = "AbleToScale"
 	HorizontalPodAutoscalerConditionTypeScalingLimited HorizontalPodAutoscalerConditionType = "ScalingLimited"
+	HorizontalPodAutoscalerConditionTypeScaledToZero   HorizontalPodAutoscalerConditionType = "ScaledToZero"
 )
 
 type MetricSourceType string
