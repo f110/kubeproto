@@ -2,6 +2,8 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_go//go:def.bzl", "GoLibrary", "go_context")
 load("@protobuf//bazel/common:proto_info.bzl", "ProtoInfo")
 
+_PROTO_TOOLCHAIN = "@protobuf//bazel/private:proto_toolchain_type"
+
 def _crd_proto_manifest(ctx):
     args = ctx.actions.args()
 
@@ -23,7 +25,7 @@ def _crd_proto_manifest(ctx):
     out = ctx.actions.declare_file("%s.crd.yaml" % ctx.label.name)
     args.add("--crd_out=%s:." % out.path)
     ctx.actions.run(
-        executable = ctx.executable.protoc,
+        executable = ctx.toolchains[_PROTO_TOOLCHAIN].proto.proto_compiler,
         tools = [ctx.executable._compiler],
         inputs = depset(
             direct = proto_files,
@@ -39,11 +41,6 @@ crd_proto_manifest = rule(
     implementation = _crd_proto_manifest,
     attrs = {
         "srcs": attr.label_list(providers = [ProtoInfo]),
-        "protoc": attr.label(
-            executable = True,
-            cfg = "host",
-            default = "@protobuf//:protoc",
-        ),
         "_compiler": attr.label(
             executable = True,
             cfg = "host",
@@ -51,6 +48,7 @@ crd_proto_manifest = rule(
         ),
         "_compiler_name": attr.string(default = "crd"),
     },
+    toolchains = [_PROTO_TOOLCHAIN],
 )
 
 K8SClient = provider()
@@ -87,11 +85,6 @@ go_client = rule(
         "srcs": attr.label_list(providers = [ProtoInfo]),
         "importpath": attr.string(mandatory = True),
         "fqdn": attr.bool(default = False, doc = "Generate with FQDN name"),
-        "protoc": attr.label(
-            executable = True,
-            cfg = "host",
-            default = "@protobuf//:protoc",
-        ),
         "_compiler": attr.label(
             executable = True,
             cfg = "host",
@@ -102,7 +95,10 @@ go_client = rule(
             default = "@rules_go//:go_context_data",
         ),
     },
-    toolchains = ["@rules_go//go:toolchain"],
+    toolchains = [
+        "@rules_go//go:toolchain",
+        _PROTO_TOOLCHAIN,
+    ],
 )
 
 def _go_testing_client(ctx):
@@ -135,11 +131,6 @@ go_testing_client = rule(
         "srcs": attr.label_list(providers = [ProtoInfo]),
         "importpath": attr.string(mandatory = True),
         "client": attr.label(mandatory = True, providers = [GoLibrary, K8SClient]),
-        "protoc": attr.label(
-            executable = True,
-            cfg = "host",
-            default = "@protobuf//:protoc",
-        ),
         "_compiler": attr.label(
             executable = True,
             cfg = "host",
@@ -150,7 +141,10 @@ go_testing_client = rule(
             default = "@rules_go//:go_context_data",
         ),
     },
-    toolchains = ["@rules_go//go:toolchain"],
+    toolchains = [
+        "@rules_go//go:toolchain",
+        _PROTO_TOOLCHAIN,
+    ],
 )
 
 def _execute_protoc(ctx, compiler, compiler_name, suffix, srcs, opts = "", env = None):
@@ -174,7 +168,7 @@ def _execute_protoc(ctx, compiler, compiler_name, suffix, srcs, opts = "", env =
         args.add("--%s_opt=%s" % (compiler_name, opts))
 
     ctx.actions.run(
-        executable = ctx.executable.protoc,
+        executable = ctx.toolchains[_PROTO_TOOLCHAIN].proto.proto_compiler,
         tools = [compiler],
         inputs = depset(
             direct = proto_files,
@@ -220,11 +214,6 @@ kubeproto_go_api = rule(
         "srcs": attr.label_list(providers = [ProtoInfo]),
         "importpath": attr.string(mandatory = True),
         "all": attr.bool(),
-        "protoc": attr.label(
-            executable = True,
-            cfg = "host",
-            default = "@protobuf//:protoc",
-        ),
         "_object_compiler": attr.label(
             executable = True,
             cfg = "host",
@@ -235,5 +224,8 @@ kubeproto_go_api = rule(
             default = "@rules_go//:go_context_data",
         ),
     },
-    toolchains = ["@rules_go//go:toolchain"],
+    toolchains = [
+        "@rules_go//go:toolchain",
+        _PROTO_TOOLCHAIN,
+    ],
 )
