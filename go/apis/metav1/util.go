@@ -95,6 +95,31 @@ func AddToGroupVersion(scheme *runtime.Scheme, groupVersion schema.GroupVersion)
 	)
 }
 
+// ListOptionsFromUpstream converts the upstream k8s.io/apimachinery
+// metav1.ListOptions into the kubeproto-internal ListOptions accepted by the
+// generated clients. It is used by the generated informer ListWatch to
+// propagate options (resource version, bookmarks, send-initial-events, ...)
+// that client-go's reflector sets when the WatchListClient feature gate is on.
+func ListOptionsFromUpstream(in k8smetav1.ListOptions) ListOptions {
+	out := ListOptions{
+		LabelSelector:        in.LabelSelector,
+		FieldSelector:        in.FieldSelector,
+		Watch:                in.Watch,
+		AllowWatchBookmarks:  in.AllowWatchBookmarks,
+		ResourceVersion:      in.ResourceVersion,
+		ResourceVersionMatch: ResourceVersionMatch(in.ResourceVersionMatch),
+		Limit:                in.Limit,
+		Continue:             in.Continue,
+	}
+	if in.TimeoutSeconds != nil {
+		out.TimeoutSeconds = *in.TimeoutSeconds
+	}
+	if in.SendInitialEvents != nil {
+		out.SendInitialEvents = *in.SendInitialEvents
+	}
+	return out
+}
+
 func Now() Time {
 	return NewTime(time.Now())
 }

@@ -767,10 +767,10 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer, fqdn bool) er
 				writer.F("return cache.NewSharedIndexInformer(")
 				writer.F("&cache.ListWatch{")
 				writer.F("ListFunc: func (options k8smetav1.ListOptions) (runtime.Object, error){")
-				writer.F("return f.client.List%s(context.TODO(), metav1.ListOptions{})", m.ShortName)
+				writer.F("return f.client.List%s(context.TODO(), metav1.ListOptionsFromUpstream(options))", m.ShortName)
 				writer.F("},") // end of ListFunc
 				writer.F("WatchFunc: func (options k8smetav1.ListOptions) (watch.Interface, error){")
-				writer.F("return f.client.Watch%s(context.TODO(), metav1.ListOptions{})", m.ShortName)
+				writer.F("return f.client.Watch%s(context.TODO(), metav1.ListOptionsFromUpstream(options))", m.ShortName)
 				writer.F("},") // end of WatchFunc
 				writer.F("},")
 				writer.F("&%s.%s{},", m.Package.Alias, m.ShortName)
@@ -781,10 +781,10 @@ func (g *informerGenerator) WriteTo(writer *codegeneration.Writer, fqdn bool) er
 				writer.F("return cache.NewSharedIndexInformer(")
 				writer.F("&cache.ListWatch{")
 				writer.F("ListFunc: func (options k8smetav1.ListOptions) (runtime.Object, error){")
-				writer.F("return f.client.List%s(context.TODO(), f.namespace, metav1.ListOptions{})", m.ShortName)
+				writer.F("return f.client.List%s(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))", m.ShortName)
 				writer.F("},") // end of ListFunc
 				writer.F("WatchFunc: func (options k8smetav1.ListOptions) (watch.Interface, error){")
-				writer.F("return f.client.Watch%s(context.TODO(), f.namespace, metav1.ListOptions{})", m.ShortName)
+				writer.F("return f.client.Watch%s(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))", m.ShortName)
 				writer.F("},") // end of WatchFunc
 				writer.F("},")
 				writer.F("&%s.%s{},", m.Package.Alias, m.ShortName)
