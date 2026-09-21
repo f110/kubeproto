@@ -1,4 +1,10 @@
 BAZEL ?= bazel
+CLANG_FORMAT ?= clang-format
+
+PROTO_FILES := proto/github.com/cert-manager/cert-manager/apis/metav1/generated.proto \
+		proto/github.com/cert-manager/cert-manager/apis/acmev1/generated.proto \
+		proto/github.com/cert-manager/cert-manager/apis/certmanagerv1/generated.proto \
+		proto/github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoringv1/generated.proto
 
 .PHONY: build
 build: pkg/apis/blogv1alpha1/blog_proto_kubeproto.generated.object.go \
@@ -8,10 +14,7 @@ build: pkg/apis/blogv1alpha1/blog_proto_kubeproto.generated.object.go \
 		crd/blog.crd.yaml
 
 .PHONY: build-thirdparty
-build-thirdparty: proto/github.com/cert-manager/cert-manager/apis/metav1/generated.proto \
-		proto/github.com/cert-manager/cert-manager/apis/acmev1/generated.proto \
-		proto/github.com/cert-manager/cert-manager/apis/certmanagerv1/generated.proto \
-		proto/github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoringv1/generated.proto \
+build-thirdparty: $(PROTO_FILES) \
 		proto/github.com/cert-manager/cert-manager/apis/metav1/metav1_kubeproto.generated.object.go \
 		proto/github.com/cert-manager/cert-manager/apis/acmev1/acmev1_kubeproto.generated.object.go \
 		proto/github.com/cert-manager/cert-manager/apis/certmanagerv1/certmanagerv1_kubeproto.generated.object.go \
@@ -68,33 +71,13 @@ pkg/thirdpartyclient/testingthirdpartyclient/testingthirdpartyclient.generated.t
 	cp ../bazel-bin/example/$@ $(@D)
 	@chmod 644 $@
 
-.PHONY: proto/github.com/cert-manager/cert-manager/apis/certmanagerv1/generated.proto
-proto/github.com/cert-manager/cert-manager/apis/certmanagerv1/generated.proto:
+.PHONY: $(PROTO_FILES)
+$(PROTO_FILES):
 	$(BAZEL) build //example/$(@D):gen
 	mkdir -p $(@D)
 	cp ../bazel-bin/example/$@ $(@D)
 	@chmod 644 $@
-
-.PHONY: proto/github.com/cert-manager/cert-manager/apis/metav1/generated.proto
-proto/github.com/cert-manager/cert-manager/apis/metav1/generated.proto:
-	$(BAZEL) build //example/$(@D):gen
-	mkdir -p $(@D)
-	cp ../bazel-bin/example/$@ $(@D)
-	@chmod 644 $@
-
-.PHONY: proto/github.com/cert-manager/cert-manager/apis/acmev1/generated.proto
-proto/github.com/cert-manager/cert-manager/apis/acmev1/generated.proto:
-	$(BAZEL) build //example/$(@D):gen
-	mkdir -p $(@D)
-	cp ../bazel-bin/example/$@ $(@D)
-	@chmod 644 $@
-
-.PHONY: proto/github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoringv1/generated.proto
-proto/github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoringv1/generated.proto:
-	$(BAZEL) build //example/$(@D):gen
-	mkdir -p $(@D)
-	cp ../bazel-bin/example/$@ $(@D)
-	@chmod 644 $@
+	$(CLANG_FORMAT) -i $@
 
 .PHONY: proto/github.com/cert-manager/cert-manager/apis/acmev1/acmev1_kubeproto.generated.object.go
 proto/github.com/cert-manager/cert-manager/apis/acmev1/acmev1_kubeproto.generated.object.go:
