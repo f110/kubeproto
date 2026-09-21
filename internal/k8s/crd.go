@@ -184,9 +184,9 @@ func (g *CRDGenerator) ToOpenAPISchema(m *definition.Message) *apiextensionsv1.J
 	properties := make(map[string]apiextensionsv1.JSONSchemaProps)
 	for _, f := range m.Fields {
 		switch f.Kind {
-		case protoreflect.BoolKind, protoreflect.StringKind, protoreflect.Int64Kind, protoreflect.Int32Kind:
+		case protoreflect.BoolKind, protoreflect.StringKind, protoreflect.Int64Kind, protoreflect.Int32Kind, protoreflect.Uint64Kind, protoreflect.Uint32Kind:
 			properties[f.FieldName] = g.fieldToJSONSchemaProps(f)
-			if !f.Optional {
+			if !f.Optional && !f.Repeated {
 				required = append(required, f.FieldName)
 			}
 		case protoreflect.MessageKind:
@@ -207,16 +207,8 @@ func (g *CRDGenerator) ToOpenAPISchema(m *definition.Message) *apiextensionsv1.J
 		case protoreflect.EnumKind:
 			enum := g.lister.GetEnums().Find(f.MessageName)
 			if enum != nil {
-				var values []apiextensionsv1.JSON
-				for _, v := range enum.Values {
-					values = append(values, apiextensionsv1.JSON{Raw: []byte(fmt.Sprintf("%q", v))})
-				}
-				properties[f.FieldName] = apiextensionsv1.JSONSchemaProps{
-					Description: f.Description,
-					Type:        "string",
-					Enum:        values,
-				}
-				if !f.Optional {
+				properties[f.FieldName] = g.enumToJSONSchemaProps(f, enum)
+				if !f.Optional && !f.Repeated {
 					required = append(required, f.FieldName)
 				}
 			}
@@ -239,6 +231,31 @@ func (g *CRDGenerator) fieldToJSONSchemaProps(f *definition.Field) apiextensions
 	switch f.Kind {
 	case protoreflect.Int64Kind:
 		props.Format = "int64"
+	}
+
+	if f.Repeated {
+		props.Description = ""
+		return apiextensionsv1.JSONSchemaProps{
+			Type:        "array",
+			Description: f.Description,
+			Items: &apiextensionsv1.JSONSchemaPropsOrArray{
+				Schema: &props,
+			},
+		}
+	}
+
+	return props
+}
+
+func (g *CRDGenerator) enumToJSONSchemaProps(f *definition.Field, enum *definition.Enum) apiextensionsv1.JSONSchemaProps {
+	var values []apiextensionsv1.JSON
+	for _, v := range enum.Values {
+		values = append(values, apiextensionsv1.JSON{Raw: []byte(fmt.Sprintf("%q", v))})
+	}
+	props := apiextensionsv1.JSONSchemaProps{
+		Description: f.Description,
+		Type:        "string",
+		Enum:        values,
 	}
 
 	if f.Repeated {
