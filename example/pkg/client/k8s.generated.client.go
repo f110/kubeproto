@@ -617,10 +617,10 @@ func (f *BlogV1alpha1Informer) BlogInformer() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListBlog(context.TODO(), metav1.ListOptions{})
+					return f.client.ListBlog(context.TODO(), metav1.ListOptionsFromUpstream(options))
 				},
 				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchBlog(context.TODO(), metav1.ListOptions{})
+					return f.client.WatchBlog(context.TODO(), metav1.ListOptionsFromUpstream(options))
 				},
 			},
 			&blogv1alpha1.Blog{},
@@ -639,10 +639,10 @@ func (f *BlogV1alpha1Informer) PostInformer() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListPost(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.ListPost(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchPost(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.WatchPost(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 			},
 			&blogv1alpha1.Post{},
@@ -679,10 +679,10 @@ func (f *BlogV1alpha2Informer) AuthorInformer() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListAuthor(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.ListAuthor(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchAuthor(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.WatchAuthor(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 			},
 			&blogv1alpha2.Author{},
@@ -701,10 +701,10 @@ func (f *BlogV1alpha2Informer) BlogInformer() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListBlog(context.TODO(), metav1.ListOptions{})
+					return f.client.ListBlog(context.TODO(), metav1.ListOptionsFromUpstream(options))
 				},
 				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchBlog(context.TODO(), metav1.ListOptions{})
+					return f.client.WatchBlog(context.TODO(), metav1.ListOptionsFromUpstream(options))
 				},
 			},
 			&blogv1alpha2.Blog{},
@@ -723,10 +723,10 @@ func (f *BlogV1alpha2Informer) PostInformer() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListPost(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.ListPost(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchPost(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.WatchPost(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 			},
 			&blogv1alpha2.Post{},
