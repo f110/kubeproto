@@ -1,22 +1,8 @@
 BAZEL ?= bazel
 GO ?= $(BAZEL) run @rules_go//go --
+CLANG_FORMAT ?= clang-format
 
-.PHONY: deps
-deps:
-	$(GO) mod tidy
-	$(BAZEL) mod tidy
-	$(BAZEL) run //:gazelle
-
-kube.pb.go: kube.proto
-	$(BAZEL) build //:kubeproto_go_proto
-	@cp bazel-bin/kubeproto_go_proto_/go.f110.dev/kubeproto/kube.pb.go ./
-	@chmod 644 $@
-
-.PHONY: gen
-gen: kube.pb.go gen-proto gen-go
-
-.PHONY: gen-proto
-gen-proto: k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto \
+PROTO_FILES := k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto \
 	k8s.io/apimachinery/pkg/api/resource/generated.proto \
 	k8s.io/apimachinery/pkg/util/intstr/generated.proto \
 	k8s.io/apimachinery/pkg/runtime/generated.proto \
@@ -42,6 +28,30 @@ gen-proto: k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto \
 	k8s.io/api/storage/v1/generated.proto \
 	k8s.io/api/apidiscovery/v2beta1/generated.proto \
 	k8s.io/api/resource/v1/generated.proto
+
+.PHONY: deps
+deps:
+	$(GO) mod tidy
+	$(BAZEL) mod tidy
+	$(BAZEL) run //:gazelle
+
+kube.pb.go: kube.proto
+	$(BAZEL) build //:kubeproto_go_proto
+	@cp bazel-bin/kubeproto_go_proto_/go.f110.dev/kubeproto/kube.pb.go ./
+	@chmod 644 $@
+
+.PHONY: gen
+gen: kube.pb.go gen-proto gen-go
+
+.PHONY: gen-proto $(PROTO_FILES)
+gen-proto: $(PROTO_FILES)
+
+$(PROTO_FILES):
+	$(BAZEL) build //$(@D):gen
+	mkdir -p $(@D)
+	cp ./bazel-bin/$@ $(@D)
+	@chmod 644 $@
+	$(CLANG_FORMAT) -i $@
 
 .PHONY: gen-object
 gen-object: go/apis/metav1/metav1_kubeproto.generated.object.go \
@@ -84,162 +94,6 @@ go/k8stestingclient/go_testingclient.generated.testingclient.go: gen-proto gen-o
 	$(BAZEL) build //$(@D):go_testingclient
 	cp ./bazel-bin/$(@D)/$(@F) $(@D)
 	@chmod 0644 $@
-
-.PHONY: k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto
-k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/apimachinery/pkg/api/resource/generated.proto
-k8s.io/apimachinery/pkg/api/resource/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/apimachinery/pkg/util/intstr/generated.proto
-k8s.io/apimachinery/pkg/util/intstr/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/apimachinery/pkg/runtime/generated.proto
-k8s.io/apimachinery/pkg/runtime/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/api/core/v1/generated.proto
-k8s.io/api/core/v1/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/api/apps/v1/generated.proto
-k8s.io/api/apps/v1/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/api/batch/v1/generated.proto
-k8s.io/api/batch/v1/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/api/authentication/v1/generated.proto
-k8s.io/api/authentication/v1/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/api/admission/v1/generated.proto
-k8s.io/api/admission/v1/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/api/policy/v1/generated.proto
-k8s.io/api/policy/v1/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/api/networking/v1/generated.proto
-k8s.io/api/networking/v1/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/api/rbac/v1/generated.proto
-k8s.io/api/rbac/v1/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/api/admissionregistration/v1/generated.proto
-k8s.io/api/admissionregistration/v1/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/api/certificates/v1/generated.proto
-k8s.io/api/certificates/v1/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/api/authorization/v1/generated.proto
-k8s.io/api/authorization/v1/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/api/discovery/v1/generated.proto
-k8s.io/api/discovery/v1/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/api/autoscaling/v1/generated.proto
-k8s.io/api/autoscaling/v1/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/api/autoscaling/v2/generated.proto
-k8s.io/api/autoscaling/v2/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/api/coordination/v1/generated.proto
-k8s.io/api/coordination/v1/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/api/events/v1/generated.proto
-k8s.io/api/events/v1/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/api/scheduling/v1/generated.proto
-k8s.io/api/scheduling/v1/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/api/storage/v1/generated.proto
-k8s.io/api/storage/v1/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/api/apidiscovery/v2beta1/generated.proto
-k8s.io/api/apidiscovery/v2beta1/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/api/resource/v1/generated.proto
-k8s.io/api/resource/v1/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto
-k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
-
-.PHONY: sigs.k8s.io/gateway-api/apis/v1/generated.proto
-sigs.k8s.io/gateway-api/apis/v1/generated.proto:
-	$(BAZEL) build //$(@D):gen
-	mkdir -p $(@D)
-	cp ./bazel-bin/$@ $(@D)
 
 .PHONY: go/apis/metav1/metav1_kubeproto.generated.object.go
 go/apis/metav1/metav1_kubeproto.generated.object.go: k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto

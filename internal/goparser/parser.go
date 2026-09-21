@@ -2,7 +2,6 @@ package goparser
 
 import (
 	"bufio"
-	"context"
 	"errors"
 	"fmt"
 	"go/ast"
@@ -10,7 +9,6 @@ import (
 	"go/token"
 	"log"
 	"os"
-	"os/exec"
 	"path"
 	"reflect"
 	"sort"
@@ -520,12 +518,6 @@ func (g *Generator) WriteFile(outputFilePath string) error {
 		return err
 	}
 
-	if _, err := exec.LookPath("clang-format"); err == nil {
-		cmd := exec.CommandContext(context.Background(), "clang-format", "-i", outputFilePath)
-		if err := cmd.Run(); err != nil {
-			return err
-		}
-	}
 	return nil
 }
 
