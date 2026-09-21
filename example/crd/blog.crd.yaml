@@ -351,6 +351,8 @@ spec:
                 items:
                   type: string
                 type: array
+              count:
+                type: integer
               publishedAt:
                 format: datetime
                 type: string

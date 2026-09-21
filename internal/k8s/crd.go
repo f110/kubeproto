@@ -184,7 +184,7 @@ func (g *CRDGenerator) ToOpenAPISchema(m *definition.Message) *apiextensionsv1.J
 	properties := make(map[string]apiextensionsv1.JSONSchemaProps)
 	for _, f := range m.Fields {
 		switch f.Kind {
-		case protoreflect.BoolKind, protoreflect.StringKind, protoreflect.Int64Kind, protoreflect.Int32Kind:
+		case protoreflect.BoolKind, protoreflect.StringKind, protoreflect.Int64Kind, protoreflect.Int32Kind, protoreflect.Uint64Kind, protoreflect.Uint32Kind:
 			properties[f.FieldName] = g.fieldToJSONSchemaProps(f)
 			if !f.Optional && !f.Repeated {
 				required = append(required, f.FieldName)
