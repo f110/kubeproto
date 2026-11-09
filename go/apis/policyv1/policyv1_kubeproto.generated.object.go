@@ -5,6 +5,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilintstr "k8s.io/apimachinery/pkg/util/intstr"
+	"maps"
 )
 
 const GroupName = "policy"
@@ -288,9 +289,7 @@ func (in *PodDisruptionBudgetStatus) DeepCopyInto(out *PodDisruptionBudgetStatus
 	if in.DisruptedPods != nil {
 		in, out := &in.DisruptedPods, &out.DisruptedPods
 		*out = make(map[string]metav1.Time, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.Conditions != nil {
 		l := make([]metav1.Condition, len(in.Conditions))

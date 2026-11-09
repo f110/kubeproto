@@ -5,6 +5,7 @@ import (
 	"go.f110.dev/kubeproto/go/apis/metav1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"maps"
 )
 
 const GroupName = "discovery.k8s.io"
@@ -186,9 +187,7 @@ func (in *Endpoint) DeepCopyInto(out *Endpoint) {
 	if in.DeprecatedTopology != nil {
 		in, out := &in.DeprecatedTopology, &out.DeprecatedTopology
 		*out = make(map[string]string, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.Hints != nil {
 		in, out := &in.Hints, &out.Hints

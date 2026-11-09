@@ -6,6 +6,7 @@ import (
 	apiresource "k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"maps"
 )
 
 const GroupName = "resource"
@@ -909,16 +910,12 @@ func (in *Device) DeepCopyInto(out *Device) {
 	if in.Attributes != nil {
 		in, out := &in.Attributes, &out.Attributes
 		*out = make(map[string]DeviceAttribute, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.Capacity != nil {
 		in, out := &in.Capacity, &out.Capacity
 		*out = make(map[string]DeviceCapacity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.ConsumesCounters != nil {
 		l := make([]DeviceCounterConsumption, len(in.ConsumesCounters))
@@ -952,9 +949,7 @@ func (in *Device) DeepCopyInto(out *Device) {
 	if in.NodeAllocatableResourceMappings != nil {
 		in, out := &in.NodeAllocatableResourceMappings, &out.NodeAllocatableResourceMappings
 		*out = make(map[string]NodeAllocatableResourceMapping, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 }
 
@@ -982,9 +977,7 @@ func (in *CounterSet) DeepCopyInto(out *CounterSet) {
 	if in.Counters != nil {
 		in, out := &in.Counters, &out.Counters
 		*out = make(map[string]Counter, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 }
 
@@ -1406,9 +1399,7 @@ func (in *DeviceCounterConsumption) DeepCopyInto(out *DeviceCounterConsumption) 
 	if in.Counters != nil {
 		in, out := &in.Counters, &out.Counters
 		*out = make(map[string]Counter, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 }
 
@@ -1842,9 +1833,7 @@ func (in *DeviceRequestAllocationResult) DeepCopyInto(out *DeviceRequestAllocati
 	if in.ConsumedCapacity != nil {
 		in, out := &in.ConsumedCapacity, &out.ConsumedCapacity
 		*out = make(map[string]apiresource.Quantity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 }
 
@@ -2010,9 +1999,7 @@ func (in *CapacityRequirements) DeepCopyInto(out *CapacityRequirements) {
 	if in.Requests != nil {
 		in, out := &in.Requests, &out.Requests
 		*out = make(map[string]apiresource.Quantity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 }
 
