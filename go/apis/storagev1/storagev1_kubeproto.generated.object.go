@@ -91,7 +91,7 @@ func (in *CSIDriver) DeepCopyObject() runtime.Object {
 type CSIDriverList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []CSIDriver `json:"items"`
+	Items           []CSIDriver `json:"items,omitempty"`
 }
 
 func (in *CSIDriverList) DeepCopyInto(out *CSIDriverList) {
@@ -156,7 +156,7 @@ func (in *CSINode) DeepCopyObject() runtime.Object {
 type CSINodeList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []CSINode `json:"items"`
+	Items           []CSINode `json:"items,omitempty"`
 }
 
 func (in *CSINodeList) DeepCopyInto(out *CSINodeList) {
@@ -264,7 +264,7 @@ func (in *CSIStorageCapacity) DeepCopyObject() runtime.Object {
 type CSIStorageCapacityList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []CSIStorageCapacity `json:"items"`
+	Items           []CSIStorageCapacity `json:"items,omitempty"`
 }
 
 func (in *CSIStorageCapacityList) DeepCopyInto(out *CSIStorageCapacityList) {
@@ -310,7 +310,7 @@ type StorageClass struct {
 	// mountOptions controls the mountOptions for dynamically provisioned PersistentVolumes of this storage class.
 	// e.g. ["ro", "soft"]. Not validated -
 	// mount of the PVs will simply fail if one is invalid.
-	MountOptions []string `json:"mountOptions"`
+	MountOptions []string `json:"mountOptions,omitempty"`
 	// allowVolumeExpansion shows whether the storage class allow volume expand.
 	AllowVolumeExpansion bool `json:"allowVolumeExpansion,omitempty"`
 	// volumeBindingMode indicates how PersistentVolumeClaims should be
@@ -321,7 +321,7 @@ type StorageClass struct {
 	// Each volume plugin defines its own supported topology specifications.
 	// An empty TopologySelectorTerm list means there is no topology restriction.
 	// This field is only honored by servers that enable the VolumeScheduling feature.
-	AllowedTopologies []corev1.TopologySelectorTerm `json:"allowedTopologies"`
+	AllowedTopologies []corev1.TopologySelectorTerm `json:"allowedTopologies,omitempty"`
 }
 
 func (in *StorageClass) DeepCopyInto(out *StorageClass) {
@@ -368,7 +368,7 @@ func (in *StorageClass) DeepCopyObject() runtime.Object {
 type StorageClassList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []StorageClass `json:"items"`
+	Items           []StorageClass `json:"items,omitempty"`
 }
 
 func (in *StorageClassList) DeepCopyInto(out *StorageClassList) {
@@ -443,7 +443,7 @@ func (in *VolumeAttachment) DeepCopyObject() runtime.Object {
 type VolumeAttachmentList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []VolumeAttachment `json:"items"`
+	Items           []VolumeAttachment `json:"items,omitempty"`
 }
 
 func (in *VolumeAttachmentList) DeepCopyInto(out *VolumeAttachmentList) {
@@ -528,7 +528,7 @@ func (in *VolumeAttributesClass) DeepCopyObject() runtime.Object {
 type VolumeAttributesClassList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []VolumeAttributesClass `json:"items"`
+	Items           []VolumeAttributesClass `json:"items,omitempty"`
 }
 
 func (in *VolumeAttributesClassList) DeepCopyInto(out *VolumeAttributesClassList) {
@@ -605,7 +605,7 @@ type CSIDriverSpec struct {
 	// A driver can support one or more of these modes and more modes may be added in the future.
 	// This field is beta.
 	// This field is immutable.
-	VolumeLifecycleModes []VolumeLifecycleMode `json:"volumeLifecycleModes"`
+	VolumeLifecycleModes []VolumeLifecycleMode `json:"volumeLifecycleModes,omitempty"`
 	// storageCapacity indicates that the CSI volume driver wants pod scheduling to consider the storage
 	// capacity that the driver deployment will report by creating
 	// CSIStorageCapacity objects with capacity information, if set to true.
@@ -641,7 +641,7 @@ type CSIDriverSpec struct {
 	// Note: Audience in each TokenRequest should be different and at
 	// most one token is empty string. To receive a new token after expiry,
 	// RequiresRepublish can be used to trigger NodePublishVolume periodically.
-	TokenRequests []TokenRequest `json:"tokenRequests"`
+	TokenRequests []TokenRequest `json:"tokenRequests,omitempty"`
 	// requiresRepublish indicates the CSI driver wants `NodePublishVolume`
 	// being periodically called to reflect any possible change in the mounted
 	// volume. This field defaults to false.
@@ -733,7 +733,7 @@ func (in *CSIDriverSpec) DeepCopy() *CSIDriverSpec {
 type CSINodeSpec struct {
 	// drivers is a list of information of all CSI Drivers existing on a node.
 	// If all drivers in the list are uninstalled, this can become empty.
-	Drivers []CSINodeDriver `json:"drivers"`
+	Drivers []CSINodeDriver `json:"drivers,omitempty"`
 }
 
 func (in *CSINodeSpec) DeepCopyInto(out *CSINodeSpec) {
@@ -878,7 +878,7 @@ type CSINodeDriver struct {
 	// back to the driver.
 	// It is possible for different nodes to use different topology keys.
 	// This can be empty if driver does not support topology.
-	TopologyKeys []string `json:"topologyKeys"`
+	TopologyKeys []string `json:"topologyKeys,omitempty"`
 	// allocatable represents the volume resources of a node that are available for scheduling.
 	// This field is beta.
 	Allocatable *VolumeNodeResources `json:"allocatable,omitempty"`

@@ -65,7 +65,7 @@ func (in *SelfSubjectReview) DeepCopyObject() runtime.Object {
 type SelfSubjectReviewList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []SelfSubjectReview `json:"items"`
+	Items           []SelfSubjectReview `json:"items,omitempty"`
 }
 
 func (in *SelfSubjectReviewList) DeepCopyInto(out *SelfSubjectReviewList) {
@@ -137,7 +137,7 @@ func (in *TokenRequest) DeepCopyObject() runtime.Object {
 type TokenRequestList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []TokenRequest `json:"items"`
+	Items           []TokenRequest `json:"items,omitempty"`
 }
 
 func (in *TokenRequestList) DeepCopyInto(out *TokenRequestList) {
@@ -209,7 +209,7 @@ func (in *TokenReview) DeepCopyObject() runtime.Object {
 type TokenReviewList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []TokenReview `json:"items"`
+	Items           []TokenReview `json:"items,omitempty"`
 }
 
 func (in *TokenReviewList) DeepCopyInto(out *TokenReviewList) {
@@ -271,7 +271,7 @@ type TokenRequestSpec struct {
 	// token issued for multiple audiences may be used to authenticate
 	// against any of the audiences listed but implies a high degree of
 	// trust between the target audiences.
-	Audiences []string `json:"audiences"`
+	Audiences []string `json:"audiences,omitempty"`
 	// expirationSeconds is the requested duration of validity of the request. The
 	// token issuer may return a token with a different validity duration so a
 	// client needs to check the 'expiration' field in a response.
@@ -336,7 +336,7 @@ type TokenReviewSpec struct {
 	// verify that the token was intended for at least one of the audiences in
 	// this list. If no audiences are provided, the audience will default to the
 	// audience of the Kubernetes apiserver.
-	Audiences []string `json:"audiences"`
+	Audiences []string `json:"audiences,omitempty"`
 }
 
 func (in *TokenReviewSpec) DeepCopyInto(out *TokenReviewSpec) {
@@ -371,7 +371,7 @@ type TokenReviewStatus struct {
 	// server is audience aware. If a TokenReview returns an empty
 	// status.audience field where status.authenticated is "true", the token is
 	// valid against the audience of the Kubernetes API server.
-	Audiences []string `json:"audiences"`
+	Audiences []string `json:"audiences,omitempty"`
 	// error indicates that the token couldn't be checked
 	Error string `json:"error,omitempty"`
 }
@@ -407,7 +407,7 @@ type UserInfo struct {
 	// different UIDs.
 	UID string `json:"uid,omitempty"`
 	// groups is the names of groups this user is a part of.
-	Groups []string `json:"groups"`
+	Groups []string `json:"groups,omitempty"`
 	// extra is any additional information provided by the authenticator.
 	Extra map[string]ExtraValue `json:"extra,omitempty"`
 }

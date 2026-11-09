@@ -175,7 +175,7 @@ func (in *MutatingAdmissionPolicyBinding) DeepCopyObject() runtime.Object {
 type MutatingAdmissionPolicyBindingList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []MutatingAdmissionPolicyBinding `json:"items"`
+	Items           []MutatingAdmissionPolicyBinding `json:"items,omitempty"`
 }
 
 func (in *MutatingAdmissionPolicyBindingList) DeepCopyInto(out *MutatingAdmissionPolicyBindingList) {
@@ -210,7 +210,7 @@ func (in *MutatingAdmissionPolicyBindingList) DeepCopyObject() runtime.Object {
 type MutatingAdmissionPolicyList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []MutatingAdmissionPolicy `json:"items"`
+	Items           []MutatingAdmissionPolicy `json:"items,omitempty"`
 }
 
 func (in *MutatingAdmissionPolicyList) DeepCopyInto(out *MutatingAdmissionPolicyList) {
@@ -246,7 +246,7 @@ type MutatingWebhookConfiguration struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
 	// webhooks is a list of webhooks and the affected resources and operations.
-	Webhooks []MutatingWebhook `json:"webhooks"`
+	Webhooks []MutatingWebhook `json:"webhooks,omitempty"`
 }
 
 func (in *MutatingWebhookConfiguration) DeepCopyInto(out *MutatingWebhookConfiguration) {
@@ -281,7 +281,7 @@ func (in *MutatingWebhookConfiguration) DeepCopyObject() runtime.Object {
 type MutatingWebhookConfigurationList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []MutatingWebhookConfiguration `json:"items"`
+	Items           []MutatingWebhookConfiguration `json:"items,omitempty"`
 }
 
 func (in *MutatingWebhookConfigurationList) DeepCopyInto(out *MutatingWebhookConfigurationList) {
@@ -394,7 +394,7 @@ func (in *ValidatingAdmissionPolicyBinding) DeepCopyObject() runtime.Object {
 type ValidatingAdmissionPolicyBindingList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []ValidatingAdmissionPolicyBinding `json:"items"`
+	Items           []ValidatingAdmissionPolicyBinding `json:"items,omitempty"`
 }
 
 func (in *ValidatingAdmissionPolicyBindingList) DeepCopyInto(out *ValidatingAdmissionPolicyBindingList) {
@@ -429,7 +429,7 @@ func (in *ValidatingAdmissionPolicyBindingList) DeepCopyObject() runtime.Object 
 type ValidatingAdmissionPolicyList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []ValidatingAdmissionPolicy `json:"items"`
+	Items           []ValidatingAdmissionPolicy `json:"items,omitempty"`
 }
 
 func (in *ValidatingAdmissionPolicyList) DeepCopyInto(out *ValidatingAdmissionPolicyList) {
@@ -465,7 +465,7 @@ type ValidatingWebhookConfiguration struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
 	// webhooks is a list of webhooks and the affected resources and operations.
-	Webhooks []ValidatingWebhook `json:"webhooks"`
+	Webhooks []ValidatingWebhook `json:"webhooks,omitempty"`
 }
 
 func (in *ValidatingWebhookConfiguration) DeepCopyInto(out *ValidatingWebhookConfiguration) {
@@ -500,7 +500,7 @@ func (in *ValidatingWebhookConfiguration) DeepCopyObject() runtime.Object {
 type ValidatingWebhookConfigurationList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []ValidatingWebhookConfiguration `json:"items"`
+	Items           []ValidatingWebhookConfiguration `json:"items,omitempty"`
 }
 
 func (in *ValidatingWebhookConfigurationList) DeepCopyInto(out *ValidatingWebhookConfigurationList) {
@@ -552,14 +552,14 @@ type MutatingAdmissionPolicySpec struct {
 	// except matchConditions because matchConditions are evaluated before the rest of the policy.
 	// The expression of a variable can refer to other variables defined earlier in the list but not those after.
 	// Thus, variables must be sorted by the order of first appearance and acyclic.
-	Variables []Variable `json:"variables"`
+	Variables []Variable `json:"variables,omitempty"`
 	// mutations contain operations to perform on matching objects.
 	// mutations may not be empty; a minimum of one mutation is required.
 	// mutations are evaluated in order, and are reinvoked according to
 	// the reinvocationPolicy.
 	// The mutations of a policy are invoked for each binding of this policy
 	// and reinvocation of mutations occurs on a per binding basis.
-	Mutations []Mutation `json:"mutations"`
+	Mutations []Mutation `json:"mutations,omitempty"`
 	// failurePolicy defines how to handle failures for the admission policy. Failures can
 	// occur from CEL expression parse errors, type check errors, runtime errors and invalid
 	// or mis-configured policy definitions or bindings.
@@ -580,7 +580,7 @@ type MutatingAdmissionPolicySpec struct {
 	// 3. If any matchCondition evaluates to an error (but none are FALSE):
 	// - If failurePolicy=Fail, reject the request
 	// - If failurePolicy=Ignore, the policy is skipped
-	MatchConditions []MatchCondition `json:"matchConditions"`
+	MatchConditions []MatchCondition `json:"matchConditions,omitempty"`
 	// reinvocationPolicy indicates whether mutations may be called multiple times per MutatingAdmissionPolicyBinding
 	// as part of a single admission evaluation.
 	// Allowed values are "Never" and "IfNeeded".
@@ -697,7 +697,7 @@ type MutatingWebhook struct {
 	// from putting the cluster in a state which cannot be recovered from without completely
 	// disabling the plugin, ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks are never called
 	// on admission requests for ValidatingWebhookConfiguration and MutatingWebhookConfiguration objects.
-	Rules []RuleWithOperations `json:"rules"`
+	Rules []RuleWithOperations `json:"rules,omitempty"`
 	// failurePolicy defines how unrecognized errors from the admission endpoint are handled -
 	// allowed values are Ignore or Fail. Defaults to Fail.
 	FailurePolicy FailurePolicyType `json:"failurePolicy,omitempty"`
@@ -785,7 +785,7 @@ type MutatingWebhook struct {
 	// If a persisted webhook configuration specifies allowed versions and does not
 	// include any versions known to the API Server, calls to the webhook will fail
 	// and be subject to the failure policy.
-	AdmissionReviewVersions []string `json:"admissionReviewVersions"`
+	AdmissionReviewVersions []string `json:"admissionReviewVersions,omitempty"`
 	// reinvocationPolicy indicates whether this webhook should be called multiple times as part of a single admission evaluation.
 	// Allowed values are "Never" and "IfNeeded".
 	// Never: the webhook will not be called more than once in a single admission evaluation.
@@ -809,7 +809,7 @@ type MutatingWebhook struct {
 	// 3. If any matchCondition evaluates to an error (but none are FALSE):
 	// - If failurePolicy=Fail, reject the request
 	// - If failurePolicy=Ignore, the error is ignored and the webhook is skipped
-	MatchConditions []MatchCondition `json:"matchConditions"`
+	MatchConditions []MatchCondition `json:"matchConditions,omitempty"`
 }
 
 func (in *MutatingWebhook) DeepCopyInto(out *MutatingWebhook) {
@@ -870,7 +870,7 @@ type ValidatingAdmissionPolicySpec struct {
 	// validations contain CEL expressions which is used to apply the validation.
 	// Validations and AuditAnnotations may not both be empty; a minimum of one Validations or AuditAnnotations is
 	// required.
-	Validations []Validation `json:"validations"`
+	Validations []Validation `json:"validations,omitempty"`
 	// failurePolicy defines how to handle failures for the admission policy. Failures can
 	// occur from CEL expression parse errors, type check errors, runtime errors and invalid
 	// or mis-configured policy definitions or bindings.
@@ -885,7 +885,7 @@ type ValidatingAdmissionPolicySpec struct {
 	// annotations for the audit event of the API request.
 	// validations and auditAnnotations may not both be empty; a least one of validations or auditAnnotations is
 	// required.
-	AuditAnnotations []AuditAnnotation `json:"auditAnnotations"`
+	AuditAnnotations []AuditAnnotation `json:"auditAnnotations,omitempty"`
 	// matchConditions is a list of conditions that must be met for a request to be validated.
 	// Match conditions filter requests that have already been matched by the rules,
 	// namespaceSelector, and objectSelector. An empty list of matchConditions matches all requests.
@@ -898,14 +898,14 @@ type ValidatingAdmissionPolicySpec struct {
 	// 3. If any matchCondition evaluates to an error (but none are FALSE):
 	// - If failurePolicy=Fail, reject the request
 	// - If failurePolicy=Ignore, the policy is skipped
-	MatchConditions []MatchCondition `json:"matchConditions"`
+	MatchConditions []MatchCondition `json:"matchConditions,omitempty"`
 	// variables contain definitions of variables that can be used in composition of other expressions.
 	// Each variable is defined as a named CEL expression.
 	// The variables defined here will be available under `variables` in other expressions of the policy
 	// except MatchConditions because MatchConditions are evaluated before the rest of the policy.
 	// The expression of a variable can refer to other variables defined earlier in the list but not those after.
 	// Thus, Variables must be sorted by the order of first appearance and acyclic.
-	Variables []Variable `json:"variables"`
+	Variables []Variable `json:"variables,omitempty"`
 }
 
 func (in *ValidatingAdmissionPolicySpec) DeepCopyInto(out *ValidatingAdmissionPolicySpec) {
@@ -966,7 +966,7 @@ type ValidatingAdmissionPolicyStatus struct {
 	// Presence of this field indicates the completion of the type checking.
 	TypeChecking *TypeChecking `json:"typeChecking,omitempty"`
 	// conditions represent the latest available observations of a policy's current state.
-	Conditions []metav1.Condition `json:"conditions"`
+	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 
 func (in *ValidatingAdmissionPolicyStatus) DeepCopyInto(out *ValidatingAdmissionPolicyStatus) {
@@ -1040,7 +1040,7 @@ type ValidatingAdmissionPolicyBindingSpec struct {
 	// needlessly duplicates the validation failure both in the
 	// API response body and the HTTP warning headers.
 	// Required.
-	ValidationActions []ValidationAction `json:"validationActions"`
+	ValidationActions []ValidationAction `json:"validationActions,omitempty"`
 }
 
 func (in *ValidatingAdmissionPolicyBindingSpec) DeepCopyInto(out *ValidatingAdmissionPolicyBindingSpec) {
@@ -1087,7 +1087,7 @@ type ValidatingWebhook struct {
 	// from putting the cluster in a state which cannot be recovered from without completely
 	// disabling the plugin, ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks are never called
 	// on admission requests for ValidatingWebhookConfiguration and MutatingWebhookConfiguration objects.
-	Rules []RuleWithOperations `json:"rules"`
+	Rules []RuleWithOperations `json:"rules,omitempty"`
 	// failurePolicy defines how unrecognized errors from the admission endpoint are handled -
 	// allowed values are Ignore or Fail. Defaults to Fail.
 	FailurePolicy FailurePolicyType `json:"failurePolicy,omitempty"`
@@ -1175,7 +1175,7 @@ type ValidatingWebhook struct {
 	// If a persisted webhook configuration specifies allowed versions and does not
 	// include any versions known to the API Server, calls to the webhook will fail
 	// and be subject to the failure policy.
-	AdmissionReviewVersions []string `json:"admissionReviewVersions"`
+	AdmissionReviewVersions []string `json:"admissionReviewVersions,omitempty"`
 	// matchConditions is a list of conditions that must be met for a request to be sent to this
 	// webhook. Match conditions filter requests that have already been matched by the rules,
 	// namespaceSelector, and objectSelector. An empty list of matchConditions matches all requests.
@@ -1186,7 +1186,7 @@ type ValidatingWebhook struct {
 	// 3. If any matchCondition evaluates to an error (but none are FALSE):
 	// - If failurePolicy=Fail, reject the request
 	// - If failurePolicy=Ignore, the error is ignored and the webhook is skipped
-	MatchConditions []MatchCondition `json:"matchConditions"`
+	MatchConditions []MatchCondition `json:"matchConditions,omitempty"`
 }
 
 func (in *ValidatingWebhook) DeepCopyInto(out *ValidatingWebhook) {
@@ -1310,10 +1310,10 @@ type MatchResources struct {
 	ObjectSelector *metav1.LabelSelector `json:"objectSelector,omitempty"`
 	// resourceRules describes what operations on what resources/subresources the ValidatingAdmissionPolicy matches.
 	// The policy cares about an operation if it matches _any_ Rule.
-	ResourceRules []NamedRuleWithOperations `json:"resourceRules"`
+	ResourceRules []NamedRuleWithOperations `json:"resourceRules,omitempty"`
 	// excludeResourceRules describes what operations on what resources/subresources the ValidatingAdmissionPolicy should not care about.
 	// The exclude rules take precedence over include rules (if a resource matches both, it is excluded)
-	ExcludeResourceRules []NamedRuleWithOperations `json:"excludeResourceRules"`
+	ExcludeResourceRules []NamedRuleWithOperations `json:"excludeResourceRules,omitempty"`
 	// matchPolicy defines how the "MatchResources" list is used to match incoming requests.
 	// Allowed values are "Exact" or "Equivalent".
 	// - Exact: match a request only if it exactly matches a specified rule.
@@ -1573,7 +1573,7 @@ type RuleWithOperations struct {
 	// for all of those operations and any future admission operations that are added.
 	// If '*' is present, the length of the slice must be one.
 	// Required.
-	Operations []OperationType `json:"operations"`
+	Operations []OperationType `json:"operations,omitempty"`
 	// Rule is embedded, it describes other criteria of the rule, like
 	// APIGroups, APIVersions, Resources, etc.
 	Rule `json:",inline"`
@@ -1723,7 +1723,7 @@ func (in *AuditAnnotation) DeepCopy() *AuditAnnotation {
 
 type TypeChecking struct {
 	// expressionWarnings contains the type checking warnings for each expression.
-	ExpressionWarnings []ExpressionWarning `json:"expressionWarnings"`
+	ExpressionWarnings []ExpressionWarning `json:"expressionWarnings,omitempty"`
 }
 
 func (in *TypeChecking) DeepCopyInto(out *TypeChecking) {
@@ -1748,7 +1748,7 @@ func (in *TypeChecking) DeepCopy() *TypeChecking {
 
 type NamedRuleWithOperations struct {
 	// resourceNames is an optional white list of names that the rule applies to.  An empty set means that everything is allowed.
-	ResourceNames []string `json:"resourceNames"`
+	ResourceNames []string `json:"resourceNames,omitempty"`
 	// RuleWithOperations is a tuple of Operations and Resources.
 	RuleWithOperations `json:",inline"`
 }
@@ -1920,11 +1920,11 @@ type Rule struct {
 	// apiGroups is the API groups the resources belong to. '*' is all groups.
 	// If '*' is present, the length of the slice must be one.
 	// Required.
-	APIGroups []string `json:"apiGroups"`
+	APIGroups []string `json:"apiGroups,omitempty"`
 	// apiVersions is the API versions the resources belong to. '*' is all versions.
 	// If '*' is present, the length of the slice must be one.
 	// Required.
-	APIVersions []string `json:"apiVersions"`
+	APIVersions []string `json:"apiVersions,omitempty"`
 	// resources is a list of resources this rule applies to.
 	// For example:
 	// 'pods' means pods.
@@ -1937,7 +1937,7 @@ type Rule struct {
 	// overlap with each other.
 	// Depending on the enclosing object, subresources might not be allowed.
 	// Required.
-	Resources []string `json:"resources"`
+	Resources []string `json:"resources,omitempty"`
 	// scope specifies the scope of this rule.
 	// Valid values are "Cluster", "Namespaced", and "*"
 	// "Cluster" means that only cluster-scoped resources will match this rule.

@@ -68,7 +68,7 @@ func (in *Lease) DeepCopyObject() runtime.Object {
 type LeaseList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []Lease `json:"items"`
+	Items           []Lease `json:"items,omitempty"`
 }
 
 func (in *LeaseList) DeepCopyInto(out *LeaseList) {

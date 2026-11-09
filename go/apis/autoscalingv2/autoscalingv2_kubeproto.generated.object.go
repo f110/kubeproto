@@ -113,7 +113,7 @@ func (in *HorizontalPodAutoscaler) DeepCopyObject() runtime.Object {
 type HorizontalPodAutoscalerList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []HorizontalPodAutoscaler `json:"items"`
+	Items           []HorizontalPodAutoscaler `json:"items,omitempty"`
 }
 
 func (in *HorizontalPodAutoscalerList) DeepCopyInto(out *HorizontalPodAutoscalerList) {
@@ -166,7 +166,7 @@ type HorizontalPodAutoscalerSpec struct {
 	// increased, and vice-versa.  See the individual metric source types for
 	// more information about how each type of metric must respond.
 	// If not set, the default metric will be set to 80% average CPU utilization.
-	Metrics []MetricSpec `json:"metrics"`
+	Metrics []MetricSpec `json:"metrics,omitempty"`
 	// behavior configures the scaling behavior of the target
 	// in both Up and Down directions (scaleUp and scaleDown fields respectively).
 	// If not set, the default HPAScalingRules for scale up and scale down are used.
@@ -212,10 +212,10 @@ type HorizontalPodAutoscalerStatus struct {
 	// as last calculated by the autoscaler.
 	DesiredReplicas int `json:"desiredReplicas"`
 	// currentMetrics is the last read state of the metrics used by this autoscaler.
-	CurrentMetrics []MetricStatus `json:"currentMetrics"`
+	CurrentMetrics []MetricStatus `json:"currentMetrics,omitempty"`
 	// conditions is the set of conditions required for this autoscaler to scale its target,
 	// and indicates whether or not those conditions are met.
-	Conditions []HorizontalPodAutoscalerCondition `json:"conditions"`
+	Conditions []HorizontalPodAutoscalerCondition `json:"conditions,omitempty"`
 }
 
 func (in *HorizontalPodAutoscalerStatus) DeepCopyInto(out *HorizontalPodAutoscalerStatus) {
@@ -608,7 +608,7 @@ type HPAScalingRules struct {
 	// If not set, use the default values:
 	// - For scale up: allow doubling the number of pods, or an absolute change of 4 pods in a 15s window.
 	// - For scale down: allow all pods to be removed in a 15s window.
-	Policies []HPAScalingPolicy `json:"policies"`
+	Policies []HPAScalingPolicy `json:"policies,omitempty"`
 	// tolerance is the tolerance on the ratio between the current and desired
 	// metric value under which no updates are made to the desired number of
 	// replicas (e.g. 0.01 for 1%). Must be greater than or equal to zero. If not

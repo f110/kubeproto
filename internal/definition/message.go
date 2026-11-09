@@ -380,7 +380,7 @@ func (f *Field) Tag() string {
 	if f.FieldName != "" {
 		s.WriteString(f.FieldName)
 	}
-	if f.Optional {
+	if f.Optional || f.Repeated {
 		s.WriteString(",omitempty")
 	}
 	s.WriteString("\"`")

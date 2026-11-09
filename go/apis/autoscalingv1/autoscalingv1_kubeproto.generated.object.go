@@ -89,7 +89,7 @@ func (in *HorizontalPodAutoscaler) DeepCopyObject() runtime.Object {
 type HorizontalPodAutoscalerList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []HorizontalPodAutoscaler `json:"items"`
+	Items           []HorizontalPodAutoscaler `json:"items,omitempty"`
 }
 
 func (in *HorizontalPodAutoscalerList) DeepCopyInto(out *HorizontalPodAutoscalerList) {
@@ -165,7 +165,7 @@ func (in *Scale) DeepCopyObject() runtime.Object {
 type ScaleList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []Scale `json:"items"`
+	Items           []Scale `json:"items,omitempty"`
 }
 
 func (in *ScaleList) DeepCopyInto(out *ScaleList) {

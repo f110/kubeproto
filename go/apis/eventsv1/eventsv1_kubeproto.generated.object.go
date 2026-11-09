@@ -125,7 +125,7 @@ func (in *Event) DeepCopyObject() runtime.Object {
 type EventList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []Event `json:"items"`
+	Items           []Event `json:"items,omitempty"`
 }
 
 func (in *EventList) DeepCopyInto(out *EventList) {

@@ -99,7 +99,7 @@ func (in *DeviceClass) DeepCopyObject() runtime.Object {
 type DeviceClassList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []DeviceClass `json:"items"`
+	Items           []DeviceClass `json:"items,omitempty"`
 }
 
 func (in *DeviceClassList) DeepCopyInto(out *DeviceClassList) {
@@ -172,7 +172,7 @@ func (in *ResourceClaim) DeepCopyObject() runtime.Object {
 type ResourceClaimList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []ResourceClaim `json:"items"`
+	Items           []ResourceClaim `json:"items,omitempty"`
 }
 
 func (in *ResourceClaimList) DeepCopyInto(out *ResourceClaimList) {
@@ -240,7 +240,7 @@ func (in *ResourceClaimTemplate) DeepCopyObject() runtime.Object {
 type ResourceClaimTemplateList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []ResourceClaimTemplate `json:"items"`
+	Items           []ResourceClaimTemplate `json:"items,omitempty"`
 }
 
 func (in *ResourceClaimTemplateList) DeepCopyInto(out *ResourceClaimTemplateList) {
@@ -306,7 +306,7 @@ func (in *ResourceSlice) DeepCopyObject() runtime.Object {
 type ResourceSliceList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []ResourceSlice `json:"items"`
+	Items           []ResourceSlice `json:"items,omitempty"`
 }
 
 func (in *ResourceSliceList) DeepCopyInto(out *ResourceSliceList) {
@@ -340,12 +340,12 @@ func (in *ResourceSliceList) DeepCopyObject() runtime.Object {
 
 type DeviceClassSpec struct {
 	// Each selector must be satisfied by a device which is claimed via this class.
-	Selectors []DeviceSelector `json:"selectors"`
+	Selectors []DeviceSelector `json:"selectors,omitempty"`
 	// Config defines configuration parameters that apply to each device that is claimed via this class.
 	// Some classses may potentially be satisfied by multiple drivers, so each instance of a vendor
 	// configuration applies to exactly one driver.
 	// They are passed to the driver, but are not considered while allocating the claim.
-	Config []DeviceClassConfiguration `json:"config"`
+	Config []DeviceClassConfiguration `json:"config,omitempty"`
 	// ExtendedResourceName is the extended resource name for the devices of this class.
 	// The devices of this class can be used to satisfy a pod's extended resource requests.
 	// It has the same format as the name of a pod's extended resource.
@@ -423,11 +423,11 @@ type ResourceClaimStatus struct {
 	// waiting for the ResourceClaim to become usable again.
 	// There can be at most 256 such reservations. This may get increased in
 	// the future, but not reduced.
-	ReservedFor []ResourceClaimConsumerReference `json:"reservedFor"`
+	ReservedFor []ResourceClaimConsumerReference `json:"reservedFor,omitempty"`
 	// Devices contains the status of each device allocated for this
 	// claim, as reported by the driver. This can include driver-specific
 	// information. Entries are owned by their respective drivers.
-	Devices []AllocatedDeviceStatus `json:"devices"`
+	Devices []AllocatedDeviceStatus `json:"devices,omitempty"`
 }
 
 func (in *ResourceClaimStatus) DeepCopyInto(out *ResourceClaimStatus) {
@@ -523,7 +523,7 @@ type ResourceSliceSpec struct {
 	// Devices lists some or all of the devices in this pool.
 	// Must not have more than 128 entries. If any device uses taints or consumes counters the limit is 64.
 	// Only one of Devices and SharedCounters can be set in a ResourceSlice.
-	Devices []Device `json:"devices"`
+	Devices []Device `json:"devices,omitempty"`
 	// PerDeviceNodeSelection defines whether the access from nodes to
 	// resources in the pool is set on the ResourceSlice level or on each
 	// device. If it is set to true, every device defined the ResourceSlice
@@ -535,7 +535,7 @@ type ResourceSliceSpec struct {
 	// The names of the counter sets must be unique in the ResourcePool.
 	// Only one of Devices and SharedCounters can be set in a ResourceSlice.
 	// The maximum number of counter sets is 8.
-	SharedCounters []CounterSet `json:"sharedCounters"`
+	SharedCounters []CounterSet `json:"sharedCounters,omitempty"`
 }
 
 func (in *ResourceSliceSpec) DeepCopyInto(out *ResourceSliceSpec) {
@@ -615,14 +615,14 @@ func (in *DeviceClassConfiguration) DeepCopy() *DeviceClassConfiguration {
 type DeviceClaim struct {
 	// Requests represent individual requests for distinct devices which
 	// must all be satisfied. If empty, nothing needs to be allocated.
-	Requests []DeviceRequest `json:"requests"`
+	Requests []DeviceRequest `json:"requests,omitempty"`
 	// These constraints must be satisfied by the set of devices that get
 	// allocated for the claim.
-	Constraints []DeviceConstraint `json:"constraints"`
+	Constraints []DeviceConstraint `json:"constraints,omitempty"`
 	// This field holds configuration for multiple potential drivers which
 	// could satisfy requests in this claim. It is ignored while allocating
 	// the claim.
-	Config []DeviceClaimConfiguration `json:"config"`
+	Config []DeviceClaimConfiguration `json:"config,omitempty"`
 }
 
 func (in *DeviceClaim) DeepCopyInto(out *DeviceClaim) {
@@ -747,7 +747,7 @@ type AllocatedDeviceStatus struct {
 	// If the device has been configured according to the class and claim
 	// config references, the `Ready` condition should be True.
 	// Must not contain more than 8 entries.
-	Conditions []metav1.Condition `json:"conditions"`
+	Conditions []metav1.Condition `json:"conditions,omitempty"`
 	// Data contains arbitrary driver-specific data.
 	// The length of the raw data must be smaller or equal to 10 Ki.
 	Data *runtime.RawExtension `json:"data,omitempty"`
@@ -841,7 +841,7 @@ type Device struct {
 	// There can only be a single entry per counterSet.
 	// The maximum number of device counter consumptions per
 	// device is 2.
-	ConsumesCounters []DeviceCounterConsumption `json:"consumesCounters"`
+	ConsumesCounters []DeviceCounterConsumption `json:"consumesCounters,omitempty"`
 	// NodeName identifies the node where the device is available.
 	// Must only be set if Spec.PerDeviceNodeSelection is set to true.
 	// At most one of NodeName, NodeSelector and AllNodes can be set.
@@ -861,7 +861,7 @@ type Device struct {
 	// allowed devices per ResourceSlice is 64 instead of 128.
 	// This is a beta field and requires enabling the DRADeviceTaints
 	// feature gate.
-	Taints []DeviceTaint `json:"taints"`
+	Taints []DeviceTaint `json:"taints,omitempty"`
 	// BindsToNode indicates if the usage of an allocation involving this device
 	// has to be limited to exactly the node that was chosen when allocating the claim.
 	// If set to true, the scheduler will set the ResourceClaim.Status.Allocation.NodeSelector
@@ -877,7 +877,7 @@ type Device struct {
 	// The conditions must be a valid condition type string.
 	// This is a beta field and requires enabling the DRADeviceBindingConditions and DRAResourceClaimDeviceStatus
 	// feature gates.
-	BindingConditions []string `json:"bindingConditions"`
+	BindingConditions []string `json:"bindingConditions,omitempty"`
 	// BindingFailureConditions defines the conditions for binding failure.
 	// They may be set in the per-device status conditions.
 	// If any is set to "True", a binding failure occurred.
@@ -885,7 +885,7 @@ type Device struct {
 	// The conditions must be a valid condition type string.
 	// This is a beta field and requires enabling the DRADeviceBindingConditions and DRAResourceClaimDeviceStatus
 	// feature gates.
-	BindingFailureConditions []string `json:"bindingFailureConditions"`
+	BindingFailureConditions []string `json:"bindingFailureConditions,omitempty"`
 	// AllowMultipleAllocations marks whether the device is allowed to be allocated to multiple DeviceRequests.
 	// If AllowMultipleAllocations is set to true, the device can be allocated more than once,
 	// and all of its capacity is consumable, regardless of whether the requestPolicy is defined or not.
@@ -1111,7 +1111,7 @@ type DeviceRequest struct {
 	// will determine which node is chosen. This means that the set of
 	// devices allocated to a claim might not be the optimal set
 	// available to the cluster. Scoring will be implemented later.
-	FirstAvailable []DeviceSubRequest `json:"firstAvailable"`
+	FirstAvailable []DeviceSubRequest `json:"firstAvailable,omitempty"`
 }
 
 func (in *DeviceRequest) DeepCopyInto(out *DeviceRequest) {
@@ -1148,7 +1148,7 @@ type DeviceConstraint struct {
 	// References to subrequests must include the name of the main request
 	// and may include the subrequest using the format <main request>[/<subrequest>]. If just
 	// the main request is given, the constraint applies to all subrequests.
-	Requests []string `json:"requests"`
+	Requests []string `json:"requests,omitempty"`
 	// MatchAttribute requires that all devices in question have this
 	// attribute and that its type and value are the same across those
 	// devices.
@@ -1202,7 +1202,7 @@ type DeviceClaimConfiguration struct {
 	// References to subrequests must include the name of the main request
 	// and may include the subrequest using the format <main request>[/<subrequest>]. If just
 	// the main request is given, the configuration applies to all subrequests.
-	Requests            []string `json:"requests"`
+	Requests            []string `json:"requests,omitempty"`
 	DeviceConfiguration `json:",inline"`
 }
 
@@ -1227,14 +1227,14 @@ func (in *DeviceClaimConfiguration) DeepCopy() *DeviceClaimConfiguration {
 
 type DeviceAllocationResult struct {
 	// Results lists all allocated devices.
-	Results []DeviceRequestAllocationResult `json:"results"`
+	Results []DeviceRequestAllocationResult `json:"results,omitempty"`
 	// This field is a combination of all the claim and class configuration parameters.
 	// Drivers can distinguish between those based on a flag.
 	// This includes configuration parameters for drivers which have no allocated
 	// devices in the result because it is up to the drivers which configuration
 	// parameters they support. They can silently ignore unknown configuration
 	// parameters.
-	Config []DeviceAllocationConfiguration `json:"config"`
+	Config []DeviceAllocationConfiguration `json:"config,omitempty"`
 }
 
 func (in *DeviceAllocationResult) DeepCopyInto(out *DeviceAllocationResult) {
@@ -1275,7 +1275,7 @@ type NetworkDeviceData struct {
 	// The IPs are in the CIDR notation, which includes both the address and the
 	// associated subnet mask.
 	// e.g.: "192.0.2.5/24" for IPv4 and "2001:db8::5/64" for IPv6.
-	IPs []string `json:"ips"`
+	IPs []string `json:"ips,omitempty"`
 	// HardwareAddress represents the hardware address (e.g. MAC Address) of the device's network interface.
 	// Must not be longer than 128 bytes.
 	HardwareAddress string `json:"hardwareAddress,omitempty"`
@@ -1311,17 +1311,17 @@ type DeviceAttribute struct {
 	VersionValue string `json:"version,omitempty"`
 	// IntValues is a non-empty list of numbers.
 	// This is an alpha field and requires enabling the DRAListTypeAttributes feature gate.
-	IntValues []int64 `json:"ints"`
+	IntValues []int64 `json:"ints,omitempty"`
 	// BoolValues is a non-empty list of true/false values.
-	BoolValues []bool `json:"bools"`
+	BoolValues []bool `json:"bools,omitempty"`
 	// StringValues is a non-empty list of strings.
 	// Each string must not be longer than 64 characters.
 	// This is an alpha field and requires enabling the DRAListTypeAttributes feature gate.
-	StringValues []string `json:"strings"`
+	StringValues []string `json:"strings,omitempty"`
 	// VersionValues is a non-empty list of semantic versions according to semver.org spec 2.0.0.
 	// Each version string must not be longer than 64 characters.
 	// This is an alpha field and requires enabling the DRAListTypeAttributes feature gate.
-	VersionValues []string `json:"versions"`
+	VersionValues []string `json:"versions,omitempty"`
 }
 
 func (in *DeviceAttribute) DeepCopyInto(out *DeviceAttribute) {
@@ -1579,7 +1579,7 @@ type ExactDeviceRequest struct {
 	// device in order for that device to be considered for this
 	// request. All selectors must be satisfied for a device to be
 	// considered.
-	Selectors []DeviceSelector `json:"selectors"`
+	Selectors []DeviceSelector `json:"selectors,omitempty"`
 	// AllocationMode and its related fields define how devices are allocated
 	// to satisfy this request. Supported values are:
 	// - ExactCount: This request is for a specific number of devices.
@@ -1619,7 +1619,7 @@ type ExactDeviceRequest struct {
 	// The maximum number of tolerations is 16.
 	// This is a beta field and requires enabling the DRADeviceTaints
 	// feature gate.
-	Tolerations []DeviceToleration `json:"tolerations"`
+	Tolerations []DeviceToleration `json:"tolerations,omitempty"`
 	// Capacity define resource requirements against each capacity.
 	// If this field is unset and the device supports multiple allocations,
 	// the default value will be applied to each capacity according to requestPolicy.
@@ -1685,7 +1685,7 @@ type DeviceSubRequest struct {
 	// device in order for that device to be considered for this
 	// subrequest. All selectors must be satisfied for a device to be
 	// considered.
-	Selectors []DeviceSelector `json:"selectors"`
+	Selectors []DeviceSelector `json:"selectors,omitempty"`
 	// AllocationMode and its related fields define how devices are allocated
 	// to satisfy this subrequest. Supported values are:
 	// - ExactCount: This request is for a specific number of devices.
@@ -1716,7 +1716,7 @@ type DeviceSubRequest struct {
 	// The maximum number of tolerations is 16.
 	// This is a beta field and requires enabling the DRADeviceTaints
 	// feature gate.
-	Tolerations []DeviceToleration `json:"tolerations"`
+	Tolerations []DeviceToleration `json:"tolerations,omitempty"`
 	// Capacity define resource requirements against each capacity.
 	// If this field is unset and the device supports multiple allocations,
 	// the default value will be applied to each capacity according to requestPolicy.
@@ -1795,17 +1795,17 @@ type DeviceRequestAllocationResult struct {
 	// The maximum number of tolerations is 16.
 	// This is a beta field and requires enabling the DRADeviceTaints
 	// feature gate.
-	Tolerations []DeviceToleration `json:"tolerations"`
+	Tolerations []DeviceToleration `json:"tolerations,omitempty"`
 	// BindingConditions contains a copy of the BindingConditions
 	// from the corresponding ResourceSlice at the time of allocation.
 	// This is a beta field and requires enabling the DRADeviceBindingConditions and DRAResourceClaimDeviceStatus
 	// feature gates.
-	BindingConditions []string `json:"bindingConditions"`
+	BindingConditions []string `json:"bindingConditions,omitempty"`
 	// BindingFailureConditions contains a copy of the BindingFailureConditions
 	// from the corresponding ResourceSlice at the time of allocation.
 	// This is a beta field and requires enabling the DRADeviceBindingConditions and DRAResourceClaimDeviceStatus
 	// feature gates.
-	BindingFailureConditions []string `json:"bindingFailureConditions"`
+	BindingFailureConditions []string `json:"bindingFailureConditions,omitempty"`
 	// ShareID uniquely identifies an individual allocation share of the device,
 	// used when the device supports multiple simultaneous allocations.
 	// It serves as an additional map key to differentiate concurrent shares
@@ -1867,7 +1867,7 @@ type DeviceAllocationConfiguration struct {
 	// References to subrequests must include the name of the main request
 	// and may include the subrequest using the format <main request>[/<subrequest>]. If just
 	// the main request is given, the configuration applies to all subrequests.
-	Requests            []string `json:"requests"`
+	Requests            []string `json:"requests,omitempty"`
 	DeviceConfiguration `json:",inline"`
 }
 
@@ -1904,7 +1904,7 @@ type CapacityRequestPolicy struct {
 	// That is: min(ceil(requestedValue) ∈ validValues), where requestedValue ≤ max(validValues).
 	// If the requested amount exceeds all valid values, the request violates the policy,
 	// and this device cannot be allocated.
-	ValidValues []apiresource.Quantity `json:"validValues"`
+	ValidValues []apiresource.Quantity `json:"validValues,omitempty"`
 	// ValidRange defines an acceptable quantity value range in consuming requests.
 	// If this field is set,
 	// Default must be defined and it must fall within the defined ValidRange.

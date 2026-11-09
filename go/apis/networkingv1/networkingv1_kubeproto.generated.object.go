@@ -87,7 +87,7 @@ func (in *IPAddress) DeepCopyObject() runtime.Object {
 type IPAddressList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []IPAddress `json:"items"`
+	Items           []IPAddress `json:"items,omitempty"`
 }
 
 func (in *IPAddressList) DeepCopyInto(out *IPAddressList) {
@@ -200,7 +200,7 @@ func (in *IngressClass) DeepCopyObject() runtime.Object {
 type IngressClassList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []IngressClass `json:"items"`
+	Items           []IngressClass `json:"items,omitempty"`
 }
 
 func (in *IngressClassList) DeepCopyInto(out *IngressClassList) {
@@ -235,7 +235,7 @@ func (in *IngressClassList) DeepCopyObject() runtime.Object {
 type IngressList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []Ingress `json:"items"`
+	Items           []Ingress `json:"items,omitempty"`
 }
 
 func (in *IngressList) DeepCopyInto(out *IngressList) {
@@ -304,7 +304,7 @@ func (in *NetworkPolicy) DeepCopyObject() runtime.Object {
 type NetworkPolicyList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []NetworkPolicy `json:"items"`
+	Items           []NetworkPolicy `json:"items,omitempty"`
 }
 
 func (in *NetworkPolicyList) DeepCopyInto(out *NetworkPolicyList) {
@@ -382,7 +382,7 @@ func (in *ServiceCIDR) DeepCopyObject() runtime.Object {
 type ServiceCIDRList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []ServiceCIDR `json:"items"`
+	Items           []ServiceCIDR `json:"items,omitempty"`
 }
 
 func (in *ServiceCIDRList) DeepCopyInto(out *ServiceCIDRList) {
@@ -460,10 +460,10 @@ type IngressSpec struct {
 	// they will be multiplexed on the same port according to the hostname specified
 	// through the SNI TLS extension, if the ingress controller fulfilling the
 	// ingress supports SNI.
-	TLS []IngressTLS `json:"tls"`
+	TLS []IngressTLS `json:"tls,omitempty"`
 	// rules is a list of host rules used to configure the Ingress. If unspecified,
 	// or no rule matches, all traffic is sent to the default backend.
-	Rules []IngressRule `json:"rules"`
+	Rules []IngressRule `json:"rules,omitempty"`
 }
 
 func (in *IngressSpec) DeepCopyInto(out *IngressSpec) {
@@ -568,7 +568,7 @@ type NetworkPolicySpec struct {
 	// across all of the NetworkPolicy objects whose podSelector matches the pod. If
 	// this field is empty then this NetworkPolicy does not allow any traffic (and serves
 	// solely to ensure that the pods it selects are isolated by default)
-	Ingress []NetworkPolicyIngressRule `json:"ingress"`
+	Ingress []NetworkPolicyIngressRule `json:"ingress,omitempty"`
 	// egress is a list of egress rules to be applied to the selected pods. Outgoing traffic
 	// is allowed if there are no NetworkPolicies selecting the pod (and cluster policy
 	// otherwise allows the traffic), OR if the traffic matches at least one egress rule
@@ -576,7 +576,7 @@ type NetworkPolicySpec struct {
 	// this field is empty then this NetworkPolicy limits all outgoing traffic (and serves
 	// solely to ensure that the pods it selects are isolated by default).
 	// This field is beta-level in 1.8
-	Egress []NetworkPolicyEgressRule `json:"egress"`
+	Egress []NetworkPolicyEgressRule `json:"egress,omitempty"`
 	// policyTypes is a list of rule types that the NetworkPolicy relates to.
 	// Valid options are ["Ingress"], ["Egress"], or ["Ingress", "Egress"].
 	// If this field is not specified, it will default based on the existence of ingress or egress rules;
@@ -587,7 +587,7 @@ type NetworkPolicySpec struct {
 	// you must specify a policyTypes value that include "Egress" (since such a policy would not include
 	// an egress section and would otherwise default to just [ "Ingress" ]).
 	// This field is beta-level in 1.8
-	PolicyTypes []PolicyType `json:"policyTypes"`
+	PolicyTypes []PolicyType `json:"policyTypes,omitempty"`
 }
 
 func (in *NetworkPolicySpec) DeepCopyInto(out *NetworkPolicySpec) {
@@ -627,7 +627,7 @@ type ServiceCIDRSpec struct {
 	// CIDRs defines the IP blocks in CIDR notation (e.g. "192.168.0.0/24" or "2001:db8::/64")
 	// from which to assign service cluster IPs. Max of two CIDRs is allowed, one of each IP family.
 	// This field is immutable.
-	CIDRs []string `json:"cidrs"`
+	CIDRs []string `json:"cidrs,omitempty"`
 }
 
 func (in *ServiceCIDRSpec) DeepCopyInto(out *ServiceCIDRSpec) {
@@ -651,7 +651,7 @@ func (in *ServiceCIDRSpec) DeepCopy() *ServiceCIDRSpec {
 type ServiceCIDRStatus struct {
 	// conditions holds an array of metav1.Condition that describe the state of the ServiceCIDR.
 	// Current service state
-	Conditions []metav1.Condition `json:"conditions"`
+	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 
 func (in *ServiceCIDRStatus) DeepCopyInto(out *ServiceCIDRStatus) {
@@ -737,7 +737,7 @@ type IngressTLS struct {
 	// this list must match the name/s used in the tlsSecret. Defaults to the
 	// wildcard host setting for the loadbalancer controller fulfilling this
 	// Ingress, if left unspecified.
-	Hosts []string `json:"hosts"`
+	Hosts []string `json:"hosts,omitempty"`
 	// secretName is the name of the secret used to terminate TLS traffic on
 	// port 443. Field is left optional to allow TLS routing based on SNI
 	// hostname alone. If the SNI host in a listener conflicts with the "Host"
@@ -811,7 +811,7 @@ func (in *IngressRule) DeepCopy() *IngressRule {
 
 type IngressLoadBalancerStatus struct {
 	// ingress is a list containing ingress points for the load-balancer.
-	Ingress []IngressLoadBalancerIngress `json:"ingress"`
+	Ingress []IngressLoadBalancerIngress `json:"ingress,omitempty"`
 }
 
 func (in *IngressLoadBalancerStatus) DeepCopyInto(out *IngressLoadBalancerStatus) {
@@ -871,13 +871,13 @@ type NetworkPolicyIngressRule struct {
 	// empty or missing, this rule matches all ports (traffic not restricted by port).
 	// If this field is present and contains at least one item, then this rule allows
 	// traffic only if the traffic matches at least one port in the list.
-	Ports []NetworkPolicyPort `json:"ports"`
+	Ports []NetworkPolicyPort `json:"ports,omitempty"`
 	// from is a list of sources which should be able to access the pods selected for this rule.
 	// Items in this list are combined using a logical OR operation. If this field is
 	// empty or missing, this rule matches all sources (traffic not restricted by
 	// source). If this field is present and contains at least one item, this rule
 	// allows traffic only if the traffic matches at least one item in the from list.
-	From []NetworkPolicyPeer `json:"from"`
+	From []NetworkPolicyPeer `json:"from,omitempty"`
 }
 
 func (in *NetworkPolicyIngressRule) DeepCopyInto(out *NetworkPolicyIngressRule) {
@@ -913,13 +913,13 @@ type NetworkPolicyEgressRule struct {
 	// empty or missing, this rule matches all ports (traffic not restricted by port).
 	// If this field is present and contains at least one item, then this rule allows
 	// traffic only if the traffic matches at least one port in the list.
-	Ports []NetworkPolicyPort `json:"ports"`
+	Ports []NetworkPolicyPort `json:"ports,omitempty"`
 	// to is a list of destinations for outgoing traffic of pods selected for this rule.
 	// Items in this list are combined using a logical OR operation. If this field is
 	// empty or missing, this rule matches all destinations (traffic not restricted by
 	// destination). If this field is present and contains at least one item, this rule
 	// allows traffic only if the traffic matches at least one item in the to list.
-	To []NetworkPolicyPeer `json:"to"`
+	To []NetworkPolicyPeer `json:"to,omitempty"`
 }
 
 func (in *NetworkPolicyEgressRule) DeepCopyInto(out *NetworkPolicyEgressRule) {
@@ -1004,7 +1004,7 @@ type IngressLoadBalancerIngress struct {
 	// hostname is set for load-balancer ingress points that are DNS based.
 	Hostname string `json:"hostname,omitempty"`
 	// ports provides information about the ports exposed by this LoadBalancer.
-	Ports []IngressPortStatus `json:"ports"`
+	Ports []IngressPortStatus `json:"ports,omitempty"`
 }
 
 func (in *IngressLoadBalancerIngress) DeepCopyInto(out *IngressLoadBalancerIngress) {
@@ -1131,7 +1131,7 @@ func (in *ServiceBackendPort) DeepCopy() *ServiceBackendPort {
 
 type HTTPIngressRuleValue struct {
 	// paths is a collection of paths that map requests to backends.
-	Paths []HTTPIngressPath `json:"paths"`
+	Paths []HTTPIngressPath `json:"paths,omitempty"`
 }
 
 func (in *HTTPIngressRuleValue) DeepCopyInto(out *HTTPIngressRuleValue) {
@@ -1191,7 +1191,7 @@ type IPBlock struct {
 	// except is a slice of CIDRs that should not be included within an IPBlock
 	// Valid examples are "192.168.1.0/24" or "2001:db8::/64"
 	// Except values will be rejected if they are outside the cidr range
-	Except []string `json:"except"`
+	Except []string `json:"except,omitempty"`
 }
 
 func (in *IPBlock) DeepCopyInto(out *IPBlock) {

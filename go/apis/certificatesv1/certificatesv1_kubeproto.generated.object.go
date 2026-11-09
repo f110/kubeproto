@@ -104,7 +104,7 @@ func (in *CertificateSigningRequest) DeepCopyObject() runtime.Object {
 type CertificateSigningRequestList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []CertificateSigningRequest `json:"items"`
+	Items           []CertificateSigningRequest `json:"items,omitempty"`
 }
 
 func (in *CertificateSigningRequestList) DeepCopyInto(out *CertificateSigningRequestList) {
@@ -184,7 +184,7 @@ type CertificateSigningRequestSpec struct {
 	// "code signing", "email protection", "s/mime",
 	// "ipsec end system", "ipsec tunnel", "ipsec user",
 	// "timestamping", "ocsp signing", "microsoft sgc", "netscape sgc"
-	Usages []KeyUsage `json:"usages"`
+	Usages []KeyUsage `json:"usages,omitempty"`
 	// username contains the name of the user that created the CertificateSigningRequest.
 	// Populated by the API server on creation and immutable.
 	Username string `json:"username,omitempty"`
@@ -193,7 +193,7 @@ type CertificateSigningRequestSpec struct {
 	UID string `json:"uid,omitempty"`
 	// groups contains group membership of the user that created the CertificateSigningRequest.
 	// Populated by the API server on creation and immutable.
-	Groups []string `json:"groups"`
+	Groups []string `json:"groups,omitempty"`
 	// extra contains extra attributes of the user that created the CertificateSigningRequest.
 	// Populated by the API server on creation and immutable.
 	Extra map[string]ExtraValue `json:"extra,omitempty"`
@@ -231,7 +231,7 @@ func (in *CertificateSigningRequestSpec) DeepCopy() *CertificateSigningRequestSp
 
 type CertificateSigningRequestStatus struct {
 	// conditions applied to the request. Known conditions are "Approved", "Denied", and "Failed".
-	Conditions []CertificateSigningRequestCondition `json:"conditions"`
+	Conditions []CertificateSigningRequestCondition `json:"conditions,omitempty"`
 	// certificate is populated with an issued certificate by the signer after an Approved condition is present.
 	// This field is set via the /status subresource. Once populated, this field is immutable.
 	// If the certificate signing request is denied, a condition of type "Denied" is added and this field remains empty.

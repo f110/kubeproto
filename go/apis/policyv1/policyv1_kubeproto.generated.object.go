@@ -71,7 +71,7 @@ func (in *Eviction) DeepCopyObject() runtime.Object {
 type EvictionList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []Eviction `json:"items"`
+	Items           []Eviction `json:"items,omitempty"`
 }
 
 func (in *EvictionList) DeepCopyInto(out *EvictionList) {
@@ -147,7 +147,7 @@ func (in *PodDisruptionBudget) DeepCopyObject() runtime.Object {
 type PodDisruptionBudgetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []PodDisruptionBudget `json:"items"`
+	Items           []PodDisruptionBudget `json:"items,omitempty"`
 }
 
 func (in *PodDisruptionBudgetList) DeepCopyInto(out *PodDisruptionBudgetList) {
@@ -280,7 +280,7 @@ type PodDisruptionBudgetStatus struct {
 	// - SufficientPods: There are more pods than required by the PodDisruptionBudget.
 	// The condition will be True, and the number of allowed
 	// disruptions are provided by the disruptionsAllowed property.
-	Conditions []metav1.Condition `json:"conditions"`
+	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 
 func (in *PodDisruptionBudgetStatus) DeepCopyInto(out *PodDisruptionBudgetStatus) {
