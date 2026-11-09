@@ -56,16 +56,17 @@ func genFakeClient() error {
 	var res pluginpb.CodeGeneratorResponse
 	supportedFeatures := uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)
 	res.SupportedFeatures = &supportedFeatures
-	out := new(bytes.Buffer)
+	out, schemaOut := new(bytes.Buffer), new(bytes.Buffer)
+	schemaFile := strings.TrimSuffix(outFile, filepath.Ext(outFile)) + ".typeschema.yaml"
 	g := k8s.NewFakeClientGenerator(input.FileToGenerate, files)
 	packageName := path.Base(filepath.Dir(outFile))
-	if err := g.Generate(out, packageName, importPath, clientPath, FQDNSetName); err != nil {
+	if err := g.Generate(out, schemaOut, filepath.Base(schemaFile), packageName, importPath, clientPath, FQDNSetName); err != nil {
 		return err
 	}
-	res.File = append(res.File, &pluginpb.CodeGeneratorResponse_File{
-		Name:    proto.String(outFile),
-		Content: proto.String(out.String()),
-	})
+	res.File = append(res.File,
+		&pluginpb.CodeGeneratorResponse_File{Name: proto.String(outFile), Content: proto.String(out.String())},
+		&pluginpb.CodeGeneratorResponse_File{Name: proto.String(schemaFile), Content: proto.String(schemaOut.String())},
+	)
 
 	output, err := proto.Marshal(&res)
 	if err != nil {

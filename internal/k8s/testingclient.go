@@ -27,7 +27,9 @@ func NewFakeClientGenerator(fileToGenerate []string, files *protoregistry.Files)
 	}
 }
 
-func (g *FakeClientGenerator) Generate(out io.Writer, packageName, importPath, clientPath string, fqdnSetName bool) error {
+// Generate writes the testing client to out and the schema of the kinds to schemaOut.
+// The testing client embeds the schema from the file named schemaFileName.
+func (g *FakeClientGenerator) Generate(out, schemaOut io.Writer, schemaFileName, packageName, importPath, clientPath string, fqdnSetName bool) error {
 	w := codegeneration.NewWriter()
 	w.F("package %s", path.Base(packageName))
 
@@ -52,9 +54,21 @@ func (g *FakeClientGenerator) Generate(out io.Writer, packageName, importPath, c
 		groupVersions[gv] = append(groupVersions[gv], m)
 	}
 
+	var kindsOfGroupVersions []*definition.Message
+	for _, k := range keys(groupVersions) {
+		kindsOfGroupVersions = append(kindsOfGroupVersions, groupVersions[k]...)
+	}
+	typeSchema, err := newTypeSchemaBuilder(messages).Build(kindsOfGroupVersions)
+	if err != nil {
+		return err
+	}
+	if _, err := io.WriteString(schemaOut, typeSchema); err != nil {
+		return err
+	}
+
 	writer := codegeneration.NewWriter()
 
-	restClient := newRestFakeClientGenerator(groupVersions, clientPath)
+	restClient := newRestFakeClientGenerator(groupVersions, clientPath, schemaFileName)
 	if err := restClient.WriteTo(writer, fqdnSetName); err != nil {
 		return err
 	}
@@ -87,13 +101,14 @@ func (g *FakeClientGenerator) Generate(out io.Writer, packageName, importPath, c
 }
 
 type restFakeClientGenerator struct {
-	clientPath string
+	clientPath     string
+	schemaFileName string
 
 	groupVersions map[string][]*definition.Message
 }
 
-func newRestFakeClientGenerator(groupVersions map[string][]*definition.Message, clientPath string) *restFakeClientGenerator {
-	return &restFakeClientGenerator{clientPath: clientPath, groupVersions: groupVersions}
+func newRestFakeClientGenerator(groupVersions map[string][]*definition.Message, clientPath, schemaFileName string) *restFakeClientGenerator {
+	return &restFakeClientGenerator{clientPath: clientPath, schemaFileName: schemaFileName, groupVersions: groupVersions}
 }
 
 func (g *restFakeClientGenerator) Import() map[string]string {
@@ -110,6 +125,10 @@ func (g *restFakeClientGenerator) Import() map[string]string {
 		"k8s.io/client-go/rest":                      "",
 		"k8s.io/client-go/testing":                   "k8stesting",
 		"go.f110.dev/kubeproto/go/apis/metav1":       "",
+		"embed":                                      "_",
+		"sync":                                       "",
+		"k8s.io/apimachinery/pkg/util/managedfields": "",
+		"sigs.k8s.io/structured-merge-diff/v6/typed": "",
 		g.clientPath:                                 "",
 	}
 
@@ -131,9 +150,25 @@ func (g *restFakeClientGenerator) WriteTo(writer *codegeneration.Writer, fqdn bo
 	writer.F("tracker k8stesting.ObjectTracker")
 	writer.F("}")
 	writer.F("")
+	writer.F("// typeSchema is the schema of structured-merge-diff for the kinds.")
+	writer.F("// The field manager of the tracker uses it to merge the objects in the same way as Server-Side Apply.")
+	writer.F("//")
+	writer.F("//go:embed %s", g.schemaFileName)
+	writer.F("var typeSchema string")
+	writer.F("")
+	writer.F("var typeSchemaParser = sync.OnceValue(func() *typed.Parser {")
+	writer.F("parser, err := typed.NewParser(typed.YAMLObject(typeSchema))")
+	writer.F("if err != nil {")
+	writer.F("panic(err)")
+	writer.F("}")
+	writer.F("return parser")
+	writer.F("})")
+	writer.F("")
+
 	writer.F("func NewSet() *Set {")
 	writer.F("s := &Set{}")
-	writer.F("s.tracker = k8stesting.NewObjectTracker(%s.Scheme, codecs.UniversalDecoder())", clientPackageName)
+	writer.F("typeConverter := managedfields.NewSchemeTypeConverter(%s.Scheme, typeSchemaParser())", clientPackageName)
+	writer.F("s.tracker = k8stesting.NewFieldManagedObjectTracker(%s.Scheme, codecs.UniversalDecoder(), typeConverter)", clientPackageName)
 	writer.F("s.fake.AddReactor(\"*\", \"*\", k8stesting.ObjectReaction(s.tracker))")
 	writer.F("s.fake.AddWatchReactor(\"*\", func(action k8stesting.Action) (handled bool, ret watch.Interface, err error) {")
 	writer.F("w, err := s.tracker.Watch(action.GetResource(), action.GetNamespace())")

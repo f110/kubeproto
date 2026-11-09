@@ -106,6 +106,7 @@ def _go_testing_client(ctx):
     opts = "%s,%s" % (ctx.attr.importpath, ctx.attr.client[GoLibrary].importpath)
     if ctx.attr.client[K8SClient].fqdn:
         opts += ",fqdn-set"
+    schema = ctx.actions.declare_file("%s.generated.testingclient.typeschema.yaml" % ctx.label.name)
     out = _execute_protoc(
         ctx,
         ctx.executable._compiler,
@@ -113,6 +114,7 @@ def _go_testing_client(ctx):
         "generated.testingclient.go",
         ctx.attr.srcs,
         opts,
+        extra_outputs = [schema],
     )
     library = go.new_library(go, srcs = [out])
     source = go.library_to_source(go, ctx.attr, library, False)
@@ -121,7 +123,7 @@ def _go_testing_client(ctx):
         library,
         source,
         DefaultInfo(
-            files = depset([out]),
+            files = depset([out, schema]),
         ),
     ]
 
@@ -147,7 +149,7 @@ go_testing_client = rule(
     ],
 )
 
-def _execute_protoc(ctx, compiler, compiler_name, suffix, srcs, opts = "", env = None):
+def _execute_protoc(ctx, compiler, compiler_name, suffix, srcs, opts = "", env = None, extra_outputs = []):
     args = ctx.actions.args()
     args.add("--plugin", ("protoc-gen-%s=%s" % (compiler_name, compiler.path)))
 
@@ -174,7 +176,7 @@ def _execute_protoc(ctx, compiler, compiler_name, suffix, srcs, opts = "", env =
             direct = proto_files,
             transitive = transitive_protos,
         ),
-        outputs = [out],
+        outputs = [out] + extra_outputs,
         arguments = [args],
         use_default_shell_env = True,
         env = env,
