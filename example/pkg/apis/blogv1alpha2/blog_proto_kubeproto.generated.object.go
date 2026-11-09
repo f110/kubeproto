@@ -73,7 +73,7 @@ func (in *Author) DeepCopyObject() runtime.Object {
 type AuthorList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []Author `json:"items"`
+	Items           []Author `json:"items,omitempty"`
 }
 
 func (in *AuthorList) DeepCopyInto(out *AuthorList) {
@@ -139,7 +139,7 @@ func (in *Blog) DeepCopyObject() runtime.Object {
 type BlogList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []Blog `json:"items"`
+	Items           []Blog `json:"items,omitempty"`
 }
 
 func (in *BlogList) DeepCopyInto(out *BlogList) {
@@ -205,7 +205,7 @@ func (in *Post) DeepCopyObject() runtime.Object {
 type PostList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []Post `json:"items"`
+	Items           []Post `json:"items,omitempty"`
 }
 
 func (in *PostList) DeepCopyInto(out *PostList) {
@@ -275,8 +275,8 @@ type BlogSpec struct {
 	AuthorSelector metav1.LabelSelector `json:"authorSelector"`
 	// A list of all tags.
 	// A tag is one of metadata of the post.
-	Tags               []string                  `json:"tags"`
-	Categories         []Category                `json:"categories"`
+	Tags               []string                  `json:"tags,omitempty"`
+	Categories         []Category                `json:"categories,omitempty"`
 	ServiceAccountJSON *corev1.SecretKeySelector `json:"serviceAccountJSON,omitempty"`
 	EditorSelector     LabelSelector             `json:"editorSelector"`
 	IssuerRef          metav1_1.ObjectReference  `json:"issuerRef"`
@@ -342,7 +342,7 @@ func (in *BlogStatus) DeepCopy() *BlogStatus {
 
 type PostSpec struct {
 	Subject     string                `json:"subject"`
-	Authors     []string              `json:"authors"`
+	Authors     []string              `json:"authors,omitempty"`
 	Count       uint64                `json:"count,omitempty"`
 	PublishedAt timestamppb.Timestamp `json:"publishedAt"`
 	Timeout     metav1.Duration       `json:"timeout"`

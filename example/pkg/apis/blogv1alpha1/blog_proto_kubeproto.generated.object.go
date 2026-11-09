@@ -60,7 +60,7 @@ func (in *Blog) DeepCopyObject() runtime.Object {
 type BlogList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []Blog `json:"items"`
+	Items           []Blog `json:"items,omitempty"`
 }
 
 func (in *BlogList) DeepCopyInto(out *BlogList) {
@@ -126,7 +126,7 @@ func (in *Post) DeepCopyObject() runtime.Object {
 type PostList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []Post `json:"items"`
+	Items           []Post `json:"items,omitempty"`
 }
 
 func (in *PostList) DeepCopyInto(out *PostList) {

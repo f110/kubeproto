@@ -6,6 +6,7 @@ import (
 	apiresource "k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"maps"
 )
 
 const GroupName = "storage.k8s.io"
@@ -331,9 +332,7 @@ func (in *StorageClass) DeepCopyInto(out *StorageClass) {
 	if in.Parameters != nil {
 		in, out := &in.Parameters, &out.Parameters
 		*out = make(map[string]string, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.MountOptions != nil {
 		t := make([]string, len(in.MountOptions))
@@ -503,9 +502,7 @@ func (in *VolumeAttributesClass) DeepCopyInto(out *VolumeAttributesClass) {
 	if in.Parameters != nil {
 		in, out := &in.Parameters, &out.Parameters
 		*out = make(map[string]string, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 }
 
@@ -806,9 +803,7 @@ func (in *VolumeAttachmentStatus) DeepCopyInto(out *VolumeAttachmentStatus) {
 	if in.AttachmentMetadata != nil {
 		in, out := &in.AttachmentMetadata, &out.AttachmentMetadata
 		*out = make(map[string]string, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.AttachError != nil {
 		in, out := &in.AttachError, &out.AttachError

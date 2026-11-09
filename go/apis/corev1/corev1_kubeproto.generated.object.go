@@ -6,6 +6,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilintstr "k8s.io/apimachinery/pkg/util/intstr"
+	"maps"
 )
 
 const GroupName = ""
@@ -1012,9 +1013,7 @@ func (in *CSIPersistentVolumeSource) DeepCopyInto(out *CSIPersistentVolumeSource
 	if in.VolumeAttributes != nil {
 		in, out := &in.VolumeAttributes, &out.VolumeAttributes
 		*out = make(map[string]string, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.ControllerPublishSecretRef != nil {
 		in, out := &in.ControllerPublishSecretRef, &out.ControllerPublishSecretRef
@@ -1079,9 +1078,7 @@ func (in *CSIVolumeSource) DeepCopyInto(out *CSIVolumeSource) {
 	if in.VolumeAttributes != nil {
 		in, out := &in.VolumeAttributes, &out.VolumeAttributes
 		*out = make(map[string]string, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.NodePublishSecretRef != nil {
 		in, out := &in.NodePublishSecretRef, &out.NodePublishSecretRef
@@ -1480,16 +1477,12 @@ func (in *ConfigMap) DeepCopyInto(out *ConfigMap) {
 	if in.Data != nil {
 		in, out := &in.Data, &out.Data
 		*out = make(map[string]string, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.BinaryData != nil {
 		in, out := &in.BinaryData, &out.BinaryData
 		*out = make(map[string][]byte, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 }
 
@@ -2313,9 +2306,7 @@ func (in *ContainerStatus) DeepCopyInto(out *ContainerStatus) {
 	if in.AllocatedResources != nil {
 		in, out := &in.AllocatedResources, &out.AllocatedResources
 		*out = make(map[string]apiresource.Quantity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.Resources != nil {
 		in, out := &in.Resources, &out.Resources
@@ -3419,9 +3410,7 @@ func (in *FlexPersistentVolumeSource) DeepCopyInto(out *FlexPersistentVolumeSour
 	if in.Options != nil {
 		in, out := &in.Options, &out.Options
 		*out = make(map[string]string, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 }
 
@@ -3464,9 +3453,7 @@ func (in *FlexVolumeSource) DeepCopyInto(out *FlexVolumeSource) {
 	if in.Options != nil {
 		in, out := &in.Options, &out.Options
 		*out = make(map[string]string, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 }
 
@@ -4101,37 +4088,27 @@ func (in *LimitRangeItem) DeepCopyInto(out *LimitRangeItem) {
 	if in.Max != nil {
 		in, out := &in.Max, &out.Max
 		*out = make(map[string]apiresource.Quantity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.Min != nil {
 		in, out := &in.Min, &out.Min
 		*out = make(map[string]apiresource.Quantity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.Default != nil {
 		in, out := &in.Default, &out.Default
 		*out = make(map[string]apiresource.Quantity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.DefaultRequest != nil {
 		in, out := &in.DefaultRequest, &out.DefaultRequest
 		*out = make(map[string]apiresource.Quantity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.MaxLimitRequestRatio != nil {
 		in, out := &in.MaxLimitRequestRatio, &out.MaxLimitRequestRatio
 		*out = make(map[string]apiresource.Quantity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 }
 
@@ -4686,9 +4663,7 @@ func (in *NodeAllocatableResourceClaimStatus) DeepCopyInto(out *NodeAllocatableR
 	if in.Resources != nil {
 		in, out := &in.Resources, &out.Resources
 		*out = make(map[string]apiresource.Quantity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 }
 
@@ -5174,16 +5149,12 @@ func (in *NodeStatus) DeepCopyInto(out *NodeStatus) {
 	if in.Capacity != nil {
 		in, out := &in.Capacity, &out.Capacity
 		*out = make(map[string]apiresource.Quantity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.Allocatable != nil {
 		in, out := &in.Allocatable, &out.Allocatable
 		*out = make(map[string]apiresource.Quantity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.Conditions != nil {
 		l := make([]NodeCondition, len(in.Conditions))
@@ -5739,9 +5710,7 @@ func (in *PersistentVolumeClaimStatus) DeepCopyInto(out *PersistentVolumeClaimSt
 	if in.Capacity != nil {
 		in, out := &in.Capacity, &out.Capacity
 		*out = make(map[string]apiresource.Quantity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.Conditions != nil {
 		l := make([]PersistentVolumeClaimCondition, len(in.Conditions))
@@ -5753,16 +5722,12 @@ func (in *PersistentVolumeClaimStatus) DeepCopyInto(out *PersistentVolumeClaimSt
 	if in.AllocatedResources != nil {
 		in, out := &in.AllocatedResources, &out.AllocatedResources
 		*out = make(map[string]apiresource.Quantity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.AllocatedResourceStatuses != nil {
 		in, out := &in.AllocatedResourceStatuses, &out.AllocatedResourceStatuses
 		*out = make(map[string]string, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.ModifyVolumeStatus != nil {
 		in, out := &in.ModifyVolumeStatus, &out.ModifyVolumeStatus
@@ -6125,9 +6090,7 @@ func (in *PersistentVolumeSpec) DeepCopyInto(out *PersistentVolumeSpec) {
 	if in.Capacity != nil {
 		in, out := &in.Capacity, &out.Capacity
 		*out = make(map[string]apiresource.Quantity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	out.PersistentVolumeSource = in.PersistentVolumeSource
 	if in.AccessModes != nil {
@@ -6539,9 +6502,7 @@ func (in *PodCertificateProjection) DeepCopyInto(out *PodCertificateProjection) 
 	if in.UserAnnotations != nil {
 		in, out := &in.UserAnnotations, &out.UserAnnotations
 		*out = make(map[string]string, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 }
 
@@ -7525,9 +7486,7 @@ func (in *PodSpec) DeepCopyInto(out *PodSpec) {
 	if in.NodeSelector != nil {
 		in, out := &in.NodeSelector, &out.NodeSelector
 		*out = make(map[string]string, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.SecurityContext != nil {
 		in, out := &in.SecurityContext, &out.SecurityContext
@@ -7575,9 +7534,7 @@ func (in *PodSpec) DeepCopyInto(out *PodSpec) {
 	if in.Overhead != nil {
 		in, out := &in.Overhead, &out.Overhead
 		*out = make(map[string]apiresource.Quantity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.TopologySpreadConstraints != nil {
 		l := make([]TopologySpreadConstraint, len(in.TopologySpreadConstraints))
@@ -7806,9 +7763,7 @@ func (in *PodStatus) DeepCopyInto(out *PodStatus) {
 	if in.AllocatedResources != nil {
 		in, out := &in.AllocatedResources, &out.AllocatedResources
 		*out = make(map[string]apiresource.Quantity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.Resources != nil {
 		in, out := &in.Resources, &out.Resources
@@ -8611,9 +8566,7 @@ func (in *ReplicationControllerSpec) DeepCopyInto(out *ReplicationControllerSpec
 	if in.Selector != nil {
 		in, out := &in.Selector, &out.Selector
 		*out = make(map[string]string, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.Template != nil {
 		in, out := &in.Template, &out.Template
@@ -8845,9 +8798,7 @@ func (in *ResourceQuotaSpec) DeepCopyInto(out *ResourceQuotaSpec) {
 	if in.Hard != nil {
 		in, out := &in.Hard, &out.Hard
 		*out = make(map[string]apiresource.Quantity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.Scopes != nil {
 		t := make([]ResourceQuotaScope, len(in.Scopes))
@@ -8883,16 +8834,12 @@ func (in *ResourceQuotaStatus) DeepCopyInto(out *ResourceQuotaStatus) {
 	if in.Hard != nil {
 		in, out := &in.Hard, &out.Hard
 		*out = make(map[string]apiresource.Quantity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.Used != nil {
 		in, out := &in.Used, &out.Used
 		*out = make(map[string]apiresource.Quantity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 }
 
@@ -8927,16 +8874,12 @@ func (in *ResourceRequirements) DeepCopyInto(out *ResourceRequirements) {
 	if in.Limits != nil {
 		in, out := &in.Limits, &out.Limits
 		*out = make(map[string]apiresource.Quantity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.Requests != nil {
 		in, out := &in.Requests, &out.Requests
 		*out = make(map[string]apiresource.Quantity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.Claims != nil {
 		l := make([]ResourceClaim, len(in.Claims))
@@ -9221,16 +9164,12 @@ func (in *Secret) DeepCopyInto(out *Secret) {
 	if in.Data != nil {
 		in, out := &in.Data, &out.Data
 		*out = make(map[string][]byte, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.StringData != nil {
 		in, out := &in.StringData, &out.StringData
 		*out = make(map[string]string, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 }
 
@@ -10069,9 +10008,7 @@ func (in *ServiceSpec) DeepCopyInto(out *ServiceSpec) {
 	if in.Selector != nil {
 		in, out := &in.Selector, &out.Selector
 		*out = make(map[string]string, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.ClusterIPs != nil {
 		t := make([]string, len(in.ClusterIPs))
@@ -10862,16 +10799,12 @@ func (in *VolumeResourceRequirements) DeepCopyInto(out *VolumeResourceRequiremen
 	if in.Limits != nil {
 		in, out := &in.Limits, &out.Limits
 		*out = make(map[string]apiresource.Quantity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 	if in.Requests != nil {
 		in, out := &in.Requests, &out.Requests
 		*out = make(map[string]apiresource.Quantity, len(*in))
-		for k, v := range *in {
-			(*out)[k] = v
-		}
+		maps.Copy(*out, *in)
 	}
 }
 
