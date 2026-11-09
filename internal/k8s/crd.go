@@ -12,6 +12,7 @@ import (
 	"gopkg.in/yaml.v2"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 
+	"go.f110.dev/kubeproto"
 	"go.f110.dev/kubeproto/internal/definition"
 	"go.f110.dev/kubeproto/internal/stringsutil"
 )
@@ -218,9 +219,40 @@ func (g *CRDGenerator) ToOpenAPISchema(m *definition.Message) *apiextensionsv1.J
 		Type:       "object",
 		Properties: properties,
 		Required:   required,
+		XMapType:   xKubernetesType(m.StructType, "STRUCT_TYPE_"),
 	}
 
 	return props
+}
+
+// arrayJSONSchemaProps returns the schema of the array that has the items.
+func (g *CRDGenerator) arrayJSONSchemaProps(f *definition.Field, items *apiextensionsv1.JSONSchemaProps) apiextensionsv1.JSONSchemaProps {
+	items.Description = ""
+	props := apiextensionsv1.JSONSchemaProps{
+		Type:        "array",
+		Description: f.Description,
+		Items: &apiextensionsv1.JSONSchemaPropsOrArray{
+			Schema: items,
+		},
+		XListType: xKubernetesType(f.ListType, "LIST_TYPE_"),
+	}
+	if f.ListType == kubeproto.ListType_LIST_TYPE_MAP {
+		props.XListMapKeys = f.ListMapKeys
+	}
+	return props
+}
+
+// xKubernetesType returns the value of x-kubernetes-list-type or x-kubernetes-map-type from the enum value of kube.proto.
+// e.g. LIST_TYPE_ATOMIC is "atomic". If the value is unspecified, xKubernetesType returns nil.
+func xKubernetesType[T interface {
+	protoreflect.Enum
+	fmt.Stringer
+}](v T, prefix string) *string {
+	if v.Number() == 0 {
+		return nil
+	}
+	s := strings.ToLower(strings.TrimPrefix(v.String(), prefix))
+	return &s
 }
 
 func (g *CRDGenerator) fieldToJSONSchemaProps(f *definition.Field) apiextensionsv1.JSONSchemaProps {
@@ -234,14 +266,7 @@ func (g *CRDGenerator) fieldToJSONSchemaProps(f *definition.Field) apiextensions
 	}
 
 	if f.Repeated {
-		props.Description = ""
-		return apiextensionsv1.JSONSchemaProps{
-			Type:        "array",
-			Description: f.Description,
-			Items: &apiextensionsv1.JSONSchemaPropsOrArray{
-				Schema: &props,
-			},
-		}
+		return g.arrayJSONSchemaProps(f, &props)
 	}
 
 	return props
@@ -259,14 +284,7 @@ func (g *CRDGenerator) enumToJSONSchemaProps(f *definition.Field, enum *definiti
 	}
 
 	if f.Repeated {
-		props.Description = ""
-		return apiextensionsv1.JSONSchemaProps{
-			Type:        "array",
-			Description: f.Description,
-			Items: &apiextensionsv1.JSONSchemaPropsOrArray{
-				Schema: &props,
-			},
-		}
+		return g.arrayJSONSchemaProps(f, &props)
 	}
 
 	return props
@@ -280,6 +298,7 @@ func (g *CRDGenerator) messageToJSONSchemaProps(f *definition.Field) *apiextensi
 	if f.IsMap() {
 		props.Type = "object"
 		props.AdditionalProperties = &apiextensionsv1.JSONSchemaPropsOrBool{Schema: &apiextensionsv1.JSONSchemaProps{Type: "string"}}
+		props.XMapType = xKubernetesType(f.MapType, "MAP_TYPE_")
 		return props
 	}
 
@@ -296,14 +315,8 @@ func (g *CRDGenerator) messageToJSONSchemaProps(f *definition.Field) *apiextensi
 	}
 
 	if f.Repeated {
-		props.Description = ""
-		return &apiextensionsv1.JSONSchemaProps{
-			Type:        "array",
-			Description: f.Description,
-			Items: &apiextensionsv1.JSONSchemaPropsOrArray{
-				Schema: props,
-			},
-		}
+		array := g.arrayJSONSchemaProps(f, props)
+		return &array
 	}
 
 	return props
