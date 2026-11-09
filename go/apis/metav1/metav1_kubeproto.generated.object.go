@@ -115,7 +115,7 @@ type APIGroup struct {
 	// name is the name of the group.
 	Name string `json:"name"`
 	// versions are the versions supported in this group.
-	Versions []GroupVersionForDiscovery `json:"versions"`
+	Versions []GroupVersionForDiscovery `json:"versions,omitempty"`
 	// preferredVersion is the version preferred by the API server, which
 	// probably is the storage version.
 	PreferredVersion *GroupVersionForDiscovery `json:"preferredVersion,omitempty"`
@@ -126,7 +126,7 @@ type APIGroup struct {
 	// The server returns only those CIDRs that it thinks that the client can match.
 	// For example: the master will return an internal IP CIDR only, if the client reaches the server using an internal IP.
 	// Server looks at X-Forwarded-For header or X-Real-Ip header or request.RemoteAddr (in that order) to get the client IP.
-	ServerAddressByClientCIDRs []ServerAddressByClientCIDR `json:"serverAddressByClientCIDRs"`
+	ServerAddressByClientCIDRs []ServerAddressByClientCIDR `json:"serverAddressByClientCIDRs,omitempty"`
 }
 
 func (in *APIGroup) DeepCopyInto(out *APIGroup) {
@@ -172,7 +172,7 @@ func (in *APIGroup) DeepCopyObject() runtime.Object {
 type APIGroupList struct {
 	TypeMeta `json:",inline"`
 	// groups is a list of APIGroup.
-	Groups []APIGroup `json:"groups"`
+	Groups []APIGroup `json:"groups,omitempty"`
 }
 
 func (in *APIGroupList) DeepCopyInto(out *APIGroupList) {
@@ -224,9 +224,9 @@ type APIResource struct {
 	// update, patch, delete, deletecollection, and proxy)
 	Verbs Verbs `json:"verbs"`
 	// shortNames is a list of suggested short names of the resource.
-	ShortNames []string `json:"shortNames"`
+	ShortNames []string `json:"shortNames,omitempty"`
 	// categories is a list of the grouped resources this resource belongs to (e.g. 'all')
-	Categories []string `json:"categories"`
+	Categories []string `json:"categories,omitempty"`
 	// The hash value of the storage version, the version this resource is
 	// converted to when written to the data store. Value must be treated
 	// as opaque by clients. Only equality comparison on the value is valid.
@@ -266,7 +266,7 @@ type APIResourceList struct {
 	// groupVersion is the group and version this APIResourceList is for.
 	GroupVersion string `json:"groupVersion"`
 	// resources contains the name of the resources and if they are namespaced.
-	APIResources []APIResource `json:"resources"`
+	APIResources []APIResource `json:"resources,omitempty"`
 }
 
 func (in *APIResourceList) DeepCopyInto(out *APIResourceList) {
@@ -300,7 +300,7 @@ func (in *APIResourceList) DeepCopyObject() runtime.Object {
 type APIVersions struct {
 	TypeMeta `json:",inline"`
 	// versions are the api versions that are available.
-	Versions []string `json:"versions"`
+	Versions []string `json:"versions,omitempty"`
 	// a map of client CIDR to server address that is serving this group.
 	// This is to help clients reach servers in the most network-efficient way possible.
 	// Clients can use the appropriate server address as per the CIDR that they match.
@@ -308,7 +308,7 @@ type APIVersions struct {
 	// The server returns only those CIDRs that it thinks that the client can match.
 	// For example: the master will return an internal IP CIDR only, if the client reaches the server using an internal IP.
 	// Server looks at X-Forwarded-For header or X-Real-Ip header or request.RemoteAddr (in that order) to get the client IP.
-	ServerAddressByClientCIDRs []ServerAddressByClientCIDR `json:"serverAddressByClientCIDRs"`
+	ServerAddressByClientCIDRs []ServerAddressByClientCIDR `json:"serverAddressByClientCIDRs,omitempty"`
 }
 
 func (in *APIVersions) DeepCopyInto(out *APIVersions) {
@@ -351,7 +351,7 @@ type ApplyOptions struct {
 	// result in an error response and no further processing of the
 	// request. Valid values are:
 	// - All: all dry run stages will be processed
-	DryRun []string `json:"dryRun"`
+	DryRun []string `json:"dryRun,omitempty"`
 	// Force is going to "force" Apply requests. It means user will
 	// re-acquire conflicting fields owned by other people.
 	Force bool `json:"force"`
@@ -437,7 +437,7 @@ type CreateOptions struct {
 	// result in an error response and no further processing of the
 	// request. Valid values are:
 	// - All: all dry run stages will be processed
-	DryRun []string `json:"dryRun"`
+	DryRun []string `json:"dryRun,omitempty"`
 	// fieldManager is a name associated with the actor or entity
 	// that is making these changes. The value must be less than or
 	// 128 characters long, and only contain printable characters,
@@ -517,7 +517,7 @@ type DeleteOptions struct {
 	// result in an error response and no further processing of the
 	// request. Valid values are:
 	// - All: all dry run stages will be processed
-	DryRun []string `json:"dryRun"`
+	DryRun []string `json:"dryRun,omitempty"`
 	// if set to true, it will trigger an unsafe deletion of the resource in
 	// case the normal deletion flow fails with a corrupt object error.
 	// A resource is considered corrupt if it can not be retrieved from
@@ -591,7 +591,7 @@ type FieldSelectorRequirement struct {
 	// values is an array of string values.
 	// If the operator is In or NotIn, the values array must be non-empty.
 	// If the operator is Exists or DoesNotExist, the values array must be empty.
-	Values []string `json:"values"`
+	Values []string `json:"values,omitempty"`
 }
 
 func (in *FieldSelectorRequirement) DeepCopyInto(out *FieldSelectorRequirement) {
@@ -780,7 +780,7 @@ type LabelSelector struct {
 	// operator is "In", and the values array contains only "value". The requirements are ANDed.
 	MatchLabels map[string]string `json:"matchLabels,omitempty"`
 	// matchExpressions is a list of label selector requirements. The requirements are ANDed.
-	MatchExpressions []LabelSelectorRequirement `json:"matchExpressions"`
+	MatchExpressions []LabelSelectorRequirement `json:"matchExpressions,omitempty"`
 }
 
 func (in *LabelSelector) DeepCopyInto(out *LabelSelector) {
@@ -820,7 +820,7 @@ type LabelSelectorRequirement struct {
 	// the values array must be non-empty. If the operator is Exists or DoesNotExist,
 	// the values array must be empty. This array is replaced during a strategic
 	// merge patch.
-	Values []string `json:"values"`
+	Values []string `json:"values,omitempty"`
 }
 
 func (in *LabelSelectorRequirement) DeepCopyInto(out *LabelSelectorRequirement) {
@@ -847,7 +847,7 @@ type List struct {
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	ListMeta *ListMeta `json:"metadata,omitempty"`
 	// List of objects
-	Items []runtime.RawExtension `json:"items"`
+	Items []runtime.RawExtension `json:"items,omitempty"`
 }
 
 func (in *List) DeepCopyInto(out *List) {
@@ -1244,7 +1244,7 @@ type ObjectMeta struct {
 	// been deleted, this object will be garbage collected. If this object is managed by a controller,
 	// then an entry in this list will point to this controller, with the controller field set to true.
 	// There cannot be more than one managing controller.
-	OwnerReferences []OwnerReference `json:"ownerReferences"`
+	OwnerReferences []OwnerReference `json:"ownerReferences,omitempty"`
 	// Must be empty before the object is deleted from the registry. Each entry
 	// is an identifier for the responsible component that will remove the entry
 	// from the list. If the deletionTimestamp of the object is non-nil, entries
@@ -1258,7 +1258,7 @@ type ObjectMeta struct {
 	// component responsible for a finalizer later in the list, resulting in a deadlock.
 	// Without enforced ordering finalizers are free to order amongst themselves and
 	// are not vulnerable to ordering changes in the list.
-	Finalizers []string `json:"finalizers"`
+	Finalizers []string `json:"finalizers,omitempty"`
 	// ManagedFields maps workflow-id and version to the set of fields
 	// that are managed by that workflow. This is mostly for internal
 	// housekeeping, and users typically shouldn't need to set or
@@ -1266,7 +1266,7 @@ type ObjectMeta struct {
 	// controller's name, or the name of a specific apply path like
 	// "ci-cd". The set of fields is always in the version that the
 	// workflow used when modifying the object.
-	ManagedFields []ManagedFieldsEntry `json:"managedFields"`
+	ManagedFields []ManagedFieldsEntry `json:"managedFields,omitempty"`
 }
 
 func (in *ObjectMeta) DeepCopyInto(out *ObjectMeta) {
@@ -1393,7 +1393,7 @@ func (in *PartialObjectMetadata) DeepCopyObject() runtime.Object {
 type PartialObjectMetadataList struct {
 	TypeMeta `json:",inline"`
 	ListMeta `json:"metadata"`
-	Items    []PartialObjectMetadata `json:"items"`
+	Items    []PartialObjectMetadata `json:"items,omitempty"`
 }
 
 func (in *PartialObjectMetadataList) DeepCopyInto(out *PartialObjectMetadataList) {
@@ -1448,7 +1448,7 @@ type PatchOptions struct {
 	// result in an error response and no further processing of the
 	// request. Valid values are:
 	// - All: all dry run stages will be processed
-	DryRun []string `json:"dryRun"`
+	DryRun []string `json:"dryRun,omitempty"`
 	// Force is going to "force" Apply requests. It means user will
 	// re-acquire conflicting fields owned by other people. Force
 	// flag must be unset for non-apply patch requests.
@@ -1528,7 +1528,7 @@ func (in *Preconditions) DeepCopy() *Preconditions {
 
 type RootPaths struct {
 	// paths are the paths available at root.
-	Paths []string `json:"paths"`
+	Paths []string `json:"paths,omitempty"`
 }
 
 func (in *RootPaths) DeepCopyInto(out *RootPaths) {
@@ -1692,7 +1692,7 @@ type StatusDetails struct {
 	UID string `json:"uid,omitempty"`
 	// The Causes array includes more details associated with the StatusReason
 	// failure. Not all StatusReasons may provide detailed causes.
-	Causes []StatusCause `json:"causes"`
+	Causes []StatusCause `json:"causes,omitempty"`
 	// If specified, the time in seconds before the operation should be retried. Some errors may indicate
 	// the client must take an alternate action - for those errors this field may indicate how long to wait
 	// before taking the alternate action.
@@ -1825,7 +1825,7 @@ type UpdateOptions struct {
 	// result in an error response and no further processing of the
 	// request. Valid values are:
 	// - All: all dry run stages will be processed
-	DryRun []string `json:"dryRun"`
+	DryRun []string `json:"dryRun,omitempty"`
 	// fieldManager is a name associated with the actor or entity
 	// that is making these changes. The value must be less than or
 	// 128 characters long, and only contain printable characters,

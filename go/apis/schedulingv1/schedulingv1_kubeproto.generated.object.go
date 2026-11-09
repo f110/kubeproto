@@ -71,7 +71,7 @@ func (in *PriorityClass) DeepCopyObject() runtime.Object {
 type PriorityClassList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []PriorityClass `json:"items"`
+	Items           []PriorityClass `json:"items,omitempty"`
 }
 
 func (in *PriorityClassList) DeepCopyInto(out *PriorityClassList) {

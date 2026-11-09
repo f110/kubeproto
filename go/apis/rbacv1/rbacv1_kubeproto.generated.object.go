@@ -34,7 +34,7 @@ type ClusterRole struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
 	// Rules holds all the PolicyRules for this ClusterRole
-	Rules []PolicyRule `json:"rules"`
+	Rules []PolicyRule `json:"rules,omitempty"`
 	// AggregationRule is an optional field that describes how to build the Rules for this ClusterRole.
 	// If AggregationRule is set, then the Rules are controller managed and direct changes to Rules will be
 	// stomped by the controller.
@@ -79,7 +79,7 @@ type ClusterRoleBinding struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
 	// Subjects holds references to the objects the role applies to.
-	Subjects []Subject `json:"subjects"`
+	Subjects []Subject `json:"subjects,omitempty"`
 	// RoleRef can only reference a ClusterRole in the global namespace.
 	// If the RoleRef cannot be resolved, the Authorizer must return an error.
 	// This field is immutable.
@@ -119,7 +119,7 @@ func (in *ClusterRoleBinding) DeepCopyObject() runtime.Object {
 type ClusterRoleBindingList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []ClusterRoleBinding `json:"items"`
+	Items           []ClusterRoleBinding `json:"items,omitempty"`
 }
 
 func (in *ClusterRoleBindingList) DeepCopyInto(out *ClusterRoleBindingList) {
@@ -154,7 +154,7 @@ func (in *ClusterRoleBindingList) DeepCopyObject() runtime.Object {
 type ClusterRoleList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []ClusterRole `json:"items"`
+	Items           []ClusterRole `json:"items,omitempty"`
 }
 
 func (in *ClusterRoleList) DeepCopyInto(out *ClusterRoleList) {
@@ -190,7 +190,7 @@ type Role struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
 	// Rules holds all the PolicyRules for this Role
-	Rules []PolicyRule `json:"rules"`
+	Rules []PolicyRule `json:"rules,omitempty"`
 }
 
 func (in *Role) DeepCopyInto(out *Role) {
@@ -226,7 +226,7 @@ type RoleBinding struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
 	// Subjects holds references to the objects the role applies to.
-	Subjects []Subject `json:"subjects"`
+	Subjects []Subject `json:"subjects,omitempty"`
 	// RoleRef can reference a Role in the current namespace or a ClusterRole in the global namespace.
 	// If the RoleRef cannot be resolved, the Authorizer must return an error.
 	// This field is immutable.
@@ -266,7 +266,7 @@ func (in *RoleBinding) DeepCopyObject() runtime.Object {
 type RoleBindingList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []RoleBinding `json:"items"`
+	Items           []RoleBinding `json:"items,omitempty"`
 }
 
 func (in *RoleBindingList) DeepCopyInto(out *RoleBindingList) {
@@ -301,7 +301,7 @@ func (in *RoleBindingList) DeepCopyObject() runtime.Object {
 type RoleList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []Role `json:"items"`
+	Items           []Role `json:"items,omitempty"`
 }
 
 func (in *RoleList) DeepCopyInto(out *RoleList) {
@@ -335,18 +335,18 @@ func (in *RoleList) DeepCopyObject() runtime.Object {
 
 type PolicyRule struct {
 	// Verbs is a list of Verbs that apply to ALL the ResourceKinds contained in this rule. '*' represents all verbs.
-	Verbs []string `json:"verbs"`
+	Verbs []string `json:"verbs,omitempty"`
 	// APIGroups is the name of the APIGroup that contains the resources.  If multiple API groups are specified, any action requested against one of
 	// the enumerated resources in any API group will be allowed. "" represents the core API group and "*" represents all API groups.
-	APIGroups []string `json:"apiGroups"`
+	APIGroups []string `json:"apiGroups,omitempty"`
 	// Resources is a list of resources this rule applies to. '*' represents all resources.
-	Resources []string `json:"resources"`
+	Resources []string `json:"resources,omitempty"`
 	// ResourceNames is an optional white list of names that the rule applies to.  An empty set means that everything is allowed.
-	ResourceNames []string `json:"resourceNames"`
+	ResourceNames []string `json:"resourceNames,omitempty"`
 	// NonResourceURLs is a set of partial urls that a user should have access to.  *s are allowed, but only as the full, final step in the path
 	// Since non-resource URLs are not namespaced, this field is only applicable for ClusterRoles referenced from a ClusterRoleBinding.
 	// Rules can either apply to API resources (such as "pods" or "secrets") or non-resource URL paths (such as "/api"),  but not both.
-	NonResourceURLs []string `json:"nonResourceURLs"`
+	NonResourceURLs []string `json:"nonResourceURLs,omitempty"`
 }
 
 func (in *PolicyRule) DeepCopyInto(out *PolicyRule) {
@@ -390,7 +390,7 @@ func (in *PolicyRule) DeepCopy() *PolicyRule {
 type AggregationRule struct {
 	// ClusterRoleSelectors holds a list of selectors which will be used to find ClusterRoles and create the rules.
 	// If any of the selectors match, then the ClusterRole's permissions will be added
-	ClusterRoleSelectors []metav1.LabelSelector `json:"clusterRoleSelectors"`
+	ClusterRoleSelectors []metav1.LabelSelector `json:"clusterRoleSelectors,omitempty"`
 }
 
 func (in *AggregationRule) DeepCopyInto(out *AggregationRule) {

@@ -122,7 +122,7 @@ func (in *ControllerRevision) DeepCopyObject() runtime.Object {
 type ControllerRevisionList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []ControllerRevision `json:"items"`
+	Items           []ControllerRevision `json:"items,omitempty"`
 }
 
 func (in *ControllerRevisionList) DeepCopyInto(out *ControllerRevisionList) {
@@ -203,7 +203,7 @@ func (in *DaemonSet) DeepCopyObject() runtime.Object {
 type DaemonSetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []DaemonSet `json:"items"`
+	Items           []DaemonSet `json:"items,omitempty"`
 }
 
 func (in *DaemonSetList) DeepCopyInto(out *DaemonSetList) {
@@ -279,7 +279,7 @@ func (in *Deployment) DeepCopyObject() runtime.Object {
 type DeploymentList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []Deployment `json:"items"`
+	Items           []Deployment `json:"items,omitempty"`
 }
 
 func (in *DeploymentList) DeepCopyInto(out *DeploymentList) {
@@ -360,7 +360,7 @@ func (in *ReplicaSet) DeepCopyObject() runtime.Object {
 type ReplicaSetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []ReplicaSet `json:"items"`
+	Items           []ReplicaSet `json:"items,omitempty"`
 }
 
 func (in *ReplicaSetList) DeepCopyInto(out *ReplicaSetList) {
@@ -437,7 +437,7 @@ func (in *StatefulSet) DeepCopyObject() runtime.Object {
 type StatefulSetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []StatefulSet `json:"items"`
+	Items           []StatefulSet `json:"items,omitempty"`
 }
 
 func (in *StatefulSetList) DeepCopyInto(out *StatefulSetList) {
@@ -552,7 +552,7 @@ type DaemonSetStatus struct {
 	// create the name for the newest ControllerRevision.
 	CollisionCount int `json:"collisionCount,omitempty"`
 	// Represents the latest available observations of a DaemonSet's current state.
-	Conditions []DaemonSetCondition `json:"conditions"`
+	Conditions []DaemonSetCondition `json:"conditions,omitempty"`
 }
 
 func (in *DaemonSetStatus) DeepCopyInto(out *DaemonSetStatus) {
@@ -650,7 +650,7 @@ type DeploymentStatus struct {
 	// This is a beta field and requires enabling DeploymentReplicaSetTerminatingReplicas feature (enabled by default).
 	TerminatingReplicas int `json:"terminatingReplicas,omitempty"`
 	// Represents the latest available observations of a deployment's current state.
-	Conditions []DeploymentCondition `json:"conditions"`
+	Conditions []DeploymentCondition `json:"conditions,omitempty"`
 	// Count of hash collisions for the Deployment. The Deployment controller uses this
 	// field as a collision avoidance mechanism when it needs to create the name for the
 	// newest ReplicaSet.
@@ -738,7 +738,7 @@ type ReplicaSetStatus struct {
 	// ObservedGeneration reflects the generation of the most recently observed ReplicaSet.
 	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
 	// Represents the latest available observations of a replica set's current state.
-	Conditions []ReplicaSetCondition `json:"conditions"`
+	Conditions []ReplicaSetCondition `json:"conditions,omitempty"`
 }
 
 func (in *ReplicaSetStatus) DeepCopyInto(out *ReplicaSetStatus) {
@@ -785,7 +785,7 @@ type StatefulSetSpec struct {
 	// this list must have at least one matching (by name) volumeMount in one
 	// container in the template. A claim in this list takes precedence over
 	// any volumes in the template, with the same name.
-	VolumeClaimTemplates []corev1.PersistentVolumeClaim `json:"volumeClaimTemplates"`
+	VolumeClaimTemplates []corev1.PersistentVolumeClaim `json:"volumeClaimTemplates,omitempty"`
 	// serviceName is the name of the service that governs this StatefulSet.
 	// This service must exist before the StatefulSet, and is responsible for
 	// the network identity of the set. Pods get DNS/hostnames that follow the
@@ -893,7 +893,7 @@ type StatefulSetStatus struct {
 	// newest ControllerRevision.
 	CollisionCount int `json:"collisionCount,omitempty"`
 	// Represents the latest available observations of a statefulset's current state.
-	Conditions []StatefulSetCondition `json:"conditions"`
+	Conditions []StatefulSetCondition `json:"conditions,omitempty"`
 	// Total number of available pods (ready for at least minReadySeconds) targeted by this statefulset.
 	AvailableReplicas int `json:"availableReplicas"`
 }

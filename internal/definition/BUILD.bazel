@@ -22,7 +22,10 @@ go_library(
 
 go_test(
     name = "definition_test",
-    srcs = ["enum_test.go"],
+    srcs = [
+        "enum_test.go",
+        "message_test.go",
+    ],
     embed = [":definition"],
     deps = [
         "@com_github_stretchr_testify//assert",

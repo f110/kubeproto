@@ -43,7 +43,7 @@ type APIGroupDiscovery struct {
 	metav1.ObjectMeta `json:"metadata"`
 	// versions are the versions supported in this group. They are sorted in descending order of preference,
 	// with the preferred version being the first entry.
-	Versions []APIVersionDiscovery `json:"versions"`
+	Versions []APIVersionDiscovery `json:"versions,omitempty"`
 }
 
 func (in *APIGroupDiscovery) DeepCopyInto(out *APIGroupDiscovery) {
@@ -78,7 +78,7 @@ func (in *APIGroupDiscovery) DeepCopyObject() runtime.Object {
 type APIGroupDiscoveryList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []APIGroupDiscovery `json:"items"`
+	Items           []APIGroupDiscovery `json:"items,omitempty"`
 }
 
 func (in *APIGroupDiscoveryList) DeepCopyInto(out *APIGroupDiscoveryList) {
@@ -114,7 +114,7 @@ type APIVersionDiscovery struct {
 	// version is the name of the version within a group version.
 	Version string `json:"version"`
 	// resources is a list of APIResourceDiscovery objects for the corresponding group version.
-	Resources []APIResourceDiscovery `json:"resources"`
+	Resources []APIResourceDiscovery `json:"resources,omitempty"`
 	// freshness marks whether a group version's discovery document is up to date.
 	// "Current" indicates the discovery document was recently
 	// refreshed. "Stale" indicates the discovery document could not
@@ -165,14 +165,14 @@ type APIResourceDiscovery struct {
 	// verbs is a list of supported API operation types (this includes
 	// but is not limited to get, list, watch, create, update, patch,
 	// delete, deletecollection, and proxy).
-	Verbs []string `json:"verbs"`
+	Verbs []string `json:"verbs,omitempty"`
 	// shortNames is a list of suggested short names of the resource.
-	ShortNames []string `json:"shortNames"`
+	ShortNames []string `json:"shortNames,omitempty"`
 	// categories is a list of the grouped resources this resource belongs to (e.g. 'all').
 	// Clients may use this to simplify acting on multiple resource types at once.
-	Categories []string `json:"categories"`
+	Categories []string `json:"categories,omitempty"`
 	// subresources is a list of subresources provided by this resource. Subresources are located at /apis/<APIGroupDiscovery.objectMeta.name>/<APIVersionDiscovery.version>/<APIResourceDiscovery.Resource>/name-of-instance/<APIResourceDiscovery.subresources[i].subresource>
-	Subresources []APISubresourceDiscovery `json:"subresources"`
+	Subresources []APISubresourceDiscovery `json:"subresources,omitempty"`
 }
 
 func (in *APIResourceDiscovery) DeepCopyInto(out *APIResourceDiscovery) {
@@ -226,14 +226,14 @@ type APISubresourceDiscovery struct {
 	// Subresources may accept the standard content types or define
 	// custom negotiation schemes. The list may not be exhaustive for
 	// all operations.
-	AcceptedTypes []metav1.GroupVersionKind `json:"acceptedTypes"`
+	AcceptedTypes []metav1.GroupVersionKind `json:"acceptedTypes,omitempty"`
 	// verbs is a list of supported API operation types (this includes
 	// but is not limited to get, list, watch, create, update, patch,
 	// delete, deletecollection, and proxy). Subresources may define
 	// custom verbs outside the standard Kubernetes verb set. Clients
 	// should expect the behavior of standard verbs to align with
 	// Kubernetes interaction conventions.
-	Verbs []string `json:"verbs"`
+	Verbs []string `json:"verbs,omitempty"`
 }
 
 func (in *APISubresourceDiscovery) DeepCopyInto(out *APISubresourceDiscovery) {

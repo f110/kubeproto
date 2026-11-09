@@ -71,7 +71,7 @@ func (in *LocalSubjectAccessReview) DeepCopyObject() runtime.Object {
 type LocalSubjectAccessReviewList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []LocalSubjectAccessReview `json:"items"`
+	Items           []LocalSubjectAccessReview `json:"items,omitempty"`
 }
 
 func (in *LocalSubjectAccessReviewList) DeepCopyInto(out *LocalSubjectAccessReviewList) {
@@ -143,7 +143,7 @@ func (in *SelfSubjectAccessReview) DeepCopyObject() runtime.Object {
 type SelfSubjectAccessReviewList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []SelfSubjectAccessReview `json:"items"`
+	Items           []SelfSubjectAccessReview `json:"items,omitempty"`
 }
 
 func (in *SelfSubjectAccessReviewList) DeepCopyInto(out *SelfSubjectAccessReviewList) {
@@ -215,7 +215,7 @@ func (in *SelfSubjectRulesReview) DeepCopyObject() runtime.Object {
 type SelfSubjectRulesReviewList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []SelfSubjectRulesReview `json:"items"`
+	Items           []SelfSubjectRulesReview `json:"items,omitempty"`
 }
 
 func (in *SelfSubjectRulesReviewList) DeepCopyInto(out *SelfSubjectRulesReviewList) {
@@ -287,7 +287,7 @@ func (in *SubjectAccessReview) DeepCopyObject() runtime.Object {
 type SubjectAccessReviewList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []SubjectAccessReview `json:"items"`
+	Items           []SubjectAccessReview `json:"items,omitempty"`
 }
 
 func (in *SubjectAccessReviewList) DeepCopyInto(out *SubjectAccessReviewList) {
@@ -328,7 +328,7 @@ type SubjectAccessReviewSpec struct {
 	// If you specify "User" but not "Groups", then is it interpreted as "What if User were not a member of any groups
 	User string `json:"user,omitempty"`
 	// groups is the groups you're testing for.
-	Groups []string `json:"groups"`
+	Groups []string `json:"groups,omitempty"`
 	// extra corresponds to the user.Info.GetExtra() method from the authenticator.  Since that is input to the authorizer
 	// it needs a reflection here.
 	Extra map[string]ExtraValue `json:"extra,omitempty"`
@@ -451,10 +451,10 @@ func (in *SelfSubjectRulesReviewSpec) DeepCopy() *SelfSubjectRulesReviewSpec {
 type SubjectRulesReviewStatus struct {
 	// resourceRules is the list of actions the subject is allowed to perform on resources.
 	// The list ordering isn't significant, may contain duplicates, and possibly be incomplete.
-	ResourceRules []ResourceRule `json:"resourceRules"`
+	ResourceRules []ResourceRule `json:"resourceRules,omitempty"`
 	// nonResourceRules is the list of actions the subject is allowed to perform on non-resources.
 	// The list ordering isn't significant, may contain duplicates, and possibly be incomplete.
-	NonResourceRules []NonResourceRule `json:"nonResourceRules"`
+	NonResourceRules []NonResourceRule `json:"nonResourceRules,omitempty"`
 	// incomplete is true when the rules returned by this call are incomplete. This is most commonly
 	// encountered when an authorizer, such as an external authorizer, doesn't support rules evaluation.
 	Incomplete bool `json:"incomplete"`
@@ -562,15 +562,15 @@ type ExtraValue []string
 
 type ResourceRule struct {
 	// verbs is a list of kubernetes resource API verbs, like: get, list, watch, create, update, delete, proxy.  "*" means all.
-	Verbs []string `json:"verbs"`
+	Verbs []string `json:"verbs,omitempty"`
 	// apiGroups is the name of the APIGroup that contains the resources.  If multiple API groups are specified, any action requested against one of
 	// the enumerated resources in any API group will be allowed.  "*" means all.
-	APIGroups []string `json:"apiGroups"`
+	APIGroups []string `json:"apiGroups,omitempty"`
 	// resources is a list of resources this rule applies to.  "*" means all in the specified apiGroups.
 	// "*/foo" represents the subresource 'foo' for all resources in the specified apiGroups.
-	Resources []string `json:"resources"`
+	Resources []string `json:"resources,omitempty"`
 	// resourceNames is an optional white list of names that the rule applies to.  An empty set means that everything is allowed.  "*" means all.
-	ResourceNames []string `json:"resourceNames"`
+	ResourceNames []string `json:"resourceNames,omitempty"`
 }
 
 func (in *ResourceRule) DeepCopyInto(out *ResourceRule) {
@@ -608,10 +608,10 @@ func (in *ResourceRule) DeepCopy() *ResourceRule {
 
 type NonResourceRule struct {
 	// verbs is a list of kubernetes non-resource API verbs, like: get, post, put, delete, patch, head, options.  "*" means all.
-	Verbs []string `json:"verbs"`
+	Verbs []string `json:"verbs,omitempty"`
 	// nonResourceURLs is a set of partial urls that a user should have access to.  *s are allowed, but only as the full,
 	// final step in the path.  "*" means all.
-	NonResourceURLs []string `json:"nonResourceURLs"`
+	NonResourceURLs []string `json:"nonResourceURLs,omitempty"`
 }
 
 func (in *NonResourceRule) DeepCopyInto(out *NonResourceRule) {
@@ -647,7 +647,7 @@ type FieldSelectorAttributes struct {
 	// Webhook implementations should handle requirements, but how to handle them is up to the webhook.
 	// Since requirements can only limit the request, it is safe to authorize as unlimited request if the requirements
 	// are not understood.
-	Requirements []metav1.FieldSelectorRequirement `json:"requirements"`
+	Requirements []metav1.FieldSelectorRequirement `json:"requirements,omitempty"`
 }
 
 func (in *FieldSelectorAttributes) DeepCopyInto(out *FieldSelectorAttributes) {
@@ -680,7 +680,7 @@ type LabelSelectorAttributes struct {
 	// Webhook implementations should handle requirements, but how to handle them is up to the webhook.
 	// Since requirements can only limit the request, it is safe to authorize as unlimited request if the requirements
 	// are not understood.
-	Requirements []metav1.LabelSelectorRequirement `json:"requirements"`
+	Requirements []metav1.LabelSelectorRequirement `json:"requirements,omitempty"`
 }
 
 func (in *LabelSelectorAttributes) DeepCopyInto(out *LabelSelectorAttributes) {

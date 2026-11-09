@@ -121,7 +121,7 @@ func (in *CronJob) DeepCopyObject() runtime.Object {
 type CronJobList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []CronJob `json:"items"`
+	Items           []CronJob `json:"items,omitempty"`
 }
 
 func (in *CronJobList) DeepCopyInto(out *CronJobList) {
@@ -199,7 +199,7 @@ func (in *Job) DeepCopyObject() runtime.Object {
 type JobList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []Job `json:"items"`
+	Items           []Job `json:"items,omitempty"`
 }
 
 func (in *JobList) DeepCopyInto(out *JobList) {
@@ -282,7 +282,7 @@ func (in *CronJobSpec) DeepCopy() *CronJobSpec {
 
 type CronJobStatus struct {
 	// A list of pointers to currently running jobs.
-	Active []corev1.ObjectReference `json:"active"`
+	Active []corev1.ObjectReference `json:"active,omitempty"`
 	// Information when was the last time the job was successfully scheduled.
 	LastScheduleTime *metav1.Time `json:"lastScheduleTime,omitempty"`
 	// Information when was the last time the job successfully completed.
@@ -490,7 +490,7 @@ type JobStatus struct {
 	// Additionally, it cannot be in the "Complete" and "FailureTarget" conditions.
 	// The "Complete", "Failed" and "FailureTarget" conditions cannot be disabled.
 	// More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/
-	Conditions []JobCondition `json:"conditions"`
+	Conditions []JobCondition `json:"conditions,omitempty"`
 	// Represents time when the job controller started processing a job. When a
 	// Job is created in the suspended state, this field is not set until the
 	// first time it is resumed. This field is reset every time a Job is resumed
@@ -630,7 +630,7 @@ type PodFailurePolicy struct {
 	// When no rule matches the Pod failure, the default handling applies - the
 	// counter of pod failures is incremented and it is checked against
 	// the backoffLimit. At most 20 elements are allowed.
-	Rules []PodFailurePolicyRule `json:"rules"`
+	Rules []PodFailurePolicyRule `json:"rules,omitempty"`
 }
 
 func (in *PodFailurePolicy) DeepCopyInto(out *PodFailurePolicy) {
@@ -660,7 +660,7 @@ type SuccessPolicy struct {
 	// The terminal state for such a Job has the "Complete" condition.
 	// Additionally, these rules are evaluated in order; Once the Job meets one of the rules,
 	// other rules are ignored. At most 20 elements are allowed.
-	Rules []SuccessPolicyRule `json:"rules"`
+	Rules []SuccessPolicyRule `json:"rules,omitempty"`
 }
 
 func (in *SuccessPolicy) DeepCopyInto(out *SuccessPolicy) {
@@ -723,9 +723,9 @@ func (in *JobCondition) DeepCopy() *JobCondition {
 
 type UncountedTerminatedPods struct {
 	// succeeded holds UIDs of succeeded Pods.
-	Succeeded []string `json:"succeeded"`
+	Succeeded []string `json:"succeeded,omitempty"`
 	// failed holds UIDs of failed Pods.
-	Failed []string `json:"failed"`
+	Failed []string `json:"failed,omitempty"`
 }
 
 func (in *UncountedTerminatedPods) DeepCopyInto(out *UncountedTerminatedPods) {
@@ -770,7 +770,7 @@ type PodFailurePolicyRule struct {
 	// Represents the requirement on the pod conditions. The requirement is represented
 	// as a list of pod condition patterns. The requirement is satisfied if at
 	// least one pattern matches an actual pod condition. At most 20 elements are allowed.
-	OnPodConditions []PodFailurePolicyOnPodConditionsPattern `json:"onPodConditions"`
+	OnPodConditions []PodFailurePolicyOnPodConditionsPattern `json:"onPodConditions,omitempty"`
 }
 
 func (in *PodFailurePolicyRule) DeepCopyInto(out *PodFailurePolicyRule) {
@@ -860,7 +860,7 @@ type PodFailurePolicyOnExitCodesRequirement struct {
 	// values with respect to the operator. The list of values must be ordered
 	// and must not contain duplicates. Value '0' cannot be used for the In operator.
 	// At least one element is required. At most 255 elements are allowed.
-	Values []int `json:"values"`
+	Values []int `json:"values,omitempty"`
 }
 
 func (in *PodFailurePolicyOnExitCodesRequirement) DeepCopyInto(out *PodFailurePolicyOnExitCodesRequirement) {
