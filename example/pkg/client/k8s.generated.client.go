@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"reflect"
 	"sync"
@@ -13,6 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
@@ -51,6 +53,7 @@ type Backend interface {
 	Create(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error)
 	Update(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	UpdateStatus(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
+	Apply(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error)
 	Delete(ctx context.Context, gvr schema.GroupVersionResource, namespace, name string, opts metav1.DeleteOptions) error
 	Watch(ctx context.Context, gvr schema.GroupVersionResource, namespace string, opts metav1.ListOptions) (watch.Interface, error)
 	GetClusterScoped(ctx context.Context, resourceName, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error)
@@ -58,6 +61,7 @@ type Backend interface {
 	CreateClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error)
 	UpdateClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	UpdateStatusClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
+	ApplyClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error)
 	DeleteClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, name string, opts metav1.DeleteOptions) error
 	WatchClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, opts metav1.ListOptions) (watch.Interface, error)
 
@@ -173,6 +177,27 @@ func (r *restBackend) UpdateStatus(ctx context.Context, resourceName string, obj
 		Into(result)
 }
 
+func (r *restBackend) Apply(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error) {
+	m := obj.(metav1.Object)
+	if m == nil {
+		return nil, errors.New("obj is not implement metav1.Object")
+	}
+	meta := m.GetObjectMeta()
+	patch, err := encodeApplyPatch(obj)
+	if err != nil {
+		return nil, err
+	}
+	patchOpts := opts.ToPatchOptions()
+	return result, r.client.Patch(types.ApplyPatchType).
+		Namespace(meta.Namespace).
+		Resource(resourceName).
+		Name(meta.Name).
+		VersionedParams(&patchOpts, ParameterCodec).
+		Body(patch).
+		Do(ctx).
+		Into(result)
+}
+
 func (r *restBackend) Delete(ctx context.Context, gvr schema.GroupVersionResource, namespace, name string, opts metav1.DeleteOptions) error {
 	return r.client.Delete().
 		Namespace(namespace).
@@ -259,6 +284,39 @@ func (r *restBackend) UpdateStatusClusterScoped(ctx context.Context, resourceNam
 		Into(result)
 }
 
+func (r *restBackend) ApplyClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error) {
+	m := obj.(metav1.Object)
+	if m == nil {
+		return nil, errors.New("obj is not implement metav1.Object")
+	}
+	meta := m.GetObjectMeta()
+	patch, err := encodeApplyPatch(obj)
+	if err != nil {
+		return nil, err
+	}
+	patchOpts := opts.ToPatchOptions()
+	return result, r.client.Patch(types.ApplyPatchType).
+		Resource(resourceName).
+		Name(meta.Name).
+		VersionedParams(&patchOpts, ParameterCodec).
+		Body(patch).
+		Do(ctx).
+		Into(result)
+}
+
+// encodeApplyPatch encodes obj into the body of the apply request.
+// The body is passed as []byte because rest.Request overwrites Content-Type when the body is runtime.Object.
+// The apply request requires apiVersion and kind, so they are set from Scheme.
+func encodeApplyPatch(obj runtime.Object) ([]byte, error) {
+	gvks, _, err := Scheme.ObjectKinds(obj)
+	if err != nil {
+		return nil, err
+	}
+	obj = obj.DeepCopyObject()
+	obj.GetObjectKind().SetGroupVersionKind(gvks[0])
+	return json.Marshal(obj)
+}
+
 func (r *restBackend) DeleteClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, name string, opts metav1.DeleteOptions) error {
 	return r.client.Delete().
 		Resource(gvr.Resource).
@@ -318,6 +376,14 @@ func (c *BlogV1alpha1) UpdateBlog(ctx context.Context, v *blogv1alpha1.Blog, opt
 	return result.(*blogv1alpha1.Blog), nil
 }
 
+func (c *BlogV1alpha1) ApplyBlog(ctx context.Context, v *blogv1alpha1.Blog, opts metav1.ApplyOptions) (*blogv1alpha1.Blog, error) {
+	result, err := c.backend.ApplyClusterScoped(ctx, "blogs", v, opts, &blogv1alpha1.Blog{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*blogv1alpha1.Blog), nil
+}
+
 func (c *BlogV1alpha1) DeleteBlog(ctx context.Context, name string, opts metav1.DeleteOptions) error {
 	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "blog.f110.dev", Version: "v1alpha1", Resource: "blogs"}, name, opts)
 }
@@ -352,6 +418,14 @@ func (c *BlogV1alpha1) CreatePost(ctx context.Context, v *blogv1alpha1.Post, opt
 
 func (c *BlogV1alpha1) UpdatePost(ctx context.Context, v *blogv1alpha1.Post, opts metav1.UpdateOptions) (*blogv1alpha1.Post, error) {
 	result, err := c.backend.Update(ctx, "posts", v, opts, &blogv1alpha1.Post{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*blogv1alpha1.Post), nil
+}
+
+func (c *BlogV1alpha1) ApplyPost(ctx context.Context, v *blogv1alpha1.Post, opts metav1.ApplyOptions) (*blogv1alpha1.Post, error) {
+	result, err := c.backend.Apply(ctx, "posts", v, opts, &blogv1alpha1.Post{})
 	if err != nil {
 		return nil, err
 	}
@@ -407,6 +481,14 @@ func (c *BlogV1alpha2) UpdateAuthor(ctx context.Context, v *blogv1alpha2.Author,
 	return result.(*blogv1alpha2.Author), nil
 }
 
+func (c *BlogV1alpha2) ApplyAuthor(ctx context.Context, v *blogv1alpha2.Author, opts metav1.ApplyOptions) (*blogv1alpha2.Author, error) {
+	result, err := c.backend.Apply(ctx, "authors", v, opts, &blogv1alpha2.Author{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*blogv1alpha2.Author), nil
+}
+
 func (c *BlogV1alpha2) DeleteAuthor(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "blog.f110.dev", Version: "v1alpha2", Resource: "authors"}, namespace, name, opts)
 }
@@ -447,6 +529,14 @@ func (c *BlogV1alpha2) UpdateBlog(ctx context.Context, v *blogv1alpha2.Blog, opt
 	return result.(*blogv1alpha2.Blog), nil
 }
 
+func (c *BlogV1alpha2) ApplyBlog(ctx context.Context, v *blogv1alpha2.Blog, opts metav1.ApplyOptions) (*blogv1alpha2.Blog, error) {
+	result, err := c.backend.ApplyClusterScoped(ctx, "blogs", v, opts, &blogv1alpha2.Blog{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*blogv1alpha2.Blog), nil
+}
+
 func (c *BlogV1alpha2) DeleteBlog(ctx context.Context, name string, opts metav1.DeleteOptions) error {
 	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "blog.f110.dev", Version: "v1alpha2", Resource: "blogs"}, name, opts)
 }
@@ -481,6 +571,14 @@ func (c *BlogV1alpha2) CreatePost(ctx context.Context, v *blogv1alpha2.Post, opt
 
 func (c *BlogV1alpha2) UpdatePost(ctx context.Context, v *blogv1alpha2.Post, opts metav1.UpdateOptions) (*blogv1alpha2.Post, error) {
 	result, err := c.backend.Update(ctx, "posts", v, opts, &blogv1alpha2.Post{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*blogv1alpha2.Post), nil
+}
+
+func (c *BlogV1alpha2) ApplyPost(ctx context.Context, v *blogv1alpha2.Post, opts metav1.ApplyOptions) (*blogv1alpha2.Post, error) {
+	result, err := c.backend.Apply(ctx, "posts", v, opts, &blogv1alpha2.Post{})
 	if err != nil {
 		return nil, err
 	}

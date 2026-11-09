@@ -1,4 +1,4 @@
-load("@rules_go//go:def.bzl", "go_library")
+load("@rules_go//go:def.bzl", "go_library", "go_test")
 load("//bazel:def.bzl", "go_client")
 
 go_client(
@@ -65,11 +65,24 @@ go_library(
         "@io_k8s_apimachinery//pkg/runtime",
         "@io_k8s_apimachinery//pkg/runtime/schema",
         "@io_k8s_apimachinery//pkg/runtime/serializer",
+        "@io_k8s_apimachinery//pkg/types",
         "@io_k8s_apimachinery//pkg/watch",
         "@io_k8s_client_go//kubernetes/scheme",
         "@io_k8s_client_go//rest",
         "@io_k8s_client_go//tools/cache",
         "@io_k8s_client_go//tools/portforward",
         "@io_k8s_client_go//transport/spdy",
+    ],
+)
+
+go_test(
+    name = "k8sclient_test",
+    srcs = ["client_test.go"],
+    embed = [":k8sclient"],
+    deps = [
+        "//go/apis/appsv1",
+        "//go/apis/metav1",
+        "//go/internal/assertion",
+        "@io_k8s_client_go//rest",
     ],
 )

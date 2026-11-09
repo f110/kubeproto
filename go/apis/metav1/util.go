@@ -120,6 +120,12 @@ func ListOptionsFromUpstream(in k8smetav1.ListOptions) ListOptions {
 	return out
 }
 
+// ToPatchOptions converts ApplyOptions into PatchOptions.
+// The apply request is sent as a PATCH request, so the options are encoded as PatchOptions.
+func (o ApplyOptions) ToPatchOptions() PatchOptions {
+	return PatchOptions{DryRun: o.DryRun, Force: o.Force, FieldManager: o.FieldManager}
+}
+
 func Now() Time {
 	return NewTime(time.Now())
 }
