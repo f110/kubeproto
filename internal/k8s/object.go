@@ -227,9 +227,8 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 							defW.F("in, out := &in.%s, &out.%s", f.Name, f.Name)
 							_, _, typ := g.lister.ResolveGoType(packageName, f)
 							defW.F("*out = make(%s, len(*in))", typ)
-							defW.F("for k, v := range *in {")
-							defW.F("(*out)[k] = v")
-							defW.F("}")
+							defW.F("maps.Copy(*out, *in)")
+							importPackages["maps"] = ""
 						} else {
 							defW.F("in, out := &in.%s, &out.%s", f.Name, f.Name)
 							importPath, _, typ := g.lister.ResolveGoType(packageName, f)
