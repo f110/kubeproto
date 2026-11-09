@@ -105,7 +105,7 @@ message AdmissionResponse {
   // Warning messages describe a problem the client making the API request should correct or be aware of.
   // Limit warnings to 120 characters if possible.
   // Warnings over 256 characters and large numbers of warnings may be truncated.
-  repeated string warnings = 7 [(dev.f110.kubeproto.field) = { go_name: "Warnings", api_field_name: "warnings", inline: false }];
+  repeated string warnings = 7 [(dev.f110.kubeproto.field) = { go_name: "Warnings", api_field_name: "warnings", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message AdmissionReview {

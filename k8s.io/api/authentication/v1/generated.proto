@@ -57,7 +57,7 @@ message TokenRequestSpec {
   // token issued for multiple audiences may be used to authenticate
   // against any of the audiences listed but implies a high degree of
   // trust between the target audiences.
-  repeated string audiences = 1 [(dev.f110.kubeproto.field) = { go_name: "Audiences", api_field_name: "audiences", inline: false }];
+  repeated string audiences = 1 [(dev.f110.kubeproto.field) = { go_name: "Audiences", api_field_name: "audiences", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // expirationSeconds is the requested duration of validity of the request. The
   // token issuer may return a token with a different validity duration so a
   // client needs to check the 'expiration' field in a response.
@@ -96,7 +96,7 @@ message TokenReviewSpec {
   // verify that the token was intended for at least one of the audiences in
   // this list. If no audiences are provided, the audience will default to the
   // audience of the Kubernetes apiserver.
-  repeated string audiences = 2 [(dev.f110.kubeproto.field) = { go_name: "Audiences", api_field_name: "audiences", inline: false }];
+  repeated string audiences = 2 [(dev.f110.kubeproto.field) = { go_name: "Audiences", api_field_name: "audiences", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message TokenReviewStatus {
@@ -113,7 +113,7 @@ message TokenReviewStatus {
   // server is audience aware. If a TokenReview returns an empty
   // status.audience field where status.authenticated is "true", the token is
   // valid against the audience of the Kubernetes API server.
-  repeated string audiences = 3 [(dev.f110.kubeproto.field) = { go_name: "Audiences", api_field_name: "audiences", inline: false }];
+  repeated string audiences = 3 [(dev.f110.kubeproto.field) = { go_name: "Audiences", api_field_name: "audiences", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // error indicates that the token couldn't be checked
   optional string error = 4 [(dev.f110.kubeproto.field) = { go_name: "Error", api_field_name: "error", inline: false }];
 }
@@ -126,7 +126,7 @@ message UserInfo {
   // different UIDs.
   optional string uid = 2 [(dev.f110.kubeproto.field) = { go_name: "UID", api_field_name: "uid", inline: false }];
   // groups is the names of groups this user is a part of.
-  repeated string groups = 3 [(dev.f110.kubeproto.field) = { go_name: "Groups", api_field_name: "groups", inline: false }];
+  repeated string groups = 3 [(dev.f110.kubeproto.field) = { go_name: "Groups", api_field_name: "groups", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // extra is any additional information provided by the authenticator.
   map<string, ExtraValue> extra = 4 [(dev.f110.kubeproto.field) = { go_name: "Extra", api_field_name: "extra", inline: false }];
 }

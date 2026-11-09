@@ -546,7 +546,7 @@ message AttachedVolume {
 message AvoidPods {
   // Bounded-sized list of signatures of pods that should avoid this node, sorted
   // in timestamp order from oldest to newest. Size of the slice is unspecified.
-  repeated PreferAvoidPodsEntry prefer_avoid_pods = 1 [(dev.f110.kubeproto.field) = { go_name: "PreferAvoidPods", api_field_name: "preferAvoidPods", inline: false }];
+  repeated PreferAvoidPodsEntry prefer_avoid_pods = 1 [(dev.f110.kubeproto.field) = { go_name: "PreferAvoidPods", api_field_name: "preferAvoidPods", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message AzureDiskVolumeSource {
@@ -670,15 +670,15 @@ message CSIVolumeSource {
 
 message Capabilities {
   // Added capabilities
-  repeated string add = 1 [(dev.f110.kubeproto.field) = { go_name: "Add", api_field_name: "add", inline: false }];
+  repeated string add = 1 [(dev.f110.kubeproto.field) = { go_name: "Add", api_field_name: "add", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Removed capabilities
-  repeated string drop = 2 [(dev.f110.kubeproto.field) = { go_name: "Drop", api_field_name: "drop", inline: false }];
+  repeated string drop = 2 [(dev.f110.kubeproto.field) = { go_name: "Drop", api_field_name: "drop", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message CephFSPersistentVolumeSource {
   // monitors is Required: Monitors is a collection of Ceph monitors
   // More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
-  repeated string monitors = 1 [(dev.f110.kubeproto.field) = { go_name: "Monitors", api_field_name: "monitors", inline: false }];
+  repeated string monitors = 1 [(dev.f110.kubeproto.field) = { go_name: "Monitors", api_field_name: "monitors", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // path is Optional: Used as the mounted root, rather than the full Ceph tree, default is /
   optional string path = 2 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
   // user is Optional: User is the rados user name, default is admin
@@ -699,7 +699,7 @@ message CephFSPersistentVolumeSource {
 message CephFSVolumeSource {
   // monitors is Required: Monitors is a collection of Ceph monitors
   // More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
-  repeated string monitors = 1 [(dev.f110.kubeproto.field) = { go_name: "Monitors", api_field_name: "monitors", inline: false }];
+  repeated string monitors = 1 [(dev.f110.kubeproto.field) = { go_name: "Monitors", api_field_name: "monitors", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // path is Optional: Used as the mounted root, rather than the full Ceph tree, default is /
   optional string path = 2 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
   // user is optional: User is the rados user name, default is admin
@@ -800,7 +800,9 @@ message ComponentCondition {
 
 message ComponentStatus {
   // List of component conditions observed
-  repeated ComponentCondition conditions = 3 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated ComponentCondition conditions = 3 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                             list_map_keys: [ "type" ],
+                                                                             inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
     scope: SCOPE_CLUSTER
@@ -854,7 +856,10 @@ message ConfigMapKeySelector {
   // The key to select.
   string key = 2 [(dev.f110.kubeproto.field) = { go_name: "Key", api_field_name: "key", inline: false }];
   // Specify whether the ConfigMap or its key must be defined
-  optional bool optional = 3 [(dev.f110.kubeproto.field) = { go_name: "Optional", api_field_name: "optional", inline: false }];
+  optional bool optional              = 3 [(dev.f110.kubeproto.field) = { go_name: "Optional", api_field_name: "optional", inline: false }];
+  option (dev.f110.kubeproto.message) = {
+    struct_type: STRUCT_TYPE_ATOMIC
+  };
 }
 
 message ConfigMapList {
@@ -892,7 +897,7 @@ message ConfigMapProjection {
   // present. If a key is specified which is not present in the ConfigMap,
   // the volume setup will error unless it is marked optional. Paths must be
   // relative and may not contain the '..' path or start with '..'.
-  repeated KeyToPath items = 2 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+  repeated KeyToPath items = 2 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // optional specify whether the ConfigMap or its keys must be defined
   optional bool optional = 3 [(dev.f110.kubeproto.field) = { go_name: "Optional", api_field_name: "optional", inline: false }];
 }
@@ -906,7 +911,7 @@ message ConfigMapVolumeSource {
   // present. If a key is specified which is not present in the ConfigMap,
   // the volume setup will error unless it is marked optional. Paths must be
   // relative and may not contain the '..' path or start with '..'.
-  repeated KeyToPath items = 2 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+  repeated KeyToPath items = 2 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // defaultMode is optional: mode bits used to set permissions on created files by default.
   // Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
   // YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
@@ -937,7 +942,7 @@ message Container {
   // produce the string literal "$(VAR_NAME)". Escaped references will never be expanded, regardless
   // of whether the variable exists or not. Cannot be updated.
   // More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
-  repeated string command = 3 [(dev.f110.kubeproto.field) = { go_name: "Command", api_field_name: "command", inline: false }];
+  repeated string command = 3 [(dev.f110.kubeproto.field) = { go_name: "Command", api_field_name: "command", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Arguments to the entrypoint.
   // The container image's CMD is used if this is not provided.
   // Variable references $(VAR_NAME) are expanded using the container's environment. If a variable
@@ -946,7 +951,7 @@ message Container {
   // produce the string literal "$(VAR_NAME)". Escaped references will never be expanded, regardless
   // of whether the variable exists or not. Cannot be updated.
   // More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
-  repeated string args = 4 [(dev.f110.kubeproto.field) = { go_name: "Args", api_field_name: "args", inline: false }];
+  repeated string args = 4 [(dev.f110.kubeproto.field) = { go_name: "Args", api_field_name: "args", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Container's working directory.
   // If not specified, the container runtime's default will be used, which
   // might be configured in the container image.
@@ -959,24 +964,28 @@ message Container {
   // Modifying this array with strategic merge patch may corrupt the data.
   // For more information See https://github.com/kubernetes/kubernetes/issues/108255.
   // Cannot be updated.
-  repeated ContainerPort ports = 6 [(dev.f110.kubeproto.field) = { go_name: "Ports", api_field_name: "ports", inline: false }];
+  repeated ContainerPort ports = 6 [(dev.f110.kubeproto.field) = { go_name: "Ports", api_field_name: "ports", list_type: LIST_TYPE_MAP,
+                                                                   list_map_keys: [ "containerPort", "protocol" ],
+                                                                   inline: false }];
   // List of sources to populate environment variables in the container.
   // The keys defined within a source may consist of any printable ASCII characters except '='.
   // When a key exists in multiple
   // sources, the value associated with the last source will take precedence.
   // Values defined by an Env with a duplicate key will take precedence.
   // Cannot be updated.
-  repeated EnvFromSource env_from = 7 [(dev.f110.kubeproto.field) = { go_name: "EnvFrom", api_field_name: "envFrom", inline: false }];
+  repeated EnvFromSource env_from = 7 [(dev.f110.kubeproto.field) = { go_name: "EnvFrom", api_field_name: "envFrom", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // List of environment variables to set in the container.
   // Cannot be updated.
-  repeated EnvVar env = 8 [(dev.f110.kubeproto.field) = { go_name: "Env", api_field_name: "env", inline: false }];
+  repeated EnvVar env = 8 [(dev.f110.kubeproto.field) = { go_name: "Env", api_field_name: "env", list_type: LIST_TYPE_MAP,
+                                                          list_map_keys: [ "name" ],
+                                                          inline: false }];
   // Compute Resources required by this container.
   // Cannot be updated.
   // More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
   optional ResourceRequirements resources = 9 [(dev.f110.kubeproto.field) = { go_name: "Resources", api_field_name: "resources", inline: false }];
   // Resources resize policy for the container.
   // This field cannot be set on ephemeral containers.
-  repeated ContainerResizePolicy resize_policy = 10 [(dev.f110.kubeproto.field) = { go_name: "ResizePolicy", api_field_name: "resizePolicy", inline: false }];
+  repeated ContainerResizePolicy resize_policy = 10 [(dev.f110.kubeproto.field) = { go_name: "ResizePolicy", api_field_name: "resizePolicy", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // RestartPolicy defines the restart behavior of individual containers in a pod.
   // This overrides the pod-level restart policy. When this field is not specified,
   // the restart behavior is defined by the Pod's restart policy and the container type.
@@ -1004,12 +1013,16 @@ message Container {
   // - Identical rules are not forbidden in validations.
   // When rules are specified, container MUST set RestartPolicy explicitly
   // even it if matches the Pod's RestartPolicy.
-  repeated ContainerRestartRule restart_policy_rules = 12 [(dev.f110.kubeproto.field) = { go_name: "RestartPolicyRules", api_field_name: "restartPolicyRules", inline: false }];
+  repeated ContainerRestartRule restart_policy_rules = 12 [(dev.f110.kubeproto.field) = { go_name: "RestartPolicyRules", api_field_name: "restartPolicyRules", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Pod volumes to mount into the container's filesystem.
   // Cannot be updated.
-  repeated VolumeMount volume_mounts = 13 [(dev.f110.kubeproto.field) = { go_name: "VolumeMounts", api_field_name: "volumeMounts", inline: false }];
+  repeated VolumeMount volume_mounts = 13 [(dev.f110.kubeproto.field) = { go_name: "VolumeMounts", api_field_name: "volumeMounts", list_type: LIST_TYPE_MAP,
+                                                                          list_map_keys: [ "mountPath" ],
+                                                                          inline: false }];
   // volumeDevices is the list of block devices to be used by the container.
-  repeated VolumeDevice volume_devices = 14 [(dev.f110.kubeproto.field) = { go_name: "VolumeDevices", api_field_name: "volumeDevices", inline: false }];
+  repeated VolumeDevice volume_devices = 14 [(dev.f110.kubeproto.field) = { go_name: "VolumeDevices", api_field_name: "volumeDevices", list_type: LIST_TYPE_MAP,
+                                                                            list_map_keys: [ "devicePath" ],
+                                                                            inline: false }];
   // Periodic probe of container liveness.
   // Container will be restarted if the probe fails.
   // Cannot be updated.
@@ -1086,7 +1099,7 @@ message ContainerExtendedResourceRequest {
 message ContainerImage {
   // Names by which this image is known.
   // e.g. ["kubernetes.example/hyperkube:v1.0.7", "cloud-vendor.registry.example/cloud-vendor/hyperkube:v1.0.7"]
-  repeated string names = 1 [(dev.f110.kubeproto.field) = { go_name: "Names", api_field_name: "names", inline: false }];
+  repeated string names = 1 [(dev.f110.kubeproto.field) = { go_name: "Names", api_field_name: "names", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // The size of the image in bytes.
   optional int64 size_bytes = 2 [(dev.f110.kubeproto.field) = { go_name: "SizeBytes", api_field_name: "sizeBytes", inline: false }];
 }
@@ -1139,7 +1152,7 @@ message ContainerRestartRuleOnExitCodes {
   optional ContainerRestartRuleOnExitCodesOperator operator = 1 [(dev.f110.kubeproto.field) = { go_name: "Operator", api_field_name: "operator", inline: false }];
   // Specifies the set of values to check for container exit codes.
   // At most 255 elements are allowed.
-  repeated int32 values = 2 [(dev.f110.kubeproto.field) = { go_name: "Values", api_field_name: "values", inline: false }];
+  repeated int32 values = 2 [(dev.f110.kubeproto.field) = { go_name: "Values", api_field_name: "values", list_type: LIST_TYPE_SET, inline: false }];
 }
 
 message ContainerState {
@@ -1233,12 +1246,16 @@ message ContainerStatus {
   // enacted on the running container after it has been started or has been successfully resized.
   optional ResourceRequirements resources = 11 [(dev.f110.kubeproto.field) = { go_name: "Resources", api_field_name: "resources", inline: false }];
   // Status of volume mounts.
-  repeated VolumeMountStatus volume_mounts = 12 [(dev.f110.kubeproto.field) = { go_name: "VolumeMounts", api_field_name: "volumeMounts", inline: false }];
+  repeated VolumeMountStatus volume_mounts = 12 [(dev.f110.kubeproto.field) = { go_name: "VolumeMounts", api_field_name: "volumeMounts", list_type: LIST_TYPE_MAP,
+                                                                                list_map_keys: [ "mountPath" ],
+                                                                                inline: false }];
   // User represents user identity information initially attached to the first process of the container
   optional ContainerUser user = 13 [(dev.f110.kubeproto.field) = { go_name: "User", api_field_name: "user", inline: false }];
   // AllocatedResourcesStatus represents the status of various resources
   // allocated for this Pod.
-  repeated ResourceStatus allocated_resources_status = 14 [(dev.f110.kubeproto.field) = { go_name: "AllocatedResourcesStatus", api_field_name: "allocatedResourcesStatus", inline: false }];
+  repeated ResourceStatus allocated_resources_status = 14 [(dev.f110.kubeproto.field) = { go_name: "AllocatedResourcesStatus", api_field_name: "allocatedResourcesStatus", list_type: LIST_TYPE_MAP,
+                                                                                          list_map_keys: [ "name" ],
+                                                                                          inline: false }];
   // StopSignal reports the effective stop signal for this container
   optional Signal stop_signal = 15 [(dev.f110.kubeproto.field) = { go_name: "StopSignal", api_field_name: "stopSignal", inline: false }];
 }
@@ -1256,7 +1273,7 @@ message DaemonEndpoint {
 
 message DownwardAPIProjection {
   // Items is a list of DownwardAPIVolume file
-  repeated DownwardAPIVolumeFile items = 1 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+  repeated DownwardAPIVolumeFile items = 1 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message DownwardAPIVolumeFile {
@@ -1278,7 +1295,7 @@ message DownwardAPIVolumeFile {
 
 message DownwardAPIVolumeSource {
   // Items is a list of downward API volume file
-  repeated DownwardAPIVolumeFile items = 1 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+  repeated DownwardAPIVolumeFile items = 1 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Optional: mode bits to use on created files by default. Must be a
   // Optional: mode bits used to set permissions on created files by default.
   // Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
@@ -1316,6 +1333,9 @@ message EndpointAddress {
   optional string node_name = 3 [(dev.f110.kubeproto.field) = { go_name: "NodeName", api_field_name: "nodeName", inline: false }];
   // Reference to object providing the endpoint.
   optional ObjectReference target_ref = 4 [(dev.f110.kubeproto.field) = { go_name: "TargetRef", api_field_name: "targetRef", inline: false }];
+  option (dev.f110.kubeproto.message) = {
+    struct_type: STRUCT_TYPE_ATOMIC
+  };
 }
 
 message EndpointPort {
@@ -1342,19 +1362,22 @@ message EndpointPort {
   //   * 'kubernetes.io/wss' - WebSocket over TLS as described in https://www.rfc-editor.org/rfc/rfc6455
   // * Other protocols should use implementation-defined prefixed names such as
   // mycompany.com/my-custom-protocol.
-  optional string app_protocol = 4 [(dev.f110.kubeproto.field) = { go_name: "AppProtocol", api_field_name: "appProtocol", inline: false }];
+  optional string app_protocol        = 4 [(dev.f110.kubeproto.field) = { go_name: "AppProtocol", api_field_name: "appProtocol", inline: false }];
+  option (dev.f110.kubeproto.message) = {
+    struct_type: STRUCT_TYPE_ATOMIC
+  };
 }
 
 message EndpointSubset {
   // IP addresses which offer the related ports that are marked as ready. These endpoints
   // should be considered safe for load balancers and clients to utilize.
-  repeated EndpointAddress addresses = 1 [(dev.f110.kubeproto.field) = { go_name: "Addresses", api_field_name: "addresses", inline: false }];
+  repeated EndpointAddress addresses = 1 [(dev.f110.kubeproto.field) = { go_name: "Addresses", api_field_name: "addresses", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // IP addresses which offer the related ports but are not currently marked as ready
   // because they have not yet finished starting, have recently failed a readiness check,
   // or have recently failed a liveness check.
-  repeated EndpointAddress not_ready_addresses = 2 [(dev.f110.kubeproto.field) = { go_name: "NotReadyAddresses", api_field_name: "notReadyAddresses", inline: false }];
+  repeated EndpointAddress not_ready_addresses = 2 [(dev.f110.kubeproto.field) = { go_name: "NotReadyAddresses", api_field_name: "notReadyAddresses", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Port numbers available on the related IP addresses.
-  repeated EndpointPort ports = 3 [(dev.f110.kubeproto.field) = { go_name: "Ports", api_field_name: "ports", inline: false }];
+  repeated EndpointPort ports = 3 [(dev.f110.kubeproto.field) = { go_name: "Ports", api_field_name: "ports", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message Endpoints {
@@ -1365,7 +1388,7 @@ message Endpoints {
   // subsets for the different ports. No address will appear in both Addresses and
   // NotReadyAddresses in the same subset.
   // Sets of addresses and ports that comprise a service.
-  repeated EndpointSubset subsets = 3 [(dev.f110.kubeproto.field) = { go_name: "Subsets", api_field_name: "subsets", inline: false }];
+  repeated EndpointSubset subsets = 3 [(dev.f110.kubeproto.field) = { go_name: "Subsets", api_field_name: "subsets", list_type: LIST_TYPE_ATOMIC, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
   };
@@ -1453,7 +1476,7 @@ message EphemeralContainerCommon {
   // produce the string literal "$(VAR_NAME)". Escaped references will never be expanded, regardless
   // of whether the variable exists or not. Cannot be updated.
   // More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
-  repeated string command = 3 [(dev.f110.kubeproto.field) = { go_name: "Command", api_field_name: "command", inline: false }];
+  repeated string command = 3 [(dev.f110.kubeproto.field) = { go_name: "Command", api_field_name: "command", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Arguments to the entrypoint.
   // The image's CMD is used if this is not provided.
   // Variable references $(VAR_NAME) are expanded using the container's environment. If a variable
@@ -1462,29 +1485,33 @@ message EphemeralContainerCommon {
   // produce the string literal "$(VAR_NAME)". Escaped references will never be expanded, regardless
   // of whether the variable exists or not. Cannot be updated.
   // More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
-  repeated string args = 4 [(dev.f110.kubeproto.field) = { go_name: "Args", api_field_name: "args", inline: false }];
+  repeated string args = 4 [(dev.f110.kubeproto.field) = { go_name: "Args", api_field_name: "args", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Container's working directory.
   // If not specified, the container runtime's default will be used, which
   // might be configured in the container image.
   // Cannot be updated.
   optional string working_dir = 5 [(dev.f110.kubeproto.field) = { go_name: "WorkingDir", api_field_name: "workingDir", inline: false }];
   // Ports are not allowed for ephemeral containers.
-  repeated ContainerPort ports = 6 [(dev.f110.kubeproto.field) = { go_name: "Ports", api_field_name: "ports", inline: false }];
+  repeated ContainerPort ports = 6 [(dev.f110.kubeproto.field) = { go_name: "Ports", api_field_name: "ports", list_type: LIST_TYPE_MAP,
+                                                                   list_map_keys: [ "containerPort", "protocol" ],
+                                                                   inline: false }];
   // List of sources to populate environment variables in the container.
   // The keys defined within a source may consist of any printable ASCII characters except '='.
   // When a key exists in multiple
   // sources, the value associated with the last source will take precedence.
   // Values defined by an Env with a duplicate key will take precedence.
   // Cannot be updated.
-  repeated EnvFromSource env_from = 7 [(dev.f110.kubeproto.field) = { go_name: "EnvFrom", api_field_name: "envFrom", inline: false }];
+  repeated EnvFromSource env_from = 7 [(dev.f110.kubeproto.field) = { go_name: "EnvFrom", api_field_name: "envFrom", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // List of environment variables to set in the container.
   // Cannot be updated.
-  repeated EnvVar env = 8 [(dev.f110.kubeproto.field) = { go_name: "Env", api_field_name: "env", inline: false }];
+  repeated EnvVar env = 8 [(dev.f110.kubeproto.field) = { go_name: "Env", api_field_name: "env", list_type: LIST_TYPE_MAP,
+                                                          list_map_keys: [ "name" ],
+                                                          inline: false }];
   // Resources are not allowed for ephemeral containers. Ephemeral containers use spare resources
   // already allocated to the pod.
   optional ResourceRequirements resources = 9 [(dev.f110.kubeproto.field) = { go_name: "Resources", api_field_name: "resources", inline: false }];
   // Resources resize policy for the container.
-  repeated ContainerResizePolicy resize_policy = 10 [(dev.f110.kubeproto.field) = { go_name: "ResizePolicy", api_field_name: "resizePolicy", inline: false }];
+  repeated ContainerResizePolicy resize_policy = 10 [(dev.f110.kubeproto.field) = { go_name: "ResizePolicy", api_field_name: "resizePolicy", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Restart policy for the container to manage the restart behavior of each
   // container within a pod.
   // You cannot set this field on ephemeral containers.
@@ -1492,12 +1519,16 @@ message EphemeralContainerCommon {
   // Represents a list of rules to be checked to determine if the
   // container should be restarted on exit. You cannot set this field on
   // ephemeral containers.
-  repeated ContainerRestartRule restart_policy_rules = 12 [(dev.f110.kubeproto.field) = { go_name: "RestartPolicyRules", api_field_name: "restartPolicyRules", inline: false }];
+  repeated ContainerRestartRule restart_policy_rules = 12 [(dev.f110.kubeproto.field) = { go_name: "RestartPolicyRules", api_field_name: "restartPolicyRules", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Pod volumes to mount into the container's filesystem. Subpath mounts are not allowed for ephemeral containers.
   // Cannot be updated.
-  repeated VolumeMount volume_mounts = 13 [(dev.f110.kubeproto.field) = { go_name: "VolumeMounts", api_field_name: "volumeMounts", inline: false }];
+  repeated VolumeMount volume_mounts = 13 [(dev.f110.kubeproto.field) = { go_name: "VolumeMounts", api_field_name: "volumeMounts", list_type: LIST_TYPE_MAP,
+                                                                          list_map_keys: [ "mountPath" ],
+                                                                          inline: false }];
   // volumeDevices is the list of block devices to be used by the container.
-  repeated VolumeDevice volume_devices = 14 [(dev.f110.kubeproto.field) = { go_name: "VolumeDevices", api_field_name: "volumeDevices", inline: false }];
+  repeated VolumeDevice volume_devices = 14 [(dev.f110.kubeproto.field) = { go_name: "VolumeDevices", api_field_name: "volumeDevices", list_type: LIST_TYPE_MAP,
+                                                                            list_map_keys: [ "devicePath" ],
+                                                                            inline: false }];
   // Probes are not allowed for ephemeral containers.
   optional Probe liveness_probe = 15 [(dev.f110.kubeproto.field) = { go_name: "LivenessProbe", api_field_name: "livenessProbe", inline: false }];
   // Probes are not allowed for ephemeral containers.
@@ -1634,12 +1665,12 @@ message ExecAction {
   // not run inside a shell, so traditional shell instructions ('|', etc) won't work. To use
   // a shell, you need to explicitly call out to that shell.
   // Exit status of 0 is treated as live/healthy and non-zero is unhealthy.
-  repeated string command = 1 [(dev.f110.kubeproto.field) = { go_name: "Command", api_field_name: "command", inline: false }];
+  repeated string command = 1 [(dev.f110.kubeproto.field) = { go_name: "Command", api_field_name: "command", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message FCVolumeSource {
   // targetWWNs is Optional: FC target worldwide names (WWNs)
-  repeated string target_wwns = 1 [(dev.f110.kubeproto.field) = { go_name: "TargetWWNs", api_field_name: "targetWWNs", inline: false }];
+  repeated string target_wwns = 1 [(dev.f110.kubeproto.field) = { go_name: "TargetWWNs", api_field_name: "targetWWNs", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // lun is Optional: FC target lun number
   optional int32 lun = 2 [(dev.f110.kubeproto.field) = { go_name: "Lun", api_field_name: "lun", inline: false }];
   // fsType is the filesystem type to mount.
@@ -1651,7 +1682,7 @@ message FCVolumeSource {
   optional bool read_only = 4 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
   // wwids Optional: FC volume world wide identifiers (wwids)
   // Either wwids or combination of targetWWNs and lun must be set, but not both simultaneously.
-  repeated string wwids = 5 [(dev.f110.kubeproto.field) = { go_name: "WWIDs", api_field_name: "wwids", inline: false }];
+  repeated string wwids = 5 [(dev.f110.kubeproto.field) = { go_name: "WWIDs", api_field_name: "wwids", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message FileKeySelector {
@@ -1670,7 +1701,10 @@ message FileKeySelector {
   // the environment variable will not be set in the Pod's containers.
   // If optional is set to false and the specified key does not exist,
   // an error will be returned during Pod creation.
-  optional bool optional = 4 [(dev.f110.kubeproto.field) = { go_name: "Optional", api_field_name: "optional", inline: false }];
+  optional bool optional              = 4 [(dev.f110.kubeproto.field) = { go_name: "Optional", api_field_name: "optional", inline: false }];
+  option (dev.f110.kubeproto.message) = {
+    struct_type: STRUCT_TYPE_ATOMIC
+  };
 }
 
 message FlexPersistentVolumeSource {
@@ -1806,7 +1840,7 @@ message HTTPGetAction {
   // Defaults to HTTP.
   optional URIScheme scheme = 4 [(dev.f110.kubeproto.field) = { go_name: "Scheme", api_field_name: "scheme", inline: false }];
   // Custom headers to set in the request. HTTP allows repeated headers.
-  repeated HTTPHeader http_headers = 5 [(dev.f110.kubeproto.field) = { go_name: "HTTPHeaders", api_field_name: "httpHeaders", inline: false }];
+  repeated HTTPHeader http_headers = 5 [(dev.f110.kubeproto.field) = { go_name: "HTTPHeaders", api_field_name: "httpHeaders", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message HTTPHeader {
@@ -1821,7 +1855,7 @@ message HostAlias {
   // IP address of the host file entry.
   string ip = 1 [(dev.f110.kubeproto.field) = { go_name: "IP", api_field_name: "ip", inline: false }];
   // Hostnames for the above IP address.
-  repeated string hostnames = 2 [(dev.f110.kubeproto.field) = { go_name: "Hostnames", api_field_name: "hostnames", inline: false }];
+  repeated string hostnames = 2 [(dev.f110.kubeproto.field) = { go_name: "Hostnames", api_field_name: "hostnames", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message HostIP {
@@ -1861,7 +1895,7 @@ message ISCSIPersistentVolumeSource {
   optional bool read_only = 6 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
   // portals is the iSCSI Target Portal List. The Portal is either an IP or ip_addr:port if the port
   // is other than default (typically TCP ports 860 and 3260).
-  repeated string portals = 7 [(dev.f110.kubeproto.field) = { go_name: "Portals", api_field_name: "portals", inline: false }];
+  repeated string portals = 7 [(dev.f110.kubeproto.field) = { go_name: "Portals", api_field_name: "portals", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // chapAuthDiscovery defines whether support iSCSI Discovery CHAP authentication
   optional bool discovery_chap_auth = 8 [(dev.f110.kubeproto.field) = { go_name: "DiscoveryCHAPAuth", api_field_name: "chapAuthDiscovery", inline: false }];
   // chapAuthSession defines whether support iSCSI Session CHAP authentication
@@ -1895,7 +1929,7 @@ message ISCSIVolumeSource {
   optional bool read_only = 6 [(dev.f110.kubeproto.field) = { go_name: "ReadOnly", api_field_name: "readOnly", inline: false }];
   // portals is the iSCSI Target Portal List. The portal is either an IP or ip_addr:port if the port
   // is other than default (typically TCP ports 860 and 3260).
-  repeated string portals = 7 [(dev.f110.kubeproto.field) = { go_name: "Portals", api_field_name: "portals", inline: false }];
+  repeated string portals = 7 [(dev.f110.kubeproto.field) = { go_name: "Portals", api_field_name: "portals", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // chapAuthDiscovery defines whether support iSCSI Discovery CHAP authentication
   optional bool discovery_chap_auth = 8 [(dev.f110.kubeproto.field) = { go_name: "DiscoveryCHAPAuth", api_field_name: "chapAuthDiscovery", inline: false }];
   // chapAuthSession defines whether support iSCSI Session CHAP authentication
@@ -2019,7 +2053,7 @@ message LimitRangeList {
 
 message LimitRangeSpec {
   // Limits is the list of LimitRangeItem objects that are enforced.
-  repeated LimitRangeItem limits = 1 [(dev.f110.kubeproto.field) = { go_name: "Limits", api_field_name: "limits", inline: false }];
+  repeated LimitRangeItem limits = 1 [(dev.f110.kubeproto.field) = { go_name: "Limits", api_field_name: "limits", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message LinuxContainerUser {
@@ -2028,7 +2062,7 @@ message LinuxContainerUser {
   // GID is the primary gid initially attached to the first process in the container
   int64 g_id = 2 [(dev.f110.kubeproto.field) = { go_name: "GID", api_field_name: "gid", inline: false }];
   // SupplementalGroups are the supplemental groups initially attached to the first process in the container
-  repeated int64 supplemental_groups = 3 [(dev.f110.kubeproto.field) = { go_name: "SupplementalGroups", api_field_name: "supplementalGroups", inline: false }];
+  repeated int64 supplemental_groups = 3 [(dev.f110.kubeproto.field) = { go_name: "SupplementalGroups", api_field_name: "supplementalGroups", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message LoadBalancerIngress {
@@ -2047,13 +2081,13 @@ message LoadBalancerIngress {
   optional LoadBalancerIPMode ip_mode = 3 [(dev.f110.kubeproto.field) = { go_name: "IPMode", api_field_name: "ipMode", inline: false }];
   // Ports is a list of records of service ports
   // If used, every port defined in the service should have an entry in it
-  repeated PortStatus ports = 4 [(dev.f110.kubeproto.field) = { go_name: "Ports", api_field_name: "ports", inline: false }];
+  repeated PortStatus ports = 4 [(dev.f110.kubeproto.field) = { go_name: "Ports", api_field_name: "ports", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message LoadBalancerStatus {
   // Ingress is a list containing ingress points for the load-balancer.
   // Traffic intended for the service should be sent to these ingress points.
-  repeated LoadBalancerIngress ingress = 1 [(dev.f110.kubeproto.field) = { go_name: "Ingress", api_field_name: "ingress", inline: false }];
+  repeated LoadBalancerIngress ingress = 1 [(dev.f110.kubeproto.field) = { go_name: "Ingress", api_field_name: "ingress", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message LocalObjectReference {
@@ -2062,7 +2096,10 @@ message LocalObjectReference {
   // allowed to be empty. Instances of this type with an empty value here are
   // almost certainly wrong.
   // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-  optional string name = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  optional string name                = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  option (dev.f110.kubeproto.message) = {
+    struct_type: STRUCT_TYPE_ATOMIC
+  };
 }
 
 message LocalVolumeSource {
@@ -2144,7 +2181,7 @@ message NamespaceList {
 message NamespaceSpec {
   // Finalizers is an opaque list of values that must be empty to permanently remove object from storage.
   // More info: https://kubernetes.io/docs/tasks/administer-cluster/namespaces/
-  repeated FinalizerName finalizers = 1 [(dev.f110.kubeproto.field) = { go_name: "Finalizers", api_field_name: "finalizers", inline: false }];
+  repeated FinalizerName finalizers = 1 [(dev.f110.kubeproto.field) = { go_name: "Finalizers", api_field_name: "finalizers", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message NamespaceStatus {
@@ -2152,7 +2189,9 @@ message NamespaceStatus {
   // More info: https://kubernetes.io/docs/tasks/administer-cluster/namespaces/
   optional NamespacePhase phase = 1 [(dev.f110.kubeproto.field) = { go_name: "Phase", api_field_name: "phase", inline: false }];
   // Represents the latest available observations of a namespace's current state.
-  repeated NamespaceCondition conditions = 2 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated NamespaceCondition conditions = 2 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                             list_map_keys: [ "type" ],
+                                                                             inline: false }];
 }
 
 message Node {
@@ -2193,14 +2232,14 @@ message NodeAffinity {
   // compute a sum by iterating through the elements of this field and adding
   // "weight" to the sum if the node matches the corresponding matchExpressions; the
   // node(s) with the highest sum are the most preferred.
-  repeated PreferredSchedulingTerm preferred_during_scheduling_ignored_during_execution = 2 [(dev.f110.kubeproto.field) = { go_name: "PreferredDuringSchedulingIgnoredDuringExecution", api_field_name: "preferredDuringSchedulingIgnoredDuringExecution", inline: false }];
+  repeated PreferredSchedulingTerm preferred_during_scheduling_ignored_during_execution = 2 [(dev.f110.kubeproto.field) = { go_name: "PreferredDuringSchedulingIgnoredDuringExecution", api_field_name: "preferredDuringSchedulingIgnoredDuringExecution", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message NodeAllocatableResourceClaimStatus {
   // ResourceClaimName is the resource claim referenced by the pod that resulted in this node allocatable resource allocation.
   string resource_claim_name = 1 [(dev.f110.kubeproto.field) = { go_name: "ResourceClaimName", api_field_name: "resourceClaimName", inline: false }];
   // Containers lists the names of all containers in this pod that reference the claim.
-  repeated string containers = 2 [(dev.f110.kubeproto.field) = { go_name: "Containers", api_field_name: "containers", inline: false }];
+  repeated string containers = 2 [(dev.f110.kubeproto.field) = { go_name: "Containers", api_field_name: "containers", list_type: LIST_TYPE_SET, inline: false }];
   // Resources is a map of the node-allocatable resource name to the aggregate quantity allocated to the claim.
   map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> resources = 3 [(dev.f110.kubeproto.field) = { go_name: "Resources", api_field_name: "resources", inline: false }];
 }
@@ -2309,7 +2348,10 @@ message NodeRuntimeHandlerFeatures {
 
 message NodeSelector {
   // Required. A list of node selector terms. The terms are ORed.
-  repeated NodeSelectorTerm node_selector_terms = 1 [(dev.f110.kubeproto.field) = { go_name: "NodeSelectorTerms", api_field_name: "nodeSelectorTerms", inline: false }];
+  repeated NodeSelectorTerm node_selector_terms = 1 [(dev.f110.kubeproto.field) = { go_name: "NodeSelectorTerms", api_field_name: "nodeSelectorTerms", list_type: LIST_TYPE_ATOMIC, inline: false }];
+  option (dev.f110.kubeproto.message)           = {
+    struct_type: STRUCT_TYPE_ATOMIC
+  };
 }
 
 message NodeSelectorRequirement {
@@ -2323,14 +2365,17 @@ message NodeSelectorRequirement {
   // the values array must be empty. If the operator is Gt or Lt, the values
   // array must have a single element, which will be interpreted as an integer.
   // This array is replaced during a strategic merge patch.
-  repeated string values = 3 [(dev.f110.kubeproto.field) = { go_name: "Values", api_field_name: "values", inline: false }];
+  repeated string values = 3 [(dev.f110.kubeproto.field) = { go_name: "Values", api_field_name: "values", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message NodeSelectorTerm {
   // A list of node selector requirements by node's labels.
-  repeated NodeSelectorRequirement match_expressions = 1 [(dev.f110.kubeproto.field) = { go_name: "MatchExpressions", api_field_name: "matchExpressions", inline: false }];
+  repeated NodeSelectorRequirement match_expressions = 1 [(dev.f110.kubeproto.field) = { go_name: "MatchExpressions", api_field_name: "matchExpressions", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // A list of node selector requirements by node's fields.
-  repeated NodeSelectorRequirement match_fields = 2 [(dev.f110.kubeproto.field) = { go_name: "MatchFields", api_field_name: "matchFields", inline: false }];
+  repeated NodeSelectorRequirement match_fields = 2 [(dev.f110.kubeproto.field) = { go_name: "MatchFields", api_field_name: "matchFields", list_type: LIST_TYPE_ATOMIC, inline: false }];
+  option (dev.f110.kubeproto.message)           = {
+    struct_type: STRUCT_TYPE_ATOMIC
+  };
 }
 
 message NodeSpec {
@@ -2339,14 +2384,14 @@ message NodeSpec {
   // podCIDRs represents the IP ranges assigned to the node for usage by Pods on that node. If this
   // field is specified, the 0th entry must match the podCIDR field. It may contain at most 1 value for
   // each of IPv4 and IPv6.
-  repeated string pod_cidrs = 2 [(dev.f110.kubeproto.field) = { go_name: "PodCIDRs", api_field_name: "podCIDRs", inline: false }];
+  repeated string pod_cidrs = 2 [(dev.f110.kubeproto.field) = { go_name: "PodCIDRs", api_field_name: "podCIDRs", list_type: LIST_TYPE_SET, inline: false }];
   // ID of the node assigned by the cloud provider in the format: <ProviderName>://<ProviderSpecificNodeID>
   optional string provider_id = 3 [(dev.f110.kubeproto.field) = { go_name: "ProviderID", api_field_name: "providerID", inline: false }];
   // Unschedulable controls node schedulability of new pods. By default, node is schedulable.
   // More info: https://kubernetes.io/docs/concepts/nodes/node/#manual-node-administration
   optional bool unschedulable = 4 [(dev.f110.kubeproto.field) = { go_name: "Unschedulable", api_field_name: "unschedulable", inline: false }];
   // If specified, the node's taints.
-  repeated Taint taints = 5 [(dev.f110.kubeproto.field) = { go_name: "Taints", api_field_name: "taints", inline: false }];
+  repeated Taint taints = 5 [(dev.f110.kubeproto.field) = { go_name: "Taints", api_field_name: "taints", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Deprecated: Previously used to specify the source of the node's configuration for the DynamicKubeletConfig feature. This feature is removed.
   optional NodeConfigSource config_source = 6 [(dev.f110.kubeproto.field) = { go_name: "ConfigSource", api_field_name: "configSource", inline: false }];
   // Deprecated. Not all kubelets will set this field. Remove field after 1.13.
@@ -2367,7 +2412,9 @@ message NodeStatus {
   optional NodePhase phase = 3 [(dev.f110.kubeproto.field) = { go_name: "Phase", api_field_name: "phase", inline: false }];
   // Conditions is an array of current observed node conditions.
   // More info: https://kubernetes.io/docs/reference/node/node-status/#condition
-  repeated NodeCondition conditions = 4 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated NodeCondition conditions = 4 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                        list_map_keys: [ "type" ],
+                                                                        inline: false }];
   // List of addresses reachable to the node.
   // Queried from cloud provider, if available.
   // More info: https://kubernetes.io/docs/reference/node/node-status/#addresses
@@ -2378,26 +2425,28 @@ message NodeStatus {
   // lifetime of a Node. However, there are some exceptions where this may not
   // be possible, such as Pods that inherit a Node's address in its own status or
   // consumers of the downward API (status.hostIP).
-  repeated NodeAddress addresses = 5 [(dev.f110.kubeproto.field) = { go_name: "Addresses", api_field_name: "addresses", inline: false }];
+  repeated NodeAddress addresses = 5 [(dev.f110.kubeproto.field) = { go_name: "Addresses", api_field_name: "addresses", list_type: LIST_TYPE_MAP,
+                                                                     list_map_keys: [ "type" ],
+                                                                     inline: false }];
   // Endpoints of daemons running on the Node.
   optional NodeDaemonEndpoints daemon_endpoints = 6 [(dev.f110.kubeproto.field) = { go_name: "DaemonEndpoints", api_field_name: "daemonEndpoints", inline: false }];
   // Set of ids/uuids to uniquely identify the node.
   // More info: https://kubernetes.io/docs/reference/node/node-status/#info
   optional NodeSystemInfo node_info = 7 [(dev.f110.kubeproto.field) = { go_name: "NodeInfo", api_field_name: "nodeInfo", inline: false }];
   // List of container images on this node
-  repeated ContainerImage images = 8 [(dev.f110.kubeproto.field) = { go_name: "Images", api_field_name: "images", inline: false }];
+  repeated ContainerImage images = 8 [(dev.f110.kubeproto.field) = { go_name: "Images", api_field_name: "images", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // List of attachable volumes in use (mounted) by the node.
-  repeated string volumes_in_use = 9 [(dev.f110.kubeproto.field) = { go_name: "VolumesInUse", api_field_name: "volumesInUse", inline: false }];
+  repeated string volumes_in_use = 9 [(dev.f110.kubeproto.field) = { go_name: "VolumesInUse", api_field_name: "volumesInUse", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // List of volumes that are attached to the node.
-  repeated AttachedVolume volumes_attached = 10 [(dev.f110.kubeproto.field) = { go_name: "VolumesAttached", api_field_name: "volumesAttached", inline: false }];
+  repeated AttachedVolume volumes_attached = 10 [(dev.f110.kubeproto.field) = { go_name: "VolumesAttached", api_field_name: "volumesAttached", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Status of the config assigned to the node via the dynamic Kubelet config feature.
   optional NodeConfigStatus config = 11 [(dev.f110.kubeproto.field) = { go_name: "Config", api_field_name: "config", inline: false }];
   // The available runtime handlers.
-  repeated NodeRuntimeHandler runtime_handlers = 12 [(dev.f110.kubeproto.field) = { go_name: "RuntimeHandlers", api_field_name: "runtimeHandlers", inline: false }];
+  repeated NodeRuntimeHandler runtime_handlers = 12 [(dev.f110.kubeproto.field) = { go_name: "RuntimeHandlers", api_field_name: "runtimeHandlers", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Features describes the set of features implemented by the CRI implementation.
   optional NodeFeatures features = 13 [(dev.f110.kubeproto.field) = { go_name: "Features", api_field_name: "features", inline: false }];
   // DeclaredFeatures represents the features related to feature gates that are declared by the node.
-  repeated string declared_features = 14 [(dev.f110.kubeproto.field) = { go_name: "DeclaredFeatures", api_field_name: "declaredFeatures", inline: false }];
+  repeated string declared_features = 14 [(dev.f110.kubeproto.field) = { go_name: "DeclaredFeatures", api_field_name: "declaredFeatures", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message NodeSwapStatus {
@@ -2438,7 +2487,10 @@ message ObjectFieldSelector {
   // Version of the schema the FieldPath is written in terms of, defaults to "v1".
   optional string api_version = 1 [(dev.f110.kubeproto.field) = { go_name: "APIVersion", api_field_name: "apiVersion", inline: false }];
   // Path of the field to select in the specified API version.
-  string field_path = 2 [(dev.f110.kubeproto.field) = { go_name: "FieldPath", api_field_name: "fieldPath", inline: false }];
+  string field_path                   = 2 [(dev.f110.kubeproto.field) = { go_name: "FieldPath", api_field_name: "fieldPath", inline: false }];
+  option (dev.f110.kubeproto.message) = {
+    struct_type: STRUCT_TYPE_ATOMIC
+  };
 }
 
 message ObjectReference {
@@ -2466,7 +2518,10 @@ message ObjectReference {
   // the event) or if no container name is specified "spec.containers[2]" (container with
   // index 2 in this pod). This syntax is chosen only to have some well-defined way of
   // referencing a part of an object.
-  optional string field_path = 7 [(dev.f110.kubeproto.field) = { go_name: "FieldPath", api_field_name: "fieldPath", inline: false }];
+  optional string field_path          = 7 [(dev.f110.kubeproto.field) = { go_name: "FieldPath", api_field_name: "fieldPath", inline: false }];
+  option (dev.f110.kubeproto.message) = {
+    struct_type: STRUCT_TYPE_ATOMIC
+  };
 }
 
 message PersistentVolume {
@@ -2531,7 +2586,7 @@ message PersistentVolumeClaimList {
 message PersistentVolumeClaimSpec {
   // accessModes contains the desired access modes the volume should have.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1
-  repeated PersistentVolumeAccessMode access_modes = 1 [(dev.f110.kubeproto.field) = { go_name: "AccessModes", api_field_name: "accessModes", inline: false }];
+  repeated PersistentVolumeAccessMode access_modes = 1 [(dev.f110.kubeproto.field) = { go_name: "AccessModes", api_field_name: "accessModes", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // selector is a label query over volumes to consider for binding.
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector selector = 2 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", inline: false }];
   // resources represents the minimum resources the volume should have.
@@ -2599,12 +2654,14 @@ message PersistentVolumeClaimStatus {
   optional PersistentVolumeClaimPhase phase = 1 [(dev.f110.kubeproto.field) = { go_name: "Phase", api_field_name: "phase", inline: false }];
   // accessModes contains the actual access modes the volume backing the PVC has.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1
-  repeated PersistentVolumeAccessMode access_modes = 2 [(dev.f110.kubeproto.field) = { go_name: "AccessModes", api_field_name: "accessModes", inline: false }];
+  repeated PersistentVolumeAccessMode access_modes = 2 [(dev.f110.kubeproto.field) = { go_name: "AccessModes", api_field_name: "accessModes", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // capacity represents the actual resources of the underlying volume.
   map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> capacity = 3 [(dev.f110.kubeproto.field) = { go_name: "Capacity", api_field_name: "capacity", inline: false }];
   // conditions is the current Condition of persistent volume claim. If underlying persistent volume is being
   // resized then the Condition will be set to 'Resizing'.
-  repeated PersistentVolumeClaimCondition conditions = 4 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated PersistentVolumeClaimCondition conditions = 4 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                                         list_map_keys: [ "type" ],
+                                                                                         inline: false }];
   // allocatedResources tracks the resources allocated to a PVC including its capacity.
   // Key names follow standard Kubernetes label syntax. Valid values are either:
   // 	* Un-prefixed keys:
@@ -2655,7 +2712,7 @@ message PersistentVolumeClaimStatus {
   // should ignore the update for the purpose it was designed. For example - a controller that
   // only is responsible for resizing capacity of the volume, should ignore PVC updates that change other valid
   // resources associated with PVC.
-  map<string, string> allocated_resource_statuses = 6 [(dev.f110.kubeproto.field) = { go_name: "AllocatedResourceStatuses", api_field_name: "allocatedResourceStatuses", inline: false }];
+  map<string, string> allocated_resource_statuses = 6 [(dev.f110.kubeproto.field) = { go_name: "AllocatedResourceStatuses", api_field_name: "allocatedResourceStatuses", map_type: MAP_TYPE_GRANULAR, inline: false }];
   // currentVolumeAttributesClassName is the current name of the VolumeAttributesClass the PVC is using.
   // When unset, there is no VolumeAttributeClass applied to this PersistentVolumeClaim
   optional string current_volume_attributes_class_name = 7 [(dev.f110.kubeproto.field) = { go_name: "CurrentVolumeAttributesClassName", api_field_name: "currentVolumeAttributesClassName", inline: false }];
@@ -2789,7 +2846,7 @@ message PersistentVolumeSpec {
   PersistentVolumeSource persistent_volume_source = 2 [(dev.f110.kubeproto.field) = { go_name: "PersistentVolumeSource", inline: true }];
   // accessModes contains all ways the volume can be mounted.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes
-  repeated PersistentVolumeAccessMode access_modes = 3 [(dev.f110.kubeproto.field) = { go_name: "AccessModes", api_field_name: "accessModes", inline: false }];
+  repeated PersistentVolumeAccessMode access_modes = 3 [(dev.f110.kubeproto.field) = { go_name: "AccessModes", api_field_name: "accessModes", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // claimRef is part of a bi-directional binding between PersistentVolume and PersistentVolumeClaim.
   // Expected to be non-nil when bound.
   // claim.VolumeName is the authoritative bind between PV and PVC.
@@ -2807,7 +2864,7 @@ message PersistentVolumeSpec {
   // mountOptions is the list of mount options, e.g. ["ro", "soft"]. Not validated - mount will
   // simply fail if one is invalid.
   // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes/#mount-options
-  repeated string mount_options = 7 [(dev.f110.kubeproto.field) = { go_name: "MountOptions", api_field_name: "mountOptions", inline: false }];
+  repeated string mount_options = 7 [(dev.f110.kubeproto.field) = { go_name: "MountOptions", api_field_name: "mountOptions", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // volumeMode defines if a volume is intended to be used with a formatted filesystem
   // or to remain in raw block state. Value of Filesystem is implied when not included in spec.
   optional PersistentVolumeMode volume_mode = 8 [(dev.f110.kubeproto.field) = { go_name: "VolumeMode", api_field_name: "volumeMode", inline: false }];
@@ -2870,7 +2927,7 @@ message PodAffinity {
   // system may or may not try to eventually evict the pod from its node.
   // When there are multiple elements, the lists of nodes corresponding to each
   // podAffinityTerm are intersected, i.e. all terms must be satisfied.
-  repeated PodAffinityTerm required_during_scheduling_ignored_during_execution = 1 [(dev.f110.kubeproto.field) = { go_name: "RequiredDuringSchedulingIgnoredDuringExecution", api_field_name: "requiredDuringSchedulingIgnoredDuringExecution", inline: false }];
+  repeated PodAffinityTerm required_during_scheduling_ignored_during_execution = 1 [(dev.f110.kubeproto.field) = { go_name: "RequiredDuringSchedulingIgnoredDuringExecution", api_field_name: "requiredDuringSchedulingIgnoredDuringExecution", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // The scheduler will prefer to schedule pods to nodes that satisfy
   // the affinity expressions specified by this field, but it may choose
   // a node that violates one or more of the expressions. The node that is
@@ -2880,7 +2937,7 @@ message PodAffinity {
   // compute a sum by iterating through the elements of this field and adding
   // "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the
   // node(s) with the highest sum are the most preferred.
-  repeated WeightedPodAffinityTerm preferred_during_scheduling_ignored_during_execution = 2 [(dev.f110.kubeproto.field) = { go_name: "PreferredDuringSchedulingIgnoredDuringExecution", api_field_name: "preferredDuringSchedulingIgnoredDuringExecution", inline: false }];
+  repeated WeightedPodAffinityTerm preferred_during_scheduling_ignored_during_execution = 2 [(dev.f110.kubeproto.field) = { go_name: "PreferredDuringSchedulingIgnoredDuringExecution", api_field_name: "preferredDuringSchedulingIgnoredDuringExecution", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message PodAffinityTerm {
@@ -2891,7 +2948,7 @@ message PodAffinityTerm {
   // The term is applied to the union of the namespaces listed in this field
   // and the ones selected by namespaceSelector.
   // null or empty namespaces list and null namespaceSelector means "this pod's namespace".
-  repeated string namespaces = 2 [(dev.f110.kubeproto.field) = { go_name: "Namespaces", api_field_name: "namespaces", inline: false }];
+  repeated string namespaces = 2 [(dev.f110.kubeproto.field) = { go_name: "Namespaces", api_field_name: "namespaces", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
   // the labelSelector in the specified namespaces, where co-located is defined as running on a node
   // whose value of the label with key topologyKey matches that of any node on which any of the
@@ -2912,7 +2969,7 @@ message PodAffinityTerm {
   // pod labels will be ignored. The default value is empty.
   // The same key is forbidden to exist in both matchLabelKeys and labelSelector.
   // Also, matchLabelKeys cannot be set when labelSelector isn't set.
-  repeated string match_label_keys = 5 [(dev.f110.kubeproto.field) = { go_name: "MatchLabelKeys", api_field_name: "matchLabelKeys", inline: false }];
+  repeated string match_label_keys = 5 [(dev.f110.kubeproto.field) = { go_name: "MatchLabelKeys", api_field_name: "matchLabelKeys", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // MismatchLabelKeys is a set of pod label keys to select which pods will
   // be taken into consideration. The keys are used to lookup values from the
   // incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`
@@ -2921,7 +2978,7 @@ message PodAffinityTerm {
   // pod labels will be ignored. The default value is empty.
   // The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
   // Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-  repeated string mismatch_label_keys = 6 [(dev.f110.kubeproto.field) = { go_name: "MismatchLabelKeys", api_field_name: "mismatchLabelKeys", inline: false }];
+  repeated string mismatch_label_keys = 6 [(dev.f110.kubeproto.field) = { go_name: "MismatchLabelKeys", api_field_name: "mismatchLabelKeys", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message PodAntiAffinity {
@@ -2932,7 +2989,7 @@ message PodAntiAffinity {
   // system may or may not try to eventually evict the pod from its node.
   // When there are multiple elements, the lists of nodes corresponding to each
   // podAffinityTerm are intersected, i.e. all terms must be satisfied.
-  repeated PodAffinityTerm required_during_scheduling_ignored_during_execution = 1 [(dev.f110.kubeproto.field) = { go_name: "RequiredDuringSchedulingIgnoredDuringExecution", api_field_name: "requiredDuringSchedulingIgnoredDuringExecution", inline: false }];
+  repeated PodAffinityTerm required_during_scheduling_ignored_during_execution = 1 [(dev.f110.kubeproto.field) = { go_name: "RequiredDuringSchedulingIgnoredDuringExecution", api_field_name: "requiredDuringSchedulingIgnoredDuringExecution", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // The scheduler will prefer to schedule pods to nodes that satisfy
   // the anti-affinity expressions specified by this field, but it may choose
   // a node that violates one or more of the expressions. The node that is
@@ -2942,7 +2999,7 @@ message PodAntiAffinity {
   // compute a sum by iterating through the elements of this field and subtracting
   // "weight" from the sum if the node has pods which matches the corresponding podAffinityTerm; the
   // node(s) with the highest sum are the most preferred.
-  repeated WeightedPodAffinityTerm preferred_during_scheduling_ignored_during_execution = 2 [(dev.f110.kubeproto.field) = { go_name: "PreferredDuringSchedulingIgnoredDuringExecution", api_field_name: "preferredDuringSchedulingIgnoredDuringExecution", inline: false }];
+  repeated WeightedPodAffinityTerm preferred_during_scheduling_ignored_during_execution = 2 [(dev.f110.kubeproto.field) = { go_name: "PreferredDuringSchedulingIgnoredDuringExecution", api_field_name: "preferredDuringSchedulingIgnoredDuringExecution", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message PodAttachOptions {
@@ -3046,16 +3103,16 @@ message PodDNSConfig {
   // A list of DNS name server IP addresses.
   // This will be appended to the base nameservers generated from DNSPolicy.
   // Duplicated nameservers will be removed.
-  repeated string nameservers = 1 [(dev.f110.kubeproto.field) = { go_name: "Nameservers", api_field_name: "nameservers", inline: false }];
+  repeated string nameservers = 1 [(dev.f110.kubeproto.field) = { go_name: "Nameservers", api_field_name: "nameservers", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // A list of DNS search domains for host-name lookup.
   // This will be appended to the base search paths generated from DNSPolicy.
   // Duplicated search paths will be removed.
-  repeated string searches = 2 [(dev.f110.kubeproto.field) = { go_name: "Searches", api_field_name: "searches", inline: false }];
+  repeated string searches = 2 [(dev.f110.kubeproto.field) = { go_name: "Searches", api_field_name: "searches", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // A list of DNS resolver options.
   // This will be merged with the base options generated from DNSPolicy.
   // Duplicated entries will be removed. Resolution options given in Options
   // will override those that appear in the base DNSPolicy.
-  repeated PodDNSConfigOption options = 3 [(dev.f110.kubeproto.field) = { go_name: "Options", api_field_name: "options", inline: false }];
+  repeated PodDNSConfigOption options = 3 [(dev.f110.kubeproto.field) = { go_name: "Options", api_field_name: "options", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message PodDNSConfigOption {
@@ -3082,13 +3139,13 @@ message PodExecOptions {
   // Defaults to only container if there is only one container in the pod.
   optional string container = 6 [(dev.f110.kubeproto.field) = { go_name: "Container", api_field_name: "container", inline: false }];
   // Command is the remote command to execute. argv array. Not executed within a shell.
-  repeated string command = 7 [(dev.f110.kubeproto.field) = { go_name: "Command", api_field_name: "command", inline: false }];
+  repeated string command = 7 [(dev.f110.kubeproto.field) = { go_name: "Command", api_field_name: "command", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message PodExtendedResourceClaimStatus {
   // RequestMappings identifies the mapping of <container, extended resource backed by DRA> to  device request
   // in the generated ResourceClaim.
-  repeated ContainerExtendedResourceRequest request_mappings = 1 [(dev.f110.kubeproto.field) = { go_name: "RequestMappings", api_field_name: "requestMappings", inline: false }];
+  repeated ContainerExtendedResourceRequest request_mappings = 1 [(dev.f110.kubeproto.field) = { go_name: "RequestMappings", api_field_name: "requestMappings", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // ResourceClaimName is the name of the ResourceClaim that was
   // generated for the Pod in the namespace of the Pod.
   string resource_claim_name = 2 [(dev.f110.kubeproto.field) = { go_name: "ResourceClaimName", api_field_name: "resourceClaimName", inline: false }];
@@ -3164,7 +3221,7 @@ message PodPortForwardOptions {
   .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
   // List of ports to forward
   // Required when using WebSockets
-  repeated int32 ports = 2 [(dev.f110.kubeproto.field) = { go_name: "Ports", api_field_name: "ports", inline: false }];
+  repeated int32 ports = 2 [(dev.f110.kubeproto.field) = { go_name: "Ports", api_field_name: "ports", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message PodProxyOptions {
@@ -3284,7 +3341,7 @@ message PodSecurityContext {
   // defined in the container image may still be used, depending on the
   // supplementalGroupsPolicy field.
   // Note that this field cannot be set when spec.os.name is windows.
-  repeated int64 supplemental_groups = 6 [(dev.f110.kubeproto.field) = { go_name: "SupplementalGroups", api_field_name: "supplementalGroups", inline: false }];
+  repeated int64 supplemental_groups = 6 [(dev.f110.kubeproto.field) = { go_name: "SupplementalGroups", api_field_name: "supplementalGroups", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Defines how supplemental groups of the first container processes are calculated.
   // Valid values are "Merge" and "Strict". If not specified, "Merge" is used.
   // (Alpha) Using the field requires the SupplementalGroupsPolicy feature gate to be enabled
@@ -3303,7 +3360,7 @@ message PodSecurityContext {
   // Sysctls hold a list of namespaced sysctls used for the pod. Pods with unsupported
   // sysctls (by the container runtime) might fail to launch.
   // Note that this field cannot be set when spec.os.name is windows.
-  repeated Sysctl sysctls = 9 [(dev.f110.kubeproto.field) = { go_name: "Sysctls", api_field_name: "sysctls", inline: false }];
+  repeated Sysctl sysctls = 9 [(dev.f110.kubeproto.field) = { go_name: "Sysctls", api_field_name: "sysctls", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // fsGroupChangePolicy defines behavior of changing ownership and permission of the volume
   // before being exposed inside Pod. This field will only apply to
   // volume types which support fsGroup based ownership(and permissions).
@@ -3347,7 +3404,9 @@ message PodSignature {
 message PodSpec {
   // List of volumes that can be mounted by containers belonging to the pod.
   // More info: https://kubernetes.io/docs/concepts/storage/volumes
-  repeated Volume volumes = 1 [(dev.f110.kubeproto.field) = { go_name: "Volumes", api_field_name: "volumes", inline: false }];
+  repeated Volume volumes = 1 [(dev.f110.kubeproto.field) = { go_name: "Volumes", api_field_name: "volumes", list_type: LIST_TYPE_MAP,
+                                                              list_map_keys: [ "name" ],
+                                                              inline: false }];
   // List of initialization containers belonging to the pod.
   // Init containers are executed in order prior to containers being started. If any
   // init container fails, the pod is considered to have failed and is handled according
@@ -3361,17 +3420,23 @@ message PodSpec {
   // Init containers cannot currently be added or removed.
   // Cannot be updated.
   // More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
-  repeated Container init_containers = 2 [(dev.f110.kubeproto.field) = { go_name: "InitContainers", api_field_name: "initContainers", inline: false }];
+  repeated Container init_containers = 2 [(dev.f110.kubeproto.field) = { go_name: "InitContainers", api_field_name: "initContainers", list_type: LIST_TYPE_MAP,
+                                                                         list_map_keys: [ "name" ],
+                                                                         inline: false }];
   // List of containers belonging to the pod.
   // Containers cannot currently be added or removed.
   // There must be at least one container in a Pod.
   // Cannot be updated.
-  repeated Container containers = 3 [(dev.f110.kubeproto.field) = { go_name: "Containers", api_field_name: "containers", inline: false }];
+  repeated Container containers = 3 [(dev.f110.kubeproto.field) = { go_name: "Containers", api_field_name: "containers", list_type: LIST_TYPE_MAP,
+                                                                    list_map_keys: [ "name" ],
+                                                                    inline: false }];
   // List of ephemeral containers run in this pod. Ephemeral containers may be run in an existing
   // pod to perform user-initiated actions such as debugging. This list cannot be specified when
   // creating a pod, and it cannot be modified by updating the pod spec. In order to add an
   // ephemeral container to an existing pod, use the pod's ephemeralcontainers subresource.
-  repeated EphemeralContainer ephemeral_containers = 4 [(dev.f110.kubeproto.field) = { go_name: "EphemeralContainers", api_field_name: "ephemeralContainers", inline: false }];
+  repeated EphemeralContainer ephemeral_containers = 4 [(dev.f110.kubeproto.field) = { go_name: "EphemeralContainers", api_field_name: "ephemeralContainers", list_type: LIST_TYPE_MAP,
+                                                                                       list_map_keys: [ "name" ],
+                                                                                       inline: false }];
   // Restart policy for all containers within the pod.
   // One of Always, OnFailure, Never. In some contexts, only a subset of those values may be permitted.
   // Default to Always.
@@ -3400,7 +3465,7 @@ message PodSpec {
   // NodeSelector is a selector which must be true for the pod to fit on a node.
   // Selector which must match a node's labels for the pod to be scheduled on that node.
   // More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  map<string, string> node_selector = 9 [(dev.f110.kubeproto.field) = { go_name: "NodeSelector", api_field_name: "nodeSelector", inline: false }];
+  map<string, string> node_selector = 9 [(dev.f110.kubeproto.field) = { go_name: "NodeSelector", api_field_name: "nodeSelector", map_type: MAP_TYPE_ATOMIC, inline: false }];
   // ServiceAccountName is the name of the ServiceAccount to use to run this pod.
   // More info: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
   optional string service_account_name = 10 [(dev.f110.kubeproto.field) = { go_name: "ServiceAccountName", api_field_name: "serviceAccountName", inline: false }];
@@ -3439,7 +3504,9 @@ message PodSpec {
   // ImagePullSecrets is an optional list of references to secrets in the same namespace to use for pulling any of the images used by this PodSpec.
   // If specified, these secrets will be passed to individual puller implementations for them to use.
   // More info: https://kubernetes.io/docs/concepts/containers/images#specifying-imagepullsecrets-on-a-pod
-  repeated LocalObjectReference image_pull_secrets = 19 [(dev.f110.kubeproto.field) = { go_name: "ImagePullSecrets", api_field_name: "imagePullSecrets", inline: false }];
+  repeated LocalObjectReference image_pull_secrets = 19 [(dev.f110.kubeproto.field) = { go_name: "ImagePullSecrets", api_field_name: "imagePullSecrets", list_type: LIST_TYPE_MAP,
+                                                                                        list_map_keys: [ "name" ],
+                                                                                        inline: false }];
   // Specifies the hostname of the Pod
   // If not specified, the pod's hostname will be set to a system-defined value.
   optional string hostname = 20 [(dev.f110.kubeproto.field) = { go_name: "Hostname", api_field_name: "hostname", inline: false }];
@@ -3452,10 +3519,12 @@ message PodSpec {
   // If not specified, the pod will be dispatched by default scheduler.
   optional string scheduler_name = 23 [(dev.f110.kubeproto.field) = { go_name: "SchedulerName", api_field_name: "schedulerName", inline: false }];
   // If specified, the pod's tolerations.
-  repeated Toleration tolerations = 24 [(dev.f110.kubeproto.field) = { go_name: "Tolerations", api_field_name: "tolerations", inline: false }];
+  repeated Toleration tolerations = 24 [(dev.f110.kubeproto.field) = { go_name: "Tolerations", api_field_name: "tolerations", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // HostAliases is an optional list of hosts and IPs that will be injected into the pod's hosts
   // file if specified.
-  repeated HostAlias host_aliases = 25 [(dev.f110.kubeproto.field) = { go_name: "HostAliases", api_field_name: "hostAliases", inline: false }];
+  repeated HostAlias host_aliases = 25 [(dev.f110.kubeproto.field) = { go_name: "HostAliases", api_field_name: "hostAliases", list_type: LIST_TYPE_MAP,
+                                                                       list_map_keys: [ "ip" ],
+                                                                       inline: false }];
   // If specified, indicates the pod's priority. "system-node-critical" and
   // "system-cluster-critical" are two special keywords which indicate the
   // highest priorities with the former being the highest priority. Any other
@@ -3477,7 +3546,7 @@ message PodSpec {
   // A pod is ready when all its containers are ready AND
   // all conditions specified in the readiness gates have status equal to "True"
   // More info: https://git.k8s.io/enhancements/keps/sig-network/580-pod-readiness-gates
-  repeated PodReadinessGate readiness_gates = 29 [(dev.f110.kubeproto.field) = { go_name: "ReadinessGates", api_field_name: "readinessGates", inline: false }];
+  repeated PodReadinessGate readiness_gates = 29 [(dev.f110.kubeproto.field) = { go_name: "ReadinessGates", api_field_name: "readinessGates", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // RuntimeClassName refers to a RuntimeClass object in the node.k8s.io group, which should be used
   // to run this pod.  If no RuntimeClass resource matches the named class, the pod will not be run.
   // If unset or empty, the "legacy" RuntimeClass will be used, which is an implicit class with an
@@ -3503,7 +3572,9 @@ message PodSpec {
   // TopologySpreadConstraints describes how a group of pods ought to spread across topology
   // domains. Scheduler will schedule pods in a way which abides by the constraints.
   // All topologySpreadConstraints are ANDed.
-  repeated TopologySpreadConstraint topology_spread_constraints = 34 [(dev.f110.kubeproto.field) = { go_name: "TopologySpreadConstraints", api_field_name: "topologySpreadConstraints", inline: false }];
+  repeated TopologySpreadConstraint topology_spread_constraints = 34 [(dev.f110.kubeproto.field) = { go_name: "TopologySpreadConstraints", api_field_name: "topologySpreadConstraints", list_type: LIST_TYPE_MAP,
+                                                                                                     list_map_keys: [ "topologyKey", "whenUnsatisfiable" ],
+                                                                                                     inline: false }];
   // If true the pod's hostname will be configured as the pod's FQDN, rather than the leaf name (the default).
   // In Linux containers, this means setting the FQDN in the hostname field of the kernel (the nodename field of struct utsname).
   // In Windows containers, this means setting the registry value of hostname for the registry key HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters to FQDN.
@@ -3554,7 +3625,9 @@ message PodSpec {
   // If schedulingGates is not empty, the pod will stay in the SchedulingGated state and the
   // scheduler will not attempt to schedule the pod.
   // SchedulingGates can only be set at pod creation time, and be removed only afterwards.
-  repeated PodSchedulingGate scheduling_gates = 38 [(dev.f110.kubeproto.field) = { go_name: "SchedulingGates", api_field_name: "schedulingGates", inline: false }];
+  repeated PodSchedulingGate scheduling_gates = 38 [(dev.f110.kubeproto.field) = { go_name: "SchedulingGates", api_field_name: "schedulingGates", list_type: LIST_TYPE_MAP,
+                                                                                   list_map_keys: [ "name" ],
+                                                                                   inline: false }];
   // ResourceClaims defines which ResourceClaims must be allocated
   // and reserved before the Pod is allowed to start. The resources
   // will be made available to those containers which consume them
@@ -3562,7 +3635,9 @@ message PodSpec {
   // This is a stable field but requires that the
   // DynamicResourceAllocation feature gate is enabled.
   // This field is immutable.
-  repeated PodResourceClaim resource_claims = 39 [(dev.f110.kubeproto.field) = { go_name: "ResourceClaims", api_field_name: "resourceClaims", inline: false }];
+  repeated PodResourceClaim resource_claims = 39 [(dev.f110.kubeproto.field) = { go_name: "ResourceClaims", api_field_name: "resourceClaims", list_type: LIST_TYPE_MAP,
+                                                                                 list_map_keys: [ "name" ],
+                                                                                 inline: false }];
   // Resources is the total amount of CPU and Memory resources required by all
   // containers in the pod. It supports specifying Requests and Limits for
   // "cpu", "memory" and "hugepages-" resource names only. ResourceClaims are not supported.
@@ -3619,7 +3694,9 @@ message PodStatus {
   optional PodPhase phase = 2 [(dev.f110.kubeproto.field) = { go_name: "Phase", api_field_name: "phase", inline: false }];
   // Current service state of pod.
   // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-conditions
-  repeated PodCondition conditions = 3 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated PodCondition conditions = 3 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                       list_map_keys: [ "type" ],
+                                                                       inline: false }];
   // A human readable message indicating details about why the pod is in this condition.
   optional string message = 4 [(dev.f110.kubeproto.field) = { go_name: "Message", api_field_name: "message", inline: false }];
   // A brief CamelCase message indicating details about why the pod is in this state.
@@ -3641,14 +3718,16 @@ message PodStatus {
   // match the hostIP field. This list is empty if the pod has not started yet.
   // A pod can be assigned to a node that has a problem in kubelet which in turns means that HostIPs will
   // not be updated even if there is a node is assigned to this pod.
-  repeated HostIP host_ips = 8 [(dev.f110.kubeproto.field) = { go_name: "HostIPs", api_field_name: "hostIPs", inline: false }];
+  repeated HostIP host_ips = 8 [(dev.f110.kubeproto.field) = { go_name: "HostIPs", api_field_name: "hostIPs", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // podIP address allocated to the pod. Routable at least within the cluster.
   // Empty if not yet allocated.
   optional string pod_ip = 9 [(dev.f110.kubeproto.field) = { go_name: "PodIP", api_field_name: "podIP", inline: false }];
   // podIPs holds the IP addresses allocated to the pod. If this field is specified, the 0th entry must
   // match the podIP field. Pods may be allocated at most 1 value for each of IPv4 and IPv6. This list
   // is empty if no IPs have been allocated yet.
-  repeated PodIP pod_ips = 10 [(dev.f110.kubeproto.field) = { go_name: "PodIPs", api_field_name: "podIPs", inline: false }];
+  repeated PodIP pod_ips = 10 [(dev.f110.kubeproto.field) = { go_name: "PodIPs", api_field_name: "podIPs", list_type: LIST_TYPE_MAP,
+                                                              list_map_keys: [ "ip" ],
+                                                              inline: false }];
   // RFC 3339 date and time at which the object was acknowledged by the Kubelet.
   // This is before the Kubelet pulled the container image(s) for the pod.
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time start_time = 11 [(dev.f110.kubeproto.field) = { go_name: "StartTime", api_field_name: "startTime", inline: false }];
@@ -3662,7 +3741,7 @@ message PodStatus {
   // the behavior of various Kubernetes components is not defined and those statuses might be
   // ignored.
   // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-and-container-status
-  repeated ContainerStatus init_container_statuses = 12 [(dev.f110.kubeproto.field) = { go_name: "InitContainerStatuses", api_field_name: "initContainerStatuses", inline: false }];
+  repeated ContainerStatus init_container_statuses = 12 [(dev.f110.kubeproto.field) = { go_name: "InitContainerStatuses", api_field_name: "initContainerStatuses", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Statuses of containers in this pod.
   // Each container in the pod should have at most one status in this list,
   // and all statuses should be for containers in the pod.
@@ -3671,7 +3750,7 @@ message PodStatus {
   // the behavior of various Kubernetes components is not defined and those statuses might be
   // ignored.
   // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
-  repeated ContainerStatus container_statuses = 13 [(dev.f110.kubeproto.field) = { go_name: "ContainerStatuses", api_field_name: "containerStatuses", inline: false }];
+  repeated ContainerStatus container_statuses = 13 [(dev.f110.kubeproto.field) = { go_name: "ContainerStatuses", api_field_name: "containerStatuses", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // The Quality of Service (QOS) classification assigned to the pod based on resource requirements
   // See PodQOSClass type for available QOS classes
   // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-qos/#quality-of-service-classes
@@ -3684,7 +3763,7 @@ message PodStatus {
   // the behavior of various Kubernetes components is not defined and those statuses might be
   // ignored.
   // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
-  repeated ContainerStatus ephemeral_container_statuses = 15 [(dev.f110.kubeproto.field) = { go_name: "EphemeralContainerStatuses", api_field_name: "ephemeralContainerStatuses", inline: false }];
+  repeated ContainerStatus ephemeral_container_statuses = 15 [(dev.f110.kubeproto.field) = { go_name: "EphemeralContainerStatuses", api_field_name: "ephemeralContainerStatuses", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Status of resources resize desired for pod's containers.
   // It is empty if no resources resize is pending.
   // Any changes to container resources will automatically set this to "Proposed"
@@ -3693,7 +3772,9 @@ message PodStatus {
   // PodResizeInProgress will track in-progress resizes, and should be present whenever allocated resources != acknowledged resources.
   optional PodResizeStatus resize = 16 [(dev.f110.kubeproto.field) = { go_name: "Resize", api_field_name: "resize", inline: false }];
   // Status of resource claims.
-  repeated PodResourceClaimStatus resource_claim_statuses = 17 [(dev.f110.kubeproto.field) = { go_name: "ResourceClaimStatuses", api_field_name: "resourceClaimStatuses", inline: false }];
+  repeated PodResourceClaimStatus resource_claim_statuses = 17 [(dev.f110.kubeproto.field) = { go_name: "ResourceClaimStatuses", api_field_name: "resourceClaimStatuses", list_type: LIST_TYPE_MAP,
+                                                                                               list_map_keys: [ "name" ],
+                                                                                               inline: false }];
   // Status of extended resource claim backed by DRA.
   optional PodExtendedResourceClaimStatus extended_resource_claim_status = 18 [(dev.f110.kubeproto.field) = { go_name: "ExtendedResourceClaimStatus", api_field_name: "extendedResourceClaimStatus", inline: false }];
   // AllocatedResources is the total requests allocated for this pod by the node.
@@ -3709,7 +3790,7 @@ message PodStatus {
   // reported in v1.Node `status.allocatable` that are not extended resources
   // (see https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#extended-resources).
   // Examples include "cpu", "memory", "ephemeral-storage", and hugepages.
-  repeated NodeAllocatableResourceClaimStatus node_allocatable_resource_claim_statuses = 21 [(dev.f110.kubeproto.field) = { go_name: "NodeAllocatableResourceClaimStatuses", api_field_name: "nodeAllocatableResourceClaimStatuses", inline: false }];
+  repeated NodeAllocatableResourceClaimStatus node_allocatable_resource_claim_statuses = 21 [(dev.f110.kubeproto.field) = { go_name: "NodeAllocatableResourceClaimStatuses", api_field_name: "nodeAllocatableResourceClaimStatuses", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message PodStatusResult {
@@ -3849,7 +3930,7 @@ message ProbeHandler {
 message ProjectedVolumeSource {
   // sources is the list of volume projections. Each entry in this list
   // handles one source.
-  repeated VolumeProjection sources = 1 [(dev.f110.kubeproto.field) = { go_name: "Sources", api_field_name: "sources", inline: false }];
+  repeated VolumeProjection sources = 1 [(dev.f110.kubeproto.field) = { go_name: "Sources", api_field_name: "sources", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // defaultMode are the mode bits used to set permissions on created files by default.
   // Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
   // YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
@@ -3883,7 +3964,7 @@ message QuobyteVolumeSource {
 message RBDPersistentVolumeSource {
   // monitors is a collection of Ceph monitors.
   // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
-  repeated string ceph_monitors = 1 [(dev.f110.kubeproto.field) = { go_name: "CephMonitors", api_field_name: "monitors", inline: false }];
+  repeated string ceph_monitors = 1 [(dev.f110.kubeproto.field) = { go_name: "CephMonitors", api_field_name: "monitors", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // image is the rados image name.
   // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   string rbd_image = 2 [(dev.f110.kubeproto.field) = { go_name: "RBDImage", api_field_name: "image", inline: false }];
@@ -3918,7 +3999,7 @@ message RBDPersistentVolumeSource {
 message RBDVolumeSource {
   // monitors is a collection of Ceph monitors.
   // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
-  repeated string ceph_monitors = 1 [(dev.f110.kubeproto.field) = { go_name: "CephMonitors", api_field_name: "monitors", inline: false }];
+  repeated string ceph_monitors = 1 [(dev.f110.kubeproto.field) = { go_name: "CephMonitors", api_field_name: "monitors", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // image is the rados image name.
   // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   string rbd_image = 2 [(dev.f110.kubeproto.field) = { go_name: "RBDImage", api_field_name: "image", inline: false }];
@@ -4013,7 +4094,7 @@ message ReplicationControllerSpec {
   // Label keys and values that must match in order to be controlled by this replication
   // controller, if empty defaulted to labels on Pod template.
   // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
-  map<string, string> selector = 3 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", inline: false }];
+  map<string, string> selector = 3 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", map_type: MAP_TYPE_ATOMIC, inline: false }];
   // Template is the object that describes the pod that will be created if
   // insufficient replicas are detected. This takes precedence over a TemplateRef.
   // The only allowed template.spec.restartPolicy value is "Always".
@@ -4034,7 +4115,9 @@ message ReplicationControllerStatus {
   // ObservedGeneration reflects the generation of the most recently observed replication controller.
   optional int64 observed_generation = 5 [(dev.f110.kubeproto.field) = { go_name: "ObservedGeneration", api_field_name: "observedGeneration", inline: false }];
   // Represents the latest available observations of a replication controller's current state.
-  repeated ReplicationControllerCondition conditions = 6 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated ReplicationControllerCondition conditions = 6 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                                         list_map_keys: [ "type" ],
+                                                                                         inline: false }];
 }
 
 message ResourceClaim {
@@ -4055,6 +4138,9 @@ message ResourceFieldSelector {
   string resource = 2 [(dev.f110.kubeproto.field) = { go_name: "Resource", api_field_name: "resource", inline: false }];
   // Specifies the output format of the exposed resources, defaults to "1"
   optional .k8s.io.apimachinery.pkg.api.resource.Quantity divisor = 3 [(dev.f110.kubeproto.field) = { go_name: "Divisor", api_field_name: "divisor", inline: false }];
+  option (dev.f110.kubeproto.message)                             = {
+    struct_type: STRUCT_TYPE_ATOMIC
+  };
 }
 
 message ResourceHealth {
@@ -4103,7 +4189,7 @@ message ResourceQuotaSpec {
   map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> hard = 1 [(dev.f110.kubeproto.field) = { go_name: "Hard", api_field_name: "hard", inline: false }];
   // A collection of filters that must match each object tracked by a quota.
   // If not specified, the quota matches all objects.
-  repeated ResourceQuotaScope scopes = 2 [(dev.f110.kubeproto.field) = { go_name: "Scopes", api_field_name: "scopes", inline: false }];
+  repeated ResourceQuotaScope scopes = 2 [(dev.f110.kubeproto.field) = { go_name: "Scopes", api_field_name: "scopes", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // scopeSelector is also a collection of filters like scopes that must match each object tracked by a quota
   // but expressed using ScopeSelectorOperator in combination with possible values.
   // For a resource to match, both scopes AND scopeSelector (if specified in spec), must be matched.
@@ -4132,7 +4218,9 @@ message ResourceRequirements {
   // This field depends on the
   // DynamicResourceAllocation feature gate.
   // This field is immutable. It can only be set for containers.
-  repeated ResourceClaim claims = 3 [(dev.f110.kubeproto.field) = { go_name: "Claims", api_field_name: "claims", inline: false }];
+  repeated ResourceClaim claims = 3 [(dev.f110.kubeproto.field) = { go_name: "Claims", api_field_name: "claims", list_type: LIST_TYPE_MAP,
+                                                                    list_map_keys: [ "name" ],
+                                                                    inline: false }];
 }
 
 message ResourceStatus {
@@ -4144,7 +4232,9 @@ message ResourceStatus {
   // At a minimum, for the lifetime of a Pod, resource ID must uniquely identify the resource allocated to the Pod on the Node.
   // If other Pod on the same Node reports the status with the same resource ID, it must be the same resource they share.
   // See ResourceID type definition for a specific format it has in various use cases.
-  repeated ResourceHealth resources = 2 [(dev.f110.kubeproto.field) = { go_name: "Resources", api_field_name: "resources", inline: false }];
+  repeated ResourceHealth resources = 2 [(dev.f110.kubeproto.field) = { go_name: "Resources", api_field_name: "resources", list_type: LIST_TYPE_MAP,
+                                                                        list_map_keys: [ "resourceID" ],
+                                                                        inline: false }];
 }
 
 message SELinuxOptions {
@@ -4220,7 +4310,10 @@ message ScaleIOVolumeSource {
 
 message ScopeSelector {
   // A list of scope selector requirements by scope of the resources.
-  repeated ScopedResourceSelectorRequirement match_expressions = 1 [(dev.f110.kubeproto.field) = { go_name: "MatchExpressions", api_field_name: "matchExpressions", inline: false }];
+  repeated ScopedResourceSelectorRequirement match_expressions = 1 [(dev.f110.kubeproto.field) = { go_name: "MatchExpressions", api_field_name: "matchExpressions", list_type: LIST_TYPE_ATOMIC, inline: false }];
+  option (dev.f110.kubeproto.message)                          = {
+    struct_type: STRUCT_TYPE_ATOMIC
+  };
 }
 
 message ScopedResourceSelectorRequirement {
@@ -4233,7 +4326,7 @@ message ScopedResourceSelectorRequirement {
   // the values array must be non-empty. If the operator is Exists or DoesNotExist,
   // the values array must be empty.
   // This array is replaced during a strategic merge patch.
-  repeated string values = 3 [(dev.f110.kubeproto.field) = { go_name: "Values", api_field_name: "values", inline: false }];
+  repeated string values = 3 [(dev.f110.kubeproto.field) = { go_name: "Values", api_field_name: "values", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message SeccompProfile {
@@ -4287,7 +4380,10 @@ message SecretKeySelector {
   // The key of the secret to select from.  Must be a valid secret key.
   string key = 2 [(dev.f110.kubeproto.field) = { go_name: "Key", api_field_name: "key", inline: false }];
   // Specify whether the Secret or its key must be defined
-  optional bool optional = 3 [(dev.f110.kubeproto.field) = { go_name: "Optional", api_field_name: "optional", inline: false }];
+  optional bool optional              = 3 [(dev.f110.kubeproto.field) = { go_name: "Optional", api_field_name: "optional", inline: false }];
+  option (dev.f110.kubeproto.message) = {
+    struct_type: STRUCT_TYPE_ATOMIC
+  };
 }
 
 message SecretList {
@@ -4309,7 +4405,7 @@ message SecretProjection {
   // present. If a key is specified which is not present in the Secret,
   // the volume setup will error unless it is marked optional. Paths must be
   // relative and may not contain the '..' path or start with '..'.
-  repeated KeyToPath items = 2 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+  repeated KeyToPath items = 2 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // optional field specify whether the Secret or its key must be defined
   optional bool optional = 3 [(dev.f110.kubeproto.field) = { go_name: "Optional", api_field_name: "optional", inline: false }];
 }
@@ -4318,7 +4414,10 @@ message SecretReference {
   // name is unique within a namespace to reference a secret resource.
   optional string name = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
   // namespace defines the space within which the secret name must be unique.
-  optional string namespace = 2 [(dev.f110.kubeproto.field) = { go_name: "Namespace", api_field_name: "namespace", inline: false }];
+  optional string namespace           = 2 [(dev.f110.kubeproto.field) = { go_name: "Namespace", api_field_name: "namespace", inline: false }];
+  option (dev.f110.kubeproto.message) = {
+    struct_type: STRUCT_TYPE_ATOMIC
+  };
 }
 
 message SecretVolumeSource {
@@ -4332,7 +4431,7 @@ message SecretVolumeSource {
   // present. If a key is specified which is not present in the Secret,
   // the volume setup will error unless it is marked optional. Paths must be
   // relative and may not contain the '..' path or start with '..'.
-  repeated KeyToPath items = 2 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+  repeated KeyToPath items = 2 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // defaultMode is Optional: mode bits used to set permissions on created files by default.
   // Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
   // YAML accepts both octal and decimal values, JSON requires decimal values
@@ -4441,12 +4540,14 @@ message ServiceAccount {
   // This field should not be used to find auto-generated service account token secrets for use outside of pods.
   // Instead, tokens can be requested directly using the TokenRequest API, or service account token secrets can be manually created.
   // More info: https://kubernetes.io/docs/concepts/configuration/secret
-  repeated ObjectReference secrets = 3 [(dev.f110.kubeproto.field) = { go_name: "Secrets", api_field_name: "secrets", inline: false }];
+  repeated ObjectReference secrets = 3 [(dev.f110.kubeproto.field) = { go_name: "Secrets", api_field_name: "secrets", list_type: LIST_TYPE_MAP,
+                                                                       list_map_keys: [ "name" ],
+                                                                       inline: false }];
   // ImagePullSecrets is a list of references to secrets in the same namespace to use for pulling any images
   // in pods that reference this ServiceAccount. ImagePullSecrets are distinct from Secrets because Secrets
   // can be mounted in the pod, but ImagePullSecrets are only accessed by the kubelet.
   // More info: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
-  repeated LocalObjectReference image_pull_secrets = 4 [(dev.f110.kubeproto.field) = { go_name: "ImagePullSecrets", api_field_name: "imagePullSecrets", inline: false }];
+  repeated LocalObjectReference image_pull_secrets = 4 [(dev.f110.kubeproto.field) = { go_name: "ImagePullSecrets", api_field_name: "imagePullSecrets", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // AutomountServiceAccountToken indicates whether pods running as this service account should have an API token automatically mounted.
   // Can be overridden at the pod level.
   optional bool automount_service_account_token = 5 [(dev.f110.kubeproto.field) = { go_name: "AutomountServiceAccountToken", api_field_name: "automountServiceAccountToken", inline: false }];
@@ -4551,14 +4652,16 @@ message ServiceProxyOptions {
 message ServiceSpec {
   // The list of ports that are exposed by this service.
   // More info: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
-  repeated ServicePort ports = 1 [(dev.f110.kubeproto.field) = { go_name: "Ports", api_field_name: "ports", inline: false }];
+  repeated ServicePort ports = 1 [(dev.f110.kubeproto.field) = { go_name: "Ports", api_field_name: "ports", list_type: LIST_TYPE_MAP,
+                                                                 list_map_keys: [ "port", "protocol" ],
+                                                                 inline: false }];
   // Route service traffic to pods with label keys and values matching this
   // selector. If empty or not present, the service is assumed to have an
   // external process managing its endpoints, which Kubernetes will not
   // modify. Only applies to types ClusterIP, NodePort, and LoadBalancer.
   // Ignored if type is ExternalName.
   // More info: https://kubernetes.io/docs/concepts/services-networking/service/
-  map<string, string> selector = 2 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", inline: false }];
+  map<string, string> selector = 2 [(dev.f110.kubeproto.field) = { go_name: "Selector", api_field_name: "selector", map_type: MAP_TYPE_ATOMIC, inline: false }];
   // clusterIP is the IP address of the service and is usually assigned
   // randomly. If an address is specified manually, is in-range (as per
   // system configuration), and is not in use, it will be allocated to the
@@ -4597,7 +4700,7 @@ message ServiceSpec {
   // These IPs must correspond to the values of the ipFamilies field. Both
   // clusterIPs and ipFamilies are governed by the ipFamilyPolicy field.
   // More info: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
-  repeated string cluster_ips = 4 [(dev.f110.kubeproto.field) = { go_name: "ClusterIPs", api_field_name: "clusterIPs", inline: false }];
+  repeated string cluster_ips = 4 [(dev.f110.kubeproto.field) = { go_name: "ClusterIPs", api_field_name: "clusterIPs", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // type determines how the Service is exposed. Defaults to ClusterIP. Valid
   // options are ExternalName, ClusterIP, NodePort, and LoadBalancer.
   // "ClusterIP" allocates a cluster-internal IP address for load-balancing
@@ -4620,7 +4723,7 @@ message ServiceSpec {
   // Kubernetes.  The user is responsible for ensuring that traffic arrives
   // at a node with this IP.  A common example is external load-balancers
   // that are not part of the Kubernetes system.
-  repeated string external_ips = 6 [(dev.f110.kubeproto.field) = { go_name: "ExternalIPs", api_field_name: "externalIPs", inline: false }];
+  repeated string external_ips = 6 [(dev.f110.kubeproto.field) = { go_name: "ExternalIPs", api_field_name: "externalIPs", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Supports "ClientIP" and "None". Used to maintain session affinity.
   // Enable client IP based session affinity.
   // Must be ClientIP or None.
@@ -4639,7 +4742,7 @@ message ServiceSpec {
   // load-balancer will be restricted to the specified client IPs. This field will be ignored if the
   // cloud-provider does not support the feature."
   // More info: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/
-  repeated string load_balancer_source_ranges = 9 [(dev.f110.kubeproto.field) = { go_name: "LoadBalancerSourceRanges", api_field_name: "loadBalancerSourceRanges", inline: false }];
+  repeated string load_balancer_source_ranges = 9 [(dev.f110.kubeproto.field) = { go_name: "LoadBalancerSourceRanges", api_field_name: "loadBalancerSourceRanges", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // externalName is the external reference that discovery mechanisms will
   // return as an alias for this service (e.g. a DNS CNAME record). No
   // proxying will be involved.  Must be a lowercase RFC-1123 hostname
@@ -4696,7 +4799,7 @@ message ServiceSpec {
   // either order).  These families must correspond to the values of the
   // clusterIPs field, if specified. Both clusterIPs and ipFamilies are
   // governed by the ipFamilyPolicy field.
-  repeated IPFamily ip_families = 15 [(dev.f110.kubeproto.field) = { go_name: "IPFamilies", api_field_name: "ipFamilies", inline: false }];
+  repeated IPFamily ip_families = 15 [(dev.f110.kubeproto.field) = { go_name: "IPFamilies", api_field_name: "ipFamilies", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // IPFamilyPolicy represents the dual-stack-ness requested or required by
   // this Service. If there is no value provided, then this field will be set
   // to SingleStack. Services can be "SingleStack" (a single IP family),
@@ -4746,7 +4849,9 @@ message ServiceStatus {
   // if one is present.
   optional LoadBalancerStatus load_balancer = 1 [(dev.f110.kubeproto.field) = { go_name: "LoadBalancer", api_field_name: "loadBalancer", inline: false }];
   // Current service state
-  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 2 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 2 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                                                          list_map_keys: [ "type" ],
+                                                                                                          inline: false }];
 }
 
 message SessionAffinityConfig {
@@ -4862,12 +4967,15 @@ message TopologySelectorLabelRequirement {
   string key = 1 [(dev.f110.kubeproto.field) = { go_name: "Key", api_field_name: "key", inline: false }];
   // An array of string values. One value must match the label to be selected.
   // Each entry in Values is ORed.
-  repeated string values = 2 [(dev.f110.kubeproto.field) = { go_name: "Values", api_field_name: "values", inline: false }];
+  repeated string values = 2 [(dev.f110.kubeproto.field) = { go_name: "Values", api_field_name: "values", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message TopologySelectorTerm {
   // A list of topology selector requirements by labels.
-  repeated TopologySelectorLabelRequirement match_label_expressions = 1 [(dev.f110.kubeproto.field) = { go_name: "MatchLabelExpressions", api_field_name: "matchLabelExpressions", inline: false }];
+  repeated TopologySelectorLabelRequirement match_label_expressions = 1 [(dev.f110.kubeproto.field) = { go_name: "MatchLabelExpressions", api_field_name: "matchLabelExpressions", list_type: LIST_TYPE_ATOMIC, inline: false }];
+  option (dev.f110.kubeproto.message)                               = {
+    struct_type: STRUCT_TYPE_ATOMIC
+  };
 }
 
 message TopologySpreadConstraint {
@@ -4964,7 +5072,7 @@ message TopologySpreadConstraint {
   // Keys that don't exist in the incoming pod labels will
   // be ignored. A null or empty list means only match against labelSelector.
   // This is a beta field and requires the MatchLabelKeysInPodTopologySpread feature gate to be enabled (enabled by default).
-  repeated string match_label_keys = 8 [(dev.f110.kubeproto.field) = { go_name: "MatchLabelKeys", api_field_name: "matchLabelKeys", inline: false }];
+  repeated string match_label_keys = 8 [(dev.f110.kubeproto.field) = { go_name: "MatchLabelKeys", api_field_name: "matchLabelKeys", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message TypedLocalObjectReference {
@@ -4975,7 +5083,10 @@ message TypedLocalObjectReference {
   // Kind is the type of resource being referenced
   string kind = 2 [(dev.f110.kubeproto.field) = { go_name: "Kind", api_field_name: "kind", inline: false }];
   // Name is the name of resource being referenced
-  string name = 3 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  string name                         = 3 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  option (dev.f110.kubeproto.message) = {
+    struct_type: STRUCT_TYPE_ATOMIC
+  };
 }
 
 message TypedObjectReference {

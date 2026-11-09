@@ -9,6 +9,7 @@ go_library(
     importpath = "go.f110.dev/kubeproto/internal/goparser",
     visibility = ["//:__subpackages__"],
     deps = [
+        "//:kubeproto_lib",
         "//internal/codegeneration",
         "//internal/stringsutil",
     ],

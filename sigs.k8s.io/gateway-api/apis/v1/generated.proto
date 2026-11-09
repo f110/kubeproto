@@ -311,7 +311,7 @@ message AllowedRoutes {
   // MUST set the "ResolvedRefs" condition to False for this Listener with the
   // "InvalidRouteKinds" reason.
   // Support: Core
-  repeated RouteGroupKind kinds = 2 [(dev.f110.kubeproto.field) = { go_name: "Kinds", api_field_name: "kinds", inline: false }];
+  repeated RouteGroupKind kinds = 2 [(dev.f110.kubeproto.field) = { go_name: "Kinds", api_field_name: "kinds", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message BackendObjectReference {
@@ -427,7 +427,7 @@ message BackendTLSPolicySpec {
   // Note that this config applies to the entire referenced resource
   // by default, but this default may change in the future to provide
   // a more granular application of the policy.
-  repeated LocalPolicyTargetReferenceWithSectionName target_refs = 1 [(dev.f110.kubeproto.field) = { go_name: "TargetRefs", api_field_name: "targetRefs", inline: false }];
+  repeated LocalPolicyTargetReferenceWithSectionName target_refs = 1 [(dev.f110.kubeproto.field) = { go_name: "TargetRefs", api_field_name: "targetRefs", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Validation contains backend TLS validation configuration.
   BackendTLSPolicyValidation validation = 2 [(dev.f110.kubeproto.field) = { go_name: "Validation", api_field_name: "validation", inline: false }];
   // Options are a list of key/value pairs to enable extended TLS
@@ -476,7 +476,7 @@ message BackendTLSPolicyValidation {
   // with the CA certificate in a key named `ca.crt`.
   // Support: Implementation-specific - More than one reference, other kinds
   // of resources, or a single reference that includes multiple certificates.
-  repeated LocalObjectReference c_a_certificate_refs = 1 [(dev.f110.kubeproto.field) = { go_name: "CACertificateRefs", api_field_name: "caCertificateRefs", inline: false }];
+  repeated LocalObjectReference c_a_certificate_refs = 1 [(dev.f110.kubeproto.field) = { go_name: "CACertificateRefs", api_field_name: "caCertificateRefs", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // WellKnownCACertificates specifies whether a well-known set of CA certificates
   // may be used in the TLS handshake between the gateway and backend pod.
   // If WellKnownCACertificates is unspecified or empty (""), then CACertificateRefs
@@ -507,7 +507,7 @@ message BackendTLSPolicyValidation {
   // When specified the certificate served from the backend MUST
   // have at least one Subject Alternate Name matching one of the specified SubjectAltNames.
   // Support: Extended
-  repeated SubjectAltName subject_alt_names = 4 [(dev.f110.kubeproto.field) = { go_name: "SubjectAltNames", api_field_name: "subjectAltNames", inline: false }];
+  repeated SubjectAltName subject_alt_names = 4 [(dev.f110.kubeproto.field) = { go_name: "SubjectAltNames", api_field_name: "subjectAltNames", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message CommonRouteSpec {
@@ -566,7 +566,7 @@ message CommonRouteSpec {
   // <gateway:standard:validation:XValidation:message="sectionName must be unique when parentRefs includes 2 or more references to the same parent",rule="self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || (has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName))))">
   // <gateway:experimental:validation:XValidation:message="sectionName or port must be specified when parentRefs includes 2 or more references to the same parent",rule="self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__)) ? ((!has(p1.sectionName) || p1.sectionName == '') == (!has(p2.sectionName) || p2.sectionName == '') && (!has(p1.port) || p1.port == 0) == (!has(p2.port) || p2.port == 0)): true))">
   // <gateway:experimental:validation:XValidation:message="sectionName or port must be unique when parentRefs includes 2 or more references to the same parent",rule="self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || ( has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName)) && (((!has(p1.port) || p1.port == 0) && (!has(p2.port) || p2.port == 0)) || (has(p1.port) && has(p2.port) && p1.port == p2.port))))">
-  repeated ParentReference parent_refs = 1 [(dev.f110.kubeproto.field) = { go_name: "ParentRefs", api_field_name: "parentRefs", inline: false }];
+  repeated ParentReference parent_refs = 1 [(dev.f110.kubeproto.field) = { go_name: "ParentRefs", api_field_name: "parentRefs", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // UseDefaultGateways indicates the default Gateway scope to use for this
   // Route. If unset (the default) or set to None, the Route will not be
   // attached to any default Gateway; if set, it will be attached to any
@@ -630,7 +630,9 @@ message FrontendTLSConfig {
   // that match this port.
   // Each override port requires a unique TLS configuration.
   // support: Core
-  repeated TLSPortConfig per_port = 2 [(dev.f110.kubeproto.field) = { go_name: "PerPort", api_field_name: "perPort", inline: false }];
+  repeated TLSPortConfig per_port = 2 [(dev.f110.kubeproto.field) = { go_name: "PerPort", api_field_name: "perPort", list_type: LIST_TYPE_MAP,
+                                                                      list_map_keys: [ "port" ],
+                                                                      inline: false }];
 }
 
 message FrontendTLSValidation {
@@ -669,7 +671,7 @@ message FrontendTLSValidation {
   // CA certificate in a key named `ca.crt`.
   // Support: Implementation-specific - More than one reference, other kinds
   // of resources, or a single reference that includes multiple certificates.
-  repeated ObjectReference c_a_certificate_refs = 1 [(dev.f110.kubeproto.field) = { go_name: "CACertificateRefs", api_field_name: "caCertificateRefs", inline: false }];
+  repeated ObjectReference c_a_certificate_refs = 1 [(dev.f110.kubeproto.field) = { go_name: "CACertificateRefs", api_field_name: "caCertificateRefs", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // FrontendValidationMode defines the mode for validating the client certificate.
   // There are two possible modes:
   // - AllowValidOnly: In this mode, the gateway will accept connections only if
@@ -690,7 +692,7 @@ message GRPCAuthConfig {
   // will be sent to the authorization server.
   // If this list is empty, then all headers must be sent.
   // If the list has entries, only those entries must be sent.
-  repeated string allowed_request_headers = 1 [(dev.f110.kubeproto.field) = { go_name: "AllowedRequestHeaders", api_field_name: "allowedHeaders", inline: false }];
+  repeated string allowed_request_headers = 1 [(dev.f110.kubeproto.field) = { go_name: "AllowedRequestHeaders", api_field_name: "allowedHeaders", list_type: LIST_TYPE_SET, inline: false }];
 }
 
 message GRPCBackendRef {
@@ -719,7 +721,7 @@ message GRPCBackendRef {
   // request is being forwarded to the backend defined here.
   // Support: Implementation-specific (For broader support of filters, use the
   // Filters field in GRPCRouteRule.)
-  repeated GRPCRouteFilter filters = 2 [(dev.f110.kubeproto.field) = { go_name: "Filters", api_field_name: "filters", inline: false }];
+  repeated GRPCRouteFilter filters = 2 [(dev.f110.kubeproto.field) = { go_name: "Filters", api_field_name: "filters", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message GRPCHeaderMatch {
@@ -822,7 +824,9 @@ message GRPCRouteMatch {
   // Headers specifies gRPC request header matchers. Multiple match values are
   // ANDed together, meaning, a request MUST match all the specified headers
   // to select the route.
-  repeated GRPCHeaderMatch headers = 2 [(dev.f110.kubeproto.field) = { go_name: "Headers", api_field_name: "headers", inline: false }];
+  repeated GRPCHeaderMatch headers = 2 [(dev.f110.kubeproto.field) = { go_name: "Headers", api_field_name: "headers", list_type: LIST_TYPE_MAP,
+                                                                       list_map_keys: [ "name" ],
+                                                                       inline: false }];
 }
 
 message GRPCRouteRule {
@@ -867,7 +871,7 @@ message GRPCRouteRule {
   // If ties still exist within the Route that has been given precedence,
   // matching precedence MUST be granted to the first matching rule meeting
   // the above criteria.
-  repeated GRPCRouteMatch matches = 2 [(dev.f110.kubeproto.field) = { go_name: "Matches", api_field_name: "matches", inline: false }];
+  repeated GRPCRouteMatch matches = 2 [(dev.f110.kubeproto.field) = { go_name: "Matches", api_field_name: "matches", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Filters define the filters that are applied to requests that match
   // this rule.
   // The effects of ordering of multiple behaviors are currently unspecified.
@@ -886,7 +890,7 @@ message GRPCRouteRule {
   // `False`, implementations may use the `IncompatibleFilters` reason to specify
   // this configuration error.
   // Support: Core
-  repeated GRPCRouteFilter filters = 3 [(dev.f110.kubeproto.field) = { go_name: "Filters", api_field_name: "filters", inline: false }];
+  repeated GRPCRouteFilter filters = 3 [(dev.f110.kubeproto.field) = { go_name: "Filters", api_field_name: "filters", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // BackendRefs defines the backend(s) where matching requests should be
   // sent.
   // Failure behavior here depends on how many BackendRefs are specified and
@@ -907,7 +911,7 @@ message GRPCRouteRule {
   // Support: Core for Kubernetes Service
   // Support: Implementation-specific for any other resource
   // Support for weight: Core
-  repeated GRPCBackendRef backend_refs = 4 [(dev.f110.kubeproto.field) = { go_name: "BackendRefs", api_field_name: "backendRefs", inline: false }];
+  repeated GRPCBackendRef backend_refs = 4 [(dev.f110.kubeproto.field) = { go_name: "BackendRefs", api_field_name: "backendRefs", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // SessionPersistence defines and configures session persistence
   // for the route rule.
   // Support: Extended
@@ -957,10 +961,10 @@ message GRPCRouteSpec {
   // The rejected Route MUST raise an 'Accepted' condition with a status of
   // 'False' in the corresponding RouteParentStatus.
   // Support: Core
-  repeated string hostnames = 2 [(dev.f110.kubeproto.field) = { go_name: "Hostnames", api_field_name: "hostnames", inline: false }];
+  repeated string hostnames = 2 [(dev.f110.kubeproto.field) = { go_name: "Hostnames", api_field_name: "hostnames", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Rules are a list of GRPC matchers, filters and actions.
   // <gateway:experimental:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))">
-  repeated GRPCRouteRule rules = 3 [(dev.f110.kubeproto.field) = { go_name: "Rules", api_field_name: "rules", inline: false }];
+  repeated GRPCRouteRule rules = 3 [(dev.f110.kubeproto.field) = { go_name: "Rules", api_field_name: "rules", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message GRPCRouteStatus {
@@ -1074,10 +1078,14 @@ message GatewayClassStatus {
   //   the implementation's copy of the object is stale and an update will be re-triggered
   //   if relevant.)
   // </gateway:util:excludeFromCRD>
-  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 1 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 1 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                                                          list_map_keys: [ "type" ],
+                                                                                                          inline: false }];
   // SupportedFeatures is the set of features the GatewayClass support.
   // It MUST be sorted in ascending alphabetical order by the Name key.
-  repeated SupportedFeature supported_features = 2 [(dev.f110.kubeproto.field) = { go_name: "SupportedFeatures", api_field_name: "supportedFeatures", inline: false }];
+  repeated SupportedFeature supported_features = 2 [(dev.f110.kubeproto.field) = { go_name: "SupportedFeatures", api_field_name: "supportedFeatures", list_type: LIST_TYPE_MAP,
+                                                                                   list_map_keys: [ "name" ],
+                                                                                   inline: false }];
 }
 
 message GatewayInfrastructure {
@@ -1236,7 +1244,9 @@ message GatewaySpec {
   // Addresses if all Listeners across all Gateways are compatible.
   // In a future release the MinItems=1 requirement MAY be dropped.
   // Support: Core
-  repeated Listener listeners = 2 [(dev.f110.kubeproto.field) = { go_name: "Listeners", api_field_name: "listeners", inline: false }];
+  repeated Listener listeners = 2 [(dev.f110.kubeproto.field) = { go_name: "Listeners", api_field_name: "listeners", list_type: LIST_TYPE_MAP,
+                                                                  list_map_keys: [ "name" ],
+                                                                  inline: false }];
   // Addresses requested for this Gateway. This is optional and behavior can
   // depend on the implementation. If a value is set in the spec and the
   // requested address is invalid or unavailable, the implementation MUST
@@ -1254,7 +1264,7 @@ message GatewaySpec {
   // GatewayStatus.Addresses.
   // Support: Extended
   // <gateway:validateIPAddress>
-  repeated GatewaySpecAddress addresses = 3 [(dev.f110.kubeproto.field) = { go_name: "Addresses", api_field_name: "addresses", inline: false }];
+  repeated GatewaySpecAddress addresses = 3 [(dev.f110.kubeproto.field) = { go_name: "Addresses", api_field_name: "addresses", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Infrastructure defines infrastructure level attributes about this Gateway instance.
   // Support: Extended
   optional GatewayInfrastructure infrastructure = 4 [(dev.f110.kubeproto.field) = { go_name: "Infrastructure", api_field_name: "infrastructure", inline: false }];
@@ -1303,7 +1313,7 @@ message GatewayStatus {
   //   * a combination of specified and dynamic addresses are assigned
   //   * a specified address was unusable (e.g. already in use)
   // <gateway:validateIPAddress>
-  repeated GatewayStatusAddress addresses = 1 [(dev.f110.kubeproto.field) = { go_name: "Addresses", api_field_name: "addresses", inline: false }];
+  repeated GatewayStatusAddress addresses = 1 [(dev.f110.kubeproto.field) = { go_name: "Addresses", api_field_name: "addresses", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Conditions describe the current conditions of the Gateway.
   // Implementations should prefer to express Gateway conditions
   // using the `GatewayConditionType` and `GatewayConditionReason`
@@ -1337,9 +1347,13 @@ message GatewayStatus {
   //   the implementation's copy of the object is stale and an update will be re-triggered
   //   if relevant.)
   // </gateway:util:excludeFromCRD>
-  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 2 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 2 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                                                          list_map_keys: [ "type" ],
+                                                                                                          inline: false }];
   // Listeners provide status for each unique listener port defined in the Spec.
-  repeated ListenerStatus listeners = 3 [(dev.f110.kubeproto.field) = { go_name: "Listeners", api_field_name: "listeners", inline: false }];
+  repeated ListenerStatus listeners = 3 [(dev.f110.kubeproto.field) = { go_name: "Listeners", api_field_name: "listeners", list_type: LIST_TYPE_MAP,
+                                                                        list_map_keys: [ "name" ],
+                                                                        inline: false }];
   // AttachedListenerSets represents the total number of ListenerSets that have been
   // successfully attached to this Gateway.
   // A ListenerSet is successfully attached to a Gateway when all the following conditions are met:
@@ -1400,12 +1414,12 @@ message HTTPAuthConfig {
   // to `0`, then `Content-Length` must be `0`. If `forwardBody.maxSize` is set
   // to anything other than `0`, then the `Content-Length` of the authorization
   // request must be set to the actual number of bytes forwarded.
-  repeated string allowed_request_headers = 2 [(dev.f110.kubeproto.field) = { go_name: "AllowedRequestHeaders", api_field_name: "allowedHeaders", inline: false }];
+  repeated string allowed_request_headers = 2 [(dev.f110.kubeproto.field) = { go_name: "AllowedRequestHeaders", api_field_name: "allowedHeaders", list_type: LIST_TYPE_SET, inline: false }];
   // AllowedResponseHeaders specifies what headers from the authorization response
   // will be copied into the request to the backend.
   // If this list is empty, then all headers from the authorization server
   // except Authority or Host must be copied.
-  repeated string allowed_response_headers = 3 [(dev.f110.kubeproto.field) = { go_name: "AllowedResponseHeaders", api_field_name: "allowedResponseHeaders", inline: false }];
+  repeated string allowed_response_headers = 3 [(dev.f110.kubeproto.field) = { go_name: "AllowedResponseHeaders", api_field_name: "allowedResponseHeaders", list_type: LIST_TYPE_SET, inline: false }];
 }
 
 message HTTPBackendRef {
@@ -1440,7 +1454,7 @@ message HTTPBackendRef {
   // request is being forwarded to the backend defined here.
   // Support: Implementation-specific (For broader support of filters, use the
   // Filters field in HTTPRouteRule.)
-  repeated HTTPRouteFilter filters = 2 [(dev.f110.kubeproto.field) = { go_name: "Filters", api_field_name: "filters", inline: false }];
+  repeated HTTPRouteFilter filters = 2 [(dev.f110.kubeproto.field) = { go_name: "Filters", api_field_name: "filters", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message HTTPCORSFilter {
@@ -1493,7 +1507,7 @@ message HTTPCORSFilter {
   // `Access-Control-Allow-Origin` is same as the `Origin` header provided by
   // the client.
   // Support: Extended
-  repeated string allow_origins = 1 [(dev.f110.kubeproto.field) = { go_name: "AllowOrigins", api_field_name: "allowOrigins", inline: false }];
+  repeated string allow_origins = 1 [(dev.f110.kubeproto.field) = { go_name: "AllowOrigins", api_field_name: "allowOrigins", list_type: LIST_TYPE_SET, inline: false }];
   // AllowCredentials indicates whether the actual cross-origin request allows
   // to include credentials.
   // When set to true, the gateway will include the `Access-Control-Allow-Credentials`
@@ -1537,7 +1551,7 @@ message HTTPCORSFilter {
   // the gateway will omit the `Access-Control-Allow-Methods` response header,
   // instead of specifying the `*` wildcard.
   // Support: Extended
-  repeated string allow_methods = 3 [(dev.f110.kubeproto.field) = { go_name: "AllowMethods", api_field_name: "allowMethods", inline: false }];
+  repeated string allow_methods = 3 [(dev.f110.kubeproto.field) = { go_name: "AllowMethods", api_field_name: "allowMethods", list_type: LIST_TYPE_SET, inline: false }];
   // AllowHeaders indicates which HTTP request headers are supported for
   // accessing the requested resource.
   // Header names are not case-sensitive.
@@ -1569,7 +1583,7 @@ message HTTPCORSFilter {
   // request, the gateway will omit the `Access-Control-Allow-Headers`
   // response header, instead of specifying the `*` wildcard.
   // Support: Extended
-  repeated string allow_headers = 4 [(dev.f110.kubeproto.field) = { go_name: "AllowHeaders", api_field_name: "allowHeaders", inline: false }];
+  repeated string allow_headers = 4 [(dev.f110.kubeproto.field) = { go_name: "AllowHeaders", api_field_name: "allowHeaders", list_type: LIST_TYPE_SET, inline: false }];
   // ExposeHeaders indicates which HTTP response headers can be exposed
   // to client-side scripts in response to a cross-origin request.
   // A CORS-safelisted response header is an HTTP header in a CORS response
@@ -1597,7 +1611,7 @@ message HTTPCORSFilter {
   // the request is credentialed, the gateway cannot use the `*` wildcard in
   // the `Access-Control-Expose-Headers` response header.
   // Support: Extended
-  repeated string expose_headers = 5 [(dev.f110.kubeproto.field) = { go_name: "ExposeHeaders", api_field_name: "exposeHeaders", inline: false }];
+  repeated string expose_headers = 5 [(dev.f110.kubeproto.field) = { go_name: "ExposeHeaders", api_field_name: "exposeHeaders", list_type: LIST_TYPE_SET, inline: false }];
   // MaxAge indicates the duration (in seconds) for the client to cache the
   // results of a "preflight" request.
   // The information provided by the `Access-Control-Allow-Methods` and
@@ -1686,7 +1700,9 @@ message HTTPHeaderFilter {
   // Output:
   //   GET /foo HTTP/1.1
   //   my-header: bar
-  repeated HTTPHeader set = 1 [(dev.f110.kubeproto.field) = { go_name: "Set", api_field_name: "set", inline: false }];
+  repeated HTTPHeader set = 1 [(dev.f110.kubeproto.field) = { go_name: "Set", api_field_name: "set", list_type: LIST_TYPE_MAP,
+                                                              list_map_keys: [ "name" ],
+                                                              inline: false }];
   // Add adds the given header(s) (name, value) to the request
   // before the action. It appends to any existing values associated
   // with the header name.
@@ -1700,7 +1716,9 @@ message HTTPHeaderFilter {
   // Output:
   //   GET /foo HTTP/1.1
   //   my-header: foo,bar,baz
-  repeated HTTPHeader add = 2 [(dev.f110.kubeproto.field) = { go_name: "Add", api_field_name: "add", inline: false }];
+  repeated HTTPHeader add = 2 [(dev.f110.kubeproto.field) = { go_name: "Add", api_field_name: "add", list_type: LIST_TYPE_MAP,
+                                                              list_map_keys: [ "name" ],
+                                                              inline: false }];
   // Remove the given header(s) from the HTTP request before the action. The
   // value of Remove is a list of HTTP header names. Note that the header
   // names are case-insensitive (see
@@ -1715,7 +1733,7 @@ message HTTPHeaderFilter {
   // Output:
   //   GET /foo HTTP/1.1
   //   my-header2: bar
-  repeated string remove = 3 [(dev.f110.kubeproto.field) = { go_name: "Remove", api_field_name: "remove", inline: false }];
+  repeated string remove = 3 [(dev.f110.kubeproto.field) = { go_name: "Remove", api_field_name: "remove", list_type: LIST_TYPE_SET, inline: false }];
 }
 
 message HTTPHeaderMatch {
@@ -2003,12 +2021,16 @@ message HTTPRouteMatch {
   // Headers specifies HTTP request header matchers. Multiple match values are
   // ANDed together, meaning, a request must match all the specified headers
   // to select the route.
-  repeated HTTPHeaderMatch headers = 2 [(dev.f110.kubeproto.field) = { go_name: "Headers", api_field_name: "headers", inline: false }];
+  repeated HTTPHeaderMatch headers = 2 [(dev.f110.kubeproto.field) = { go_name: "Headers", api_field_name: "headers", list_type: LIST_TYPE_MAP,
+                                                                       list_map_keys: [ "name" ],
+                                                                       inline: false }];
   // QueryParams specifies HTTP query parameter matchers. Multiple match
   // values are ANDed together, meaning, a request must match all the
   // specified query parameters to select the route.
   // Support: Extended
-  repeated HTTPQueryParamMatch query_params = 3 [(dev.f110.kubeproto.field) = { go_name: "QueryParams", api_field_name: "queryParams", inline: false }];
+  repeated HTTPQueryParamMatch query_params = 3 [(dev.f110.kubeproto.field) = { go_name: "QueryParams", api_field_name: "queryParams", list_type: LIST_TYPE_MAP,
+                                                                                list_map_keys: [ "name" ],
+                                                                                inline: false }];
   // Method specifies HTTP method matcher.
   // When specified, this route will be matched only if the request has the
   // specified method.
@@ -2020,7 +2042,7 @@ message HTTPRouteRetry {
   // Codes defines the HTTP response status codes for which a backend request
   // should be retried.
   // Support: Extended
-  repeated int32 codes = 1 [(dev.f110.kubeproto.field) = { go_name: "Codes", api_field_name: "codes", inline: false }];
+  repeated int32 codes = 1 [(dev.f110.kubeproto.field) = { go_name: "Codes", api_field_name: "codes", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Attempts specifies the maximum number of times an individual request
   // from the gateway to a backend should be retried.
   // If the maximum number of retries has been attempted without a successful
@@ -2108,7 +2130,7 @@ message HTTPRouteRule {
   // criteria.
   // When no rules matching a request have been successfully attached to the
   // parent a request is coming from, a HTTP 404 status code MUST be returned.
-  repeated HTTPRouteMatch matches = 2 [(dev.f110.kubeproto.field) = { go_name: "Matches", api_field_name: "matches", inline: false }];
+  repeated HTTPRouteMatch matches = 2 [(dev.f110.kubeproto.field) = { go_name: "Matches", api_field_name: "matches", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Filters define the filters that are applied to requests that match
   // this rule.
   // Wherever possible, implementations SHOULD implement filters in the order
@@ -2137,7 +2159,7 @@ message HTTPRouteRule {
   // `False`, implementations may use the `IncompatibleFilters` reason to specify
   // this configuration error.
   // Support: Core
-  repeated HTTPRouteFilter filters = 3 [(dev.f110.kubeproto.field) = { go_name: "Filters", api_field_name: "filters", inline: false }];
+  repeated HTTPRouteFilter filters = 3 [(dev.f110.kubeproto.field) = { go_name: "Filters", api_field_name: "filters", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // BackendRefs defines the backend(s) where matching requests should be
   // sent.
   // Failure behavior here depends on how many BackendRefs are specified and
@@ -2163,7 +2185,7 @@ message HTTPRouteRule {
   // Support: Extended for Kubernetes ServiceImport
   // Support: Implementation-specific for any other resource
   // Support for weight: Core
-  repeated HTTPBackendRef backend_refs = 4 [(dev.f110.kubeproto.field) = { go_name: "BackendRefs", api_field_name: "backendRefs", inline: false }];
+  repeated HTTPBackendRef backend_refs = 4 [(dev.f110.kubeproto.field) = { go_name: "BackendRefs", api_field_name: "backendRefs", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Timeouts defines the timeouts that can be configured for an HTTP request.
   // Support: Extended
   optional HTTPRouteTimeouts timeouts = 5 [(dev.f110.kubeproto.field) = { go_name: "Timeouts", api_field_name: "timeouts", inline: false }];
@@ -2222,10 +2244,10 @@ message HTTPRouteSpec {
   // If ties exist across multiple Routes, the matching precedence rules for
   // HTTPRouteMatches takes over.
   // Support: Core
-  repeated string hostnames = 2 [(dev.f110.kubeproto.field) = { go_name: "Hostnames", api_field_name: "hostnames", inline: false }];
+  repeated string hostnames = 2 [(dev.f110.kubeproto.field) = { go_name: "Hostnames", api_field_name: "hostnames", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Rules are a list of HTTP matchers, filters and actions.
   // <gateway:experimental:validation:XValidation:message="Rule name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))">
-  repeated HTTPRouteRule rules = 3 [(dev.f110.kubeproto.field) = { go_name: "Rules", api_field_name: "rules", inline: false }];
+  repeated HTTPRouteRule rules = 3 [(dev.f110.kubeproto.field) = { go_name: "Rules", api_field_name: "rules", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message HTTPRouteStatus {
@@ -2436,7 +2458,7 @@ message ListenerEntryStatus {
   // condition to "False" with the "InvalidRouteKinds" reason. If both valid
   // and invalid Route kinds are specified, the implementation MUST
   // reference the valid Route kinds that have been specified.
-  repeated RouteGroupKind supported_kinds = 2 [(dev.f110.kubeproto.field) = { go_name: "SupportedKinds", api_field_name: "supportedKinds", inline: false }];
+  repeated RouteGroupKind supported_kinds = 2 [(dev.f110.kubeproto.field) = { go_name: "SupportedKinds", api_field_name: "supportedKinds", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // AttachedRoutes represents the total number of Routes that have been
   // successfully attached to this Listener.
   // Successful attachment of a Route to a Listener is based solely on the
@@ -2457,7 +2479,9 @@ message ListenerEntryStatus {
   // measuring blast radius/impact of changes to a Listener.
   int32 attached_routes = 3 [(dev.f110.kubeproto.field) = { go_name: "AttachedRoutes", api_field_name: "attachedRoutes", inline: false }];
   // Conditions describe the current condition of this listener.
-  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 4 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 4 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                                                          list_map_keys: [ "type" ],
+                                                                                                          inline: false }];
 }
 
 message ListenerNamespaces {
@@ -2514,7 +2538,9 @@ message ListenerSetSpec {
   // parent or siblings are reported to avoid accidentally leaking
   // sensitive information that the child would not otherwise have access
   // to. This can include contents of secrets etc.
-  repeated ListenerEntry listeners = 2 [(dev.f110.kubeproto.field) = { go_name: "Listeners", api_field_name: "listeners", inline: false }];
+  repeated ListenerEntry listeners = 2 [(dev.f110.kubeproto.field) = { go_name: "Listeners", api_field_name: "listeners", list_type: LIST_TYPE_MAP,
+                                                                       list_map_keys: [ "name" ],
+                                                                       inline: false }];
 }
 
 message ListenerSetStatus {
@@ -2526,9 +2552,13 @@ message ListenerSetStatus {
   // Known condition types are:
   // * "Accepted"
   // * "Programmed"
-  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 1 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 1 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                                                          list_map_keys: [ "type" ],
+                                                                                                          inline: false }];
   // Listeners provide status for each unique listener port defined in the Spec.
-  repeated ListenerEntryStatus listeners = 2 [(dev.f110.kubeproto.field) = { go_name: "Listeners", api_field_name: "listeners", inline: false }];
+  repeated ListenerEntryStatus listeners = 2 [(dev.f110.kubeproto.field) = { go_name: "Listeners", api_field_name: "listeners", list_type: LIST_TYPE_MAP,
+                                                                             list_map_keys: [ "name" ],
+                                                                             inline: false }];
 }
 
 message ListenerStatus {
@@ -2542,7 +2572,7 @@ message ListenerStatus {
   // condition to "False" with the "InvalidRouteKinds" reason. If both valid
   // and invalid Route kinds are specified, the implementation MUST
   // reference the valid Route kinds that have been specified.
-  repeated RouteGroupKind supported_kinds = 2 [(dev.f110.kubeproto.field) = { go_name: "SupportedKinds", api_field_name: "supportedKinds", inline: false }];
+  repeated RouteGroupKind supported_kinds = 2 [(dev.f110.kubeproto.field) = { go_name: "SupportedKinds", api_field_name: "supportedKinds", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // AttachedRoutes represents the total number of Routes that have been
   // successfully attached to this Listener.
   // Successful attachment of a Route to a Listener is based solely on the
@@ -2587,7 +2617,9 @@ message ListenerStatus {
   //   the implementation's copy of the object is stale and an update will be re-triggered
   //   if relevant.)
   // </gateway:util:excludeFromCRD>
-  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 4 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 4 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                                                          list_map_keys: [ "type" ],
+                                                                                                          inline: false }];
 }
 
 message ListenerTLSConfig {
@@ -2621,7 +2653,7 @@ message ListenerTLSConfig {
   // Secret, or implementation-specific custom resources.
   // Support: Core - A single reference to a Kubernetes Secret of type kubernetes.io/tls
   // Support: Implementation-specific (More than one reference or other resource types)
-  repeated SecretObjectReference certificate_refs = 2 [(dev.f110.kubeproto.field) = { go_name: "CertificateRefs", api_field_name: "certificateRefs", inline: false }];
+  repeated SecretObjectReference certificate_refs = 2 [(dev.f110.kubeproto.field) = { go_name: "CertificateRefs", api_field_name: "certificateRefs", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Options are a list of key/value pairs to enable extended TLS
   // configuration for each implementation. For example, configuring the
   // minimum TLS version or supported cipher suites.
@@ -2857,7 +2889,9 @@ message PolicyAncestorStatus {
   //   the implementation's copy of the object is stale and an update will be re-triggered
   //   if relevant.)
   // </gateway:util:excludeFromCRD>
-  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 3 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 3 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                                                          list_map_keys: [ "type" ],
+                                                                                                          inline: false }];
 }
 
 message PolicyStatus {
@@ -2885,7 +2919,7 @@ message PolicyStatus {
   // here. For example, if this list was full on BackendTLSPolicy, no
   // additional Gateways would be able to reference the Service targeted by
   // the BackendTLSPolicy.
-  repeated PolicyAncestorStatus ancestors = 1 [(dev.f110.kubeproto.field) = { go_name: "Ancestors", api_field_name: "ancestors", inline: false }];
+  repeated PolicyAncestorStatus ancestors = 1 [(dev.f110.kubeproto.field) = { go_name: "Ancestors", api_field_name: "ancestors", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message ReferenceGrant {
@@ -2930,13 +2964,13 @@ message ReferenceGrantSpec {
   // to be an additional place that references can be valid from, or to put
   // this another way, entries MUST be combined using OR.
   // Support: Core
-  repeated ReferenceGrantFrom from = 1 [(dev.f110.kubeproto.field) = { go_name: "From", api_field_name: "from", inline: false }];
+  repeated ReferenceGrantFrom from = 1 [(dev.f110.kubeproto.field) = { go_name: "From", api_field_name: "from", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // To describes the resources that may be referenced by the resources
   // described in "From". Each entry in this list MUST be considered to be an
   // additional place that references can be valid to, or to put this another
   // way, entries MUST be combined using OR.
   // Support: Core
-  repeated ReferenceGrantTo to = 2 [(dev.f110.kubeproto.field) = { go_name: "To", api_field_name: "to", inline: false }];
+  repeated ReferenceGrantTo to = 2 [(dev.f110.kubeproto.field) = { go_name: "To", api_field_name: "to", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message ReferenceGrantTo {
@@ -3033,7 +3067,9 @@ message RouteParentStatus {
   //   the implementation's copy of the object is stale and an update will be re-triggered
   //   if relevant.)
   // </gateway:util:excludeFromCRD>
-  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 3 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 3 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                                                          list_map_keys: [ "type" ],
+                                                                                                          inline: false }];
 }
 
 message RouteStatus {
@@ -3067,7 +3103,7 @@ message RouteStatus {
   //   must be confident they have fetched the most recent version of this field,
   //   and ensure that changes they make are on that recent version.
   // </gateway:util:excludeFromCRD>
-  repeated RouteParentStatus parents = 1 [(dev.f110.kubeproto.field) = { go_name: "Parents", api_field_name: "parents", inline: false }];
+  repeated RouteParentStatus parents = 1 [(dev.f110.kubeproto.field) = { go_name: "Parents", api_field_name: "parents", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message SecretObjectReference {
@@ -3190,7 +3226,7 @@ message TLSRouteRule {
   // Support: Extended for Kubernetes ServiceImport
   // Support: Implementation-specific for any other resource
   // Support for weight: Extended
-  repeated BackendRef backend_refs = 2 [(dev.f110.kubeproto.field) = { go_name: "BackendRefs", api_field_name: "backendRefs", inline: false }];
+  repeated BackendRef backend_refs = 2 [(dev.f110.kubeproto.field) = { go_name: "BackendRefs", api_field_name: "backendRefs", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message TLSRouteSpec {
@@ -3232,9 +3268,9 @@ message TLSRouteSpec {
   // Core: Listener with `protocol` `TLS` and `tls.mode` `Passthrough`.
   // Extended: Listener with `protocol` `TLS` and `tls.mode` `Terminate`. The feature name for this Extended feature is `TLSRouteTermination`.
   // </gateway:util:excludeFromCRD>
-  repeated string hostnames = 2 [(dev.f110.kubeproto.field) = { go_name: "Hostnames", api_field_name: "hostnames", inline: false }];
+  repeated string hostnames = 2 [(dev.f110.kubeproto.field) = { go_name: "Hostnames", api_field_name: "hostnames", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Rules are a list of actions.
-  repeated TLSRouteRule rules = 3 [(dev.f110.kubeproto.field) = { go_name: "Rules", api_field_name: "rules", inline: false }];
+  repeated TLSRouteRule rules = 3 [(dev.f110.kubeproto.field) = { go_name: "Rules", api_field_name: "rules", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message TLSRouteStatus {

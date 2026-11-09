@@ -52,7 +52,7 @@ message ConversionRequest {
   // desiredAPIVersion is the version to convert given objects to. e.g. "myapi.example.com/v1"
   string desired_api_version = 2 [(dev.f110.kubeproto.field) = { go_name: "DesiredAPIVersion", api_field_name: "desiredAPIVersion", inline: false }];
   // objects is the list of custom resource objects to be converted.
-  repeated .k8s.io.apimachinery.pkg.runtime.RawExtension objects = 3 [(dev.f110.kubeproto.field) = { go_name: "Objects", api_field_name: "objects", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.runtime.RawExtension objects = 3 [(dev.f110.kubeproto.field) = { go_name: "Objects", api_field_name: "objects", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message ConversionResponse {
@@ -63,7 +63,7 @@ message ConversionResponse {
   // The webhook is expected to set `apiVersion` of these objects to the `request.desiredAPIVersion`. The list
   // must also have the same size as the input list with the same objects in the same order (equal kind, metadata.uid, metadata.name and metadata.namespace).
   // The webhook is allowed to mutate labels and annotations. Any other change to the metadata is silently ignored.
-  repeated .k8s.io.apimachinery.pkg.runtime.RawExtension converted_objects = 2 [(dev.f110.kubeproto.field) = { go_name: "ConvertedObjects", api_field_name: "convertedObjects", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.runtime.RawExtension converted_objects = 2 [(dev.f110.kubeproto.field) = { go_name: "ConvertedObjects", api_field_name: "convertedObjects", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // result contains the result of conversion with extra details if the conversion failed. `result.status` determines if
   // the conversion failed or succeeded. The `result.status` field is required and represents the success or failure of the
   // conversion. A successful conversion must set `result.status` to `Success`. A failed conversion must set
@@ -160,7 +160,7 @@ message CustomResourceDefinitionNames {
   // shortNames are short names for the resource, exposed in API discovery documents,
   // and used by clients to support invocations like `kubectl get <shortname>`.
   // It must be all lowercase.
-  repeated string short_names = 3 [(dev.f110.kubeproto.field) = { go_name: "ShortNames", api_field_name: "shortNames", inline: false }];
+  repeated string short_names = 3 [(dev.f110.kubeproto.field) = { go_name: "ShortNames", api_field_name: "shortNames", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // kind is the serialized kind of the resource. It is normally CamelCase and singular.
   // Custom resource instances will use this value as the `kind` attribute in API calls.
   string kind = 4 [(dev.f110.kubeproto.field) = { go_name: "Kind", api_field_name: "kind", inline: false }];
@@ -169,7 +169,7 @@ message CustomResourceDefinitionNames {
   // categories is a list of grouped resources this custom resource belongs to (e.g. 'all').
   // This is published in API discovery documents, and used by clients to support invocations like
   // `kubectl get all`.
-  repeated string categories = 6 [(dev.f110.kubeproto.field) = { go_name: "Categories", api_field_name: "categories", inline: false }];
+  repeated string categories = 6 [(dev.f110.kubeproto.field) = { go_name: "Categories", api_field_name: "categories", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message CustomResourceDefinitionSpec {
@@ -190,7 +190,7 @@ message CustomResourceDefinitionSpec {
   // by GA > beta > alpha (where GA is a version with no suffix such as beta or alpha), and then by comparing
   // major version, then minor version. An example sorted list of versions:
   // v10, v2, v1, v11beta2, v10beta3, v3beta1, v12alpha1, v11alpha2, foo1, foo10.
-  repeated CustomResourceDefinitionVersion versions = 4 [(dev.f110.kubeproto.field) = { go_name: "Versions", api_field_name: "versions", inline: false }];
+  repeated CustomResourceDefinitionVersion versions = 4 [(dev.f110.kubeproto.field) = { go_name: "Versions", api_field_name: "versions", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // conversion defines conversion settings for the CRD.
   optional CustomResourceConversion conversion = 5 [(dev.f110.kubeproto.field) = { go_name: "Conversion", api_field_name: "conversion", inline: false }];
   // preserveUnknownFields indicates that object fields which are not specified
@@ -203,7 +203,9 @@ message CustomResourceDefinitionSpec {
 
 message CustomResourceDefinitionStatus {
   // conditions indicate state for particular aspects of a CustomResourceDefinition
-  repeated CustomResourceDefinitionCondition conditions = 1 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated CustomResourceDefinitionCondition conditions = 1 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                                            list_map_keys: [ "type" ],
+                                                                                            inline: false }];
   // acceptedNames are the names that are actually being used to serve discovery.
   // They may be different than the names in spec.
   CustomResourceDefinitionNames accepted_names = 2 [(dev.f110.kubeproto.field) = { go_name: "AcceptedNames", api_field_name: "acceptedNames", inline: false }];
@@ -213,7 +215,7 @@ message CustomResourceDefinitionStatus {
   // no old objects are left in storage), and then remove the rest of the
   // versions from this list.
   // Versions may not be removed from `spec.versions` while they exist in this list.
-  repeated string stored_versions = 3 [(dev.f110.kubeproto.field) = { go_name: "StoredVersions", api_field_name: "storedVersions", inline: false }];
+  repeated string stored_versions = 3 [(dev.f110.kubeproto.field) = { go_name: "StoredVersions", api_field_name: "storedVersions", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // The generation observed by the CRD controller.
   optional int64 observed_generation = 4 [(dev.f110.kubeproto.field) = { go_name: "ObservedGeneration", api_field_name: "observedGeneration", inline: false }];
 }
@@ -243,11 +245,11 @@ message CustomResourceDefinitionVersion {
   // additionalPrinterColumns specifies additional columns returned in Table output.
   // See https://kubernetes.io/docs/reference/using-api/api-concepts/#receiving-resources-as-tables for details.
   // If no columns are specified, a single column displaying the age of the custom resource is used.
-  repeated CustomResourceColumnDefinition additional_printer_columns = 8 [(dev.f110.kubeproto.field) = { go_name: "AdditionalPrinterColumns", api_field_name: "additionalPrinterColumns", inline: false }];
+  repeated CustomResourceColumnDefinition additional_printer_columns = 8 [(dev.f110.kubeproto.field) = { go_name: "AdditionalPrinterColumns", api_field_name: "additionalPrinterColumns", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // selectableFields specifies paths to fields that may be used as field selectors.
   // A maximum of 8 selectable fields are allowed.
   // See https://kubernetes.io/docs/concepts/overview/working-with-objects/field-selectors
-  repeated SelectableField selectable_fields = 9 [(dev.f110.kubeproto.field) = { go_name: "SelectableFields", api_field_name: "selectableFields", inline: false }];
+  repeated SelectableField selectable_fields = 9 [(dev.f110.kubeproto.field) = { go_name: "SelectableFields", api_field_name: "selectableFields", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message CustomResourceSubresourceScale {
@@ -349,14 +351,14 @@ message JSONSchemaProps {
   optional int64                            min_items             = 17 [(dev.f110.kubeproto.field) = { go_name: "MinItems", api_field_name: "minItems", inline: false }];
   optional bool                             unique_items          = 18 [(dev.f110.kubeproto.field) = { go_name: "UniqueItems", api_field_name: "uniqueItems", inline: false }];
   optional float                            multiple_of           = 19 [(dev.f110.kubeproto.field) = { go_name: "MultipleOf", api_field_name: "multipleOf", inline: false }];
-  repeated                                  JSON enum             = 20 [(dev.f110.kubeproto.field) = { go_name: "Enum", api_field_name: "enum", inline: false }];
+  repeated                                  JSON enum             = 20 [(dev.f110.kubeproto.field) = { go_name: "Enum", api_field_name: "enum", list_type: LIST_TYPE_ATOMIC, inline: false }];
   optional int64                            max_properties        = 21 [(dev.f110.kubeproto.field) = { go_name: "MaxProperties", api_field_name: "maxProperties", inline: false }];
   optional int64                            min_properties        = 22 [(dev.f110.kubeproto.field) = { go_name: "MinProperties", api_field_name: "minProperties", inline: false }];
-  repeated string                           required              = 23 [(dev.f110.kubeproto.field) = { go_name: "Required", api_field_name: "required", inline: false }];
+  repeated string                           required              = 23 [(dev.f110.kubeproto.field) = { go_name: "Required", api_field_name: "required", list_type: LIST_TYPE_ATOMIC, inline: false }];
   optional JSONSchemaPropsOrArray           items                 = 24 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
-  repeated JSONSchemaProps                  all_of                = 25 [(dev.f110.kubeproto.field) = { go_name: "AllOf", api_field_name: "allOf", inline: false }];
-  repeated JSONSchemaProps                  one_of                = 26 [(dev.f110.kubeproto.field) = { go_name: "OneOf", api_field_name: "oneOf", inline: false }];
-  repeated JSONSchemaProps                  any_of                = 27 [(dev.f110.kubeproto.field) = { go_name: "AnyOf", api_field_name: "anyOf", inline: false }];
+  repeated JSONSchemaProps                  all_of                = 25 [(dev.f110.kubeproto.field) = { go_name: "AllOf", api_field_name: "allOf", list_type: LIST_TYPE_ATOMIC, inline: false }];
+  repeated JSONSchemaProps                  one_of                = 26 [(dev.f110.kubeproto.field) = { go_name: "OneOf", api_field_name: "oneOf", list_type: LIST_TYPE_ATOMIC, inline: false }];
+  repeated JSONSchemaProps                  any_of                = 27 [(dev.f110.kubeproto.field) = { go_name: "AnyOf", api_field_name: "anyOf", list_type: LIST_TYPE_ATOMIC, inline: false }];
   optional JSONSchemaProps                  not                   = 28 [(dev.f110.kubeproto.field) = { go_name: "Not", api_field_name: "not", inline: false }];
   map<string, JSONSchemaProps>              properties            = 29 [(dev.f110.kubeproto.field) = { go_name: "Properties", api_field_name: "properties", inline: false }];
   optional JSONSchemaPropsOrBool            additional_properties = 30 [(dev.f110.kubeproto.field) = { go_name: "AdditionalProperties", api_field_name: "additionalProperties", inline: false }];
@@ -402,7 +404,7 @@ message JSONSchemaProps {
   // be a scalar typed field of the child structure (no nesting is supported).
   // The properties specified must either be required or have a default value,
   // to ensure those properties are present for all list items.
-  repeated string x_list_map_keys = 41 [(dev.f110.kubeproto.field) = { go_name: "XListMapKeys", api_field_name: "x-kubernetes-list-map-keys", inline: false }];
+  repeated string x_list_map_keys = 41 [(dev.f110.kubeproto.field) = { go_name: "XListMapKeys", api_field_name: "x-kubernetes-list-map-keys", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // x-kubernetes-list-type annotates an array to further describe its topology.
   // This extension must only be used on lists and may have 3 possible values:
   // 1) `atomic`: the list is treated as a single entity, like a scalar.
@@ -433,7 +435,7 @@ message JSONSchemaProps {
 
 message JSONSchemaPropsOrArray {
   optional JSONSchemaProps schema       = 1 [(dev.f110.kubeproto.field) = { go_name: "Schema", inline: false }];
-  repeated JSONSchemaProps json_schemas = 2 [(dev.f110.kubeproto.field) = { go_name: "JSONSchemas", inline: false }];
+  repeated JSONSchemaProps json_schemas = 2 [(dev.f110.kubeproto.field) = { go_name: "JSONSchemas", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message JSONSchemaPropsOrBool {
@@ -443,7 +445,7 @@ message JSONSchemaPropsOrBool {
 
 message JSONSchemaPropsOrStringArray {
   optional JSONSchemaProps schema   = 1 [(dev.f110.kubeproto.field) = { go_name: "Schema", inline: false }];
-  repeated string          property = 2 [(dev.f110.kubeproto.field) = { go_name: "Property", inline: false }];
+  repeated string          property = 2 [(dev.f110.kubeproto.field) = { go_name: "Property", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message SelectableField {
@@ -621,5 +623,5 @@ message WebhookConversion {
   // are supported by API server, conversion will fail for the custom resource.
   // If a persisted Webhook configuration specifies allowed versions and does not
   // include any versions known to the API Server, calls to the webhook will fail.
-  repeated string conversion_review_versions = 2 [(dev.f110.kubeproto.field) = { go_name: "ConversionReviewVersions", api_field_name: "conversionReviewVersions", inline: false }];
+  repeated string conversion_review_versions = 2 [(dev.f110.kubeproto.field) = { go_name: "ConversionReviewVersions", api_field_name: "conversionReviewVersions", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }

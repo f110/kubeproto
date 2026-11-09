@@ -14,12 +14,12 @@ import "k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto";
 message AggregationRule {
   // ClusterRoleSelectors holds a list of selectors which will be used to find ClusterRoles and create the rules.
   // If any of the selectors match, then the ClusterRole's permissions will be added
-  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector cluster_role_selectors = 1 [(dev.f110.kubeproto.field) = { go_name: "ClusterRoleSelectors", api_field_name: "clusterRoleSelectors", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector cluster_role_selectors = 1 [(dev.f110.kubeproto.field) = { go_name: "ClusterRoleSelectors", api_field_name: "clusterRoleSelectors", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message ClusterRole {
   // Rules holds all the PolicyRules for this ClusterRole
-  repeated PolicyRule rules = 3 [(dev.f110.kubeproto.field) = { go_name: "Rules", api_field_name: "rules", inline: false }];
+  repeated PolicyRule rules = 3 [(dev.f110.kubeproto.field) = { go_name: "Rules", api_field_name: "rules", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // AggregationRule is an optional field that describes how to build the Rules for this ClusterRole.
   // If AggregationRule is set, then the Rules are controller managed and direct changes to Rules will be
   // stomped by the controller.
@@ -32,7 +32,7 @@ message ClusterRole {
 
 message ClusterRoleBinding {
   // Subjects holds references to the objects the role applies to.
-  repeated Subject subjects = 3 [(dev.f110.kubeproto.field) = { go_name: "Subjects", api_field_name: "subjects", inline: false }];
+  repeated Subject subjects = 3 [(dev.f110.kubeproto.field) = { go_name: "Subjects", api_field_name: "subjects", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // RoleRef can only reference a ClusterRole in the global namespace.
   // If the RoleRef cannot be resolved, the Authorizer must return an error.
   // This field is immutable.
@@ -61,23 +61,23 @@ message ClusterRoleList {
 
 message PolicyRule {
   // Verbs is a list of Verbs that apply to ALL the ResourceKinds contained in this rule. '*' represents all verbs.
-  repeated string verbs = 1 [(dev.f110.kubeproto.field) = { go_name: "Verbs", api_field_name: "verbs", inline: false }];
+  repeated string verbs = 1 [(dev.f110.kubeproto.field) = { go_name: "Verbs", api_field_name: "verbs", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // APIGroups is the name of the APIGroup that contains the resources.  If multiple API groups are specified, any action requested against one of
   // the enumerated resources in any API group will be allowed. "" represents the core API group and "*" represents all API groups.
-  repeated string api_groups = 2 [(dev.f110.kubeproto.field) = { go_name: "APIGroups", api_field_name: "apiGroups", inline: false }];
+  repeated string api_groups = 2 [(dev.f110.kubeproto.field) = { go_name: "APIGroups", api_field_name: "apiGroups", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Resources is a list of resources this rule applies to. '*' represents all resources.
-  repeated string resources = 3 [(dev.f110.kubeproto.field) = { go_name: "Resources", api_field_name: "resources", inline: false }];
+  repeated string resources = 3 [(dev.f110.kubeproto.field) = { go_name: "Resources", api_field_name: "resources", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // ResourceNames is an optional white list of names that the rule applies to.  An empty set means that everything is allowed.
-  repeated string resource_names = 4 [(dev.f110.kubeproto.field) = { go_name: "ResourceNames", api_field_name: "resourceNames", inline: false }];
+  repeated string resource_names = 4 [(dev.f110.kubeproto.field) = { go_name: "ResourceNames", api_field_name: "resourceNames", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // NonResourceURLs is a set of partial urls that a user should have access to.  *s are allowed, but only as the full, final step in the path
   // Since non-resource URLs are not namespaced, this field is only applicable for ClusterRoles referenced from a ClusterRoleBinding.
   // Rules can either apply to API resources (such as "pods" or "secrets") or non-resource URL paths (such as "/api"),  but not both.
-  repeated string non_resource_url_s = 5 [(dev.f110.kubeproto.field) = { go_name: "NonResourceURLs", api_field_name: "nonResourceURLs", inline: false }];
+  repeated string non_resource_url_s = 5 [(dev.f110.kubeproto.field) = { go_name: "NonResourceURLs", api_field_name: "nonResourceURLs", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message Role {
   // Rules holds all the PolicyRules for this Role
-  repeated PolicyRule rules = 3 [(dev.f110.kubeproto.field) = { go_name: "Rules", api_field_name: "rules", inline: false }];
+  repeated PolicyRule rules = 3 [(dev.f110.kubeproto.field) = { go_name: "Rules", api_field_name: "rules", list_type: LIST_TYPE_ATOMIC, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
   };
@@ -85,7 +85,7 @@ message Role {
 
 message RoleBinding {
   // Subjects holds references to the objects the role applies to.
-  repeated Subject subjects = 3 [(dev.f110.kubeproto.field) = { go_name: "Subjects", api_field_name: "subjects", inline: false }];
+  repeated Subject subjects = 3 [(dev.f110.kubeproto.field) = { go_name: "Subjects", api_field_name: "subjects", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // RoleRef can reference a Role in the current namespace or a ClusterRole in the global namespace.
   // If the RoleRef cannot be resolved, the Authorizer must return an error.
   // This field is immutable.
@@ -117,7 +117,10 @@ message RoleRef {
   // Kind is the type of resource being referenced
   string kind = 2 [(dev.f110.kubeproto.field) = { go_name: "Kind", api_field_name: "kind", inline: false }];
   // Name is the name of resource being referenced
-  string name = 3 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  string name                         = 3 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  option (dev.f110.kubeproto.message) = {
+    struct_type: STRUCT_TYPE_ATOMIC
+  };
 }
 
 message Subject {
@@ -132,5 +135,8 @@ message Subject {
   string name = 3 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
   // Namespace of the referenced object.  If the object kind is non-namespace, such as "User" or "Group", and this value is not empty
   // the Authorizer should report an error.
-  optional string namespace = 4 [(dev.f110.kubeproto.field) = { go_name: "Namespace", api_field_name: "namespace", inline: false }];
+  optional string namespace           = 4 [(dev.f110.kubeproto.field) = { go_name: "Namespace", api_field_name: "namespace", inline: false }];
+  option (dev.f110.kubeproto.message) = {
+    struct_type: STRUCT_TYPE_ATOMIC
+  };
 }

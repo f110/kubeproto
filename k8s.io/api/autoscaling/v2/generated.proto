@@ -112,7 +112,7 @@ message HPAScalingRules {
   // If not set, use the default values:
   // - For scale up: allow doubling the number of pods, or an absolute change of 4 pods in a 15s window.
   // - For scale down: allow all pods to be removed in a 15s window.
-  repeated HPAScalingPolicy policies = 3 [(dev.f110.kubeproto.field) = { go_name: "Policies", api_field_name: "policies", inline: false }];
+  repeated HPAScalingPolicy policies = 3 [(dev.f110.kubeproto.field) = { go_name: "Policies", api_field_name: "policies", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // tolerance is the tolerance on the ratio between the current and desired
   // metric value under which no updates are made to the desired number of
   // replicas (e.g. 0.01 for 1%). Must be greater than or equal to zero. If not
@@ -194,7 +194,7 @@ message HorizontalPodAutoscalerSpec {
   // increased, and vice-versa.  See the individual metric source types for
   // more information about how each type of metric must respond.
   // If not set, the default metric will be set to 80% average CPU utilization.
-  repeated MetricSpec metrics = 4 [(dev.f110.kubeproto.field) = { go_name: "Metrics", api_field_name: "metrics", inline: false }];
+  repeated MetricSpec metrics = 4 [(dev.f110.kubeproto.field) = { go_name: "Metrics", api_field_name: "metrics", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // behavior configures the scaling behavior of the target
   // in both Up and Down directions (scaleUp and scaleDown fields respectively).
   // If not set, the default HPAScalingRules for scale up and scale down are used.
@@ -214,10 +214,12 @@ message HorizontalPodAutoscalerStatus {
   // as last calculated by the autoscaler.
   int32 desired_replicas = 4 [(dev.f110.kubeproto.field) = { go_name: "DesiredReplicas", api_field_name: "desiredReplicas", inline: false }];
   // currentMetrics is the last read state of the metrics used by this autoscaler.
-  repeated MetricStatus current_metrics = 5 [(dev.f110.kubeproto.field) = { go_name: "CurrentMetrics", api_field_name: "currentMetrics", inline: false }];
+  repeated MetricStatus current_metrics = 5 [(dev.f110.kubeproto.field) = { go_name: "CurrentMetrics", api_field_name: "currentMetrics", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // conditions is the set of conditions required for this autoscaler to scale its target,
   // and indicates whether or not those conditions are met.
-  repeated HorizontalPodAutoscalerCondition conditions = 6 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated HorizontalPodAutoscalerCondition conditions = 6 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                                           list_map_keys: [ "type" ],
+                                                                                           inline: false }];
 }
 
 message MetricIdentifier {

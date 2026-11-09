@@ -106,7 +106,7 @@ message CronJobSpec {
 
 message CronJobStatus {
   // A list of pointers to currently running jobs.
-  repeated .k8s.io.api.core.v1.ObjectReference active = 1 [(dev.f110.kubeproto.field) = { go_name: "Active", api_field_name: "active", inline: false }];
+  repeated .k8s.io.api.core.v1.ObjectReference active = 1 [(dev.f110.kubeproto.field) = { go_name: "Active", api_field_name: "active", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Information when was the last time the job was successfully scheduled.
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time last_schedule_time = 2 [(dev.f110.kubeproto.field) = { go_name: "LastScheduleTime", api_field_name: "lastScheduleTime", inline: false }];
   // Information when was the last time the job successfully completed.
@@ -291,7 +291,7 @@ message JobStatus {
   // Additionally, it cannot be in the "Complete" and "FailureTarget" conditions.
   // The "Complete", "Failed" and "FailureTarget" conditions cannot be disabled.
   // More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/
-  repeated JobCondition conditions = 1 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated JobCondition conditions = 1 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Represents time when the job controller started processing a job. When a
   // Job is created in the suspended state, this field is not set until the
   // first time it is resumed. This field is reset every time a Job is resumed
@@ -373,7 +373,7 @@ message PodFailurePolicy {
   // When no rule matches the Pod failure, the default handling applies - the
   // counter of pod failures is incremented and it is checked against
   // the backoffLimit. At most 20 elements are allowed.
-  repeated PodFailurePolicyRule rules = 1 [(dev.f110.kubeproto.field) = { go_name: "Rules", api_field_name: "rules", inline: false }];
+  repeated PodFailurePolicyRule rules = 1 [(dev.f110.kubeproto.field) = { go_name: "Rules", api_field_name: "rules", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message PodFailurePolicyOnExitCodesRequirement {
@@ -399,7 +399,7 @@ message PodFailurePolicyOnExitCodesRequirement {
   // values with respect to the operator. The list of values must be ordered
   // and must not contain duplicates. Value '0' cannot be used for the In operator.
   // At least one element is required. At most 255 elements are allowed.
-  repeated int32 values = 3 [(dev.f110.kubeproto.field) = { go_name: "Values", api_field_name: "values", inline: false }];
+  repeated int32 values = 3 [(dev.f110.kubeproto.field) = { go_name: "Values", api_field_name: "values", list_type: LIST_TYPE_SET, inline: false }];
 }
 
 message PodFailurePolicyOnPodConditionsPattern {
@@ -431,7 +431,7 @@ message PodFailurePolicyRule {
   // Represents the requirement on the pod conditions. The requirement is represented
   // as a list of pod condition patterns. The requirement is satisfied if at
   // least one pattern matches an actual pod condition. At most 20 elements are allowed.
-  repeated PodFailurePolicyOnPodConditionsPattern on_pod_conditions = 3 [(dev.f110.kubeproto.field) = { go_name: "OnPodConditions", api_field_name: "onPodConditions", inline: false }];
+  repeated PodFailurePolicyOnPodConditionsPattern on_pod_conditions = 3 [(dev.f110.kubeproto.field) = { go_name: "OnPodConditions", api_field_name: "onPodConditions", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message SuccessPolicy {
@@ -441,7 +441,7 @@ message SuccessPolicy {
   // The terminal state for such a Job has the "Complete" condition.
   // Additionally, these rules are evaluated in order; Once the Job meets one of the rules,
   // other rules are ignored. At most 20 elements are allowed.
-  repeated SuccessPolicyRule rules = 1 [(dev.f110.kubeproto.field) = { go_name: "Rules", api_field_name: "rules", inline: false }];
+  repeated SuccessPolicyRule rules = 1 [(dev.f110.kubeproto.field) = { go_name: "Rules", api_field_name: "rules", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message SuccessPolicyRule {
@@ -472,7 +472,7 @@ message SuccessPolicyRule {
 
 message UncountedTerminatedPods {
   // succeeded holds UIDs of succeeded Pods.
-  repeated string succeeded = 1 [(dev.f110.kubeproto.field) = { go_name: "Succeeded", api_field_name: "succeeded", inline: false }];
+  repeated string succeeded = 1 [(dev.f110.kubeproto.field) = { go_name: "Succeeded", api_field_name: "succeeded", list_type: LIST_TYPE_SET, inline: false }];
   // failed holds UIDs of failed Pods.
-  repeated string failed = 2 [(dev.f110.kubeproto.field) = { go_name: "Failed", api_field_name: "failed", inline: false }];
+  repeated string failed = 2 [(dev.f110.kubeproto.field) = { go_name: "Failed", api_field_name: "failed", list_type: LIST_TYPE_SET, inline: false }];
 }
