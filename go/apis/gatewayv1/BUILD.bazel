@@ -1,0 +1,13 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "gatewayv1",
+    srcs = ["gatewayv1_kubeproto.generated.object.go"],
+    importpath = "go.f110.dev/kubeproto/go/apis/gatewayv1",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//go/apis/metav1",
+        "@io_k8s_apimachinery//pkg/runtime",
+        "@io_k8s_apimachinery//pkg/runtime/schema",
+    ],
+)

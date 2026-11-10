@@ -24,12 +24,16 @@ go_test(
     name = "definition_test",
     srcs = [
         "enum_test.go",
+        "lister_test.go",
         "message_test.go",
     ],
     embed = [":definition"],
     deps = [
         "@com_github_stretchr_testify//assert",
-        "@org_golang_google_protobuf//proto",
+        "@com_github_stretchr_testify//require",
+        "@org_golang_google_protobuf//reflect/protodesc",
+        "@org_golang_google_protobuf//reflect/protoregistry",
         "@org_golang_google_protobuf//types/descriptorpb",
+        "@org_golang_google_protobuf//types/known/timestamppb",
     ],
 )

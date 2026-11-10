@@ -43,7 +43,7 @@ func (l *Lister) GetMessages() Messages {
 
 	var msgs Messages
 	addMessage := func(m protoreflect.MessageDescriptor, desc protoreflect.FileDescriptor) bool {
-		if m.IsMapEntry() {
+		if m.IsMapEntry() || m.FullName() == protoreflect.FullName(MessageTimestamp.Name) {
 			return true
 		}
 		msg, err := NewMessageFromMessageDescriptor(m, desc, l.packageNameManager)
@@ -113,7 +113,7 @@ func (l *Lister) GetMessages() Messages {
 		return true
 	})
 
-	msgs = append(msgs, MessageTypeMeta, MessageObjectMeta, MessageListMeta)
+	msgs = append(msgs, MessageTypeMeta, MessageObjectMeta, MessageListMeta, MessageTimestamp)
 	l.messages = msgs
 	return msgs
 }
@@ -148,11 +148,11 @@ func (l *Lister) ResolveGoType(packageName string, f *Field) (importPath string,
 		key, value := f.MapKeyValue()
 		keyTyp := protoreflectKindMap[key.Kind()]
 		valTyp, ok := protoreflectKindMap[value.Kind()]
+		var importPath, packageAlias string
 		if !ok {
-			_, _, typ := l.protoreflectKindToGoType(packageName, value.Kind(), string(value.Message().FullName()), false, false)
-			valTyp = typ
+			importPath, packageAlias, valTyp = l.protoreflectKindToGoType(packageName, value.Kind(), string(value.Message().FullName()), false, false)
 		}
-		return "", "", fmt.Sprintf("map[%s]%s", keyTyp, valTyp)
+		return importPath, packageAlias, fmt.Sprintf("map[%s]%s", keyTyp, valTyp)
 	}
 
 	importPath, packageAlias, typ := l.protoreflectKindToGoType(packageName, f.Kind, f.MessageName, f.Optional, f.Repeated)

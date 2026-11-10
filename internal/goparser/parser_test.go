@@ -177,3 +177,109 @@ type Volume struct {
 		t.Errorf("message option is expected only for Port\n%s", generated)
 	}
 }
+
+func TestUnresolvedPackage(t *testing.T) {
+	cases := map[string]string{
+		"Field":   "Ref unknown.Reference",
+		"Pointer": "Ref *unknown.Reference",
+		"Slice":   "Refs []unknown.Reference",
+		"Map":     "Refs map[string]unknown.Reference",
+	}
+	for name, field := range cases {
+		t.Run(name, func(t *testing.T) {
+			code := `package api
+
+import (
+	"time"
+
+	"example.com/unknown"
+)
+
+type Spec struct {
+	Timeout time.Duration ` + "`json:\"timeout\"`" + `
+	` + field + " `json:\"ref\"`" + `
+}
+`
+			tmpDir := t.TempDir()
+			if err := os.WriteFile(filepath.Join(tmpDir, "types.go"), []byte(code), 0644); err != nil {
+				t.Fatal(err)
+			}
+			err := New().AddDir(tmpDir, true)
+			if err == nil {
+				t.Fatal("expect an error but got nil")
+			}
+			if !strings.Contains(err.Error(), "example.com/unknown") {
+				t.Errorf("error does not contain the import path: %v", err)
+			}
+		})
+	}
+
+	t.Run("Resolved", func(t *testing.T) {
+		code := `package api
+
+import (
+	"time"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+)
+
+type Spec struct {
+	Timeout time.Duration ` + "`json:\"timeout\"`" + `
+	Time metav1.Time ` + "`json:\"time\"`" + `
+}
+`
+		tmpDir := t.TempDir()
+		if err := os.WriteFile(filepath.Join(tmpDir, "types.go"), []byte(code), 0644); err != nil {
+			t.Fatal(err)
+		}
+		if err := New().AddDir(tmpDir, true); err != nil {
+			t.Fatal(err)
+		}
+	})
+}
+
+func TestPredefinedType(t *testing.T) {
+	code := `package api
+
+import (
+	corev1 "k8s.io/api/core/v1"
+)
+
+type PodResources struct {
+	Limits corev1.ResourceList ` + "`json:\"limits,omitempty\"`" + `
+	Requests *corev1.ResourceList ` + "`json:\"requests,omitempty\"`" + `
+}
+`
+	tmpDir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(tmpDir, "types.go"), []byte(code), 0644); err != nil {
+		t.Fatal(err)
+	}
+	g := New()
+	g.SetProtoPackage("api")
+	if err := g.AddDir(tmpDir, true); err != nil {
+		t.Fatal(err)
+	}
+	out := filepath.Join(t.TempDir(), "generated.proto")
+	if err := g.WriteFile(out); err != nil {
+		t.Fatal(err)
+	}
+	b, err := os.ReadFile(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	generated := string(b)
+
+	expects := []string{
+		`import "k8s.io/apimachinery/pkg/api/resource/generated.proto";`,
+		`map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> limits = 1 [(dev.f110.kubeproto.field) = {go_name: "Limits", api_field_name: "limits", inline: false}];`,
+		`map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> requests = 2 [(dev.f110.kubeproto.field) = {go_name: "Requests", api_field_name: "requests", inline: false}];`,
+	}
+	for _, v := range expects {
+		if !strings.Contains(generated, v) {
+			t.Errorf("generated proto does not contain %q\n%s", v, generated)
+		}
+	}
+	if strings.Contains(generated, "k8s.io/api/core/v1/generated.proto") {
+		t.Errorf("generated proto should not import k8s.io/api/core/v1\n%s", generated)
+	}
+}

@@ -102,6 +102,20 @@ var preDefinedPackages = []packageInformation{
 	},
 }
 
+type typeInformation struct {
+	ProtobufKind    string
+	ProtobufPackage string
+}
+
+// preDefinedTypes is a list of the types in the other packages which are not defined as a message or an enum in protobuf.
+// The key of map is the import path and the name of the type.
+var preDefinedTypes = map[string]typeInformation{
+	"k8s.io/api/core/v1.ResourceList": {
+		ProtobufKind:    "map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity>",
+		ProtobufPackage: "k8s.io.apimachinery.pkg.api.resource",
+	},
+}
+
 // Go package to protobuf package
 var packageMap = map[string]string{}
 
@@ -150,6 +164,9 @@ type Generator struct {
 	kubeprotoGoPackage string
 
 	typeDeclaration []*typeDeclaration
+
+	// unresolvedTypes is a list of the types which could not be converted to protobuf types.
+	unresolvedTypes []error
 }
 
 func New() *Generator {
@@ -229,6 +246,10 @@ func (g *Generator) AddDir(dir string, allStructs bool) error {
 				}
 			}
 		}
+	}
+
+	if len(g.unresolvedTypes) > 0 {
+		return errors.Join(g.unresolvedTypes...)
 	}
 
 	for k := range g.enumValueCandidates {
@@ -711,17 +732,17 @@ func (g *Generator) structToProtobufMessage(v *ast.GenDecl, comment *ast.Comment
 			optional = true
 			kind = g.goTypeToProtobufKind(v.X)
 			if s, ok := v.X.(*ast.SelectorExpr); ok {
-				externalPackage = g.resolveProtobufPackageFromGoPackage(s.X.(*ast.Ident))
+				externalPackage = g.externalPackage(s)
 			}
 		case *ast.ArrayType:
 			repeated = true
 			kind = g.goTypeToProtobufKind(v.Elt)
 			if s, ok := v.Elt.(*ast.SelectorExpr); ok {
-				externalPackage = g.resolveProtobufPackageFromGoPackage(s.X.(*ast.Ident))
+				externalPackage = g.externalPackage(s)
 			}
 		case *ast.SelectorExpr:
 			kind = g.goTypeToProtobufKind(v)
-			externalPackage = g.resolveProtobufPackageFromGoPackage(v.X.(*ast.Ident))
+			externalPackage = g.externalPackage(v)
 		case *ast.MapType:
 			mapKeyKind, mapValueKind = g.goTypeToProtobufKind(v.Key), g.goTypeToProtobufKind(v.Value)
 			isMap = true
@@ -888,6 +909,9 @@ func (g *Generator) goTypeToProtobufKind(in ast.Expr) string {
 		if nameIdent.Name == "time" && v.Sel.Name == "Duration" {
 			return "int64"
 		}
+		if t, ok := g.lookupPreDefinedType(v); ok {
+			return t.ProtobufKind
+		}
 
 		protobufPackage := g.resolveProtobufPackageFromGoPackage(nameIdent)
 		// Special type resolve for types.UID.
@@ -897,6 +921,11 @@ func (g *Generator) goTypeToProtobufKind(in ast.Expr) string {
 		if protobufPackage != "" {
 			return "." + protobufPackage + "." + v.Sel.Name
 		}
+		importPath, ok := g.packageMap[nameIdent.Name]
+		if !ok {
+			importPath = nameIdent.Name
+		}
+		g.unresolvedTypes = append(g.unresolvedTypes, fmt.Errorf("protobuf package corresponding to %s.%s is not found", importPath, v.Sel.Name))
 		return ""
 	case *ast.ArrayType:
 		ident, ok := v.Elt.(*ast.Ident)
@@ -911,6 +940,23 @@ func (g *Generator) goTypeToProtobufKind(in ast.Expr) string {
 	default:
 		return ""
 	}
+}
+
+func (g *Generator) lookupPreDefinedType(in *ast.SelectorExpr) (typeInformation, bool) {
+	importPath, ok := g.packageMap[in.X.(*ast.Ident).Name]
+	if !ok {
+		return typeInformation{}, false
+	}
+	t, ok := preDefinedTypes[importPath+"."+in.Sel.Name]
+	return t, ok
+}
+
+// externalPackage returns the protobuf package which the field of the type has to import.
+func (g *Generator) externalPackage(in *ast.SelectorExpr) string {
+	if t, ok := g.lookupPreDefinedType(in); ok {
+		return t.ProtobufPackage
+	}
+	return g.resolveProtobufPackageFromGoPackage(in.X.(*ast.Ident))
 }
 
 func (g *Generator) resolveProtobufPackageFromGoPackage(in *ast.Ident) string {
