@@ -68,6 +68,10 @@ func (in *PriorityClass) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *PriorityClass) OpenAPIModelName() string {
+	return "k8s.io.api.scheduling.v1.PriorityClass"
+}
+
 type PriorityClassList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -101,4 +105,8 @@ func (in *PriorityClassList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *PriorityClassList) OpenAPIModelName() string {
+	return "k8s.io.api.scheduling.v1.PriorityClassList"
 }

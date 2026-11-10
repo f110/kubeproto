@@ -75,6 +75,10 @@ func (in *ClusterRole) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *ClusterRole) OpenAPIModelName() string {
+	return "k8s.io.api.rbac.v1.ClusterRole"
+}
+
 type ClusterRoleBinding struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
@@ -116,6 +120,10 @@ func (in *ClusterRoleBinding) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *ClusterRoleBinding) OpenAPIModelName() string {
+	return "k8s.io.api.rbac.v1.ClusterRoleBinding"
+}
+
 type ClusterRoleBindingList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -149,6 +157,10 @@ func (in *ClusterRoleBindingList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *ClusterRoleBindingList) OpenAPIModelName() string {
+	return "k8s.io.api.rbac.v1.ClusterRoleBindingList"
 }
 
 type ClusterRoleList struct {
@@ -186,6 +198,10 @@ func (in *ClusterRoleList) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *ClusterRoleList) OpenAPIModelName() string {
+	return "k8s.io.api.rbac.v1.ClusterRoleList"
+}
+
 type Role struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
@@ -220,6 +236,10 @@ func (in *Role) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *Role) OpenAPIModelName() string {
+	return "k8s.io.api.rbac.v1.Role"
 }
 
 type RoleBinding struct {
@@ -263,6 +283,10 @@ func (in *RoleBinding) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *RoleBinding) OpenAPIModelName() string {
+	return "k8s.io.api.rbac.v1.RoleBinding"
+}
+
 type RoleBindingList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -298,6 +322,10 @@ func (in *RoleBindingList) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *RoleBindingList) OpenAPIModelName() string {
+	return "k8s.io.api.rbac.v1.RoleBindingList"
+}
+
 type RoleList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -331,6 +359,10 @@ func (in *RoleList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *RoleList) OpenAPIModelName() string {
+	return "k8s.io.api.rbac.v1.RoleList"
 }
 
 type PolicyRule struct {

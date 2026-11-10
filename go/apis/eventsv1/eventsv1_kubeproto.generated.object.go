@@ -122,6 +122,10 @@ func (in *Event) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *Event) OpenAPIModelName() string {
+	return "k8s.io.api.events.v1.Event"
+}
+
 type EventList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -155,6 +159,10 @@ func (in *EventList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *EventList) OpenAPIModelName() string {
+	return "k8s.io.api.events.v1.EventList"
 }
 
 type EventSeries struct {

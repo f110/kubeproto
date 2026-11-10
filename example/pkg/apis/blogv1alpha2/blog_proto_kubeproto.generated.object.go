@@ -70,6 +70,10 @@ func (in *Author) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *Author) OpenAPIModelName() string {
+	return "example.apis.blogv1alpha2.Author"
+}
+
 type AuthorList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -105,6 +109,10 @@ func (in *AuthorList) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *AuthorList) OpenAPIModelName() string {
+	return "example.apis.blogv1alpha2.AuthorList"
+}
+
 type Blog struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
@@ -134,6 +142,10 @@ func (in *Blog) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *Blog) OpenAPIModelName() string {
+	return "example.apis.blogv1alpha2.Blog"
 }
 
 type BlogList struct {
@@ -171,6 +183,10 @@ func (in *BlogList) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *BlogList) OpenAPIModelName() string {
+	return "example.apis.blogv1alpha2.BlogList"
+}
+
 type Post struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
@@ -200,6 +216,10 @@ func (in *Post) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *Post) OpenAPIModelName() string {
+	return "example.apis.blogv1alpha2.Post"
 }
 
 type PostList struct {
@@ -235,6 +255,10 @@ func (in *PostList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *PostList) OpenAPIModelName() string {
+	return "example.apis.blogv1alpha2.PostList"
 }
 
 type AuthorSpec struct {

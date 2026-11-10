@@ -925,6 +925,10 @@ func (in *Binding) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *Binding) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.Binding"
+}
+
 type BindingList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -958,6 +962,10 @@ func (in *BindingList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *BindingList) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.BindingList"
 }
 
 type CSIPersistentVolumeSource struct {
@@ -1411,6 +1419,10 @@ func (in *ComponentStatus) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *ComponentStatus) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.ComponentStatus"
+}
+
 type ComponentStatusList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -1444,6 +1456,10 @@ func (in *ComponentStatusList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *ComponentStatusList) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.ComponentStatusList"
 }
 
 type ConfigMap struct {
@@ -1500,6 +1516,10 @@ func (in *ConfigMap) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *ConfigMap) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.ConfigMap"
 }
 
 type ConfigMapEnvSource struct {
@@ -1579,6 +1599,10 @@ func (in *ConfigMapList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *ConfigMapList) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.ConfigMapList"
 }
 
 type ConfigMapNodeConfigSource struct {
@@ -2676,6 +2700,10 @@ func (in *Endpoints) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *Endpoints) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.Endpoints"
+}
+
 type EndpointsList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -2709,6 +2737,10 @@ func (in *EndpointsList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *EndpointsList) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.EndpointsList"
 }
 
 type EnvFromSource struct {
@@ -3201,6 +3233,10 @@ func (in *Event) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *Event) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.Event"
+}
+
 type EventList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -3234,6 +3270,10 @@ func (in *EventList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *EventList) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.EventList"
 }
 
 type EventSeries struct {
@@ -4068,6 +4108,10 @@ func (in *LimitRange) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *LimitRange) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.LimitRange"
+}
+
 type LimitRangeItem struct {
 	// Type of resource that this limit applies to.
 	Type LimitType `json:"type"`
@@ -4154,6 +4198,10 @@ func (in *LimitRangeList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *LimitRangeList) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.LimitRangeList"
 }
 
 type LimitRangeSpec struct {
@@ -4417,6 +4465,10 @@ func (in *Namespace) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *Namespace) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.Namespace"
+}
+
 type NamespaceCondition struct {
 	// Type of namespace controller condition.
 	Type NamespaceConditionType `json:"type"`
@@ -4481,6 +4533,10 @@ func (in *NamespaceList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *NamespaceList) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.NamespaceList"
 }
 
 type NamespaceSpec struct {
@@ -4578,6 +4634,10 @@ func (in *Node) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *Node) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.Node"
 }
 
 type NodeAddress struct {
@@ -4883,6 +4943,10 @@ func (in *NodeList) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *NodeList) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.NodeList"
+}
+
 type NodeProxyOptions struct {
 	metav1.TypeMeta `json:",inline"`
 	// Path is the URL path to use for the current proxy request to node.
@@ -4908,6 +4972,10 @@ func (in *NodeProxyOptions) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *NodeProxyOptions) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.NodeProxyOptions"
 }
 
 type NodeRuntimeHandler struct {
@@ -5404,6 +5472,10 @@ func (in *PersistentVolume) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *PersistentVolume) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.PersistentVolume"
+}
+
 type PersistentVolumeClaim struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
@@ -5446,6 +5518,10 @@ func (in *PersistentVolumeClaim) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *PersistentVolumeClaim) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.PersistentVolumeClaim"
 }
 
 type PersistentVolumeClaimCondition struct {
@@ -5524,6 +5600,10 @@ func (in *PersistentVolumeClaimList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *PersistentVolumeClaimList) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.PersistentVolumeClaimList"
 }
 
 type PersistentVolumeClaimSpec struct {
@@ -5831,6 +5911,10 @@ func (in *PersistentVolumeList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *PersistentVolumeList) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.PersistentVolumeList"
 }
 
 type PersistentVolumeSource struct {
@@ -6224,6 +6308,10 @@ func (in *Pod) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *Pod) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.Pod"
+}
+
 type PodAffinity struct {
 	// If the affinity requirements specified by this field are not met at
 	// scheduling time, the pod will not be scheduled onto the node.
@@ -6439,6 +6527,10 @@ func (in *PodAttachOptions) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *PodAttachOptions) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.PodAttachOptions"
 }
 
 type PodCertificateProjection struct {
@@ -6670,6 +6762,10 @@ func (in *PodExecOptions) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *PodExecOptions) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.PodExecOptions"
+}
+
 type PodExtendedResourceClaimStatus struct {
 	// RequestMappings identifies the mapping of <container, extended resource backed by DRA> to  device request
 	// in the generated ResourceClaim.
@@ -6752,6 +6848,10 @@ func (in *PodList) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *PodList) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.PodList"
+}
+
 type PodLogOptions struct {
 	metav1.TypeMeta `json:",inline"`
 	// The container for which to stream logs. Defaults to only container if there is one container in the pod.
@@ -6821,6 +6921,10 @@ func (in *PodLogOptions) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *PodLogOptions) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.PodLogOptions"
+}
+
 type PodOS struct {
 	// Name is the name of the operating system. The currently supported values are linux and windows.
 	// Additional value may be defined in future and can be one of:
@@ -6875,6 +6979,10 @@ func (in *PodPortForwardOptions) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *PodPortForwardOptions) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.PodPortForwardOptions"
+}
+
 type PodProxyOptions struct {
 	metav1.TypeMeta `json:",inline"`
 	// Path is the URL path to use for the current proxy request to pod.
@@ -6900,6 +7008,10 @@ func (in *PodProxyOptions) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *PodProxyOptions) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.PodProxyOptions"
 }
 
 type PodReadinessGate struct {
@@ -7826,6 +7938,10 @@ func (in *PodStatusResult) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *PodStatusResult) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.PodStatusResult"
+}
+
 type PodStatusResultList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -7859,6 +7975,10 @@ func (in *PodStatusResultList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *PodStatusResultList) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.PodStatusResultList"
 }
 
 type PodTemplate struct {
@@ -7896,6 +8016,10 @@ func (in *PodTemplate) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *PodTemplate) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.PodTemplate"
+}
+
 type PodTemplateList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -7929,6 +8053,10 @@ func (in *PodTemplateList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *PodTemplateList) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.PodTemplateList"
 }
 
 type PodTemplateSpec struct {
@@ -8391,6 +8519,10 @@ func (in *RangeAllocation) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *RangeAllocation) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.RangeAllocation"
+}
+
 type RangeAllocationList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -8424,6 +8556,10 @@ func (in *RangeAllocationList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *RangeAllocationList) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.RangeAllocationList"
 }
 
 type ReplicationController struct {
@@ -8470,6 +8606,10 @@ func (in *ReplicationController) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *ReplicationController) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.ReplicationController"
 }
 
 type ReplicationControllerCondition struct {
@@ -8536,6 +8676,10 @@ func (in *ReplicationControllerList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *ReplicationControllerList) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.ReplicationControllerList"
 }
 
 type ReplicationControllerSpec struct {
@@ -8745,6 +8889,10 @@ func (in *ResourceQuota) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *ResourceQuota) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.ResourceQuota"
+}
+
 type ResourceQuotaList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -8778,6 +8926,10 @@ func (in *ResourceQuotaList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *ResourceQuotaList) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.ResourceQuotaList"
 }
 
 type ResourceQuotaSpec struct {
@@ -9189,6 +9341,10 @@ func (in *Secret) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *Secret) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.Secret"
+}
+
 type SecretEnvSource struct {
 	// The Secret to select from.
 	LocalObjectReference `json:",inline"`
@@ -9266,6 +9422,10 @@ func (in *SecretList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *SecretList) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.SecretList"
 }
 
 type SecretProjection struct {
@@ -9505,6 +9665,10 @@ func (in *SerializedReference) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *SerializedReference) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.SerializedReference"
+}
+
 type Service struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
@@ -9548,6 +9712,10 @@ func (in *Service) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *Service) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.Service"
 }
 
 type ServiceAccount struct {
@@ -9607,6 +9775,10 @@ func (in *ServiceAccount) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *ServiceAccount) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.ServiceAccount"
+}
+
 type ServiceAccountList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -9640,6 +9812,10 @@ func (in *ServiceAccountList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *ServiceAccountList) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.ServiceAccountList"
 }
 
 type ServiceAccountTokenProjection struct {
@@ -9706,6 +9882,10 @@ func (in *ServiceList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *ServiceList) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.ServiceList"
 }
 
 type ServicePort struct {
@@ -9801,6 +9981,10 @@ func (in *ServiceProxyOptions) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *ServiceProxyOptions) OpenAPIModelName() string {
+	return "k8s.io.api.core.v1.ServiceProxyOptions"
 }
 
 type ServiceSpec struct {

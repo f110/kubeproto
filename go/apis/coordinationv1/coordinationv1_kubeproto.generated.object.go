@@ -65,6 +65,10 @@ func (in *Lease) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *Lease) OpenAPIModelName() string {
+	return "k8s.io.api.coordination.v1.Lease"
+}
+
 type LeaseList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -98,6 +102,10 @@ func (in *LeaseList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *LeaseList) OpenAPIModelName() string {
+	return "k8s.io.api.coordination.v1.LeaseList"
 }
 
 type LeaseSpec struct {

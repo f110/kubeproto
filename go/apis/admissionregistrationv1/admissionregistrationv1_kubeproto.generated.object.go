@@ -138,6 +138,10 @@ func (in *MutatingAdmissionPolicy) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *MutatingAdmissionPolicy) OpenAPIModelName() string {
+	return "k8s.io.api.admissionregistration.v1.MutatingAdmissionPolicy"
+}
+
 type MutatingAdmissionPolicyBinding struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
@@ -170,6 +174,10 @@ func (in *MutatingAdmissionPolicyBinding) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *MutatingAdmissionPolicyBinding) OpenAPIModelName() string {
+	return "k8s.io.api.admissionregistration.v1.MutatingAdmissionPolicyBinding"
 }
 
 type MutatingAdmissionPolicyBindingList struct {
@@ -207,6 +215,10 @@ func (in *MutatingAdmissionPolicyBindingList) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *MutatingAdmissionPolicyBindingList) OpenAPIModelName() string {
+	return "k8s.io.api.admissionregistration.v1.MutatingAdmissionPolicyBindingList"
+}
+
 type MutatingAdmissionPolicyList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -240,6 +252,10 @@ func (in *MutatingAdmissionPolicyList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *MutatingAdmissionPolicyList) OpenAPIModelName() string {
+	return "k8s.io.api.admissionregistration.v1.MutatingAdmissionPolicyList"
 }
 
 type MutatingWebhookConfiguration struct {
@@ -278,6 +294,10 @@ func (in *MutatingWebhookConfiguration) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *MutatingWebhookConfiguration) OpenAPIModelName() string {
+	return "k8s.io.api.admissionregistration.v1.MutatingWebhookConfiguration"
+}
+
 type MutatingWebhookConfigurationList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -311,6 +331,10 @@ func (in *MutatingWebhookConfigurationList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *MutatingWebhookConfigurationList) OpenAPIModelName() string {
+	return "k8s.io.api.admissionregistration.v1.MutatingWebhookConfigurationList"
 }
 
 type ValidatingAdmissionPolicy struct {
@@ -357,6 +381,10 @@ func (in *ValidatingAdmissionPolicy) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *ValidatingAdmissionPolicy) OpenAPIModelName() string {
+	return "k8s.io.api.admissionregistration.v1.ValidatingAdmissionPolicy"
+}
+
 type ValidatingAdmissionPolicyBinding struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
@@ -389,6 +417,10 @@ func (in *ValidatingAdmissionPolicyBinding) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *ValidatingAdmissionPolicyBinding) OpenAPIModelName() string {
+	return "k8s.io.api.admissionregistration.v1.ValidatingAdmissionPolicyBinding"
 }
 
 type ValidatingAdmissionPolicyBindingList struct {
@@ -426,6 +458,10 @@ func (in *ValidatingAdmissionPolicyBindingList) DeepCopyObject() runtime.Object 
 	return nil
 }
 
+func (in *ValidatingAdmissionPolicyBindingList) OpenAPIModelName() string {
+	return "k8s.io.api.admissionregistration.v1.ValidatingAdmissionPolicyBindingList"
+}
+
 type ValidatingAdmissionPolicyList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -459,6 +495,10 @@ func (in *ValidatingAdmissionPolicyList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *ValidatingAdmissionPolicyList) OpenAPIModelName() string {
+	return "k8s.io.api.admissionregistration.v1.ValidatingAdmissionPolicyList"
 }
 
 type ValidatingWebhookConfiguration struct {
@@ -497,6 +537,10 @@ func (in *ValidatingWebhookConfiguration) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *ValidatingWebhookConfiguration) OpenAPIModelName() string {
+	return "k8s.io.api.admissionregistration.v1.ValidatingWebhookConfiguration"
+}
+
 type ValidatingWebhookConfigurationList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -530,6 +574,10 @@ func (in *ValidatingWebhookConfigurationList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *ValidatingWebhookConfigurationList) OpenAPIModelName() string {
+	return "k8s.io.api.admissionregistration.v1.ValidatingWebhookConfigurationList"
 }
 
 type MutatingAdmissionPolicySpec struct {

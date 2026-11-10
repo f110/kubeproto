@@ -84,6 +84,10 @@ func (in *IPAddress) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *IPAddress) OpenAPIModelName() string {
+	return "k8s.io.api.networking.v1.IPAddress"
+}
+
 type IPAddressList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -117,6 +121,10 @@ func (in *IPAddressList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *IPAddressList) OpenAPIModelName() string {
+	return "k8s.io.api.networking.v1.IPAddressList"
 }
 
 type Ingress struct {
@@ -162,6 +170,10 @@ func (in *Ingress) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *Ingress) OpenAPIModelName() string {
+	return "k8s.io.api.networking.v1.Ingress"
+}
+
 type IngressClass struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
@@ -195,6 +207,10 @@ func (in *IngressClass) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *IngressClass) OpenAPIModelName() string {
+	return "k8s.io.api.networking.v1.IngressClass"
 }
 
 type IngressClassList struct {
@@ -232,6 +248,10 @@ func (in *IngressClassList) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *IngressClassList) OpenAPIModelName() string {
+	return "k8s.io.api.networking.v1.IngressClassList"
+}
+
 type IngressList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -265,6 +285,10 @@ func (in *IngressList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *IngressList) OpenAPIModelName() string {
+	return "k8s.io.api.networking.v1.IngressList"
 }
 
 type NetworkPolicy struct {
@@ -301,6 +325,10 @@ func (in *NetworkPolicy) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *NetworkPolicy) OpenAPIModelName() string {
+	return "k8s.io.api.networking.v1.NetworkPolicy"
+}
+
 type NetworkPolicyList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -334,6 +362,10 @@ func (in *NetworkPolicyList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *NetworkPolicyList) OpenAPIModelName() string {
+	return "k8s.io.api.networking.v1.NetworkPolicyList"
 }
 
 type ServiceCIDR struct {
@@ -379,6 +411,10 @@ func (in *ServiceCIDR) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *ServiceCIDR) OpenAPIModelName() string {
+	return "k8s.io.api.networking.v1.ServiceCIDR"
+}
+
 type ServiceCIDRList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -412,6 +448,10 @@ func (in *ServiceCIDRList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *ServiceCIDRList) OpenAPIModelName() string {
+	return "k8s.io.api.networking.v1.ServiceCIDRList"
 }
 
 type IPAddressSpec struct {
