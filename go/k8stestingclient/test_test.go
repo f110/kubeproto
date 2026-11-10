@@ -5,15 +5,16 @@ import (
 	"testing"
 	"time"
 
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/types"
+	k8stesting "k8s.io/client-go/testing"
+
 	"go.f110.dev/kubeproto/go/apis/appsv1"
 	"go.f110.dev/kubeproto/go/apis/corev1"
 	"go.f110.dev/kubeproto/go/apis/metav1"
 	"go.f110.dev/kubeproto/go/internal/assertion"
 	"go.f110.dev/kubeproto/go/k8sclient"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/apimachinery/pkg/types"
-	k8stesting "k8s.io/client-go/testing"
 )
 
 func TestTestingClient(t *testing.T) {
@@ -124,6 +125,53 @@ func TestApplyWithFieldManager(t *testing.T) {
 	// Changing the field owned by the other manager is a conflict.
 	_, err = s.AppsV1.ApplyDeployment(t.Context(), deployment(corev1.Container{Name: "app", Image: "app:v3"}), metav1.ApplyOptions{FieldManager: "injector"})
 	assertion.Equal(t, true, apierrors.IsConflict(err))
+}
+
+func TestCreateAndUpdateWithFieldManager(t *testing.T) {
+	s := NewSet()
+
+	cm, err := s.CoreV1.CreateConfigMap(
+		t.Context(),
+		&corev1.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: metav1.NamespaceDefault}, Data: map[string]string{"a": "1"}},
+		metav1.CreateOptions{FieldManager: "creator"},
+	)
+	assertion.MustNoError(t, err)
+	assertion.Len(t, cm.ManagedFields, 1)
+	assertion.Equal(t, "creator", cm.ManagedFields[0].Manager)
+
+	cm.Data["b"] = "2"
+	cm, err = s.CoreV1.UpdateConfigMap(t.Context(), cm, metav1.UpdateOptions{FieldManager: "updater"})
+	assertion.MustNoError(t, err)
+	managers := make(map[string]struct{})
+	for _, v := range cm.ManagedFields {
+		managers[v.Manager] = struct{}{}
+	}
+	assertion.Len(t, managers, 2)
+	_, ok := managers["updater"]
+	assertion.Equal(t, true, ok)
+
+	d, err := s.AppsV1.CreateDeployment(
+		t.Context(),
+		&appsv1.Deployment{ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: metav1.NamespaceDefault}},
+		metav1.CreateOptions{FieldManager: "creator"},
+	)
+	assertion.MustNoError(t, err)
+	d.Status = &appsv1.DeploymentStatus{Replicas: 1}
+	d, err = s.AppsV1.UpdateStatusDeployment(t.Context(), d, metav1.UpdateOptions{FieldManager: "status-updater"})
+	assertion.MustNoError(t, err)
+	var found bool
+	for _, v := range d.ManagedFields {
+		if v.Manager == "status-updater" {
+			found = true
+		}
+	}
+	assertion.Equal(t, true, found)
+
+	actions := s.Actions()
+	assertion.Len(t, actions, 4)
+	assertion.Equal(t, "creator", actions[0].(k8stesting.CreateActionImpl).CreateOptions.FieldManager)
+	assertion.Equal(t, "updater", actions[1].(k8stesting.UpdateActionImpl).UpdateOptions.FieldManager)
+	assertion.Equal(t, "status-updater", actions[3].(k8stesting.UpdateActionImpl).UpdateOptions.FieldManager)
 }
 
 func TestApplyIgnoresStatusSubresource(t *testing.T) {
