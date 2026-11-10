@@ -89,6 +89,10 @@ func (in *CSIDriver) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *CSIDriver) OpenAPIModelName() string {
+	return "k8s.io.api.storage.v1.CSIDriver"
+}
+
 type CSIDriverList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -124,6 +128,10 @@ func (in *CSIDriverList) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *CSIDriverList) OpenAPIModelName() string {
+	return "k8s.io.api.storage.v1.CSIDriverList"
+}
+
 type CSINode struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
@@ -152,6 +160,10 @@ func (in *CSINode) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *CSINode) OpenAPIModelName() string {
+	return "k8s.io.api.storage.v1.CSINode"
 }
 
 type CSINodeList struct {
@@ -187,6 +199,10 @@ func (in *CSINodeList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *CSINodeList) OpenAPIModelName() string {
+	return "k8s.io.api.storage.v1.CSINodeList"
 }
 
 type CSIStorageCapacity struct {
@@ -262,6 +278,10 @@ func (in *CSIStorageCapacity) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *CSIStorageCapacity) OpenAPIModelName() string {
+	return "k8s.io.api.storage.v1.CSIStorageCapacity"
+}
+
 type CSIStorageCapacityList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -295,6 +315,10 @@ func (in *CSIStorageCapacityList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *CSIStorageCapacityList) OpenAPIModelName() string {
+	return "k8s.io.api.storage.v1.CSIStorageCapacityList"
 }
 
 type StorageClass struct {
@@ -364,6 +388,10 @@ func (in *StorageClass) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *StorageClass) OpenAPIModelName() string {
+	return "k8s.io.api.storage.v1.StorageClass"
+}
+
 type StorageClassList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -397,6 +425,10 @@ func (in *StorageClassList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *StorageClassList) OpenAPIModelName() string {
+	return "k8s.io.api.storage.v1.StorageClassList"
 }
 
 type VolumeAttachment struct {
@@ -439,6 +471,10 @@ func (in *VolumeAttachment) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *VolumeAttachment) OpenAPIModelName() string {
+	return "k8s.io.api.storage.v1.VolumeAttachment"
+}
+
 type VolumeAttachmentList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -472,6 +508,10 @@ func (in *VolumeAttachmentList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *VolumeAttachmentList) OpenAPIModelName() string {
+	return "k8s.io.api.storage.v1.VolumeAttachmentList"
 }
 
 type VolumeAttributesClass struct {
@@ -522,6 +562,10 @@ func (in *VolumeAttributesClass) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *VolumeAttributesClass) OpenAPIModelName() string {
+	return "k8s.io.api.storage.v1.VolumeAttributesClass"
+}
+
 type VolumeAttributesClassList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -555,6 +599,10 @@ func (in *VolumeAttributesClassList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *VolumeAttributesClassList) OpenAPIModelName() string {
+	return "k8s.io.api.storage.v1.VolumeAttributesClassList"
 }
 
 type CSIDriverSpec struct {

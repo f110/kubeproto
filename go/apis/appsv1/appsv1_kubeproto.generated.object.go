@@ -119,6 +119,10 @@ func (in *ControllerRevision) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *ControllerRevision) OpenAPIModelName() string {
+	return "k8s.io.api.apps.v1.ControllerRevision"
+}
+
 type ControllerRevisionList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -152,6 +156,10 @@ func (in *ControllerRevisionList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *ControllerRevisionList) OpenAPIModelName() string {
+	return "k8s.io.api.apps.v1.ControllerRevisionList"
 }
 
 type DaemonSet struct {
@@ -200,6 +208,10 @@ func (in *DaemonSet) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *DaemonSet) OpenAPIModelName() string {
+	return "k8s.io.api.apps.v1.DaemonSet"
+}
+
 type DaemonSetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -233,6 +245,10 @@ func (in *DaemonSetList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *DaemonSetList) OpenAPIModelName() string {
+	return "k8s.io.api.apps.v1.DaemonSetList"
 }
 
 type Deployment struct {
@@ -276,6 +292,10 @@ func (in *Deployment) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *Deployment) OpenAPIModelName() string {
+	return "k8s.io.api.apps.v1.Deployment"
+}
+
 type DeploymentList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -309,6 +329,10 @@ func (in *DeploymentList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *DeploymentList) OpenAPIModelName() string {
+	return "k8s.io.api.apps.v1.DeploymentList"
 }
 
 type ReplicaSet struct {
@@ -357,6 +381,10 @@ func (in *ReplicaSet) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *ReplicaSet) OpenAPIModelName() string {
+	return "k8s.io.api.apps.v1.ReplicaSet"
+}
+
 type ReplicaSetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -390,6 +418,10 @@ func (in *ReplicaSetList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *ReplicaSetList) OpenAPIModelName() string {
+	return "k8s.io.api.apps.v1.ReplicaSetList"
 }
 
 type StatefulSet struct {
@@ -434,6 +466,10 @@ func (in *StatefulSet) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *StatefulSet) OpenAPIModelName() string {
+	return "k8s.io.api.apps.v1.StatefulSet"
+}
+
 type StatefulSetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -467,6 +503,10 @@ func (in *StatefulSetList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *StatefulSetList) OpenAPIModelName() string {
+	return "k8s.io.api.apps.v1.StatefulSetList"
 }
 
 type DaemonSetSpec struct {

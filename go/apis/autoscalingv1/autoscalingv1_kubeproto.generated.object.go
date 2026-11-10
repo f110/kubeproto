@@ -86,6 +86,10 @@ func (in *HorizontalPodAutoscaler) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *HorizontalPodAutoscaler) OpenAPIModelName() string {
+	return "k8s.io.api.autoscaling.v1.HorizontalPodAutoscaler"
+}
+
 type HorizontalPodAutoscalerList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -119,6 +123,10 @@ func (in *HorizontalPodAutoscalerList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *HorizontalPodAutoscalerList) OpenAPIModelName() string {
+	return "k8s.io.api.autoscaling.v1.HorizontalPodAutoscalerList"
 }
 
 type Scale struct {
@@ -162,6 +170,10 @@ func (in *Scale) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *Scale) OpenAPIModelName() string {
+	return "k8s.io.api.autoscaling.v1.Scale"
+}
+
 type ScaleList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -195,6 +207,10 @@ func (in *ScaleList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *ScaleList) OpenAPIModelName() string {
+	return "k8s.io.api.autoscaling.v1.ScaleList"
 }
 
 type HorizontalPodAutoscalerSpec struct {

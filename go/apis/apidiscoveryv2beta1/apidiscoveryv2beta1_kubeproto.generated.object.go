@@ -75,6 +75,10 @@ func (in *APIGroupDiscovery) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *APIGroupDiscovery) OpenAPIModelName() string {
+	return "k8s.io.api.apidiscovery.v2beta1.APIGroupDiscovery"
+}
+
 type APIGroupDiscoveryList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -108,6 +112,10 @@ func (in *APIGroupDiscoveryList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *APIGroupDiscoveryList) OpenAPIModelName() string {
+	return "k8s.io.api.apidiscovery.v2beta1.APIGroupDiscoveryList"
 }
 
 type APIVersionDiscovery struct {

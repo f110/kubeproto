@@ -294,6 +294,10 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 				defW.F("}")
 				defW.F("return nil")
 				defW.F("}")
+				defW.F("")
+				defW.F("func (in *%s) OpenAPIModelName() string {", obj.ShortName)
+				defW.F("return %q", strings.TrimPrefix(obj.Name, "."))
+				defW.F("}")
 			}
 		}
 

@@ -69,6 +69,10 @@ func (in *LocalSubjectAccessReview) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *LocalSubjectAccessReview) OpenAPIModelName() string {
+	return "k8s.io.api.authorization.v1.LocalSubjectAccessReview"
+}
+
 type LocalSubjectAccessReviewList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -102,6 +106,10 @@ func (in *LocalSubjectAccessReviewList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *LocalSubjectAccessReviewList) OpenAPIModelName() string {
+	return "k8s.io.api.authorization.v1.LocalSubjectAccessReviewList"
 }
 
 type SelfSubjectAccessReview struct {
@@ -141,6 +149,10 @@ func (in *SelfSubjectAccessReview) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *SelfSubjectAccessReview) OpenAPIModelName() string {
+	return "k8s.io.api.authorization.v1.SelfSubjectAccessReview"
+}
+
 type SelfSubjectAccessReviewList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -174,6 +186,10 @@ func (in *SelfSubjectAccessReviewList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *SelfSubjectAccessReviewList) OpenAPIModelName() string {
+	return "k8s.io.api.authorization.v1.SelfSubjectAccessReviewList"
 }
 
 type SelfSubjectRulesReview struct {
@@ -213,6 +229,10 @@ func (in *SelfSubjectRulesReview) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *SelfSubjectRulesReview) OpenAPIModelName() string {
+	return "k8s.io.api.authorization.v1.SelfSubjectRulesReview"
+}
+
 type SelfSubjectRulesReviewList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -246,6 +266,10 @@ func (in *SelfSubjectRulesReviewList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *SelfSubjectRulesReviewList) OpenAPIModelName() string {
+	return "k8s.io.api.authorization.v1.SelfSubjectRulesReviewList"
 }
 
 type SubjectAccessReview struct {
@@ -285,6 +309,10 @@ func (in *SubjectAccessReview) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *SubjectAccessReview) OpenAPIModelName() string {
+	return "k8s.io.api.authorization.v1.SubjectAccessReview"
+}
+
 type SubjectAccessReviewList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -318,6 +346,10 @@ func (in *SubjectAccessReviewList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *SubjectAccessReviewList) OpenAPIModelName() string {
+	return "k8s.io.api.authorization.v1.SubjectAccessReviewList"
 }
 
 type SubjectAccessReviewSpec struct {

@@ -97,6 +97,10 @@ func (in *DeviceClass) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *DeviceClass) OpenAPIModelName() string {
+	return "k8s.io.api.resource.v1.DeviceClass"
+}
+
 type DeviceClassList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -130,6 +134,10 @@ func (in *DeviceClassList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *DeviceClassList) OpenAPIModelName() string {
+	return "k8s.io.api.resource.v1.DeviceClassList"
 }
 
 type ResourceClaim struct {
@@ -170,6 +178,10 @@ func (in *ResourceClaim) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *ResourceClaim) OpenAPIModelName() string {
+	return "k8s.io.api.resource.v1.ResourceClaim"
+}
+
 type ResourceClaimList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -205,6 +217,10 @@ func (in *ResourceClaimList) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *ResourceClaimList) OpenAPIModelName() string {
+	return "k8s.io.api.resource.v1.ResourceClaimList"
+}
+
 type ResourceClaimTemplate struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
@@ -236,6 +252,10 @@ func (in *ResourceClaimTemplate) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *ResourceClaimTemplate) OpenAPIModelName() string {
+	return "k8s.io.api.resource.v1.ResourceClaimTemplate"
 }
 
 type ResourceClaimTemplateList struct {
@@ -273,6 +293,10 @@ func (in *ResourceClaimTemplateList) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *ResourceClaimTemplateList) OpenAPIModelName() string {
+	return "k8s.io.api.resource.v1.ResourceClaimTemplateList"
+}
+
 type ResourceSlice struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
@@ -302,6 +326,10 @@ func (in *ResourceSlice) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *ResourceSlice) OpenAPIModelName() string {
+	return "k8s.io.api.resource.v1.ResourceSlice"
 }
 
 type ResourceSliceList struct {
@@ -337,6 +365,10 @@ func (in *ResourceSliceList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *ResourceSliceList) OpenAPIModelName() string {
+	return "k8s.io.api.resource.v1.ResourceSliceList"
 }
 
 type DeviceClassSpec struct {

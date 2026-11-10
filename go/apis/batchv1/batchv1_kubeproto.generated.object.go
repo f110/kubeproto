@@ -118,6 +118,10 @@ func (in *CronJob) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *CronJob) OpenAPIModelName() string {
+	return "k8s.io.api.batch.v1.CronJob"
+}
+
 type CronJobList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -151,6 +155,10 @@ func (in *CronJobList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *CronJobList) OpenAPIModelName() string {
+	return "k8s.io.api.batch.v1.CronJobList"
 }
 
 type Job struct {
@@ -196,6 +204,10 @@ func (in *Job) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *Job) OpenAPIModelName() string {
+	return "k8s.io.api.batch.v1.Job"
+}
+
 type JobList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -229,6 +241,10 @@ func (in *JobList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *JobList) OpenAPIModelName() string {
+	return "k8s.io.api.batch.v1.JobList"
 }
 
 type CronJobSpec struct {

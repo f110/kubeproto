@@ -63,6 +63,10 @@ func (in *SelfSubjectReview) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *SelfSubjectReview) OpenAPIModelName() string {
+	return "k8s.io.api.authentication.v1.SelfSubjectReview"
+}
+
 type SelfSubjectReviewList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -96,6 +100,10 @@ func (in *SelfSubjectReviewList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *SelfSubjectReviewList) OpenAPIModelName() string {
+	return "k8s.io.api.authentication.v1.SelfSubjectReviewList"
 }
 
 type TokenRequest struct {
@@ -135,6 +143,10 @@ func (in *TokenRequest) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *TokenRequest) OpenAPIModelName() string {
+	return "k8s.io.api.authentication.v1.TokenRequest"
+}
+
 type TokenRequestList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -168,6 +180,10 @@ func (in *TokenRequestList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *TokenRequestList) OpenAPIModelName() string {
+	return "k8s.io.api.authentication.v1.TokenRequestList"
 }
 
 type TokenReview struct {
@@ -207,6 +223,10 @@ func (in *TokenReview) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *TokenReview) OpenAPIModelName() string {
+	return "k8s.io.api.authentication.v1.TokenReview"
+}
+
 type TokenReviewList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -240,6 +260,10 @@ func (in *TokenReviewList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *TokenReviewList) OpenAPIModelName() string {
+	return "k8s.io.api.authentication.v1.TokenReviewList"
 }
 
 type SelfSubjectReviewStatus struct {

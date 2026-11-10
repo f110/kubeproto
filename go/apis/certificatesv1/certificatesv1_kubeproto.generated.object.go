@@ -102,6 +102,10 @@ func (in *CertificateSigningRequest) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *CertificateSigningRequest) OpenAPIModelName() string {
+	return "k8s.io.api.certificates.v1.CertificateSigningRequest"
+}
+
 type CertificateSigningRequestList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -135,6 +139,10 @@ func (in *CertificateSigningRequestList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *CertificateSigningRequestList) OpenAPIModelName() string {
+	return "k8s.io.api.certificates.v1.CertificateSigningRequestList"
 }
 
 type CertificateSigningRequestSpec struct {

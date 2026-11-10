@@ -1,4 +1,4 @@
-load("@rules_go//go:def.bzl", "go_library")
+load("@rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "corev1",
@@ -14,5 +14,15 @@ go_library(
         "@io_k8s_apimachinery//pkg/runtime",
         "@io_k8s_apimachinery//pkg/runtime/schema",
         "@io_k8s_apimachinery//pkg/util/intstr",
+    ],
+)
+
+go_test(
+    name = "corev1_test",
+    srcs = ["object_test.go"],
+    embed = [":corev1"],
+    deps = [
+        "//go/internal/assertion",
+        "@io_k8s_apimachinery//pkg/runtime",
     ],
 )

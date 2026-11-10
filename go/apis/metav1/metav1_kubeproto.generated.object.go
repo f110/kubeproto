@@ -170,6 +170,10 @@ func (in *APIGroup) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *APIGroup) OpenAPIModelName() string {
+	return "k8s.io.apimachinery.pkg.apis.meta.v1.APIGroup"
+}
+
 type APIGroupList struct {
 	TypeMeta `json:",inline"`
 	// groups is a list of APIGroup.
@@ -202,6 +206,10 @@ func (in *APIGroupList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *APIGroupList) OpenAPIModelName() string {
+	return "k8s.io.apimachinery.pkg.apis.meta.v1.APIGroupList"
 }
 
 type APIResource struct {
@@ -298,6 +306,10 @@ func (in *APIResourceList) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *APIResourceList) OpenAPIModelName() string {
+	return "k8s.io.apimachinery.pkg.apis.meta.v1.APIResourceList"
+}
+
 type APIVersions struct {
 	TypeMeta `json:",inline"`
 	// versions are the api versions that are available.
@@ -345,6 +357,10 @@ func (in *APIVersions) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *APIVersions) OpenAPIModelName() string {
+	return "k8s.io.apimachinery.pkg.apis.meta.v1.APIVersions"
+}
+
 type ApplyOptions struct {
 	TypeMeta `json:",inline"`
 	// When present, indicates that modifications should not be
@@ -388,6 +404,10 @@ func (in *ApplyOptions) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *ApplyOptions) OpenAPIModelName() string {
+	return "k8s.io.apimachinery.pkg.apis.meta.v1.ApplyOptions"
 }
 
 type Condition struct {
@@ -489,6 +509,10 @@ func (in *CreateOptions) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *CreateOptions) OpenAPIModelName() string {
+	return "k8s.io.apimachinery.pkg.apis.meta.v1.CreateOptions"
+}
+
 type DeleteOptions struct {
 	TypeMeta `json:",inline"`
 	// The duration in seconds before the object should be deleted. Value must be non-negative integer.
@@ -563,6 +587,10 @@ func (in *DeleteOptions) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *DeleteOptions) OpenAPIModelName() string {
+	return "k8s.io.apimachinery.pkg.apis.meta.v1.DeleteOptions"
 }
 
 type Duration struct {
@@ -660,6 +688,10 @@ func (in *GetOptions) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *GetOptions) OpenAPIModelName() string {
+	return "k8s.io.apimachinery.pkg.apis.meta.v1.GetOptions"
 }
 
 type GroupKind struct {
@@ -882,6 +914,10 @@ func (in *List) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *List) OpenAPIModelName() string {
+	return "k8s.io.apimachinery.pkg.apis.meta.v1.List"
+}
+
 type ListMeta struct {
 	// Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
 	SelfLink string `json:"selfLink,omitempty"`
@@ -1067,6 +1103,10 @@ func (in *ListOptions) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *ListOptions) OpenAPIModelName() string {
+	return "k8s.io.apimachinery.pkg.apis.meta.v1.ListOptions"
 }
 
 type ManagedFieldsEntry struct {
@@ -1385,6 +1425,10 @@ func (in *PartialObjectMetadata) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *PartialObjectMetadata) OpenAPIModelName() string {
+	return "k8s.io.apimachinery.pkg.apis.meta.v1.PartialObjectMetadata"
+}
+
 type PartialObjectMetadataList struct {
 	TypeMeta `json:",inline"`
 	ListMeta `json:"metadata"`
@@ -1418,6 +1462,10 @@ func (in *PartialObjectMetadataList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *PartialObjectMetadataList) OpenAPIModelName() string {
+	return "k8s.io.apimachinery.pkg.apis.meta.v1.PartialObjectMetadataList"
 }
 
 type Patch struct {
@@ -1499,6 +1547,10 @@ func (in *PatchOptions) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *PatchOptions) OpenAPIModelName() string {
+	return "k8s.io.apimachinery.pkg.apis.meta.v1.PatchOptions"
 }
 
 type Preconditions struct {
@@ -1640,6 +1692,10 @@ func (in *Status) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *Status) OpenAPIModelName() string {
+	return "k8s.io.apimachinery.pkg.apis.meta.v1.Status"
+}
+
 type StatusCause struct {
 	// A machine-readable description of the cause of the error. If this value is
 	// empty there is no information available.
@@ -1742,6 +1798,10 @@ func (in *TableOptions) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *TableOptions) OpenAPIModelName() string {
+	return "k8s.io.apimachinery.pkg.apis.meta.v1.TableOptions"
 }
 
 type Time struct {
@@ -1869,6 +1929,10 @@ func (in *UpdateOptions) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *UpdateOptions) OpenAPIModelName() string {
+	return "k8s.io.apimachinery.pkg.apis.meta.v1.UpdateOptions"
 }
 
 type Verbs []string

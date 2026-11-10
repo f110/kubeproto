@@ -96,6 +96,10 @@ func (in *EndpointSlice) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *EndpointSlice) OpenAPIModelName() string {
+	return "k8s.io.api.discovery.v1.EndpointSlice"
+}
+
 type EndpointSliceList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -129,6 +133,10 @@ func (in *EndpointSliceList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *EndpointSliceList) OpenAPIModelName() string {
+	return "k8s.io.api.discovery.v1.EndpointSliceList"
 }
 
 type Endpoint struct {

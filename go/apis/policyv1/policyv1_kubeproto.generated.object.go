@@ -69,6 +69,10 @@ func (in *Eviction) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *Eviction) OpenAPIModelName() string {
+	return "k8s.io.api.policy.v1.Eviction"
+}
+
 type EvictionList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -102,6 +106,10 @@ func (in *EvictionList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *EvictionList) OpenAPIModelName() string {
+	return "k8s.io.api.policy.v1.EvictionList"
 }
 
 type PodDisruptionBudget struct {
@@ -145,6 +153,10 @@ func (in *PodDisruptionBudget) DeepCopyObject() runtime.Object {
 	return nil
 }
 
+func (in *PodDisruptionBudget) OpenAPIModelName() string {
+	return "k8s.io.api.policy.v1.PodDisruptionBudget"
+}
+
 type PodDisruptionBudgetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
@@ -178,6 +190,10 @@ func (in *PodDisruptionBudgetList) DeepCopyObject() runtime.Object {
 		return c
 	}
 	return nil
+}
+
+func (in *PodDisruptionBudgetList) OpenAPIModelName() string {
+	return "k8s.io.api.policy.v1.PodDisruptionBudgetList"
 }
 
 type PodDisruptionBudgetSpec struct {
