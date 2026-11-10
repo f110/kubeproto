@@ -148,11 +148,11 @@ func (l *Lister) ResolveGoType(packageName string, f *Field) (importPath string,
 		key, value := f.MapKeyValue()
 		keyTyp := protoreflectKindMap[key.Kind()]
 		valTyp, ok := protoreflectKindMap[value.Kind()]
+		var importPath, packageAlias string
 		if !ok {
-			_, _, typ := l.protoreflectKindToGoType(packageName, value.Kind(), string(value.Message().FullName()), false, false)
-			valTyp = typ
+			importPath, packageAlias, valTyp = l.protoreflectKindToGoType(packageName, value.Kind(), string(value.Message().FullName()), false, false)
 		}
-		return "", "", fmt.Sprintf("map[%s]%s", keyTyp, valTyp)
+		return importPath, packageAlias, fmt.Sprintf("map[%s]%s", keyTyp, valTyp)
 	}
 
 	importPath, packageAlias, typ := l.protoreflectKindToGoType(packageName, f.Kind, f.MessageName, f.Optional, f.Repeated)
