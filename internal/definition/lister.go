@@ -43,7 +43,7 @@ func (l *Lister) GetMessages() Messages {
 
 	var msgs Messages
 	addMessage := func(m protoreflect.MessageDescriptor, desc protoreflect.FileDescriptor) bool {
-		if m.IsMapEntry() {
+		if m.IsMapEntry() || m.FullName() == protoreflect.FullName(MessageTimestamp.Name) {
 			return true
 		}
 		msg, err := NewMessageFromMessageDescriptor(m, desc, l.packageNameManager)
@@ -113,7 +113,7 @@ func (l *Lister) GetMessages() Messages {
 		return true
 	})
 
-	msgs = append(msgs, MessageTypeMeta, MessageObjectMeta, MessageListMeta)
+	msgs = append(msgs, MessageTypeMeta, MessageObjectMeta, MessageListMeta, MessageTimestamp)
 	l.messages = msgs
 	return msgs
 }

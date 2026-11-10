@@ -71,6 +71,14 @@ var (
 		ShortName: "ListMeta",
 		Package:   ImportPackage{Path: "go.f110.dev/kubeproto/go/apis/metav1"},
 	}
+	// MessageTimestamp is google.protobuf.Timestamp. It is represented as metav1.Time.
+	MessageTimestamp = &Message{
+		Dep:       true,
+		Virtual:   true,
+		Name:      "google.protobuf.Timestamp",
+		ShortName: "Time",
+		Package:   ImportPackage{Path: "go.f110.dev/kubeproto/go/apis/metav1"},
+	}
 )
 
 type Messages []*Message
