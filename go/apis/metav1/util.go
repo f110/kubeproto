@@ -1,6 +1,8 @@
 package metav1
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
 	"time"
 
@@ -149,6 +151,23 @@ func (in *Time) Equal(u *Time) bool {
 		return in.Time.Equal(u.Time)
 	}
 	return false
+}
+
+func (f FieldsV1) MarshalJSON() ([]byte, error) {
+	if f.Raw == nil {
+		return []byte("null"), nil
+	}
+	return f.Raw, nil
+}
+
+func (f *FieldsV1) UnmarshalJSON(b []byte) error {
+	if f == nil {
+		return errors.New("metav1.FieldsV1: UnmarshalJSON on nil pointer")
+	}
+	if !bytes.Equal(b, []byte("null")) {
+		f.Raw = append(f.Raw[0:0], b...)
+	}
+	return nil
 }
 
 func (in *Duration) TimeDuration() time.Duration {
