@@ -4,7 +4,6 @@ import (
 	metav1_1 "go.f110.dev/kubeproto/example/proto/github.com/cert-manager/cert-manager/apis/metav1"
 	"go.f110.dev/kubeproto/go/apis/corev1"
 	"go.f110.dev/kubeproto/go/apis/metav1"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
@@ -303,7 +302,7 @@ type BlogSpec struct {
 	Categories         []Category                `json:"categories,omitempty"`
 	ServiceAccountJSON *corev1.SecretKeySelector `json:"serviceAccountJSON,omitempty"`
 	EditorSelector     LabelSelector             `json:"editorSelector"`
-	IssuerRef          metav1_1.ObjectReference  `json:"issuerRef"`
+	IssuerRef          metav1_1.IssuerReference  `json:"issuerRef"`
 }
 
 func (in *BlogSpec) DeepCopyInto(out *BlogSpec) {
@@ -365,11 +364,11 @@ func (in *BlogStatus) DeepCopy() *BlogStatus {
 }
 
 type PostSpec struct {
-	Subject     string                `json:"subject"`
-	Authors     []string              `json:"authors,omitempty"`
-	Count       uint64                `json:"count,omitempty"`
-	PublishedAt timestamppb.Timestamp `json:"publishedAt"`
-	Timeout     metav1.Duration       `json:"timeout"`
+	Subject     string          `json:"subject"`
+	Authors     []string        `json:"authors,omitempty"`
+	Count       uint64          `json:"count,omitempty"`
+	PublishedAt metav1.Time     `json:"publishedAt"`
+	Timeout     metav1.Duration `json:"timeout"`
 }
 
 func (in *PostSpec) DeepCopyInto(out *PostSpec) {

@@ -17,8 +17,8 @@ go_deps = use_extension("@gazelle//:extensions.bzl", "go_deps")
 go_deps.from_file(go_mod = "//:go.mod")
 go_deps.module(
     path = "github.com/cert-manager/cert-manager",
-    sum = "h1:gmDm7nNwzJck8n/Erhi7M2xmrCF6AYr72OM/qbnN/MU=",
-    version = "v1.9.0-beta.1.0.20220924143035-9a328bd798b2",
+    sum = "h1:s5xNJPfWSiBWLAxMmXw8runfcXMVVWM4kcMpZ1OODbY=",
+    version = "v1.21.3",
 )
 go_deps.module(
     path = "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring",

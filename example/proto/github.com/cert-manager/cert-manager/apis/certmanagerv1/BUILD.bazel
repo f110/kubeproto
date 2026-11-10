@@ -1,4 +1,5 @@
 load("@protobuf//bazel:proto_library.bzl", "proto_library")
+load("@rules_go//go:def.bzl", "go_library")
 load("//bazel:def.bzl", "kubeproto_go_api")
 load("//bazel:protobuf.bzl", "gen_protobuf")
 
@@ -12,26 +13,40 @@ gen_protobuf(
     proto_package_name = "github.com.cert_manager.cert_manager.pkg.apis.certmanagerv1",
     visibility = ["//visibility:public"],
     deps = [
-        "//example/proto/github.com/cert-manager/cert-manager/apis/metav1:gen",
         "//example/proto/github.com/cert-manager/cert-manager/apis/acmev1:gen",
+        "//example/proto/github.com/cert-manager/cert-manager/apis/metav1:gen",
     ],
 )
 
 proto_library(
-    name = "certmanagerv1",
+    name = "certmanagerv1_proto",
     srcs = ["generated.proto"],
     visibility = ["//visibility:public"],
     deps = [
         "//:k8s_proto",
         "//:kubeproto",
         "//:sigs_gateway_api_proto",
-        "//example/proto/github.com/cert-manager/cert-manager/apis/acmev1",
-        "//example/proto/github.com/cert-manager/cert-manager/apis/metav1",
+        "//example/proto/github.com/cert-manager/cert-manager/apis/acmev1:acmev1_proto",
+        "//example/proto/github.com/cert-manager/cert-manager/apis/metav1:metav1_proto",
     ],
 )
 
 kubeproto_go_api(
     name = "certmanagerv1_kubeproto",
-    srcs = [":certmanagerv1"],
+    srcs = [":certmanagerv1_proto"],
     importpath = "go.f110.dev/kubeproto/example/proto/github.com/cert-manager/cert-manager/apis/certmanagerv1",
+)
+
+go_library(
+    name = "certmanagerv1",
+    srcs = ["certmanagerv1_kubeproto.generated.object.go"],
+    importpath = "go.f110.dev/kubeproto/example/proto/github.com/cert-manager/cert-manager/apis/certmanagerv1",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/proto/github.com/cert-manager/cert-manager/apis/acmev1",
+        "//example/proto/github.com/cert-manager/cert-manager/apis/metav1",
+        "//go/apis/metav1",
+        "@io_k8s_apimachinery//pkg/runtime",
+        "@io_k8s_apimachinery//pkg/runtime/schema",
+    ],
 )

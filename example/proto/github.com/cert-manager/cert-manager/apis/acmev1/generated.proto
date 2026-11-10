@@ -11,8 +11,9 @@ import "kube.proto";
 import "example/proto/github.com/cert-manager/cert-manager/apis/metav1/generated.proto";
 import "k8s.io/api/core/v1/generated.proto";
 import "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1/generated.proto";
+import "k8s.io/apimachinery/pkg/api/resource/generated.proto";
 import "k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto";
-import "sigs.k8s.io/gateway-api/apis/v1alpha2/generated.proto";
+import "sigs.k8s.io/gateway-api/apis/v1/generated.proto";
 
 enum ACMEChallengeType {
   ACME_CHALLENGE_TYPE_HTTP_01 = 0 [(dev.f110.kubeproto.value) = { value: "HTTP-01" }];
@@ -26,10 +27,20 @@ enum AzureDNSEnvironment {
   AZURE_DNS_ENVIRONMENT_AZURE_U_S_GOVERNMENT_CLOUD = 3;
 }
 
+enum AzureZoneType {
+  AZURE_ZONE_TYPE_AZURE_PRIVATE_ZONE = 0;
+  AZURE_ZONE_TYPE_AZURE_PUBLIC_ZONE  = 1;
+}
+
 enum HMACKeyAlgorithm {
   HMAC_KEY_ALGORITHM_H_S256 = 0;
   HMAC_KEY_ALGORITHM_H_S384 = 1;
   HMAC_KEY_ALGORITHM_H_S512 = 2;
+}
+
+enum RFC2136UpdateProtocol {
+  R_FC_2136_UPDATE_PROTOCOL_TCP = 0;
+  R_FC_2136_UPDATE_PROTOCOL_UDP = 1;
 }
 
 enum State {
@@ -67,7 +78,7 @@ message ACMEAuthorization {
   // One of these challenge types will be selected when validating the DNS
   // name and an appropriate Challenge resource will be created to perform
   // the ACME challenge process.
-  repeated ACMEChallenge challenges = 5 [(dev.f110.kubeproto.field) = { go_name: "Challenges", api_field_name: "challenges", inline: false }];
+  repeated ACMEChallenge challenges = 5 [(dev.f110.kubeproto.field) = { go_name: "Challenges", api_field_name: "challenges", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message ACMEChallenge {
@@ -77,7 +88,7 @@ message ACMEChallenge {
   // Token is the token that must be presented for this challenge.
   // This is used to compute the 'key' that must also be presented.
   string token = 2 [(dev.f110.kubeproto.field) = { go_name: "Token", api_field_name: "token", inline: false }];
-  // Type is the type of challenge being offered, e.g. 'http-01', 'dns-01',
+  // Type is the type of challenge being offered, e.g., 'http-01', 'dns-01',
   // 'tls-sni-01', etc.
   // This is the raw value retrieved from the ACME server.
   // Only 'http-01' and 'dns-01' are supported by cert-manager, other values
@@ -95,11 +106,25 @@ message ACMEChallengeSolver {
   // Configures cert-manager to attempt to complete authorizations by
   // performing the HTTP01 challenge flow.
   // It is not possible to obtain certificates for wildcard domain names
-  // (e.g. `*.example.com`) using the HTTP01 challenge mechanism.
+  // (e.g., `*.example.com`) using the HTTP01 challenge mechanism.
   optional ACMEChallengeSolverHTTP01 http_01 = 2 [(dev.f110.kubeproto.field) = { go_name: "HTTP01", api_field_name: "http01", inline: false }];
   // Configures cert-manager to attempt to complete authorizations by
   // performing the DNS01 challenge flow.
   optional ACMEChallengeSolverDNS01 dns_01 = 3 [(dev.f110.kubeproto.field) = { go_name: "DNS01", api_field_name: "dns01", inline: false }];
+  // WaitInsteadOfSelfCheck, if set, skips cert-manager's self-check and
+  // instead waits this long after presentation before asking the ACME server
+  // to validate the challenge.
+  // This is an advanced escape hatch for environments where cert-manager's
+  // self-check cannot succeed from its own network or DNS viewpoint even
+  // though the ACME server can still validate successfully, for example due
+  // to split-horizon DNS or NAT hairpinning.
+  // A value of 0 skips the self-check and asks the ACME server to validate
+  // immediately after presentation, relying on the ACME server's own
+  // validation retries (RFC 8555 section 8.2) to succeed once the challenge
+  // has propagated. A negative duration is rejected.
+  // Value must be in units accepted by Go time.ParseDuration https://golang.org/pkg/time/#ParseDuration,
+  // for example `30s` or `2m`.
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Duration wait_instead_of_self_check = 4 [(dev.f110.kubeproto.field) = { go_name: "WaitInsteadOfSelfCheck", api_field_name: "waitInsteadOfSelfCheck", inline: false }];
 }
 
 message ACMEChallengeSolverDNS01 {
@@ -152,30 +177,40 @@ message ACMEChallengeSolverHTTP01GatewayHTTPRoute {
   // When solving an HTTP-01 challenge, cert-manager creates an HTTPRoute.
   // cert-manager needs to know which parentRefs should be used when creating
   // the HTTPRoute. Usually, the parentRef references a Gateway. See:
-  // https://gateway-api.sigs.k8s.io/v1alpha2/api-types/httproute/#attaching-to-gateways
-  repeated .sigs.k8s.io.gateway_api.apis.v1alpha2.ParentReference parent_refs = 3 [(dev.f110.kubeproto.field) = { go_name: "ParentRefs", api_field_name: "parentRefs", inline: false }];
+  // https://gateway-api.sigs.k8s.io/api-types/httproute/#attaching-to-gateways
+  repeated .sigs.k8s.io.gateway_api.apis.v1.ParentReference parent_refs = 3 [(dev.f110.kubeproto.field) = { go_name: "ParentRefs", api_field_name: "parentRefs", list_type: LIST_TYPE_ATOMIC, inline: false }];
+  // Optional pod template used to configure the ACME challenge solver pods
+  // used for HTTP01 challenges.
+  optional ACMEChallengeSolverHTTP01IngressPodTemplate pod_template = 4 [(dev.f110.kubeproto.field) = { go_name: "PodTemplate", api_field_name: "podTemplate", inline: false }];
 }
 
 message ACMEChallengeSolverHTTP01Ingress {
   // Optional service type for Kubernetes solver service. Supported values
   // are NodePort or ClusterIP. If unset, defaults to NodePort.
   optional .k8s.io.api.core.v1.ServiceType service_type = 1 [(dev.f110.kubeproto.field) = { go_name: "ServiceType", api_field_name: "serviceType", inline: false }];
-  // The ingress class to use when creating Ingress resources to solve ACME
-  // challenges that use this challenge solver.
-  // Only one of 'class' or 'name' may be specified.
-  optional string class = 2 [(dev.f110.kubeproto.field) = { go_name: "Class", api_field_name: "class", inline: false }];
+  // This field configures the field `ingressClassName` on the created Ingress
+  // resources used to solve ACME challenges that use this challenge solver.
+  // This is the recommended way of configuring the ingress class. Only one of
+  // `class`, `name` or `ingressClassName` may be specified.
+  optional string ingress_class_name = 2 [(dev.f110.kubeproto.field) = { go_name: "IngressClassName", api_field_name: "ingressClassName", inline: false }];
+  // This field configures the annotation `kubernetes.io/ingress.class` when
+  // creating Ingress resources to solve ACME challenges that use this
+  // challenge solver. Only one of `class`, `name` or `ingressClassName` may
+  // be specified.
+  optional string class = 3 [(dev.f110.kubeproto.field) = { go_name: "Class", api_field_name: "class", inline: false }];
   // The name of the ingress resource that should have ACME challenge solving
   // routes inserted into it in order to solve HTTP01 challenges.
   // This is typically used in conjunction with ingress controllers like
   // ingress-gce, which maintains a 1:1 mapping between external IPs and
-  // ingress resources.
-  optional string name = 3 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  // ingress resources. Only one of `class`, `name` or `ingressClassName` may
+  // be specified.
+  optional string name = 4 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
   // Optional pod template used to configure the ACME challenge solver pods
   // used for HTTP01 challenges.
-  optional ACMEChallengeSolverHTTP01IngressPodTemplate pod_template = 4 [(dev.f110.kubeproto.field) = { go_name: "PodTemplate", api_field_name: "podTemplate", inline: false }];
+  optional ACMEChallengeSolverHTTP01IngressPodTemplate pod_template = 5 [(dev.f110.kubeproto.field) = { go_name: "PodTemplate", api_field_name: "podTemplate", inline: false }];
   // Optional ingress template used to configure the ACME challenge solver
   // ingress used for HTTP01 challenges.
-  optional ACMEChallengeSolverHTTP01IngressTemplate ingress_template = 5 [(dev.f110.kubeproto.field) = { go_name: "IngressTemplate", api_field_name: "ingressTemplate", inline: false }];
+  optional ACMEChallengeSolverHTTP01IngressTemplate ingress_template = 6 [(dev.f110.kubeproto.field) = { go_name: "IngressTemplate", api_field_name: "ingressTemplate", inline: false }];
 }
 
 message ACMEChallengeSolverHTTP01IngressObjectMeta {
@@ -186,10 +221,84 @@ message ACMEChallengeSolverHTTP01IngressObjectMeta {
 }
 
 message ACMEChallengeSolverHTTP01IngressPodObjectMeta {
-  // Annotations that should be added to the create ACME HTTP01 solver pods.
+  // Annotations that should be added to the created ACME HTTP01 solver pods.
   map<string, string> annotations = 1 [(dev.f110.kubeproto.field) = { go_name: "Annotations", api_field_name: "annotations", inline: false }];
   // Labels that should be added to the created ACME HTTP01 solver pods.
   map<string, string> labels = 2 [(dev.f110.kubeproto.field) = { go_name: "Labels", api_field_name: "labels", inline: false }];
+}
+
+message ACMEChallengeSolverHTTP01IngressPodResources {
+  // Limits describes the maximum amount of compute resources allowed.
+  // More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> limits = 1 [(dev.f110.kubeproto.field) = { go_name: "Limits", api_field_name: "limits", inline: false }];
+  // Requests describes the minimum amount of compute resources required.
+  // If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+  // otherwise to the global values configured via controller flags. Requests cannot exceed Limits.
+  // More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> requests = 2 [(dev.f110.kubeproto.field) = { go_name: "Requests", api_field_name: "requests", inline: false }];
+}
+
+message ACMEChallengeSolverHTTP01IngressPodSecurityContext {
+  // The SELinux context to be applied to all containers.
+  // If unspecified, the container runtime will allocate a random SELinux context for each
+  // container.  May also be set in SecurityContext.  If set in
+  // both SecurityContext and PodSecurityContext, the value specified in SecurityContext
+  // takes precedence for that container.
+  // Note that this field cannot be set when spec.os.name is windows.
+  optional .k8s.io.api.core.v1.SELinuxOptions selinux_options = 1 [(dev.f110.kubeproto.field) = { go_name: "SELinuxOptions", api_field_name: "seLinuxOptions", inline: false }];
+  // The UID to run the entrypoint of the container process.
+  // Defaults to user specified in image metadata if unspecified.
+  // May also be set in SecurityContext.  If set in both SecurityContext and
+  // PodSecurityContext, the value specified in SecurityContext takes precedence
+  // for that container.
+  // Note that this field cannot be set when spec.os.name is windows.
+  optional int64 run_as_user = 2 [(dev.f110.kubeproto.field) = { go_name: "RunAsUser", api_field_name: "runAsUser", inline: false }];
+  // The GID to run the entrypoint of the container process.
+  // Uses runtime default if unset.
+  // May also be set in SecurityContext.  If set in both SecurityContext and
+  // PodSecurityContext, the value specified in SecurityContext takes precedence
+  // for that container.
+  // Note that this field cannot be set when spec.os.name is windows.
+  optional int64 run_as_group = 3 [(dev.f110.kubeproto.field) = { go_name: "RunAsGroup", api_field_name: "runAsGroup", inline: false }];
+  // Indicates that the container must run as a non-root user.
+  // If true, the Kubelet will validate the image at runtime to ensure that it
+  // does not run as UID 0 (root) and fail to start the container if it does.
+  // If unset or false, no such validation will be performed.
+  // May also be set in SecurityContext.  If set in both SecurityContext and
+  // PodSecurityContext, the value specified in SecurityContext takes precedence.
+  optional bool run_as_non_root = 4 [(dev.f110.kubeproto.field) = { go_name: "RunAsNonRoot", api_field_name: "runAsNonRoot", inline: false }];
+  // A list of groups applied to the first process run in each container, in addition
+  // to the container's primary GID, the fsGroup (if specified), and group memberships
+  // defined in the container image for the uid of the container process. If unspecified,
+  // no additional groups are added to any container. Note that group memberships
+  // defined in the container image for the uid of the container process are still effective,
+  // even if they are not included in this list.
+  // Note that this field cannot be set when spec.os.name is windows.
+  repeated int64 supplemental_groups = 5 [(dev.f110.kubeproto.field) = { go_name: "SupplementalGroups", api_field_name: "supplementalGroups", list_type: LIST_TYPE_ATOMIC, inline: false }];
+  // A special supplemental group that applies to all containers in a pod.
+  // Some volume types allow the Kubelet to change the ownership of that volume
+  // to be owned by the pod:
+  // 1. The owning GID will be the FSGroup
+  // 2. The setgid bit is set (new files created in the volume will be owned by FSGroup)
+  // 3. The permission bits are OR'd with rw-rw----
+  // If unset, the Kubelet will not modify the ownership and permissions of any volume.
+  // Note that this field cannot be set when spec.os.name is windows.
+  optional int64 fs_group = 6 [(dev.f110.kubeproto.field) = { go_name: "FSGroup", api_field_name: "fsGroup", inline: false }];
+  // Sysctls hold a list of namespaced sysctls used for the pod. Pods with unsupported
+  // sysctls (by the container runtime) might fail to launch.
+  // Note that this field cannot be set when spec.os.name is windows.
+  repeated .k8s.io.api.core.v1.Sysctl sysctls = 7 [(dev.f110.kubeproto.field) = { go_name: "Sysctls", api_field_name: "sysctls", list_type: LIST_TYPE_ATOMIC, inline: false }];
+  // fsGroupChangePolicy defines behavior of changing ownership and permission of the volume
+  // before being exposed inside Pod. This field will only apply to
+  // volume types which support fsGroup based ownership(and permissions).
+  // It will have no effect on ephemeral volume types such as: secret, configmaps
+  // and emptydir.
+  // Valid values are "OnRootMismatch" and "Always". If not specified, "Always" is used.
+  // Note that this field cannot be set when spec.os.name is windows.
+  optional .k8s.io.api.core.v1.PodFSGroupChangePolicy fs_group_change_policy = 8 [(dev.f110.kubeproto.field) = { go_name: "FSGroupChangePolicy", api_field_name: "fsGroupChangePolicy", inline: false }];
+  // The seccomp options to use by the containers in this pod.
+  // Note that this field cannot be set when spec.os.name is windows.
+  optional .k8s.io.api.core.v1.SeccompProfile seccomp_profile = 9 [(dev.f110.kubeproto.field) = { go_name: "SeccompProfile", api_field_name: "seccompProfile", inline: false }];
 }
 
 message ACMEChallengeSolverHTTP01IngressPodSpec {
@@ -200,11 +309,24 @@ message ACMEChallengeSolverHTTP01IngressPodSpec {
   // If specified, the pod's scheduling constraints
   optional .k8s.io.api.core.v1.Affinity affinity = 2 [(dev.f110.kubeproto.field) = { go_name: "Affinity", api_field_name: "affinity", inline: false }];
   // If specified, the pod's tolerations.
-  repeated .k8s.io.api.core.v1.Toleration tolerations = 3 [(dev.f110.kubeproto.field) = { go_name: "Tolerations", api_field_name: "tolerations", inline: false }];
+  repeated .k8s.io.api.core.v1.Toleration tolerations = 3 [(dev.f110.kubeproto.field) = { go_name: "Tolerations", api_field_name: "tolerations", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // If specified, the pod's priorityClassName.
   optional string priority_class_name = 4 [(dev.f110.kubeproto.field) = { go_name: "PriorityClassName", api_field_name: "priorityClassName", inline: false }];
   // If specified, the pod's service account
   optional string service_account_name = 5 [(dev.f110.kubeproto.field) = { go_name: "ServiceAccountName", api_field_name: "serviceAccountName", inline: false }];
+  // If specified, the pod's imagePullSecrets
+  repeated .k8s.io.api.core.v1.LocalObjectReference image_pull_secrets = 6 [(dev.f110.kubeproto.field) = { go_name: "ImagePullSecrets", api_field_name: "imagePullSecrets", list_type: LIST_TYPE_MAP,
+                                                                                                           list_map_keys: [ "name" ],
+                                                                                                           inline: false }];
+  // If specified, the pod's security context
+  optional ACMEChallengeSolverHTTP01IngressPodSecurityContext security_context = 7 [(dev.f110.kubeproto.field) = { go_name: "SecurityContext", api_field_name: "securityContext", inline: false }];
+  // If specified, the pod's resource requirements.
+  // These values override the global resource configuration flags.
+  // Note that when only specifying resource limits, ensure they are greater than or equal
+  // to the corresponding global resource requests configured via controller flags
+  // (--acme-http01-solver-resource-request-cpu, --acme-http01-solver-resource-request-memory).
+  // Kubernetes will reject pod creation if limits are lower than requests, causing challenge failures.
+  optional ACMEChallengeSolverHTTP01IngressPodResources resources = 8 [(dev.f110.kubeproto.field) = { go_name: "Resources", api_field_name: "resources", inline: false }];
 }
 
 message ACMEChallengeSolverHTTP01IngressPodTemplate {
@@ -214,8 +336,7 @@ message ACMEChallengeSolverHTTP01IngressPodTemplate {
   // will override the in-built values.
   ACMEChallengeSolverHTTP01IngressPodObjectMeta acme_challenge_solver_http_01_ingress_pod_object_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "ACMEChallengeSolverHTTP01IngressPodObjectMeta", api_field_name: "metadata", inline: false }];
   // PodSpec defines overrides for the HTTP01 challenge solver pod.
-  // Only the 'priorityClassName', 'nodeSelector', 'affinity',
-  // 'serviceAccountName' and 'tolerations' fields are supported currently.
+  // Check ACMEChallengeSolverHTTP01IngressPodSpec to find out currently supported fields.
   // All other fields will be ignored.
   ACMEChallengeSolverHTTP01IngressPodSpec spec = 2 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
 }
@@ -260,49 +381,62 @@ message ACMEIssuer {
   // PreferredChain is the chain to use if the ACME server outputs multiple.
   // PreferredChain is no guarantee that this one gets delivered by the ACME
   // endpoint.
-  // For example, for Let's Encrypt's DST crosssign you would use:
+  // For example, for Let's Encrypt's DST cross-sign you would use:
   // "DST Root CA X3" or "ISRG Root X1" for the newer Let's Encrypt root CA.
-  // This value picks the first certificate bundle in the ACME alternative
-  // chains that has a certificate with this value as its issuer's CN
-  string preferred_chain = 3 [(dev.f110.kubeproto.field) = { go_name: "PreferredChain", api_field_name: "preferredChain", inline: false }];
-  // Enables or disables validation of the ACME server TLS certificate.
-  // If true, requests to the ACME server will not have their TLS certificate
-  // validated (i.e. insecure connections will be allowed).
+  // This value picks the first certificate bundle in the combined set of
+  // ACME default and alternative chains that has a root-most certificate with
+  // this value as its issuer's commonname.
+  optional string preferred_chain = 3 [(dev.f110.kubeproto.field) = { go_name: "PreferredChain", api_field_name: "preferredChain", inline: false }];
+  // Base64-encoded bundle of PEM CAs which can be used to validate the certificate
+  // chain presented by the ACME server.
+  // Mutually exclusive with SkipTLSVerify; prefer using CABundle to prevent various
+  // kinds of security vulnerabilities.
+  // If CABundle and SkipTLSVerify are unset, the system certificate bundle inside
+  // the container is used to validate the TLS connection.
+  optional bytes c_a_bundle = 4 [(dev.f110.kubeproto.field) = { go_name: "CABundle", api_field_name: "caBundle", inline: false }];
+  // INSECURE: Enables or disables validation of the ACME server TLS certificate.
+  // If true, requests to the ACME server will not have the TLS certificate chain
+  // validated.
+  // Mutually exclusive with CABundle; prefer using CABundle to prevent various
+  // kinds of security vulnerabilities.
   // Only enable this option in development environments.
-  // The cert-manager system installed roots will be used to verify connections
-  // to the ACME server if this is false.
+  // If CABundle and SkipTLSVerify are unset, the system certificate bundle inside
+  // the container is used to validate the TLS connection.
   // Defaults to false.
-  optional bool skip_tls_verify = 4 [(dev.f110.kubeproto.field) = { go_name: "SkipTLSVerify", api_field_name: "skipTLSVerify", inline: false }];
+  optional bool skip_tls_verify = 5 [(dev.f110.kubeproto.field) = { go_name: "SkipTLSVerify", api_field_name: "skipTLSVerify", inline: false }];
   // ExternalAccountBinding is a reference to a CA external account of the ACME
   // server.
   // If set, upon registration cert-manager will attempt to associate the given
   // external account credentials with the registered ACME account.
-  optional ACMEExternalAccountBinding external_account_binding = 5 [(dev.f110.kubeproto.field) = { go_name: "ExternalAccountBinding", api_field_name: "externalAccountBinding", inline: false }];
+  optional ACMEExternalAccountBinding external_account_binding = 6 [(dev.f110.kubeproto.field) = { go_name: "ExternalAccountBinding", api_field_name: "externalAccountBinding", inline: false }];
   // PrivateKey is the name of a Kubernetes Secret resource that will be used to
   // store the automatically generated ACME account private key.
   // Optionally, a `key` may be specified to select a specific entry within
   // the named Secret resource.
   // If `key` is not specified, a default of `tls.key` will be used.
-  .github.com.cert_manager.cert_manager.apis.metav1.SecretKeySelector private_key = 6 [(dev.f110.kubeproto.field) = { go_name: "PrivateKey", api_field_name: "privateKeySecretRef", inline: false }];
+  .github.com.cert_manager.cert_manager.apis.metav1.SecretKeySelector private_key = 7 [(dev.f110.kubeproto.field) = { go_name: "PrivateKey", api_field_name: "privateKeySecretRef", inline: false }];
   // Solvers is a list of challenge solvers that will be used to solve
   // ACME challenges for the matching domains.
   // Solver configurations must be provided in order to obtain certificates
   // from an ACME server.
   // For more information, see: https://cert-manager.io/docs/configuration/acme/
-  repeated ACMEChallengeSolver solvers = 7 [(dev.f110.kubeproto.field) = { go_name: "Solvers", api_field_name: "solvers", inline: false }];
+  repeated ACMEChallengeSolver solvers = 8 [(dev.f110.kubeproto.field) = { go_name: "Solvers", api_field_name: "solvers", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Enables or disables generating a new ACME account key.
   // If true, the Issuer resource will *not* request a new account but will expect
   // the account key to be supplied via an existing secret.
   // If false, the cert-manager system will generate a new ACME account key
   // for the Issuer.
   // Defaults to false.
-  optional bool disable_account_key_generation = 8 [(dev.f110.kubeproto.field) = { go_name: "DisableAccountKeyGeneration", api_field_name: "disableAccountKeyGeneration", inline: false }];
+  optional bool disable_account_key_generation = 9 [(dev.f110.kubeproto.field) = { go_name: "DisableAccountKeyGeneration", api_field_name: "disableAccountKeyGeneration", inline: false }];
   // Enables requesting a Not After date on certificates that matches the
   // duration of the certificate. This is not supported by all ACME servers
   // like Let's Encrypt. If set to true when the ACME server does not support
-  // it it will create an error on the Order.
+  // it, it will create an error on the Order.
   // Defaults to false.
-  optional bool enable_duration_feature = 9 [(dev.f110.kubeproto.field) = { go_name: "EnableDurationFeature", api_field_name: "enableDurationFeature", inline: false }];
+  optional bool enable_duration_feature = 10 [(dev.f110.kubeproto.field) = { go_name: "EnableDurationFeature", api_field_name: "enableDurationFeature", inline: false }];
+  // Profile allows requesting a certificate profile from the ACME server.
+  // Supported profiles are listed by the server's ACME directory URL.
+  optional string profile = 11 [(dev.f110.kubeproto.field) = { go_name: "Profile", api_field_name: "profile", inline: false }];
 }
 
 message ACMEIssuerDNS01ProviderAcmeDNS {
@@ -318,13 +452,19 @@ message ACMEIssuerDNS01ProviderAkamai {
 }
 
 message ACMEIssuerDNS01ProviderAzureDNS {
-  // if both this and ClientSecret are left unset MSI will be used
+  // Auth: Azure Service Principal:
+  // The ClientID of the Azure Service Principal used to authenticate with Azure DNS.
+  // If set, ClientSecret and TenantID must also be set.
   optional string client_id = 1 [(dev.f110.kubeproto.field) = { go_name: "ClientID", api_field_name: "clientID", inline: false }];
-  // if both this and ClientID are left unset MSI will be used
+  // Auth: Azure Service Principal:
+  // A reference to a Secret containing the password associated with the Service Principal.
+  // If set, ClientID and TenantID must also be set.
   optional .github.com.cert_manager.cert_manager.apis.metav1.SecretKeySelector client_secret = 2 [(dev.f110.kubeproto.field) = { go_name: "ClientSecret", api_field_name: "clientSecretSecretRef", inline: false }];
   // ID of the Azure subscription
   string subscription_id = 3 [(dev.f110.kubeproto.field) = { go_name: "SubscriptionID", api_field_name: "subscriptionID", inline: false }];
-  // when specifying ClientID and ClientSecret then this field is also needed
+  // Auth: Azure Service Principal:
+  // The TenantID of the Azure Service Principal used to authenticate with Azure DNS.
+  // If set, ClientID and ClientSecret must also be set.
   optional string tenant_id = 4 [(dev.f110.kubeproto.field) = { go_name: "TenantID", api_field_name: "tenantID", inline: false }];
   // resource group the DNS zone is located in
   string resource_group_name = 5 [(dev.f110.kubeproto.field) = { go_name: "ResourceGroupName", api_field_name: "resourceGroupName", inline: false }];
@@ -332,8 +472,18 @@ message ACMEIssuerDNS01ProviderAzureDNS {
   optional string hosted_zone_name = 6 [(dev.f110.kubeproto.field) = { go_name: "HostedZoneName", api_field_name: "hostedZoneName", inline: false }];
   // name of the Azure environment (default AzurePublicCloud)
   optional AzureDNSEnvironment environment = 7 [(dev.f110.kubeproto.field) = { go_name: "Environment", api_field_name: "environment", inline: false }];
-  // managed identity configuration, can not be used at the same time as clientID, clientSecretSecretRef or tenantID
+  // Auth: Azure Workload Identity or Azure Managed Service Identity:
+  // Settings to enable Azure Workload Identity or Azure Managed Service Identity
+  // If set, ClientID, ClientSecret and TenantID must not be set.
   optional AzureManagedIdentity managed_identity = 8 [(dev.f110.kubeproto.field) = { go_name: "ManagedIdentity", api_field_name: "managedIdentity", inline: false }];
+  // ZoneType determines which type of Azure DNS zone to use.
+  // Valid values are:
+  //   - AzurePublicZone  (default): Use a public Azure DNS zone.
+  //   - AzurePrivateZone: Use an Azure Private DNS zone.
+  // If not specified, AzurePublicZone is used.
+  // Support for Azure Private DNS zones is currently
+  // experimental and may change in future releases.
+  optional AzureZoneType zone_type = 9 [(dev.f110.kubeproto.field) = { go_name: "ZoneType", api_field_name: "zoneType", inline: false }];
 }
 
 message ACMEIssuerDNS01ProviderCloudDNS {
@@ -363,7 +513,7 @@ message ACMEIssuerDNS01ProviderDigitalOcean {
 message ACMEIssuerDNS01ProviderRFC2136 {
   // The IP address or hostname of an authoritative DNS server supporting
   // RFC2136 in the form host:port. If the host is an IPv6 address it must be
-  // enclosed in square brackets (e.g [2001:db8::1]) ; port is optional.
+  // enclosed in square brackets (e.g [2001:db8::1]); port is optional.
   // This field is required.
   string nameserver = 1 [(dev.f110.kubeproto.field) = { go_name: "Nameserver", api_field_name: "nameserver", inline: false }];
   // The name of the secret containing the TSIG value.
@@ -377,34 +527,55 @@ message ACMEIssuerDNS01ProviderRFC2136 {
   // Supported values are (case-insensitive): ``HMACMD5`` (default),
   // ``HMACSHA1``, ``HMACSHA256`` or ``HMACSHA512``.
   optional string t_s_i_g_algorithm = 4 [(dev.f110.kubeproto.field) = { go_name: "TSIGAlgorithm", api_field_name: "tsigAlgorithm", inline: false }];
+  // Protocol to use for dynamic DNS update queries. Valid values are (case-sensitive) ``TCP`` and ``UDP``; ``UDP`` (default).
+  optional RFC2136UpdateProtocol protocol = 5 [(dev.f110.kubeproto.field) = { go_name: "Protocol", api_field_name: "protocol", inline: false }];
 }
 
 message ACMEIssuerDNS01ProviderRoute53 {
+  // Auth configures how cert-manager authenticates.
+  optional Route53Auth auth = 1 [(dev.f110.kubeproto.field) = { go_name: "Auth", api_field_name: "auth", inline: false }];
   // The AccessKeyID is used for authentication.
   // Cannot be set when SecretAccessKeyID is set.
-  // If neither the Access Key nor Key ID are set, we fall-back to using env
-  // vars, shared credentials file or AWS Instance metadata,
+  // If neither the Access Key nor Key ID are set, we fall back to using env
+  // vars, shared credentials file, or AWS Instance metadata,
   // see: https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html#specifying-credentials
-  optional string access_key_id = 1 [(dev.f110.kubeproto.field) = { go_name: "AccessKeyID", api_field_name: "accessKeyID", inline: false }];
+  optional string access_key_id = 2 [(dev.f110.kubeproto.field) = { go_name: "AccessKeyID", api_field_name: "accessKeyID", inline: false }];
   // The SecretAccessKey is used for authentication. If set, pull the AWS
   // access key ID from a key within a Kubernetes Secret.
   // Cannot be set when AccessKeyID is set.
-  // If neither the Access Key nor Key ID are set, we fall-back to using env
-  // vars, shared credentials file or AWS Instance metadata,
+  // If neither the Access Key nor Key ID are set, we fall back to using env
+  // vars, shared credentials file, or AWS Instance metadata,
   // see: https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html#specifying-credentials
-  optional .github.com.cert_manager.cert_manager.apis.metav1.SecretKeySelector secret_access_key_id = 2 [(dev.f110.kubeproto.field) = { go_name: "SecretAccessKeyID", api_field_name: "accessKeyIDSecretRef", inline: false }];
+  optional .github.com.cert_manager.cert_manager.apis.metav1.SecretKeySelector secret_access_key_id = 3 [(dev.f110.kubeproto.field) = { go_name: "SecretAccessKeyID", api_field_name: "accessKeyIDSecretRef", inline: false }];
   // The SecretAccessKey is used for authentication.
-  // If neither the Access Key nor Key ID are set, we fall-back to using env
-  // vars, shared credentials file or AWS Instance metadata,
+  // If neither the Access Key nor Key ID are set, we fall back to using env
+  // vars, shared credentials file, or AWS Instance metadata,
   // see: https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html#specifying-credentials
-  .github.com.cert_manager.cert_manager.apis.metav1.SecretKeySelector secret_access_key = 3 [(dev.f110.kubeproto.field) = { go_name: "SecretAccessKey", api_field_name: "secretAccessKeySecretRef", inline: false }];
+  .github.com.cert_manager.cert_manager.apis.metav1.SecretKeySelector secret_access_key = 4 [(dev.f110.kubeproto.field) = { go_name: "SecretAccessKey", api_field_name: "secretAccessKeySecretRef", inline: false }];
   // Role is a Role ARN which the Route53 provider will assume using either the explicit credentials AccessKeyID/SecretAccessKey
   // or the inferred credentials from environment variables, shared credentials file or AWS Instance metadata
-  optional string role = 4 [(dev.f110.kubeproto.field) = { go_name: "Role", api_field_name: "role", inline: false }];
-  // If set, the provider will manage only this zone in Route53 and will not do an lookup using the route53:ListHostedZonesByName api call.
-  optional string hosted_zone_id = 5 [(dev.f110.kubeproto.field) = { go_name: "HostedZoneID", api_field_name: "hostedZoneID", inline: false }];
-  // Always set the region when using AccessKeyID and SecretAccessKey
-  string region = 6 [(dev.f110.kubeproto.field) = { go_name: "Region", api_field_name: "region", inline: false }];
+  optional string role = 5 [(dev.f110.kubeproto.field) = { go_name: "Role", api_field_name: "role", inline: false }];
+  // If set, the provider will manage only this zone in Route53 and will not do a lookup using the route53:ListHostedZonesByName api call.
+  optional string hosted_zone_id = 6 [(dev.f110.kubeproto.field) = { go_name: "HostedZoneID", api_field_name: "hostedZoneID", inline: false }];
+  // Override the AWS region.
+  // Route53 is a global service and does not have regional endpoints but the
+  // region specified here (or via environment variables) is used as a hint to
+  // help compute the correct AWS credential scope and partition when it
+  // connects to Route53. See:
+  // - [Amazon Route 53 endpoints and quotas](https://docs.aws.amazon.com/general/latest/gr/r53.html)
+  // - [Global services](https://docs.aws.amazon.com/whitepapers/latest/aws-fault-isolation-boundaries/global-services.html)
+  // If you omit this region field, cert-manager will use the region from
+  // AWS_REGION and AWS_DEFAULT_REGION environment variables, if they are set
+  // in the cert-manager controller Pod.
+  // The `region` field is not needed if you use [IAM Roles for Service Accounts (IRSA)](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html).
+  // Instead an AWS_REGION environment variable is added to the cert-manager controller Pod by:
+  // [Amazon EKS Pod Identity Webhook](https://github.com/aws/amazon-eks-pod-identity-webhook).
+  // In this case this `region` field value is ignored.
+  // The `region` field is not needed if you use [EKS Pod Identities](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html).
+  // Instead an AWS_REGION environment variable is added to the cert-manager controller Pod by:
+  // [Amazon EKS Pod Identity Agent](https://github.com/aws/eks-pod-identity-agent),
+  // In this case this `region` field value is ignored.
+  optional string region = 7 [(dev.f110.kubeproto.field) = { go_name: "Region", api_field_name: "region", inline: false }];
 }
 
 message ACMEIssuerDNS01ProviderWebhook {
@@ -415,13 +586,13 @@ message ACMEIssuerDNS01ProviderWebhook {
   string group_name = 1 [(dev.f110.kubeproto.field) = { go_name: "GroupName", api_field_name: "groupName", inline: false }];
   // The name of the solver to use, as defined in the webhook provider
   // implementation.
-  // This will typically be the name of the provider, e.g. 'cloudflare'.
+  // This will typically be the name of the provider, e.g., 'cloudflare'.
   string solver_name = 2 [(dev.f110.kubeproto.field) = { go_name: "SolverName", api_field_name: "solverName", inline: false }];
   // Additional configuration that should be passed to the webhook apiserver
   // when challenges are processed.
   // This can contain arbitrary JSON data.
   // Secret values should not be specified in this stanza.
-  // If secret values are needed (e.g. credentials for a DNS service), you
+  // If secret values are needed (e.g., credentials for a DNS service), you
   // should use a SecretKeySelector to reference a Secret resource.
   // For details on the schema of this field, consult the webhook provider
   // implementation's documentation.
@@ -436,13 +607,20 @@ message ACMEIssuerStatus {
   // ACME account, in order to track changes made to registered account
   // associated with the  Issuer
   optional string last_registered_email = 2 [(dev.f110.kubeproto.field) = { go_name: "LastRegisteredEmail", api_field_name: "lastRegisteredEmail", inline: false }];
+  // LastPrivateKeyHash is a hash of the private key associated with the latest
+  // registered ACME account, in order to track changes made to registered account
+  // associated with the Issuer
+  optional string last_private_key_hash = 3 [(dev.f110.kubeproto.field) = { go_name: "LastPrivateKeyHash", api_field_name: "lastPrivateKeyHash", inline: false }];
 }
 
 message AzureManagedIdentity {
-  // client ID of the managed identity, can not be used at the same time as resourceID
+  // client ID of the managed identity, cannot be used at the same time as resourceID
   optional string client_id = 1 [(dev.f110.kubeproto.field) = { go_name: "ClientID", api_field_name: "clientID", inline: false }];
-  // resource ID of the managed identity, can not be used at the same time as clientID
+  // resource ID of the managed identity, cannot be used at the same time as clientID
+  // Cannot be used for Azure Managed Service Identity
   optional string resource_id = 2 [(dev.f110.kubeproto.field) = { go_name: "ResourceID", api_field_name: "resourceID", inline: false }];
+  // tenant ID of the managed identity, cannot be used at the same time as resourceID
+  optional string tenant_id = 3 [(dev.f110.kubeproto.field) = { go_name: "TenantID", api_field_name: "tenantID", inline: false }];
 }
 
 message CertificateDNSNameSelector {
@@ -456,7 +634,7 @@ message CertificateDNSNameSelector {
   // with the most matching labels in matchLabels will be selected.
   // If neither has more matches, the solver defined earlier in the list
   // will be selected.
-  repeated string dns_names = 2 [(dev.f110.kubeproto.field) = { go_name: "DNSNames", api_field_name: "dnsNames", inline: false }];
+  repeated string dns_names = 2 [(dev.f110.kubeproto.field) = { go_name: "DNSNames", api_field_name: "dnsNames", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // List of DNSZones that this solver will be used to solve.
   // The most specific DNS zone match specified here will take precedence
   // over other DNS zone matches, so a solver specifying sys.example.com
@@ -466,7 +644,7 @@ message CertificateDNSNameSelector {
   // with the most matching labels in matchLabels will be selected.
   // If neither has more matches, the solver defined earlier in the list
   // will be selected.
-  repeated string dns_zones = 3 [(dev.f110.kubeproto.field) = { go_name: "DNSZones", api_field_name: "dnsZones", inline: false }];
+  repeated string dns_zones = 3 [(dev.f110.kubeproto.field) = { go_name: "DNSZones", api_field_name: "dnsZones", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message Challenge {
@@ -490,9 +668,9 @@ message ChallengeSpec {
   // The URL to the ACME Authorization resource that this
   // challenge is a part of.
   string authorization_url = 2 [(dev.f110.kubeproto.field) = { go_name: "AuthorizationURL", api_field_name: "authorizationURL", inline: false }];
-  // dnsName is the identifier that this challenge is for, e.g. example.com.
+  // dnsName is the identifier that this challenge is for, e.g., example.com.
   // If the requested DNSName is a 'wildcard', this field MUST be set to the
-  // non-wildcard domain, e.g. for `*.example.com`, it must be `example.com`.
+  // non-wildcard domain, e.g., for `*.example.com`, it must be `example.com`.
   string dns_name = 3 [(dev.f110.kubeproto.field) = { go_name: "DNSName", api_field_name: "dnsName", inline: false }];
   // wildcard will be true if this challenge is for a wildcard identifier,
   // for example '*.example.com'.
@@ -519,7 +697,7 @@ message ChallengeSpec {
   // If the Issuer does not exist, processing will be retried.
   // If the Issuer is not an 'ACME' Issuer, an error will be returned and the
   // Challenge will be marked as failed.
-  .github.com.cert_manager.cert_manager.apis.metav1.ObjectReference issuer_ref = 9 [(dev.f110.kubeproto.field) = { go_name: "IssuerRef", api_field_name: "issuerRef", inline: false }];
+  .github.com.cert_manager.cert_manager.apis.metav1.IssuerReference issuer_ref = 9 [(dev.f110.kubeproto.field) = { go_name: "IssuerRef", api_field_name: "issuerRef", inline: false }];
 }
 
 message ChallengeStatus {
@@ -530,19 +708,24 @@ message ChallengeStatus {
   // If this field is set to false, the challenge controller will not take
   // any more action.
   bool processing = 1 [(dev.f110.kubeproto.field) = { go_name: "Processing", api_field_name: "processing", inline: false }];
-  // presented will be set to true if the challenge values for this challenge
-  // are currently 'presented'.
-  // This *does not* imply the self check is passing. Only that the values
-  // have been 'submitted' for the appropriate challenge mechanism (i.e. the
-  // DNS01 TXT record has been presented, or the HTTP01 configuration has been
-  // configured).
+  // Presented is true once cert-manager has configured the solver resources
+  // needed to expose this challenge's validation material.
+  // For example, the DNS01 TXT record has been created, or the HTTP01 solver
+  // has been configured to serve the challenge token.
+  // This does not imply the self check is passing, that the ACME server has
+  // validated the challenge, or that cert-manager has already accepted the
+  // challenge with the ACME server.
   bool presented = 2 [(dev.f110.kubeproto.field) = { go_name: "Presented", api_field_name: "presented", inline: false }];
+  // PresentedAt records when cert-manager first configured the solver
+  // resources for this challenge. This is used by the optional delay-based
+  // readiness logic.
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time presented_at = 3 [(dev.f110.kubeproto.field) = { go_name: "PresentedAt", api_field_name: "presentedAt", inline: false }];
   // Contains human readable information on why the Challenge is in the
   // current state.
-  optional string reason = 3 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
+  optional string reason = 4 [(dev.f110.kubeproto.field) = { go_name: "Reason", api_field_name: "reason", inline: false }];
   // Contains the current 'state' of the challenge.
   // If not set, the state of the challenge is unknown.
-  optional State state = 4 [(dev.f110.kubeproto.field) = { go_name: "State", api_field_name: "state", inline: false }];
+  optional State state = 5 [(dev.f110.kubeproto.field) = { go_name: "State", api_field_name: "state", inline: false }];
 }
 
 message Order {
@@ -569,7 +752,7 @@ message OrderSpec {
   // If the Issuer does not exist, processing will be retried.
   // If the Issuer is not an 'ACME' Issuer, an error will be returned and the
   // Order will be marked as failed.
-  .github.com.cert_manager.cert_manager.apis.metav1.ObjectReference issuer_ref = 2 [(dev.f110.kubeproto.field) = { go_name: "IssuerRef", api_field_name: "issuerRef", inline: false }];
+  .github.com.cert_manager.cert_manager.apis.metav1.IssuerReference issuer_ref = 2 [(dev.f110.kubeproto.field) = { go_name: "IssuerRef", api_field_name: "issuerRef", inline: false }];
   // CommonName is the common name as specified on the DER encoded CSR.
   // If specified, this value must also be present in `dnsNames` or `ipAddresses`.
   // This field must match the corresponding field on the DER encoded CSR.
@@ -577,14 +760,24 @@ message OrderSpec {
   // DNSNames is a list of DNS names that should be included as part of the Order
   // validation process.
   // This field must match the corresponding field on the DER encoded CSR.
-  repeated string dns_names = 4 [(dev.f110.kubeproto.field) = { go_name: "DNSNames", api_field_name: "dnsNames", inline: false }];
+  repeated string dns_names = 4 [(dev.f110.kubeproto.field) = { go_name: "DNSNames", api_field_name: "dnsNames", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // IPAddresses is a list of IP addresses that should be included as part of the Order
   // validation process.
   // This field must match the corresponding field on the DER encoded CSR.
-  repeated string ip_addresses = 5 [(dev.f110.kubeproto.field) = { go_name: "IPAddresses", api_field_name: "ipAddresses", inline: false }];
+  repeated string ip_addresses = 5 [(dev.f110.kubeproto.field) = { go_name: "IPAddresses", api_field_name: "ipAddresses", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Duration is the duration for the not after date for the requested certificate.
-  // this is set on order creation as pe the ACME spec.
+  // This is set on order creation as per the ACME spec.
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.Duration duration = 6 [(dev.f110.kubeproto.field) = { go_name: "Duration", api_field_name: "duration", inline: false }];
+  // Profile allows requesting a certificate profile from the ACME server.
+  // Supported profiles are listed by the server's ACME directory URL.
+  optional string profile = 7 [(dev.f110.kubeproto.field) = { go_name: "Profile", api_field_name: "profile", inline: false }];
+  // Replaces is the ARI CertID (RFC 9773 §4.1) of the certificate that this
+  // Order is intended to replace. When set, cert-manager will include the
+  // "replaces" field on the newOrder request to the ACME server if and only
+  // if the server advertises ARI support in its directory. The CertID has
+  // the form "base64url(AKI).base64url(serial)" and is derived locally from
+  // the currently issued leaf certificate.
+  optional string replaces = 8 [(dev.f110.kubeproto.field) = { go_name: "Replaces", api_field_name: "replaces", inline: false }];
 }
 
 message OrderStatus {
@@ -599,7 +792,7 @@ message OrderStatus {
   // Authorizations contains data returned from the ACME server on what
   // authorizations must be completed in order to validate the DNS names
   // specified on the Order.
-  repeated ACMEAuthorization authorizations = 3 [(dev.f110.kubeproto.field) = { go_name: "Authorizations", api_field_name: "authorizations", inline: false }];
+  repeated ACMEAuthorization authorizations = 3 [(dev.f110.kubeproto.field) = { go_name: "Authorizations", api_field_name: "authorizations", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Certificate is a copy of the PEM encoded certificate for this Order.
   // This field will be populated after the order has been successfully
   // finalized with the ACME server, and the order has transitioned to the
@@ -614,4 +807,27 @@ message OrderStatus {
   // FailureTime stores the time that this order failed.
   // This is used to influence garbage collection and back-off.
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time failure_time = 7 [(dev.f110.kubeproto.field) = { go_name: "FailureTime", api_field_name: "failureTime", inline: false }];
+}
+
+message Route53Auth {
+  // Kubernetes authenticates with Route53 using AssumeRoleWithWebIdentity
+  // by passing a bound ServiceAccount token.
+  optional Route53KubernetesAuth kubernetes = 1 [(dev.f110.kubeproto.field) = { go_name: "Kubernetes", api_field_name: "kubernetes", inline: false }];
+}
+
+message Route53KubernetesAuth {
+  // A reference to a service account that will be used to request a bound
+  // token (also known as "projected token"). To use this field, you must
+  // configure an RBAC rule to let cert-manager request a token.
+  optional ServiceAccountRef service_account_ref = 1 [(dev.f110.kubeproto.field) = { go_name: "ServiceAccountRef", api_field_name: "serviceAccountRef", inline: false }];
+}
+
+message ServiceAccountRef {
+  // Name of the ServiceAccount used to request a token.
+  string name = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  // TokenAudiences is an optional list of audiences to include in the
+  // token passed to AWS. The default token consisting of the issuer's namespace
+  // and name is always included.
+  // If unset the audience defaults to `sts.amazonaws.com`.
+  repeated string token_audiences = 2 [(dev.f110.kubeproto.field) = { go_name: "TokenAudiences", api_field_name: "audiences", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }

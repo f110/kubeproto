@@ -6,10 +6,10 @@ go_library(
     importpath = "go.f110.dev/kubeproto/example/pkg/apis",
     visibility = ["//visibility:public"],
     deps = [
-        "//example/vendor/github.com/cert-manager/cert-manager/pkg/apis/acme/v1:acme",
-        "//example/vendor/github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1:certmanager",
-        "//example/vendor/github.com/cert-manager/cert-manager/pkg/apis/meta/v1:meta",
-        "//example/vendor/github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1:monitoring",
-        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+        "@com_github_cert_manager_cert_manager//pkg/apis/acme/v1:acme",
+        "@com_github_cert_manager_cert_manager//pkg/apis/certmanager/v1:certmanager",
+        "@com_github_cert_manager_cert_manager//pkg/apis/meta/v1:meta",
+        "@com_github_prometheus_operator_prometheus_operator_pkg_apis_monitoring//v1:monitoring",
+        "@io_k8s_apimachinery//pkg/apis/meta/v1:meta",
     ],
 )

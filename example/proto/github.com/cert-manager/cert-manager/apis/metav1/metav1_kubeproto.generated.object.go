@@ -28,3 +28,69 @@ const (
 	ConditionStatusFalse   ConditionStatus = "False"
 	ConditionStatusUnknown ConditionStatus = "Unknown"
 )
+
+type IssuerReference struct {
+	// Name of the issuer being referred to.
+	Name string `json:"name"`
+	// Kind of the issuer being referred to.
+	// Defaults to 'Issuer'.
+	Kind string `json:"kind,omitempty"`
+	// Group of the issuer being referred to.
+	// Defaults to 'cert-manager.io'.
+	Group string `json:"group,omitempty"`
+}
+
+func (in *IssuerReference) DeepCopyInto(out *IssuerReference) {
+	*out = *in
+}
+
+func (in *IssuerReference) DeepCopy() *IssuerReference {
+	if in == nil {
+		return nil
+	}
+	out := new(IssuerReference)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type LocalObjectReference struct {
+	// Name of the resource being referred to.
+	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+	Name string `json:"name"`
+}
+
+func (in *LocalObjectReference) DeepCopyInto(out *LocalObjectReference) {
+	*out = *in
+}
+
+func (in *LocalObjectReference) DeepCopy() *LocalObjectReference {
+	if in == nil {
+		return nil
+	}
+	out := new(LocalObjectReference)
+	in.DeepCopyInto(out)
+	return out
+}
+
+type SecretKeySelector struct {
+	// The name of the Secret resource being referred to.
+	LocalObjectReference `json:",inline"`
+	// The key of the entry in the Secret resource's `data` field to be used.
+	// Some instances of this field may be defaulted, in others it may be
+	// required.
+	Key string `json:"key,omitempty"`
+}
+
+func (in *SecretKeySelector) DeepCopyInto(out *SecretKeySelector) {
+	*out = *in
+	out.LocalObjectReference = in.LocalObjectReference
+}
+
+func (in *SecretKeySelector) DeepCopy() *SecretKeySelector {
+	if in == nil {
+		return nil
+	}
+	out := new(SecretKeySelector)
+	in.DeepCopyInto(out)
+	return out
+}

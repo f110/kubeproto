@@ -13,8 +13,8 @@ import "example/proto/github.com/cert-manager/cert-manager/apis/metav1/generated
 import "k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto";
 
 enum CertificateConditionType {
-  CERTIFICATE_CONDITION_TYPE_READY   = 0 [(dev.f110.kubeproto.value) = { value: "Ready" }];
-  CERTIFICATE_CONDITION_TYPE_ISSUING = 1 [(dev.f110.kubeproto.value) = { value: "Issuing" }];
+  CERTIFICATE_CONDITION_TYPE_READY   = 0;
+  CERTIFICATE_CONDITION_TYPE_ISSUING = 1;
 }
 
 enum CertificateOutputFormatType {
@@ -22,15 +22,20 @@ enum CertificateOutputFormatType {
   CERTIFICATE_OUTPUT_FORMAT_TYPE_COMBINED_P_E_M = 1;
 }
 
+enum CertificateRenewalPolicy {
+  CERTIFICATE_RENEWAL_POLICY_RENEW_BEFORE = 0;
+  CERTIFICATE_RENEWAL_POLICY_DISABLED     = 1;
+}
+
 enum CertificateRequestConditionType {
-  CERTIFICATE_REQUEST_CONDITION_TYPE_READY           = 0 [(dev.f110.kubeproto.value) = { value: "Ready" }];
+  CERTIFICATE_REQUEST_CONDITION_TYPE_READY           = 0;
   CERTIFICATE_REQUEST_CONDITION_TYPE_INVALID_REQUEST = 1;
-  CERTIFICATE_REQUEST_CONDITION_TYPE_APPROVED        = 2 [(dev.f110.kubeproto.value) = { value: "Approved" }];
-  CERTIFICATE_REQUEST_CONDITION_TYPE_DENIED          = 3 [(dev.f110.kubeproto.value) = { value: "Denied" }];
+  CERTIFICATE_REQUEST_CONDITION_TYPE_APPROVED        = 2;
+  CERTIFICATE_REQUEST_CONDITION_TYPE_DENIED          = 3;
 }
 
 enum IssuerConditionType {
-  ISSUER_CONDITION_TYPE_READY = 0 [(dev.f110.kubeproto.value) = { value: "Ready" }];
+  ISSUER_CONDITION_TYPE_READY = 0;
 }
 
 enum KeyUsage {
@@ -59,6 +64,13 @@ enum KeyUsage {
   KEY_USAGE_NETSCAPE_SGC       = 22 [(dev.f110.kubeproto.value) = { value: "netscape sgc" }];
 }
 
+enum PKCS12Profile {
+  P_K_C_S12_PROFILE_LEGACY_R_C2  = 0;
+  P_K_C_S12_PROFILE_LEGACY_D_E_S = 1;
+  P_K_C_S12_PROFILE_MODERN2023   = 2;
+  P_K_C_S12_PROFILE_MODERN2026   = 3;
+}
+
 enum PrivateKeyAlgorithm {
   PRIVATE_KEY_ALGORITHM_R_S_A     = 0;
   PRIVATE_KEY_ALGORITHM_E_C_D_S_A = 1;
@@ -70,6 +82,23 @@ enum PrivateKeyEncoding {
   PRIVATE_KEY_ENCODING_P_K_C_S8 = 1;
 }
 
+enum SignatureAlgorithm {
+  SIGNATURE_ALGORITHM_S_H_A256_WITH_R_S_A     = 0;
+  SIGNATURE_ALGORITHM_S_H_A384_WITH_R_S_A     = 1;
+  SIGNATURE_ALGORITHM_S_H_A512_WITH_R_S_A     = 2;
+  SIGNATURE_ALGORITHM_E_C_D_S_A_WITH_S_H_A256 = 3;
+  SIGNATURE_ALGORITHM_E_C_D_S_A_WITH_S_H_A384 = 4;
+  SIGNATURE_ALGORITHM_E_C_D_S_A_WITH_S_H_A512 = 5;
+  SIGNATURE_ALGORITHM_PURE_ED25519            = 6;
+}
+
+message ACMERenewalWindow {
+  // Start is the start of the suggested renewal window.
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time start = 1 [(dev.f110.kubeproto.field) = { go_name: "Start", api_field_name: "start", inline: false }];
+  // End is the end of the suggested renewal window.
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time end = 2 [(dev.f110.kubeproto.field) = { go_name: "End", api_field_name: "end", inline: false }];
+}
+
 message CAIssuer {
   // SecretName is the name of the secret used to sign Certificates issued
   // by this Issuer.
@@ -77,23 +106,55 @@ message CAIssuer {
   // The CRL distribution points is an X.509 v3 certificate extension which identifies
   // the location of the CRL from which the revocation of this certificate can be checked.
   // If not set, certificates will be issued without distribution points set.
-  repeated string c_r_l_distribution_points = 2 [(dev.f110.kubeproto.field) = { go_name: "CRLDistributionPoints", api_field_name: "crlDistributionPoints", inline: false }];
+  repeated string c_r_l_distribution_points = 2 [(dev.f110.kubeproto.field) = { go_name: "CRLDistributionPoints", api_field_name: "crlDistributionPoints", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // The OCSP server list is an X.509 v3 extension that defines a list of
   // URLs of OCSP responders. The OCSP responders can be queried for the
   // revocation status of an issued certificate. If not set, the
   // certificate will be issued with no OCSP servers set. For example, an
   // OCSP server URL could be "http://ocsp.int-x3.letsencrypt.org".
-  repeated string o_c_s_p_servers = 3 [(dev.f110.kubeproto.field) = { go_name: "OCSPServers", api_field_name: "ocspServers", inline: false }];
+  repeated string o_c_s_p_servers = 3 [(dev.f110.kubeproto.field) = { go_name: "OCSPServers", api_field_name: "ocspServers", list_type: LIST_TYPE_ATOMIC, inline: false }];
+  // IssuingCertificateURLs is a list of URLs which this issuer should embed into certificates
+  // it creates. See https://www.rfc-editor.org/rfc/rfc5280#section-4.2.2.1 for more details.
+  // As an example, such a URL might be "http://ca.domain.com/ca.crt".
+  repeated string issuing_certificate_url_s = 4 [(dev.f110.kubeproto.field) = { go_name: "IssuingCertificateURLs", api_field_name: "issuingCertificateURLs", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message Certificate {
-  // Desired state of the Certificate resource.
+  // Specification of the desired state of the Certificate resource.
+  // https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   CertificateSpec spec = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
-  // Status of the Certificate. This is set and managed automatically.
+  // Status of the Certificate.
+  // This is set and managed automatically.
+  // Read-only.
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   CertificateStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", sub_resource: true, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
   };
+}
+
+message CertificateACMEARIStatus {
+  // SuggestedWindow is the suggested renewal window as returned by the ACME server in accordance with RFC 9773.
+  optional ACMERenewalWindow suggested_window = 1 [(dev.f110.kubeproto.field) = { go_name: "SuggestedWindow", api_field_name: "suggestedWindow", inline: false }];
+  // ExplanationURL is a human-readable URL that may explain why the suggested window
+  // has its current value.
+  optional string explanation_url = 2 [(dev.f110.kubeproto.field) = { go_name: "ExplanationURL", api_field_name: "explanationURL", inline: false }];
+  // LastChecked is the time at which the ACME server was last checked for renewal information.
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time last_checked = 3 [(dev.f110.kubeproto.field) = { go_name: "LastChecked", api_field_name: "lastChecked", inline: false }];
+  // NextCheck is the time at which the ACME server will next be checked for renewal information.
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time next_check = 4 [(dev.f110.kubeproto.field) = { go_name: "NextCheck", api_field_name: "nextCheck", inline: false }];
+  // LastError is the last error encountered when checking the ACME server for renewal information, if any.
+  optional string last_error = 5 [(dev.f110.kubeproto.field) = { go_name: "LastError", api_field_name: "lastError", inline: false }];
+  // CertID is the ARI CertID (RFC 9773) of the certificate this renewal information was
+  // fetched for. This is used to determine if we need to re-fetch the renewal information
+  // as changed cert id means that ARI fetched before is stale.
+  optional string cert_id = 6 [(dev.f110.kubeproto.field) = { go_name: "CertID", api_field_name: "certID", inline: false }];
+}
+
+message CertificateACMEStatus {
+  // ARI stores the ACME Renewal Information that is fetched from the ACME server
+  // in accordance with RFC 9773. This is only populated if the ARI feature gate is enabled.
+  optional CertificateACMEARIStatus a_r_i = 1 [(dev.f110.kubeproto.field) = { go_name: "ARI", api_field_name: "ari", inline: false }];
 }
 
 message CertificateAdditionalOutputFormat {
@@ -135,20 +196,24 @@ message CertificateKeystores {
 
 message CertificateList {
   .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
-  .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
-  repeated Certificate                           items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+  // Standard list metadata.
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  // List of Certificates
+  repeated Certificate items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
 
 message CertificatePrivateKey {
   // RotationPolicy controls how private keys should be regenerated when a
   // re-issuance is being processed.
-  // If set to Never, a private key will only be generated if one does not
-  // already exist in the target `spec.secretName`. If one does exists but it
+  // If set to `Never`, a private key will only be generated if one does not
+  // already exist in the target `spec.secretName`. If one does exist but it
   // does not have the correct algorithm or size, a warning will be raised
   // to await user intervention.
-  // If set to Always, a private key matching the specified requirements
+  // If set to `Always`, a private key matching the specified requirements
   // will be generated whenever a re-issuance occurs.
-  // Default is 'Never' for backward compatibility.
+  // Default is `Always`.
+  // The default was changed from `Never` to `Always` in cert-manager >=v1.18.0.
   string rotation_policy = 1 [(dev.f110.kubeproto.field) = { go_name: "RotationPolicy", api_field_name: "rotationPolicy", inline: false }];
   // The private key cryptography standards (PKCS) encoding for this
   // certificate's private key to be encoded in.
@@ -157,10 +222,11 @@ message CertificatePrivateKey {
   // Defaults to `PKCS1` if not specified.
   optional PrivateKeyEncoding encoding = 2 [(dev.f110.kubeproto.field) = { go_name: "Encoding", api_field_name: "encoding", inline: false }];
   // Algorithm is the private key algorithm of the corresponding private key
-  // for this certificate. If provided, allowed values are either `RSA`,`Ed25519` or `ECDSA`
+  // for this certificate.
+  // If provided, allowed values are either `RSA`, `ECDSA` or `Ed25519`.
   // If `algorithm` is specified and `size` is not provided,
-  // key size of 256 will be used for `ECDSA` key algorithm and
-  // key size of 2048 will be used for `RSA` key algorithm.
+  // key size of 2048 will be used for `RSA` key algorithm and
+  // key size of 256 will be used for `ECDSA` key algorithm.
   // key size is ignored when using the `Ed25519` key algorithm.
   optional PrivateKeyAlgorithm algorithm = 3 [(dev.f110.kubeproto.field) = { go_name: "Algorithm", api_field_name: "algorithm", inline: false }];
   // Size is the key bit size of the corresponding private key for this certificate.
@@ -173,10 +239,39 @@ message CertificatePrivateKey {
   optional int32 size = 4 [(dev.f110.kubeproto.field) = { go_name: "Size", api_field_name: "size", inline: false }];
 }
 
+message CertificateRenewal {
+  // `policy` must be one of `Disabled`, `RenewBefore`.
+  optional CertificateRenewalPolicy policy = 1 [(dev.f110.kubeproto.field) = { go_name: "Policy", api_field_name: "policy", inline: false }];
+  // `windows` mentions the behavior of when the renewal must happen.
+  repeated CertificateRenewalWindows windows = 2 [(dev.f110.kubeproto.field) = { go_name: "Windows", api_field_name: "windows", list_type: LIST_TYPE_ATOMIC, inline: false }];
+}
+
+message CertificateRenewalWindows {
+  // `timezone` is IANA compliant timezone. For example America/Denver.
+  // If this field is not set, timezone is treated as UTC.
+  optional string timezone = 1 [(dev.f110.kubeproto.field) = { go_name: "Timezone", api_field_name: "timezone", inline: false }];
+  // `windowDuration` is how long the cron definition is active for.
+  // Value must be in units accepted by Go time.ParseDuration https://golang.org/pkg/time/#ParseDuration.
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.Duration window_duration = 2 [(dev.f110.kubeproto.field) = { go_name: "WindowDuration", api_field_name: "windowDuration", inline: false }];
+  // `cron` is a cron compliant string to allow when the renewal should be allowed. Format is as shown below:
+  // * * * * *
+  // | | | | |
+  // | | | | day of the week (0–6) (Sunday to Saturday;
+  // | | | month (1–12)             7 is also Sunday on some systems)
+  // | | day of the month (1–31)
+  // | hour (0–23)
+  // minute (0–59)
+  optional string cron = 3 [(dev.f110.kubeproto.field) = { go_name: "Cron", api_field_name: "cron", inline: false }];
+}
+
 message CertificateRequest {
-  // Desired state of the CertificateRequest resource.
+  // Specification of the desired state of the CertificateRequest resource.
+  // https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   CertificateRequestSpec spec = 3 [(dev.f110.kubeproto.field) = { go_name: "Spec", api_field_name: "spec", inline: false }];
-  // Status of the CertificateRequest. This is set and managed automatically.
+  // Status of the CertificateRequest.
+  // This is set and managed automatically.
+  // Read-only.
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   CertificateRequestStatus status = 4 [(dev.f110.kubeproto.field) = { go_name: "Status", api_field_name: "status", sub_resource: true, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
@@ -202,33 +297,47 @@ message CertificateRequestCondition {
 
 message CertificateRequestList {
   .k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta type_meta = 1 [(dev.f110.kubeproto.field) = { go_name: "TypeMeta", inline: true }];
-  .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
-  repeated CertificateRequest                    items     = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
+  // Standard list metadata.
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta list_meta = 2 [(dev.f110.kubeproto.field) = { go_name: "ListMeta", api_field_name: "metadata", inline: false }];
+  // List of CertificateRequests
+  repeated CertificateRequest items = 3 [(dev.f110.kubeproto.field) = { go_name: "Items", api_field_name: "items", inline: false }];
 }
 
 message CertificateRequestSpec {
-  // The requested 'duration' (i.e. lifetime) of the Certificate.
-  // This option may be ignored/overridden by some issuer types.
+  // Requested 'duration' (i.e. lifetime) of the Certificate. Note that the
+  // issuer may choose to ignore the requested duration, just like any other
+  // requested attribute.
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.Duration duration = 1 [(dev.f110.kubeproto.field) = { go_name: "Duration", api_field_name: "duration", inline: false }];
-  // IssuerRef is a reference to the issuer for this CertificateRequest.  If
-  // the `kind` field is not set, or set to `Issuer`, an Issuer resource with
-  // the given name in the same namespace as the CertificateRequest will be
-  // used.  If the `kind` field is set to `ClusterIssuer`, a ClusterIssuer with
-  // the provided name will be used. The `name` field in this stanza is
-  // required at all times. The group field refers to the API group of the
-  // issuer which defaults to `cert-manager.io` if empty.
-  .github.com.cert_manager.cert_manager.apis.metav1.ObjectReference issuer_ref = 2 [(dev.f110.kubeproto.field) = { go_name: "IssuerRef", api_field_name: "issuerRef", inline: false }];
-  // The PEM-encoded x509 certificate signing request to be submitted to the
-  // CA for signing.
+  // Reference to the issuer responsible for issuing the certificate.
+  // If the issuer is namespace-scoped, it must be in the same namespace
+  // as the Certificate. If the issuer is cluster-scoped, it can be used
+  // from any namespace.
+  // The `name` field of the reference must always be specified.
+  .github.com.cert_manager.cert_manager.apis.metav1.IssuerReference issuer_ref = 2 [(dev.f110.kubeproto.field) = { go_name: "IssuerRef", api_field_name: "issuerRef", inline: false }];
+  // The PEM-encoded X.509 certificate signing request to be submitted to the
+  // issuer for signing.
+  // If the CSR has a BasicConstraints extension, its isCA attribute must
+  // match the `isCA` value of this CertificateRequest.
+  // If the CSR has a KeyUsage extension, its key usages must match the
+  // key usages in the `usages` field of this CertificateRequest.
+  // If the CSR has a ExtKeyUsage extension, its extended key usages
+  // must match the extended key usages in the `usages` field of this
+  // CertificateRequest.
   optional bytes request = 3 [(dev.f110.kubeproto.field) = { go_name: "Request", api_field_name: "request", inline: false }];
-  // IsCA will request to mark the certificate as valid for certificate signing
-  // when submitting to the issuer.
-  // This will automatically add the `cert sign` usage to the list of `usages`.
+  // Requested basic constraints isCA value. Note that the issuer may choose
+  // to ignore the requested isCA value, just like any other requested attribute.
+  // NOTE: If the CSR in the `Request` field has a BasicConstraints extension,
+  // it must have the same isCA value as specified here.
+  // If true, this will automatically add the `cert sign` usage to the list
+  // of requested `usages`.
   optional bool is_c_a = 4 [(dev.f110.kubeproto.field) = { go_name: "IsCA", api_field_name: "isCA", inline: false }];
-  // Usages is the set of x509 usages that are requested for the certificate.
-  // If usages are set they SHOULD be encoded inside the CSR spec
-  // Defaults to `digital signature` and `key encipherment` if not specified.
-  repeated KeyUsage usages = 5 [(dev.f110.kubeproto.field) = { go_name: "Usages", api_field_name: "usages", inline: false }];
+  // Requested key usages and extended key usages.
+  // NOTE: If the CSR in the `Request` field has uses the KeyUsage or
+  // ExtKeyUsage extension, these extensions must have the same values
+  // as specified here without any additional values.
+  // If unset, defaults to `digital signature` and `key encipherment`.
+  repeated KeyUsage usages = 5 [(dev.f110.kubeproto.field) = { go_name: "Usages", api_field_name: "usages", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Username contains the name of the user that created the CertificateRequest.
   // Populated by the cert-manager webhook on creation and immutable.
   optional string username = 6 [(dev.f110.kubeproto.field) = { go_name: "Username", api_field_name: "username", inline: false }];
@@ -237,7 +346,7 @@ message CertificateRequestSpec {
   optional string uid = 7 [(dev.f110.kubeproto.field) = { go_name: "UID", api_field_name: "uid", inline: false }];
   // Groups contains group membership of the user that created the CertificateRequest.
   // Populated by the cert-manager webhook on creation and immutable.
-  repeated string groups = 8 [(dev.f110.kubeproto.field) = { go_name: "Groups", api_field_name: "groups", inline: false }];
+  repeated string groups = 8 [(dev.f110.kubeproto.field) = { go_name: "Groups", api_field_name: "groups", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Extra contains extra attributes of the user that created the CertificateRequest.
   // Populated by the cert-manager webhook on creation and immutable.
   // This field can not be represented by protobuf.
@@ -246,15 +355,17 @@ message CertificateRequestSpec {
 
 message CertificateRequestStatus {
   // List of status conditions to indicate the status of a CertificateRequest.
-  // Known condition types are `Ready` and `InvalidRequest`.
-  repeated CertificateRequestCondition conditions = 1 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
-  // The PEM encoded x509 certificate resulting from the certificate
+  // Known condition types are `Ready`, `InvalidRequest`, `Approved` and `Denied`.
+  repeated CertificateRequestCondition conditions = 1 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                                      list_map_keys: [ "type" ],
+                                                                                      inline: false }];
+  // The PEM encoded X.509 certificate resulting from the certificate
   // signing request.
   // If not set, the CertificateRequest has either not been completed or has
   // failed. More information on failure can be found by checking the
   // `conditions` field.
   optional bytes certificate = 2 [(dev.f110.kubeproto.field) = { go_name: "Certificate", api_field_name: "certificate", inline: false }];
-  // The PEM encoded x509 certificate of the signer, also known as the CA
+  // The PEM encoded X.509 certificate of the signer, also known as the CA
   // (Certificate Authority).
   // This is set on a best-effort basis by different issuers.
   // If not set, the CA is assumed to be unknown/not available.
@@ -272,99 +383,154 @@ message CertificateSecretTemplate {
 }
 
 message CertificateSpec {
-  // Full X509 name specification (https://golang.org/pkg/crypto/x509/pkix/#Name).
+  // Requested set of X509 certificate subject attributes.
+  // More info: https://datatracker.ietf.org/doc/html/rfc5280#section-4.1.2.6
+  // The common name attribute is specified separately in the `commonName` field.
+  // Cannot be set if the `literalSubject` field is set.
   optional X509Subject subject = 1 [(dev.f110.kubeproto.field) = { go_name: "Subject", api_field_name: "subject", inline: false }];
-  // LiteralSubject is an LDAP formatted string that represents the [X.509 Subject field](https://datatracker.ietf.org/doc/html/rfc5280#section-4.1.2.6).
-  // Use this *instead* of the Subject field if you need to ensure the correct ordering of the RDN sequence, such as when issuing certs for LDAP authentication. See https://github.com/cert-manager/cert-manager/issues/3203, https://github.com/cert-manager/cert-manager/issues/4424.
-  // This field is alpha level and is only supported by cert-manager installations where LiteralCertificateSubject feature gate is enabled on both cert-manager controller and webhook.
+  // Requested X.509 certificate subject, represented using the LDAP "String
+  // Representation of a Distinguished Name" [1].
+  // Important: the LDAP string format also specifies the order of the attributes
+  // in the subject, this is important when issuing certs for LDAP authentication.
+  // Example: `CN=foo,DC=corp,DC=example,DC=com`
+  // More info [1]: https://datatracker.ietf.org/doc/html/rfc4514
+  // More info: https://github.com/cert-manager/cert-manager/issues/3203
+  // More info: https://github.com/cert-manager/cert-manager/issues/4424
+  // Cannot be set if the `subject` or `commonName` field is set.
   optional string literal_subject = 2 [(dev.f110.kubeproto.field) = { go_name: "LiteralSubject", api_field_name: "literalSubject", inline: false }];
-  // CommonName is a common name to be used on the Certificate.
-  // The CommonName should have a length of 64 characters or fewer to avoid
-  // generating invalid CSRs.
-  // This value is ignored by TLS clients when any subject alt name is set.
-  // This is x509 behaviour: https://tools.ietf.org/html/rfc6125#section-6.4.4
+  // Requested common name X509 certificate subject attribute.
+  // More info: https://datatracker.ietf.org/doc/html/rfc5280#section-4.1.2.6
+  // NOTE: TLS clients will ignore this value when any subject alternative name is
+  // set (see https://tools.ietf.org/html/rfc6125#section-6.4.4).
+  // Should have a length of 64 characters or fewer to avoid generating invalid CSRs.
+  // Cannot be set if the `literalSubject` field is set.
   optional string common_name = 3 [(dev.f110.kubeproto.field) = { go_name: "CommonName", api_field_name: "commonName", inline: false }];
-  // The requested 'duration' (i.e. lifetime) of the Certificate. This option
-  // may be ignored/overridden by some issuer types. If unset this defaults to
-  // 90 days. Certificate will be renewed either 2/3 through its duration or
-  // `renewBefore` period before its expiry, whichever is later. Minimum
-  // accepted duration is 1 hour. Value must be in units accepted by Go
-  // time.ParseDuration https://golang.org/pkg/time/#ParseDuration
+  // Requested 'duration' (i.e. lifetime) of the Certificate. Note that the
+  // issuer may choose to ignore the requested duration, just like any other
+  // requested attribute.
+  // If unset, this defaults to 90 days.
+  // Minimum accepted duration is 1 hour.
+  // Value must be in units accepted by Go time.ParseDuration https://golang.org/pkg/time/#ParseDuration.
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.Duration duration = 4 [(dev.f110.kubeproto.field) = { go_name: "Duration", api_field_name: "duration", inline: false }];
-  // How long before the currently issued certificate's expiry
-  // cert-manager should renew the certificate. The default is 2/3 of the
-  // issued certificate's duration. Minimum accepted value is 5 minutes.
-  // Value must be in units accepted by Go time.ParseDuration
-  // https://golang.org/pkg/time/#ParseDuration
+  // How long before the currently issued certificate's expiry cert-manager should
+  // renew the certificate. For example, if a certificate is valid for 60 minutes,
+  // and `renewBefore=10m`, cert-manager will begin to attempt to renew the certificate
+  // 50 minutes after it was issued (i.e. when there are 10 minutes remaining until
+  // the certificate is no longer valid).
+  // NOTE: The actual lifetime of the issued certificate is used to determine the
+  // renewal time. If an issuer returns a certificate with a different lifetime than
+  // the one requested, cert-manager will use the lifetime of the issued certificate.
+  // If unset, this defaults to 1/3 of the issued certificate's lifetime.
+  // Minimum accepted value is 5 minutes.
+  // Value must be in units accepted by Go time.ParseDuration https://golang.org/pkg/time/#ParseDuration.
+  // Cannot be set if the `renewBeforePercentage` field is set.
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.Duration renew_before = 5 [(dev.f110.kubeproto.field) = { go_name: "RenewBefore", api_field_name: "renewBefore", inline: false }];
-  // DNSNames is a list of DNS subjectAltNames to be set on the Certificate.
-  repeated string dns_names = 6 [(dev.f110.kubeproto.field) = { go_name: "DNSNames", api_field_name: "dnsNames", inline: false }];
-  // IPAddresses is a list of IP address subjectAltNames to be set on the Certificate.
-  repeated string ip_addresses = 7 [(dev.f110.kubeproto.field) = { go_name: "IPAddresses", api_field_name: "ipAddresses", inline: false }];
-  // URIs is a list of URI subjectAltNames to be set on the Certificate.
-  repeated string uri_s = 8 [(dev.f110.kubeproto.field) = { go_name: "URIs", api_field_name: "uris", inline: false }];
-  // EmailAddresses is a list of email subjectAltNames to be set on the Certificate.
-  repeated string email_addresses = 9 [(dev.f110.kubeproto.field) = { go_name: "EmailAddresses", api_field_name: "emailAddresses", inline: false }];
-  // SecretName is the name of the secret resource that will be automatically
-  // created and managed by this Certificate resource.
-  // It will be populated with a private key and certificate, signed by the
-  // denoted issuer.
-  string secret_name = 10 [(dev.f110.kubeproto.field) = { go_name: "SecretName", api_field_name: "secretName", inline: false }];
-  // SecretTemplate defines annotations and labels to be copied to the
-  // Certificate's Secret. Labels and annotations on the Secret will be changed
-  // as they appear on the SecretTemplate when added or removed. SecretTemplate
-  // annotations are added in conjunction with, and cannot overwrite, the base
-  // set of annotations cert-manager sets on the Certificate's Secret.
-  optional CertificateSecretTemplate secret_template = 11 [(dev.f110.kubeproto.field) = { go_name: "SecretTemplate", api_field_name: "secretTemplate", inline: false }];
-  // Keystores configures additional keystore output formats stored in the
-  // `secretName` Secret resource.
-  optional CertificateKeystores keystores = 12 [(dev.f110.kubeproto.field) = { go_name: "Keystores", api_field_name: "keystores", inline: false }];
-  // IssuerRef is a reference to the issuer for this certificate.
-  // If the `kind` field is not set, or set to `Issuer`, an Issuer resource
-  // with the given name in the same namespace as the Certificate will be used.
-  // If the `kind` field is set to `ClusterIssuer`, a ClusterIssuer with the
-  // provided name will be used.
-  // The `name` field in this stanza is required at all times.
-  .github.com.cert_manager.cert_manager.apis.metav1.ObjectReference issuer_ref = 13 [(dev.f110.kubeproto.field) = { go_name: "IssuerRef", api_field_name: "issuerRef", inline: false }];
-  // IsCA will mark this Certificate as valid for certificate signing.
-  // This will automatically add the `cert sign` usage to the list of `usages`.
-  optional bool is_c_a = 14 [(dev.f110.kubeproto.field) = { go_name: "IsCA", api_field_name: "isCA", inline: false }];
-  // Usages is the set of x509 usages that are requested for the certificate.
-  // Defaults to `digital signature` and `key encipherment` if not specified.
-  repeated KeyUsage usages = 15 [(dev.f110.kubeproto.field) = { go_name: "Usages", api_field_name: "usages", inline: false }];
-  // Options to control private keys used for the Certificate.
-  optional CertificatePrivateKey private_key = 16 [(dev.f110.kubeproto.field) = { go_name: "PrivateKey", api_field_name: "privateKey", inline: false }];
-  // EncodeUsagesInRequest controls whether key usages should be present
-  // in the CertificateRequest
-  optional bool encode_usages_in_request = 17 [(dev.f110.kubeproto.field) = { go_name: "EncodeUsagesInRequest", api_field_name: "encodeUsagesInRequest", inline: false }];
-  // revisionHistoryLimit is the maximum number of CertificateRequest revisions
-  // that are maintained in the Certificate's history. Each revision represents
-  // a single `CertificateRequest` created by this Certificate, either when it
-  // was created, renewed, or Spec was changed. Revisions will be removed by
-  // oldest first if the number of revisions exceeds this number. If set,
-  // revisionHistoryLimit must be a value of `1` or greater. If unset (`nil`),
-  // revisions will not be garbage collected. Default value is `nil`.
-  optional int32 revision_history_limit = 18 [(dev.f110.kubeproto.field) = { go_name: "RevisionHistoryLimit", api_field_name: "revisionHistoryLimit", inline: false }];
-  // AdditionalOutputFormats defines extra output formats of the private key
-  // and signed certificate chain to be written to this Certificate's target
-  // Secret. This is an Alpha Feature and is only enabled with the
-  // `--feature-gates=AdditionalCertificateOutputFormats=true` option on both
+  // `renewBeforePercentage` is like `renewBefore`, except it is a relative percentage
+  // rather than an absolute duration. For example, if a certificate is valid for 60
+  // minutes, and  `renewBeforePercentage=25`, cert-manager will begin to attempt to
+  // renew the certificate 45 minutes after it was issued (i.e. when there are 15
+  // minutes (25%) remaining until the certificate is no longer valid).
+  // NOTE: The actual lifetime of the issued certificate is used to determine the
+  // renewal time. If an issuer returns a certificate with a different lifetime than
+  // the one requested, cert-manager will use the lifetime of the issued certificate.
+  // Value must be an integer in the range (0,100). The minimum effective
+  // `renewBefore` derived from the `renewBeforePercentage` and `duration` fields is 5
+  // minutes.
+  // Cannot be set if the `renewBefore` field is set.
+  optional int32 renew_before_percentage = 6 [(dev.f110.kubeproto.field) = { go_name: "RenewBeforePercentage", api_field_name: "renewBeforePercentage", inline: false }];
+  // `renewal` allows configuration of how your certificate is renewed. If the policy mentioned is
+  // `RenewBefore` then the controller respects `renewBefore` and `renewBeforePercentage`.
+  optional CertificateRenewal renewal = 7 [(dev.f110.kubeproto.field) = { go_name: "Renewal", api_field_name: "renewal", inline: false }];
+  // Requested DNS subject alternative names.
+  repeated string dns_names = 8 [(dev.f110.kubeproto.field) = { go_name: "DNSNames", api_field_name: "dnsNames", list_type: LIST_TYPE_ATOMIC, inline: false }];
+  // Requested IP address subject alternative names.
+  repeated string ip_addresses = 9 [(dev.f110.kubeproto.field) = { go_name: "IPAddresses", api_field_name: "ipAddresses", list_type: LIST_TYPE_ATOMIC, inline: false }];
+  // Requested URI subject alternative names.
+  repeated string uri_s = 10 [(dev.f110.kubeproto.field) = { go_name: "URIs", api_field_name: "uris", list_type: LIST_TYPE_ATOMIC, inline: false }];
+  // `otherNames` is an escape hatch for SAN that allows any type. We currently restrict the support to string like otherNames, cf RFC 5280 p 37
+  // Any UTF8 String valued otherName can be passed with by setting the keys oid: x.x.x.x and UTF8Value: somevalue for `otherName`.
+  // Most commonly this would be UPN set with oid: 1.3.6.1.4.1.311.20.2.3
+  // You should ensure that any OID passed is valid for the UTF8String type as we do not explicitly validate this.
+  repeated OtherName other_names = 11 [(dev.f110.kubeproto.field) = { go_name: "OtherNames", api_field_name: "otherNames", list_type: LIST_TYPE_ATOMIC, inline: false }];
+  // Requested email subject alternative names.
+  repeated string email_addresses = 12 [(dev.f110.kubeproto.field) = { go_name: "EmailAddresses", api_field_name: "emailAddresses", list_type: LIST_TYPE_ATOMIC, inline: false }];
+  // Name of the Secret resource that will be automatically created and
+  // managed by this Certificate resource. It will be populated with a
+  // private key and certificate, signed by the denoted issuer. The Secret
+  // resource lives in the same namespace as the Certificate resource.
+  string secret_name = 13 [(dev.f110.kubeproto.field) = { go_name: "SecretName", api_field_name: "secretName", inline: false }];
+  // Defines annotations and labels to be copied to the Certificate's Secret.
+  // Labels and annotations on the Secret will be changed as they appear on the
+  // SecretTemplate when added or removed. SecretTemplate annotations are added
+  // in conjunction with, and cannot overwrite, the base set of annotations
+  // cert-manager sets on the Certificate's Secret.
+  optional CertificateSecretTemplate secret_template = 14 [(dev.f110.kubeproto.field) = { go_name: "SecretTemplate", api_field_name: "secretTemplate", inline: false }];
+  // Additional keystore output formats to be stored in the Certificate's Secret.
+  optional CertificateKeystores keystores = 15 [(dev.f110.kubeproto.field) = { go_name: "Keystores", api_field_name: "keystores", inline: false }];
+  // Reference to the issuer responsible for issuing the certificate.
+  // If the issuer is namespace-scoped, it must be in the same namespace
+  // as the Certificate. If the issuer is cluster-scoped, it can be used
+  // from any namespace.
+  // The `name` field of the reference must always be specified.
+  .github.com.cert_manager.cert_manager.apis.metav1.IssuerReference issuer_ref = 16 [(dev.f110.kubeproto.field) = { go_name: "IssuerRef", api_field_name: "issuerRef", inline: false }];
+  // Requested basic constraints isCA value.
+  // The isCA value is used to set the `isCA` field on the created CertificateRequest
+  // resources. Note that the issuer may choose to ignore the requested isCA value, just
+  // like any other requested attribute.
+  // If true, this will automatically add the `cert sign` usage to the list
+  // of requested `usages`.
+  optional bool is_c_a = 17 [(dev.f110.kubeproto.field) = { go_name: "IsCA", api_field_name: "isCA", inline: false }];
+  // Requested key usages and extended key usages.
+  // These usages are used to set the `usages` field on the created CertificateRequest
+  // resources. If `encodeUsagesInRequest` is unset or set to `true`, the usages
+  // will additionally be encoded in the `request` field which contains the CSR blob.
+  // If unset, defaults to `digital signature` and `key encipherment`.
+  repeated KeyUsage usages = 18 [(dev.f110.kubeproto.field) = { go_name: "Usages", api_field_name: "usages", list_type: LIST_TYPE_ATOMIC, inline: false }];
+  // Private key options. These include the key algorithm and size, the used
+  // encoding and the rotation policy.
+  optional CertificatePrivateKey private_key = 19 [(dev.f110.kubeproto.field) = { go_name: "PrivateKey", api_field_name: "privateKey", inline: false }];
+  // Signature algorithm to use.
+  // Allowed values for RSA keys: SHA256WithRSA, SHA384WithRSA, SHA512WithRSA.
+  // Allowed values for ECDSA keys: ECDSAWithSHA256, ECDSAWithSHA384, ECDSAWithSHA512.
+  // Allowed values for Ed25519 keys: PureEd25519.
+  optional SignatureAlgorithm signature_algorithm = 20 [(dev.f110.kubeproto.field) = { go_name: "SignatureAlgorithm", api_field_name: "signatureAlgorithm", inline: false }];
+  // Whether the KeyUsage and ExtKeyUsage extensions should be set in the encoded CSR.
+  // This option defaults to true, and should only be disabled if the target
+  // issuer does not support CSRs with these X509 KeyUsage/ ExtKeyUsage extensions.
+  optional bool encode_usages_in_request = 21 [(dev.f110.kubeproto.field) = { go_name: "EncodeUsagesInRequest", api_field_name: "encodeUsagesInRequest", inline: false }];
+  // The maximum number of CertificateRequest revisions that are maintained in
+  // the Certificate's history. Each revision represents a single `CertificateRequest`
+  // created by this Certificate, either when it was created, renewed, or Spec
+  // was changed. Revisions will be removed by oldest first if the number of
+  // revisions exceeds this number.
+  // If set, revisionHistoryLimit must be a value of `1` or greater.
+  // Default value is `1`.
+  optional int32 revision_history_limit = 22 [(dev.f110.kubeproto.field) = { go_name: "RevisionHistoryLimit", api_field_name: "revisionHistoryLimit", inline: false }];
+  // Defines extra output formats of the private key and signed certificate chain
+  // to be written to this Certificate's target Secret.
+  repeated CertificateAdditionalOutputFormat additional_output_formats = 23 [(dev.f110.kubeproto.field) = { go_name: "AdditionalOutputFormats", api_field_name: "additionalOutputFormats", list_type: LIST_TYPE_ATOMIC, inline: false }];
+  // x.509 certificate NameConstraint extension which MUST NOT be used in a non-CA certificate.
+  // More Info: https://datatracker.ietf.org/doc/html/rfc5280#section-4.2.1.10
+  // This is an Alpha Feature and is only enabled with the
+  // `--feature-gates=NameConstraints=true` option set on both
   // the controller and webhook components.
-  repeated CertificateAdditionalOutputFormat additional_output_formats = 19 [(dev.f110.kubeproto.field) = { go_name: "AdditionalOutputFormats", api_field_name: "additionalOutputFormats", inline: false }];
+  optional NameConstraints name_constraints = 24 [(dev.f110.kubeproto.field) = { go_name: "NameConstraints", api_field_name: "nameConstraints", inline: false }];
 }
 
 message CertificateStatus {
   // List of status conditions to indicate the status of certificates.
   // Known condition types are `Ready` and `Issuing`.
-  repeated CertificateCondition conditions = 1 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
-  // LastFailureTime is the time as recorded by the Certificate controller
-  // of the most recent failure to complete a CertificateRequest for this
-  // Certificate resource.
-  // If set, cert-manager will not re-request another Certificate until
-  // 1 hour has elapsed from this time.
+  repeated CertificateCondition conditions = 1 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                               list_map_keys: [ "type" ],
+                                                                               inline: false }];
+  // LastFailureTime is set only if the latest issuance for this
+  // Certificate failed and contains the time of the failure. If an
+  // issuance has failed, the delay till the next issuance will be
+  // calculated using formula time.Hour * 2 ^ (failedIssuanceAttempts -
+  // 1). If the latest issuance has succeeded this field will be unset.
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time last_failure_time = 2 [(dev.f110.kubeproto.field) = { go_name: "LastFailureTime", api_field_name: "lastFailureTime", inline: false }];
   // The time after which the certificate stored in the secret named
-  // by this resource in spec.secretName is valid.
+  // by this resource in `spec.secretName` is valid.
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.Time not_before = 3 [(dev.f110.kubeproto.field) = { go_name: "NotBefore", api_field_name: "notBefore", inline: false }];
   // The expiration time of the certificate stored in the secret named
   // by this resource in `spec.secretName`.
@@ -398,6 +564,8 @@ message CertificateStatus {
   // delay till the next issuance will be calculated using formula
   // time.Hour * 2 ^ (failedIssuanceAttempts - 1).
   optional int32 failed_issuance_attempts = 8 [(dev.f110.kubeproto.field) = { go_name: "FailedIssuanceAttempts", api_field_name: "failedIssuanceAttempts", inline: false }];
+  // ACME stores information that is fetched from the ACME CA server.
+  optional CertificateACMEStatus acme = 9 [(dev.f110.kubeproto.field) = { go_name: "ACME", api_field_name: "acme", inline: false }];
 }
 
 message ClusterIssuer {
@@ -463,8 +631,8 @@ message IssuerConfig {
   // SelfSigned configures this issuer to 'self sign' certificates using the
   // private key used to create the CertificateRequest object.
   optional SelfSignedIssuer self_signed = 4 [(dev.f110.kubeproto.field) = { go_name: "SelfSigned", api_field_name: "selfSigned", inline: false }];
-  // Venafi configures this issuer to sign certificates using a Venafi TPP
-  // or Venafi Cloud policy zone.
+  // Venafi configures this issuer to sign certificates using a CyberArk Certificate Manager Self-Hosted
+  // or SaaS policy zone.
   optional VenafiIssuer venafi = 5 [(dev.f110.kubeproto.field) = { go_name: "Venafi", api_field_name: "venafi", inline: false }];
 }
 
@@ -481,7 +649,9 @@ message IssuerSpec {
 message IssuerStatus {
   // List of status conditions to indicate the status of a CertificateRequest.
   // Known condition types are `Ready`.
-  repeated IssuerCondition conditions = 1 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated IssuerCondition conditions = 1 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                          list_map_keys: [ "type" ],
+                                                                          inline: false }];
   // ACME specific status options.
   // This field should only be set if the Issuer is configured to use an ACME
   // server to issue certificates.
@@ -492,37 +662,133 @@ message JKSKeystore {
   // Create enables JKS keystore creation for the Certificate.
   // If true, a file named `keystore.jks` will be created in the target
   // Secret resource, encrypted using the password stored in
-  // `passwordSecretRef`.
-  // The keystore file will only be updated upon re-issuance.
-  // A file named `truststore.jks` will also be created in the target
-  // Secret resource, encrypted using the password stored in
-  // `passwordSecretRef` containing the issuing Certificate Authority
+  // `passwordSecretRef` or `password`.
+  // The keystore file will be updated immediately.
+  // If the issuer provided a CA certificate, a file named `truststore.jks`
+  // will also be created in the target Secret resource, encrypted using the
+  // password stored in `passwordSecretRef`
+  // containing the issuing Certificate Authority
   bool create = 1 [(dev.f110.kubeproto.field) = { go_name: "Create", api_field_name: "create", inline: false }];
-  // PasswordSecretRef is a reference to a key in a Secret resource
+  // Alias specifies the alias of the key in the keystore, required by the JKS format.
+  // If not provided, the default alias `certificate` will be used.
+  optional string alias = 2 [(dev.f110.kubeproto.field) = { go_name: "Alias", api_field_name: "alias", inline: false }];
+  // PasswordSecretRef is a reference to a non-empty key in a Secret resource
   // containing the password used to encrypt the JKS keystore.
-  .github.com.cert_manager.cert_manager.apis.metav1.SecretKeySelector password_secret_ref = 2 [(dev.f110.kubeproto.field) = { go_name: "PasswordSecretRef", api_field_name: "passwordSecretRef", inline: false }];
+  // Mutually exclusive with password.
+  // One of password or passwordSecretRef must provide a password with a non-zero length.
+  optional .github.com.cert_manager.cert_manager.apis.metav1.SecretKeySelector password_secret_ref = 3 [(dev.f110.kubeproto.field) = { go_name: "PasswordSecretRef", api_field_name: "passwordSecretRef", inline: false }];
+  // Password provides a literal password used to encrypt the JKS keystore.
+  // Mutually exclusive with passwordSecretRef.
+  // One of password or passwordSecretRef must provide a password with a non-zero length.
+  optional string password = 4 [(dev.f110.kubeproto.field) = { go_name: "Password", api_field_name: "password", inline: false }];
+}
+
+message NameConstraintItem {
+  // DNSDomains is a list of DNS domains that are permitted or excluded.
+  repeated string dns_domains = 1 [(dev.f110.kubeproto.field) = { go_name: "DNSDomains", api_field_name: "dnsDomains", list_type: LIST_TYPE_ATOMIC, inline: false }];
+  // IPRanges is a list of IP Ranges that are permitted or excluded.
+  // This should be a valid CIDR notation.
+  repeated string ip_ranges = 2 [(dev.f110.kubeproto.field) = { go_name: "IPRanges", api_field_name: "ipRanges", list_type: LIST_TYPE_ATOMIC, inline: false }];
+  // EmailAddresses is a list of Email Addresses that are permitted or excluded.
+  repeated string email_addresses = 3 [(dev.f110.kubeproto.field) = { go_name: "EmailAddresses", api_field_name: "emailAddresses", list_type: LIST_TYPE_ATOMIC, inline: false }];
+  // URIDomains is a list of URI domains that are permitted or excluded.
+  repeated string u_r_id_omains = 4 [(dev.f110.kubeproto.field) = { go_name: "URIDomains", api_field_name: "uriDomains", list_type: LIST_TYPE_ATOMIC, inline: false }];
+}
+
+message NameConstraints {
+  // if true then the name constraints are marked critical.
+  optional bool critical = 1 [(dev.f110.kubeproto.field) = { go_name: "Critical", api_field_name: "critical", inline: false }];
+  // Permitted contains the constraints in which the names must be located.
+  optional NameConstraintItem permitted = 2 [(dev.f110.kubeproto.field) = { go_name: "Permitted", api_field_name: "permitted", inline: false }];
+  // Excluded contains the constraints which must be disallowed. Any name matching a
+  // restriction in the excluded field is invalid regardless
+  // of information appearing in the permitted
+  optional NameConstraintItem excluded = 3 [(dev.f110.kubeproto.field) = { go_name: "Excluded", api_field_name: "excluded", inline: false }];
+}
+
+message OtherName {
+  // OID is the object identifier for the otherName SAN.
+  // The object identifier must be expressed as a dotted string, for
+  // example, "1.2.840.113556.1.4.221".
+  optional string o_id = 1 [(dev.f110.kubeproto.field) = { go_name: "OID", api_field_name: "oid", inline: false }];
+  // utf8Value is the string value of the otherName SAN.
+  // The utf8Value accepts any valid UTF8 string to set as value for the otherName SAN.
+  optional string u_t_f8_value = 2 [(dev.f110.kubeproto.field) = { go_name: "UTF8Value", api_field_name: "utf8Value", inline: false }];
 }
 
 message PKCS12Keystore {
   // Create enables PKCS12 keystore creation for the Certificate.
   // If true, a file named `keystore.p12` will be created in the target
   // Secret resource, encrypted using the password stored in
-  // `passwordSecretRef`.
-  // The keystore file will only be updated upon re-issuance.
-  // A file named `truststore.p12` will also be created in the target
-  // Secret resource, encrypted using the password stored in
-  // `passwordSecretRef` containing the issuing Certificate Authority
+  // `passwordSecretRef` or in `password`.
+  // The keystore file will be updated immediately.
+  // If the issuer provided a CA certificate, a file named `truststore.p12` will
+  // also be created in the target Secret resource, encrypted using the
+  // password stored in `passwordSecretRef` containing the issuing Certificate
+  // Authority
   bool create = 1 [(dev.f110.kubeproto.field) = { go_name: "Create", api_field_name: "create", inline: false }];
-  // PasswordSecretRef is a reference to a key in a Secret resource
-  // containing the password used to encrypt the PKCS12 keystore.
-  .github.com.cert_manager.cert_manager.apis.metav1.SecretKeySelector password_secret_ref = 2 [(dev.f110.kubeproto.field) = { go_name: "PasswordSecretRef", api_field_name: "passwordSecretRef", inline: false }];
+  // Profile specifies the key and certificate encryption algorithms and the HMAC algorithm
+  // used to create the PKCS12 keystore. Default value is `LegacyRC2` for backward compatibility.
+  // If provided, allowed values are:
+  // `LegacyRC2`: Deprecated. Not supported by default in OpenSSL 3 or Java 20.
+  // `LegacyDES`: Less secure algorithm. Use this option for maximal compatibility.
+  // `Modern2023`: Secure algorithm. Use this option in case you have to always use secure algorithms
+  // (e.g., because of company policy). Please note that the security of the algorithm is not that important
+  // in reality, because the unencrypted certificate and private key are also stored in the Secret.
+  // `Modern2026`: Encodes PKCS#12 files using algorithms that are considered modern as of 2026.
+  // Private keys and certificates are encrypted using PBES2 with PBKDF2-HMAC-SHA-256 and AES-256-CBC.
+  // The MAC algorithm is PBMAC1 with PBKDF2-HMAC-SHA-256 and HMAC-SHA256.
+  // Files produced with this profile can be read by OpenSSL 3.4.0 and higher, Java 26 and higher,
+  // or with Java using compatible versions of Bouncy Castle. Meets FIPS 140-3 requirements.
+  optional PKCS12Profile profile = 2 [(dev.f110.kubeproto.field) = { go_name: "Profile", api_field_name: "profile", inline: false }];
+  // PasswordSecretRef is a reference to a non-empty key in a Secret resource
+  // containing the password used to encrypt the PKCS#12 keystore.
+  // Mutually exclusive with password.
+  // One of password or passwordSecretRef must provide a password with a non-zero length.
+  optional .github.com.cert_manager.cert_manager.apis.metav1.SecretKeySelector password_secret_ref = 3 [(dev.f110.kubeproto.field) = { go_name: "PasswordSecretRef", api_field_name: "passwordSecretRef", inline: false }];
+  // Password provides a literal password used to encrypt the PKCS#12 keystore.
+  // Mutually exclusive with passwordSecretRef.
+  // One of password or passwordSecretRef must provide a password with a non-zero length.
+  optional string password = 4 [(dev.f110.kubeproto.field) = { go_name: "Password", api_field_name: "password", inline: false }];
 }
 
 message SelfSignedIssuer {
   // The CRL distribution points is an X.509 v3 certificate extension which identifies
   // the location of the CRL from which the revocation of this certificate can be checked.
   // If not set certificate will be issued without CDP. Values are strings.
-  repeated string c_r_l_distribution_points = 1 [(dev.f110.kubeproto.field) = { go_name: "CRLDistributionPoints", api_field_name: "crlDistributionPoints", inline: false }];
+  repeated string c_r_l_distribution_points = 1 [(dev.f110.kubeproto.field) = { go_name: "CRLDistributionPoints", api_field_name: "crlDistributionPoints", list_type: LIST_TYPE_ATOMIC, inline: false }];
+}
+
+message ServiceAccountRef {
+  // Name of the ServiceAccount used to request a token.
+  string name = 1 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
+  // TokenAudiences is an optional list of extra audiences to include in the token passed to Vault.
+  // The default audiences are always included in the token.
+  repeated string token_audiences = 2 [(dev.f110.kubeproto.field) = { go_name: "TokenAudiences", api_field_name: "audiences", list_type: LIST_TYPE_ATOMIC, inline: false }];
+}
+
+message VaultAWSAuth {
+  // The Vault mountPath here is the mount path to use when authenticating with
+  // Vault. For example, setting a value to `/v1/auth/foo`, will use the path
+  // `/v1/auth/foo/login` to authenticate with Vault. If unspecified, the
+  // default value "/v1/auth/aws" will be used.
+  optional string mount_path = 1 [(dev.f110.kubeproto.field) = { go_name: "MountPath", api_field_name: "mountPath", inline: false }];
+  // A required field containing the Vault Role to assume when authenticating.
+  string role = 2 [(dev.f110.kubeproto.field) = { go_name: "Role", api_field_name: "role", inline: false }];
+  // The AWS region to use for authentication. If not specified, the region
+  // will be determined from AWS_REGION or AWS_DEFAULT_REGION environment
+  // variables, falling back to "us-east-1" if not set.
+  optional string region = 3 [(dev.f110.kubeproto.field) = { go_name: "Region", api_field_name: "region", inline: false }];
+  // A reference to a service account that will be used to request a web identity
+  // token for IRSA (IAM Roles for Service Accounts) authentication.
+  optional ServiceAccountRef service_account_ref = 4 [(dev.f110.kubeproto.field) = { go_name: "ServiceAccountRef", api_field_name: "serviceAccountRef", inline: false }];
+  // The ARN of the AWS IAM role to assume using the Kubernetes service account
+  // token. Required when using IRSA (serviceAccountRef is set).
+  // This role must have a trust policy that allows the OIDC provider to assume it.
+  optional string i_a_m_role_a_r_n = 5 [(dev.f110.kubeproto.field) = { go_name: "IAMRoleARN", api_field_name: "iamRoleArn", inline: false }];
+  // The Vault header value to include in the STS signing request.
+  // This is used to prevent replay attacks.
+  optional string vault_header_value = 6 [(dev.f110.kubeproto.field) = { go_name: "VaultHeaderValue", api_field_name: "vaultHeaderValue", inline: false }];
 }
 
 message VaultAppRole {
@@ -545,9 +811,32 @@ message VaultAuth {
   // AppRole authenticates with Vault using the App Role auth mechanism,
   // with the role and secret stored in a Kubernetes Secret resource.
   optional VaultAppRole app_role = 2 [(dev.f110.kubeproto.field) = { go_name: "AppRole", api_field_name: "appRole", inline: false }];
+  // ClientCertificate authenticates with Vault by presenting a client
+  // certificate during the request's TLS handshake.
+  // Works only when using HTTPS protocol.
+  optional VaultClientCertificateAuth client_certificate = 3 [(dev.f110.kubeproto.field) = { go_name: "ClientCertificate", api_field_name: "clientCertificate", inline: false }];
   // Kubernetes authenticates with Vault by passing the ServiceAccount
   // token stored in the named Secret resource to the Vault server.
-  optional VaultKubernetesAuth kubernetes = 3 [(dev.f110.kubeproto.field) = { go_name: "Kubernetes", api_field_name: "kubernetes", inline: false }];
+  optional VaultKubernetesAuth kubernetes = 4 [(dev.f110.kubeproto.field) = { go_name: "Kubernetes", api_field_name: "kubernetes", inline: false }];
+  // AWS authenticates with Vault using AWS IAM authentication.
+  // This allows authentication using IAM roles for service accounts (IRSA),
+  // EKS Pod Identity (PIA), or ambient credentials (EC2 instance profiles, ECS task role).
+  optional VaultAWSAuth aws = 5 [(dev.f110.kubeproto.field) = { go_name: "AWS", api_field_name: "aws", inline: false }];
+}
+
+message VaultClientCertificateAuth {
+  // The Vault mountPath here is the mount path to use when authenticating with
+  // Vault. For example, setting a value to `/v1/auth/foo`, will use the path
+  // `/v1/auth/foo/login` to authenticate with Vault. If unspecified, the
+  // default value "/v1/auth/cert" will be used.
+  optional string path = 1 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "mountPath", inline: false }];
+  // Reference to Kubernetes Secret of type "kubernetes.io/tls" (hence containing
+  // tls.crt and tls.key) used to authenticate to Vault using TLS client
+  // authentication.
+  optional string secret_name = 2 [(dev.f110.kubeproto.field) = { go_name: "SecretName", api_field_name: "secretName", inline: false }];
+  // Name of the certificate role to authenticate against.
+  // If not set, matching any certificate role, if available.
+  optional string name = 3 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
 }
 
 message VaultIssuer {
@@ -555,17 +844,35 @@ message VaultIssuer {
   VaultAuth auth = 1 [(dev.f110.kubeproto.field) = { go_name: "Auth", api_field_name: "auth", inline: false }];
   // Server is the connection address for the Vault server, e.g: "https://vault.example.com:8200".
   string server = 2 [(dev.f110.kubeproto.field) = { go_name: "Server", api_field_name: "server", inline: false }];
+  // ServerName is used to verify the hostname on the returned certificates
+  // by the Vault server.
+  optional string server_name = 3 [(dev.f110.kubeproto.field) = { go_name: "ServerName", api_field_name: "serverName", inline: false }];
   // Path is the mount path of the Vault PKI backend's `sign` endpoint, e.g:
   // "my_pki_mount/sign/my-role-name".
-  string path = 3 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
+  string path = 4 [(dev.f110.kubeproto.field) = { go_name: "Path", api_field_name: "path", inline: false }];
   // Name of the vault namespace. Namespaces is a set of features within Vault Enterprise that allows Vault environments to support Secure Multi-tenancy. e.g: "ns1"
   // More about namespaces can be found here https://www.vaultproject.io/docs/enterprise/namespaces
-  optional string namespace = 4 [(dev.f110.kubeproto.field) = { go_name: "Namespace", api_field_name: "namespace", inline: false }];
-  // PEM-encoded CA bundle (base64-encoded) used to validate Vault server
-  // certificate. Only used if the Server URL is using HTTPS protocol. This
-  // parameter is ignored for plain HTTP protocol connection. If not set the
-  // system root certificates are used to validate the TLS connection.
-  optional bytes c_a_bundle = 5 [(dev.f110.kubeproto.field) = { go_name: "CABundle", api_field_name: "caBundle", inline: false }];
+  optional string namespace = 5 [(dev.f110.kubeproto.field) = { go_name: "Namespace", api_field_name: "namespace", inline: false }];
+  // Base64-encoded bundle of PEM CAs which will be used to validate the certificate
+  // chain presented by Vault. Only used if using HTTPS to connect to Vault and
+  // ignored for HTTP connections.
+  // Mutually exclusive with CABundleSecretRef.
+  // If neither CABundle nor CABundleSecretRef are defined, the certificate bundle in
+  // the cert-manager controller container is used to validate the TLS connection.
+  optional bytes c_a_bundle = 6 [(dev.f110.kubeproto.field) = { go_name: "CABundle", api_field_name: "caBundle", inline: false }];
+  // Reference to a Secret containing a bundle of PEM-encoded CAs to use when
+  // verifying the certificate chain presented by Vault when using HTTPS.
+  // Mutually exclusive with CABundle.
+  // If neither CABundle nor CABundleSecretRef are defined, the certificate bundle in
+  // the cert-manager controller container is used to validate the TLS connection.
+  // If no key for the Secret is specified, cert-manager will default to 'ca.crt'.
+  optional .github.com.cert_manager.cert_manager.apis.metav1.SecretKeySelector c_a_bundle_secret_ref = 7 [(dev.f110.kubeproto.field) = { go_name: "CABundleSecretRef", api_field_name: "caBundleSecretRef", inline: false }];
+  // Reference to a Secret containing a PEM-encoded Client Certificate to use when the
+  // Vault server requires mTLS.
+  optional .github.com.cert_manager.cert_manager.apis.metav1.SecretKeySelector client_cert_secret_ref = 8 [(dev.f110.kubeproto.field) = { go_name: "ClientCertSecretRef", api_field_name: "clientCertSecretRef", inline: false }];
+  // Reference to a Secret containing a PEM-encoded Client Private Key to use when the
+  // Vault server requires mTLS.
+  optional .github.com.cert_manager.cert_manager.apis.metav1.SecretKeySelector client_key_secret_ref = 9 [(dev.f110.kubeproto.field) = { go_name: "ClientKeySecretRef", api_field_name: "clientKeySecretRef", inline: false }];
 }
 
 message VaultKubernetesAuth {
@@ -577,66 +884,97 @@ message VaultKubernetesAuth {
   // The required Secret field containing a Kubernetes ServiceAccount JWT used
   // for authenticating with Vault. Use of 'ambient credentials' is not
   // supported.
-  .github.com.cert_manager.cert_manager.apis.metav1.SecretKeySelector secret_ref = 2 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
+  optional .github.com.cert_manager.cert_manager.apis.metav1.SecretKeySelector secret_ref = 2 [(dev.f110.kubeproto.field) = { go_name: "SecretRef", api_field_name: "secretRef", inline: false }];
+  // A reference to a service account that will be used to request a bound
+  // token (also known as "projected token"). Compared to using "secretRef",
+  // using this field means that you don't rely on statically bound tokens. To
+  // use this field, you must configure an RBAC rule to let cert-manager
+  // request a token.
+  optional ServiceAccountRef service_account_ref = 3 [(dev.f110.kubeproto.field) = { go_name: "ServiceAccountRef", api_field_name: "serviceAccountRef", inline: false }];
   // A required field containing the Vault Role to assume. A Role binds a
   // Kubernetes ServiceAccount with a set of Vault policies.
-  string role = 3 [(dev.f110.kubeproto.field) = { go_name: "Role", api_field_name: "role", inline: false }];
+  string role = 4 [(dev.f110.kubeproto.field) = { go_name: "Role", api_field_name: "role", inline: false }];
 }
 
 message VenafiCloud {
-  // URL is the base URL for Venafi Cloud.
-  // Defaults to "https://api.venafi.cloud/v1".
+  // URL is the base URL for CyberArk Certificate Manager SaaS.
+  // Defaults to "https://api.venafi.cloud/".
   optional string url = 1 [(dev.f110.kubeproto.field) = { go_name: "URL", api_field_name: "url", inline: false }];
-  // APITokenSecretRef is a secret key selector for the Venafi Cloud API token.
+  // APITokenSecretRef is a secret key selector for the CyberArk Certificate Manager SaaS API token.
   .github.com.cert_manager.cert_manager.apis.metav1.SecretKeySelector api_token_secret_ref = 2 [(dev.f110.kubeproto.field) = { go_name: "APITokenSecretRef", api_field_name: "apiTokenSecretRef", inline: false }];
 }
 
 message VenafiIssuer {
-  // Zone is the Venafi Policy Zone to use for this issuer.
-  // All requests made to the Venafi platform will be restricted by the named
+  // Zone is the Certificate Manager Policy Zone to use for this issuer.
+  // All requests made to the Certificate Manager platform will be restricted by the named
   // zone policy.
   // This field is required.
   string zone = 1 [(dev.f110.kubeproto.field) = { go_name: "Zone", api_field_name: "zone", inline: false }];
-  // TPP specifies Trust Protection Platform configuration settings.
-  // Only one of TPP or Cloud may be specified.
+  // TPP specifies CyberArk Certificate Manager Self-Hosted configuration settings.
+  // Only one of CyberArk Certificate Manager may be specified.
   optional VenafiTPP t_p_p = 2 [(dev.f110.kubeproto.field) = { go_name: "TPP", api_field_name: "tpp", inline: false }];
-  // Cloud specifies the Venafi cloud configuration settings.
-  // Only one of TPP or Cloud may be specified.
+  // Cloud specifies the CyberArk Certificate Manager SaaS configuration settings.
+  // Only one of CyberArk Certificate Manager may be specified.
   optional VenafiCloud cloud = 3 [(dev.f110.kubeproto.field) = { go_name: "Cloud", api_field_name: "cloud", inline: false }];
+  // NGTS specifies Palo Alto Networks Next Generation Trust Services (NGTS) configuration
+  // using OAuth 2.0 Client Credentials. Only one of tpp, cloud, or ngts may be specified.
+  optional VenafiNGTS n_g_t_s = 4 [(dev.f110.kubeproto.field) = { go_name: "NGTS", api_field_name: "ngts", inline: false }];
+}
+
+message VenafiNGTS {
+  // URL is the base URL for the NGTS API endpoint.
+  // Defaults to "https://api.strata.paloaltonetworks.com/ngts" if not set.
+  optional string url = 1 [(dev.f110.kubeproto.field) = { go_name: "URL", api_field_name: "url", inline: false }];
+  // TokenEndpoint is the OAuth 2.0 token endpoint URL used to obtain access tokens,
+  // for example "https://auth.apps.paloaltonetworks.com/oauth2/access_token".
+  // Defaults to "https://auth.apps.paloaltonetworks.com/oauth2/access_token" if not set.
+  optional string token_endpoint = 2 [(dev.f110.kubeproto.field) = { go_name: "TokenEndpoint", api_field_name: "tokenEndpoint", inline: false }];
+  // TSGID is the Tenant Service Group ID used to scope the OAuth 2.0 access token,
+  // for example "1234567890". The tsg_id: prefix is added automatically.
+  // This field is required.
+  string t_s_g_id = 3 [(dev.f110.kubeproto.field) = { go_name: "TSGID", api_field_name: "tsgID", inline: false }];
+  // CredentialsRef is a reference to a Kubernetes Secret containing the OAuth 2.0
+  // Client ID and Client Secret. The secret must contain the keys 'client-id' and
+  // 'client-secret'.
+  .github.com.cert_manager.cert_manager.apis.metav1.LocalObjectReference credentials_ref = 4 [(dev.f110.kubeproto.field) = { go_name: "CredentialsRef", api_field_name: "credentialsRef", inline: false }];
 }
 
 message VenafiTPP {
-  // URL is the base URL for the vedsdk endpoint of the Venafi TPP instance,
+  // URL is the base URL for the vedsdk endpoint of the CyberArk Certificate Manager Self-Hosted instance,
   // for example: "https://tpp.example.com/vedsdk".
   string url = 1 [(dev.f110.kubeproto.field) = { go_name: "URL", api_field_name: "url", inline: false }];
-  // CredentialsRef is a reference to a Secret containing the username and
-  // password for the TPP server.
-  // The secret must contain two keys, 'username' and 'password'.
+  // CredentialsRef is a reference to a Secret containing the CyberArk Certificate Manager Self-Hosted API credentials.
+  // The secret must contain the key 'access-token' for the Access Token Authentication,
+  // or two keys, 'username' and 'password' for the API Keys Authentication.
   .github.com.cert_manager.cert_manager.apis.metav1.LocalObjectReference credentials_ref = 2 [(dev.f110.kubeproto.field) = { go_name: "CredentialsRef", api_field_name: "credentialsRef", inline: false }];
-  // CABundle is a PEM encoded TLS certificate to use to verify connections to
-  // the TPP instance.
-  // If specified, system roots will not be used and the issuing CA for the
-  // TPP instance must be verifiable using the provided root.
-  // If not specified, the connection will be verified using the cert-manager
-  // system root certificates.
+  // Base64-encoded bundle of PEM CAs which will be used to validate the certificate
+  // chain presented by the CyberArk Certificate Manager Self-Hosted server. Only used if using HTTPS; ignored for HTTP.
+  // If undefined, the certificate bundle in the cert-manager controller container
+  // is used to validate the chain.
   optional bytes c_a_bundle = 3 [(dev.f110.kubeproto.field) = { go_name: "CABundle", api_field_name: "caBundle", inline: false }];
+  // Reference to a Secret containing a base64-encoded bundle of PEM CAs
+  // which will be used to validate the certificate chain presented by the CyberArk Certificate Manager Self-Hosted server.
+  // Only used if using HTTPS; ignored for HTTP. Mutually exclusive with CABundle.
+  // If neither CABundle nor CABundleSecretRef is defined, the certificate bundle in
+  // the cert-manager controller container is used to validate the TLS connection.
+  optional .github.com.cert_manager.cert_manager.apis.metav1.SecretKeySelector c_a_bundle_secret_ref = 4 [(dev.f110.kubeproto.field) = { go_name: "CABundleSecretRef", api_field_name: "caBundleSecretRef", inline: false }];
 }
 
 message X509Subject {
   // Organizations to be used on the Certificate.
-  repeated string organizations = 1 [(dev.f110.kubeproto.field) = { go_name: "Organizations", api_field_name: "organizations", inline: false }];
+  repeated string organizations = 1 [(dev.f110.kubeproto.field) = { go_name: "Organizations", api_field_name: "organizations", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Countries to be used on the Certificate.
-  repeated string countries = 2 [(dev.f110.kubeproto.field) = { go_name: "Countries", api_field_name: "countries", inline: false }];
+  repeated string countries = 2 [(dev.f110.kubeproto.field) = { go_name: "Countries", api_field_name: "countries", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Organizational Units to be used on the Certificate.
-  repeated string organizational_units = 3 [(dev.f110.kubeproto.field) = { go_name: "OrganizationalUnits", api_field_name: "organizationalUnits", inline: false }];
+  repeated string organizational_units = 3 [(dev.f110.kubeproto.field) = { go_name: "OrganizationalUnits", api_field_name: "organizationalUnits", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Cities to be used on the Certificate.
-  repeated string localities = 4 [(dev.f110.kubeproto.field) = { go_name: "Localities", api_field_name: "localities", inline: false }];
+  repeated string localities = 4 [(dev.f110.kubeproto.field) = { go_name: "Localities", api_field_name: "localities", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // State/Provinces to be used on the Certificate.
-  repeated string provinces = 5 [(dev.f110.kubeproto.field) = { go_name: "Provinces", api_field_name: "provinces", inline: false }];
+  repeated string provinces = 5 [(dev.f110.kubeproto.field) = { go_name: "Provinces", api_field_name: "provinces", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Street addresses to be used on the Certificate.
-  repeated string street_addresses = 6 [(dev.f110.kubeproto.field) = { go_name: "StreetAddresses", api_field_name: "streetAddresses", inline: false }];
+  repeated string street_addresses = 6 [(dev.f110.kubeproto.field) = { go_name: "StreetAddresses", api_field_name: "streetAddresses", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Postal codes to be used on the Certificate.
-  repeated string postal_codes = 7 [(dev.f110.kubeproto.field) = { go_name: "PostalCodes", api_field_name: "postalCodes", inline: false }];
+  repeated string postal_codes = 7 [(dev.f110.kubeproto.field) = { go_name: "PostalCodes", api_field_name: "postalCodes", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Serial number to be used on the Certificate.
   optional string serial_number = 8 [(dev.f110.kubeproto.field) = { go_name: "SerialNumber", api_field_name: "serialNumber", inline: false }];
 }

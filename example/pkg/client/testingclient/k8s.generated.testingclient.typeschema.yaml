@@ -239,7 +239,7 @@ types:
         namedType: example.apis.blogv1alpha2.LabelSelector
     - name: issuerRef
       type:
-        namedType: github.com.cert_manager.cert_manager.apis.metav1.ObjectReference
+        namedType: github.com.cert_manager.cert_manager.apis.metav1.IssuerReference
 - name: k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector
   map:
     fields:
@@ -309,7 +309,7 @@ types:
     - name: namespace
       type:
         scalar: string
-- name: github.com.cert_manager.cert_manager.apis.metav1.ObjectReference
+- name: github.com.cert_manager.cert_manager.apis.metav1.IssuerReference
   map:
     fields:
     - name: name
