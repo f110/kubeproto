@@ -1,6 +1,7 @@
 load("@protobuf//bazel:proto_library.bzl", "proto_library")
-load("//bazel:protobuf.bzl", "gen_protobuf")
+load("@rules_go//go:def.bzl", "go_library")
 load("//bazel:def.bzl", "kubeproto_go_api")
+load("//bazel:protobuf.bzl", "gen_protobuf")
 
 gen_protobuf(
     name = "gen",
@@ -15,7 +16,7 @@ gen_protobuf(
 )
 
 proto_library(
-    name = "monitoringv1",
+    name = "monitoringv1_proto",
     srcs = ["generated.proto"],
     visibility = ["//visibility:public"],
     deps = [
@@ -26,6 +27,20 @@ proto_library(
 
 kubeproto_go_api(
     name = "monitoringv1_kubeproto",
-    srcs = [":monitoringv1"],
+    srcs = [":monitoringv1_proto"],
     importpath = "go.f110.dev/kubeproto/example/proto/github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoringv1",
+)
+
+go_library(
+    name = "monitoringv1",
+    srcs = ["monitoringv1_kubeproto.generated.object.go"],
+    importpath = "go.f110.dev/kubeproto/example/proto/github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoringv1",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//go/apis/corev1",
+        "//go/apis/metav1",
+        "@io_k8s_apimachinery//pkg/runtime",
+        "@io_k8s_apimachinery//pkg/runtime/schema",
+        "@io_k8s_apimachinery//pkg/util/intstr",
+    ],
 )

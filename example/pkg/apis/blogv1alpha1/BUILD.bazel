@@ -1,5 +1,6 @@
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
 load("@rules_go//go:def.bzl", "go_library")
-load("@rules_proto//proto:defs.bzl", "proto_library")
+load("//bazel:def.bzl", "kubeproto_go_api")
 
 proto_library(
     name = "blog_proto",
@@ -9,8 +10,6 @@ proto_library(
         "//:kubeproto",
     ],
 )
-
-load("//bazel:def.bzl", "kubeproto_go_api")
 
 kubeproto_go_api(
     name = "blog_proto_kubeproto",
@@ -24,8 +23,8 @@ go_library(
     importpath = "go.f110.dev/kubeproto/example/pkg/apis/blogv1alpha1",
     visibility = ["//visibility:public"],
     deps = [
-        "//example/vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
-        "//example/vendor/k8s.io/apimachinery/pkg/runtime",
-        "//example/vendor/k8s.io/apimachinery/pkg/runtime/schema",
+        "//go/apis/metav1",
+        "@io_k8s_apimachinery//pkg/runtime",
+        "@io_k8s_apimachinery//pkg/runtime/schema",
     ],
 )

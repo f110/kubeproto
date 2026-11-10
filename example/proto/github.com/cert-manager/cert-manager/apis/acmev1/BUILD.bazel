@@ -1,6 +1,7 @@
 load("@protobuf//bazel:proto_library.bzl", "proto_library")
-load("//bazel:protobuf.bzl", "gen_protobuf")
+load("@rules_go//go:def.bzl", "go_library")
 load("//bazel:def.bzl", "kubeproto_go_api")
+load("//bazel:protobuf.bzl", "gen_protobuf")
 
 gen_protobuf(
     name = "gen",
@@ -15,20 +16,39 @@ gen_protobuf(
 )
 
 proto_library(
-    name = "acmev1",
+    name = "acmev1_proto",
     srcs = ["generated.proto"],
     visibility = ["//visibility:public"],
     deps = [
         "//:k8s_proto",
         "//:kubeproto",
+        "//example/proto/github.com/cert-manager/cert-manager/apis/metav1:metav1_proto",
         "//k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1:apiextensions_proto",
-        "//sigs.k8s.io/gateway-api/apis/v1alpha2:v1alpha2_proto",
-        "//example/proto/github.com/cert-manager/cert-manager/apis/metav1",
+        "//k8s.io/apimachinery/pkg/api/resource:resource_proto",
+        "//sigs.k8s.io/gateway-api/apis/v1:v1_proto",
     ],
 )
 
 kubeproto_go_api(
     name = "acmev1_kubeproto",
-    srcs = [":acmev1"],
+    srcs = [":acmev1_proto"],
+    all = True,
     importpath = "go.f110.dev/kubeproto/example/proto/github.com/cert-manager/cert-manager/apis/acmev1",
+)
+
+go_library(
+    name = "acmev1",
+    srcs = ["acmev1_kubeproto.generated.object.go"],
+    importpath = "go.f110.dev/kubeproto/example/proto/github.com/cert-manager/cert-manager/apis/acmev1",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/proto/github.com/cert-manager/cert-manager/apis/metav1",
+        "//go/apis/corev1",
+        "//go/apis/gatewayv1",
+        "//go/apis/metav1",
+        "@io_k8s_apiextensions_apiserver//pkg/apis/apiextensions/v1:apiextensions",
+        "@io_k8s_apimachinery//pkg/api/resource",
+        "@io_k8s_apimachinery//pkg/runtime",
+        "@io_k8s_apimachinery//pkg/runtime/schema",
+    ],
 )

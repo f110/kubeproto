@@ -2,6 +2,7 @@ package thirdpartyclient
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"reflect"
 	"sync"
@@ -13,6 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
@@ -51,6 +53,7 @@ type Backend interface {
 	Create(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error)
 	Update(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	UpdateStatus(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
+	Apply(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error)
 	Delete(ctx context.Context, gvr schema.GroupVersionResource, namespace, name string, opts metav1.DeleteOptions) error
 	Watch(ctx context.Context, gvr schema.GroupVersionResource, namespace string, opts metav1.ListOptions) (watch.Interface, error)
 	GetClusterScoped(ctx context.Context, resourceName, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error)
@@ -58,14 +61,16 @@ type Backend interface {
 	CreateClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.CreateOptions, result runtime.Object) (runtime.Object, error)
 	UpdateClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	UpdateStatusClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
+	ApplyClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error)
 	DeleteClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, name string, opts metav1.DeleteOptions) error
 	WatchClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, opts metav1.ListOptions) (watch.Interface, error)
+
+	RESTClient() *rest.RESTClient
 }
 
 type Set struct {
 	CertManagerIoV1 *CertManagerIoV1
 	CoreosComV1     *CoreosComV1
-	RESTClient      *rest.RESTClient
 }
 
 func NewSet(cfg *rest.Config) (*Set, error) {
@@ -79,7 +84,7 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.CertManagerIoV1 = NewCertManagerIoV1Client(&restBackend{client: c})
+		s.CertManagerIoV1 = NewCertManagerIoV1Client(&restBackend{client: c}, &conf)
 	}
 	{
 		conf := *cfg
@@ -90,15 +95,7 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.CoreosComV1 = NewCoreosComV1Client(&restBackend{client: c})
-	}
-	{
-		conf := *cfg
-		c, err := rest.RESTClientFor(&conf)
-		if err != nil {
-			return nil, err
-		}
-		s.RESTClient = c
+		s.CoreosComV1 = NewCoreosComV1Client(&restBackend{client: c}, &conf)
 	}
 
 	return s, nil
@@ -176,6 +173,27 @@ func (r *restBackend) UpdateStatus(ctx context.Context, resourceName string, obj
 		SubResource("status").
 		VersionedParams(&opts, ParameterCodec).
 		Body(obj).
+		Do(ctx).
+		Into(result)
+}
+
+func (r *restBackend) Apply(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error) {
+	m := obj.(metav1.Object)
+	if m == nil {
+		return nil, errors.New("obj is not implement metav1.Object")
+	}
+	meta := m.GetObjectMeta()
+	patch, err := encodeApplyPatch(obj)
+	if err != nil {
+		return nil, err
+	}
+	patchOpts := opts.ToPatchOptions()
+	return result, r.client.Patch(types.ApplyPatchType).
+		Namespace(meta.Namespace).
+		Resource(resourceName).
+		Name(meta.Name).
+		VersionedParams(&patchOpts, ParameterCodec).
+		Body(patch).
 		Do(ctx).
 		Into(result)
 }
@@ -266,6 +284,39 @@ func (r *restBackend) UpdateStatusClusterScoped(ctx context.Context, resourceNam
 		Into(result)
 }
 
+func (r *restBackend) ApplyClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error) {
+	m := obj.(metav1.Object)
+	if m == nil {
+		return nil, errors.New("obj is not implement metav1.Object")
+	}
+	meta := m.GetObjectMeta()
+	patch, err := encodeApplyPatch(obj)
+	if err != nil {
+		return nil, err
+	}
+	patchOpts := opts.ToPatchOptions()
+	return result, r.client.Patch(types.ApplyPatchType).
+		Resource(resourceName).
+		Name(meta.Name).
+		VersionedParams(&patchOpts, ParameterCodec).
+		Body(patch).
+		Do(ctx).
+		Into(result)
+}
+
+// encodeApplyPatch encodes obj into the body of the apply request.
+// The body is passed as []byte because rest.Request overwrites Content-Type when the body is runtime.Object.
+// The apply request requires apiVersion and kind, so they are set from Scheme.
+func encodeApplyPatch(obj runtime.Object) ([]byte, error) {
+	gvks, _, err := Scheme.ObjectKinds(obj)
+	if err != nil {
+		return nil, err
+	}
+	obj = obj.DeepCopyObject()
+	obj.GetObjectKind().SetGroupVersionKind(gvks[0])
+	return json.Marshal(obj)
+}
+
 func (r *restBackend) DeleteClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, name string, opts metav1.DeleteOptions) error {
 	return r.client.Delete().
 		Resource(gvr.Resource).
@@ -288,12 +339,17 @@ func (r *restBackend) WatchClusterScoped(ctx context.Context, gvr schema.GroupVe
 		Watch(ctx)
 }
 
-type CertManagerIoV1 struct {
-	backend Backend
+func (r *restBackend) RESTClient() *rest.RESTClient {
+	return r.client
 }
 
-func NewCertManagerIoV1Client(b Backend) *CertManagerIoV1 {
-	return &CertManagerIoV1{backend: b}
+type CertManagerIoV1 struct {
+	backend Backend
+	config  *rest.Config
+}
+
+func NewCertManagerIoV1Client(b Backend, config *rest.Config) *CertManagerIoV1 {
+	return &CertManagerIoV1{backend: b, config: config}
 }
 
 func (c *CertManagerIoV1) GetCertificate(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*certmanagerv1.Certificate, error) {
@@ -322,6 +378,14 @@ func (c *CertManagerIoV1) UpdateCertificate(ctx context.Context, v *certmanagerv
 
 func (c *CertManagerIoV1) UpdateStatusCertificate(ctx context.Context, v *certmanagerv1.Certificate, opts metav1.UpdateOptions) (*certmanagerv1.Certificate, error) {
 	result, err := c.backend.UpdateStatus(ctx, "certificates", v, opts, &certmanagerv1.Certificate{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*certmanagerv1.Certificate), nil
+}
+
+func (c *CertManagerIoV1) ApplyCertificate(ctx context.Context, v *certmanagerv1.Certificate, opts metav1.ApplyOptions) (*certmanagerv1.Certificate, error) {
+	result, err := c.backend.Apply(ctx, "certificates", v, opts, &certmanagerv1.Certificate{})
 	if err != nil {
 		return nil, err
 	}
@@ -376,6 +440,14 @@ func (c *CertManagerIoV1) UpdateStatusCertificateRequest(ctx context.Context, v 
 	return result.(*certmanagerv1.CertificateRequest), nil
 }
 
+func (c *CertManagerIoV1) ApplyCertificateRequest(ctx context.Context, v *certmanagerv1.CertificateRequest, opts metav1.ApplyOptions) (*certmanagerv1.CertificateRequest, error) {
+	result, err := c.backend.Apply(ctx, "certificaterequests", v, opts, &certmanagerv1.CertificateRequest{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*certmanagerv1.CertificateRequest), nil
+}
+
 func (c *CertManagerIoV1) DeleteCertificateRequest(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "cert-manager.io.", Version: "v1", Resource: "certificaterequests"}, namespace, name, opts)
 }
@@ -418,6 +490,14 @@ func (c *CertManagerIoV1) UpdateClusterIssuer(ctx context.Context, v *certmanage
 
 func (c *CertManagerIoV1) UpdateStatusClusterIssuer(ctx context.Context, v *certmanagerv1.ClusterIssuer, opts metav1.UpdateOptions) (*certmanagerv1.ClusterIssuer, error) {
 	result, err := c.backend.UpdateStatusClusterScoped(ctx, "clusterissuers", v, opts, &certmanagerv1.ClusterIssuer{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*certmanagerv1.ClusterIssuer), nil
+}
+
+func (c *CertManagerIoV1) ApplyClusterIssuer(ctx context.Context, v *certmanagerv1.ClusterIssuer, opts metav1.ApplyOptions) (*certmanagerv1.ClusterIssuer, error) {
+	result, err := c.backend.ApplyClusterScoped(ctx, "clusterissuers", v, opts, &certmanagerv1.ClusterIssuer{})
 	if err != nil {
 		return nil, err
 	}
@@ -472,6 +552,14 @@ func (c *CertManagerIoV1) UpdateStatusIssuer(ctx context.Context, v *certmanager
 	return result.(*certmanagerv1.Issuer), nil
 }
 
+func (c *CertManagerIoV1) ApplyIssuer(ctx context.Context, v *certmanagerv1.Issuer, opts metav1.ApplyOptions) (*certmanagerv1.Issuer, error) {
+	result, err := c.backend.Apply(ctx, "issuers", v, opts, &certmanagerv1.Issuer{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*certmanagerv1.Issuer), nil
+}
+
 func (c *CertManagerIoV1) DeleteIssuer(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "cert-manager.io.", Version: "v1", Resource: "issuers"}, namespace, name, opts)
 }
@@ -490,10 +578,11 @@ func (c *CertManagerIoV1) WatchIssuer(ctx context.Context, namespace string, opt
 
 type CoreosComV1 struct {
 	backend Backend
+	config  *rest.Config
 }
 
-func NewCoreosComV1Client(b Backend) *CoreosComV1 {
-	return &CoreosComV1{backend: b}
+func NewCoreosComV1Client(b Backend, config *rest.Config) *CoreosComV1 {
+	return &CoreosComV1{backend: b, config: config}
 }
 
 func (c *CoreosComV1) GetAlertmanager(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*monitoringv1.Alertmanager, error) {
@@ -522,6 +611,14 @@ func (c *CoreosComV1) UpdateAlertmanager(ctx context.Context, v *monitoringv1.Al
 
 func (c *CoreosComV1) UpdateStatusAlertmanager(ctx context.Context, v *monitoringv1.Alertmanager, opts metav1.UpdateOptions) (*monitoringv1.Alertmanager, error) {
 	result, err := c.backend.UpdateStatus(ctx, "alertmanagers", v, opts, &monitoringv1.Alertmanager{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*monitoringv1.Alertmanager), nil
+}
+
+func (c *CoreosComV1) ApplyAlertmanager(ctx context.Context, v *monitoringv1.Alertmanager, opts metav1.ApplyOptions) (*monitoringv1.Alertmanager, error) {
+	result, err := c.backend.Apply(ctx, "alertmanagers", v, opts, &monitoringv1.Alertmanager{})
 	if err != nil {
 		return nil, err
 	}
@@ -568,6 +665,14 @@ func (c *CoreosComV1) UpdatePodMonitor(ctx context.Context, v *monitoringv1.PodM
 	return result.(*monitoringv1.PodMonitor), nil
 }
 
+func (c *CoreosComV1) ApplyPodMonitor(ctx context.Context, v *monitoringv1.PodMonitor, opts metav1.ApplyOptions) (*monitoringv1.PodMonitor, error) {
+	result, err := c.backend.Apply(ctx, "podmonitors", v, opts, &monitoringv1.PodMonitor{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*monitoringv1.PodMonitor), nil
+}
+
 func (c *CoreosComV1) DeletePodMonitor(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "coreos.com.monitor", Version: "v1", Resource: "podmonitors"}, namespace, name, opts)
 }
@@ -602,6 +707,14 @@ func (c *CoreosComV1) CreateProbe(ctx context.Context, v *monitoringv1.Probe, op
 
 func (c *CoreosComV1) UpdateProbe(ctx context.Context, v *monitoringv1.Probe, opts metav1.UpdateOptions) (*monitoringv1.Probe, error) {
 	result, err := c.backend.Update(ctx, "probes", v, opts, &monitoringv1.Probe{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*monitoringv1.Probe), nil
+}
+
+func (c *CoreosComV1) ApplyProbe(ctx context.Context, v *monitoringv1.Probe, opts metav1.ApplyOptions) (*monitoringv1.Probe, error) {
+	result, err := c.backend.Apply(ctx, "probes", v, opts, &monitoringv1.Probe{})
 	if err != nil {
 		return nil, err
 	}
@@ -656,6 +769,14 @@ func (c *CoreosComV1) UpdateStatusPrometheus(ctx context.Context, v *monitoringv
 	return result.(*monitoringv1.Prometheus), nil
 }
 
+func (c *CoreosComV1) ApplyPrometheus(ctx context.Context, v *monitoringv1.Prometheus, opts metav1.ApplyOptions) (*monitoringv1.Prometheus, error) {
+	result, err := c.backend.Apply(ctx, "prometheuses", v, opts, &monitoringv1.Prometheus{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*monitoringv1.Prometheus), nil
+}
+
 func (c *CoreosComV1) DeletePrometheus(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "coreos.com.monitor", Version: "v1", Resource: "prometheuses"}, namespace, name, opts)
 }
@@ -696,6 +817,14 @@ func (c *CoreosComV1) UpdatePrometheusRule(ctx context.Context, v *monitoringv1.
 	return result.(*monitoringv1.PrometheusRule), nil
 }
 
+func (c *CoreosComV1) ApplyPrometheusRule(ctx context.Context, v *monitoringv1.PrometheusRule, opts metav1.ApplyOptions) (*monitoringv1.PrometheusRule, error) {
+	result, err := c.backend.Apply(ctx, "prometheusrules", v, opts, &monitoringv1.PrometheusRule{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*monitoringv1.PrometheusRule), nil
+}
+
 func (c *CoreosComV1) DeletePrometheusRule(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "coreos.com.monitor", Version: "v1", Resource: "prometheusrules"}, namespace, name, opts)
 }
@@ -730,6 +859,14 @@ func (c *CoreosComV1) CreateServiceMonitor(ctx context.Context, v *monitoringv1.
 
 func (c *CoreosComV1) UpdateServiceMonitor(ctx context.Context, v *monitoringv1.ServiceMonitor, opts metav1.UpdateOptions) (*monitoringv1.ServiceMonitor, error) {
 	result, err := c.backend.Update(ctx, "servicemonitors", v, opts, &monitoringv1.ServiceMonitor{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*monitoringv1.ServiceMonitor), nil
+}
+
+func (c *CoreosComV1) ApplyServiceMonitor(ctx context.Context, v *monitoringv1.ServiceMonitor, opts metav1.ApplyOptions) (*monitoringv1.ServiceMonitor, error) {
+	result, err := c.backend.Apply(ctx, "servicemonitors", v, opts, &monitoringv1.ServiceMonitor{})
 	if err != nil {
 		return nil, err
 	}
@@ -778,6 +915,14 @@ func (c *CoreosComV1) UpdateThanosRuler(ctx context.Context, v *monitoringv1.Tha
 
 func (c *CoreosComV1) UpdateStatusThanosRuler(ctx context.Context, v *monitoringv1.ThanosRuler, opts metav1.UpdateOptions) (*monitoringv1.ThanosRuler, error) {
 	result, err := c.backend.UpdateStatus(ctx, "thanosrulers", v, opts, &monitoringv1.ThanosRuler{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*monitoringv1.ThanosRuler), nil
+}
+
+func (c *CoreosComV1) ApplyThanosRuler(ctx context.Context, v *monitoringv1.ThanosRuler, opts metav1.ApplyOptions) (*monitoringv1.ThanosRuler, error) {
+	result, err := c.backend.Apply(ctx, "thanosrulers", v, opts, &monitoringv1.ThanosRuler{})
 	if err != nil {
 		return nil, err
 	}
@@ -938,10 +1083,10 @@ func (f *CertManagerIoV1Informer) CertificateInformer() cache.SharedIndexInforme
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListCertificate(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.ListCertificate(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchCertificate(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.WatchCertificate(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 			},
 			&certmanagerv1.Certificate{},
@@ -960,10 +1105,10 @@ func (f *CertManagerIoV1Informer) CertificateRequestInformer() cache.SharedIndex
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListCertificateRequest(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.ListCertificateRequest(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchCertificateRequest(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.WatchCertificateRequest(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 			},
 			&certmanagerv1.CertificateRequest{},
@@ -982,10 +1127,10 @@ func (f *CertManagerIoV1Informer) ClusterIssuerInformer() cache.SharedIndexInfor
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListClusterIssuer(context.TODO(), metav1.ListOptions{})
+					return f.client.ListClusterIssuer(context.TODO(), metav1.ListOptionsFromUpstream(options))
 				},
 				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchClusterIssuer(context.TODO(), metav1.ListOptions{})
+					return f.client.WatchClusterIssuer(context.TODO(), metav1.ListOptionsFromUpstream(options))
 				},
 			},
 			&certmanagerv1.ClusterIssuer{},
@@ -1004,10 +1149,10 @@ func (f *CertManagerIoV1Informer) IssuerInformer() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListIssuer(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.ListIssuer(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchIssuer(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.WatchIssuer(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 			},
 			&certmanagerv1.Issuer{},
@@ -1044,10 +1189,10 @@ func (f *CoreosComV1Informer) AlertmanagerInformer() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListAlertmanager(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.ListAlertmanager(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchAlertmanager(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.WatchAlertmanager(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 			},
 			&monitoringv1.Alertmanager{},
@@ -1066,10 +1211,10 @@ func (f *CoreosComV1Informer) PodMonitorInformer() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListPodMonitor(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.ListPodMonitor(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchPodMonitor(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.WatchPodMonitor(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 			},
 			&monitoringv1.PodMonitor{},
@@ -1088,10 +1233,10 @@ func (f *CoreosComV1Informer) ProbeInformer() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListProbe(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.ListProbe(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchProbe(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.WatchProbe(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 			},
 			&monitoringv1.Probe{},
@@ -1110,10 +1255,10 @@ func (f *CoreosComV1Informer) PrometheusInformer() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListPrometheus(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.ListPrometheus(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchPrometheus(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.WatchPrometheus(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 			},
 			&monitoringv1.Prometheus{},
@@ -1132,10 +1277,10 @@ func (f *CoreosComV1Informer) PrometheusRuleInformer() cache.SharedIndexInformer
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListPrometheusRule(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.ListPrometheusRule(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchPrometheusRule(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.WatchPrometheusRule(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 			},
 			&monitoringv1.PrometheusRule{},
@@ -1154,10 +1299,10 @@ func (f *CoreosComV1Informer) ServiceMonitorInformer() cache.SharedIndexInformer
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListServiceMonitor(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.ListServiceMonitor(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchServiceMonitor(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.WatchServiceMonitor(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 			},
 			&monitoringv1.ServiceMonitor{},
@@ -1176,10 +1321,10 @@ func (f *CoreosComV1Informer) ThanosRulerInformer() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options k8smetav1.ListOptions) (runtime.Object, error) {
-					return f.client.ListThanosRuler(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.ListThanosRuler(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 				WatchFunc: func(options k8smetav1.ListOptions) (watch.Interface, error) {
-					return f.client.WatchThanosRuler(context.TODO(), f.namespace, metav1.ListOptions{})
+					return f.client.WatchThanosRuler(context.TODO(), f.namespace, metav1.ListOptionsFromUpstream(options))
 				},
 			},
 			&monitoringv1.ThanosRuler{},

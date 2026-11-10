@@ -1,6 +1,7 @@
 load("@protobuf//bazel:proto_library.bzl", "proto_library")
-load("//bazel:protobuf.bzl", "gen_protobuf")
+load("@rules_go//go:def.bzl", "go_library")
 load("//bazel:def.bzl", "kubeproto_go_api")
+load("//bazel:protobuf.bzl", "gen_protobuf")
 
 gen_protobuf(
     name = "gen",
@@ -9,13 +10,13 @@ gen_protobuf(
     api_sub_group = "cert-manager.io",
     api_version = "v1",
     importpath = "go.f110.dev/kubeproto/example/proto/github.com/cert-manager/cert-manager/apis/metav1",
-#     importpath = "github.com/cert-manager/cert-manager/pkg/apis/meta/v1",
+    #     importpath = "github.com/cert-manager/cert-manager/pkg/apis/meta/v1",
     proto_package_name = "github.com.cert_manager.cert_manager.apis.metav1",
     visibility = ["//visibility:public"],
 )
 
 proto_library(
-    name = "metav1",
+    name = "metav1_proto",
     srcs = ["generated.proto"],
     visibility = ["//visibility:public"],
     deps = [
@@ -25,6 +26,19 @@ proto_library(
 
 kubeproto_go_api(
     name = "metav1_kubeproto",
-    srcs = [":metav1"],
+    srcs = [":metav1_proto"],
+    all = True,
     importpath = "go.f110.dev/kubeproto/example/proto/github.com/cert-manager/cert-manager/apis/metav1",
+)
+
+go_library(
+    name = "metav1",
+    srcs = ["metav1_kubeproto.generated.object.go"],
+    importpath = "go.f110.dev/kubeproto/example/proto/github.com/cert-manager/cert-manager/apis/metav1",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//go/apis/metav1",
+        "@io_k8s_apimachinery//pkg/runtime",
+        "@io_k8s_apimachinery//pkg/runtime/schema",
+    ],
 )
