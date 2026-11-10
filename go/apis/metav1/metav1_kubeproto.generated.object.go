@@ -644,7 +644,7 @@ func (in *FieldSelectorRequirement) DeepCopy() *FieldSelectorRequirement {
 type FieldsV1 struct {
 	// Raw is the underlying serialization of this object.
 	// Deprecated: Direct access to this field is deprecated. Use GetRawBytes, GetRawString, SetRawBytes, SetRawString, GetRawReader, NewFieldsV1 instead.
-	Raw []byte `json:"-,omitempty"`
+	Raw []byte `json:"-"`
 }
 
 func (in *FieldsV1) DeepCopyInto(out *FieldsV1) {

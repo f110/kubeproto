@@ -397,6 +397,9 @@ func (f *Field) Tag() string {
 	if f.Inline {
 		return "`json:\",inline\"`"
 	}
+	if f.FieldName == "-" {
+		return "`json:\"-\"`"
+	}
 
 	s := strings.Builder{}
 	s.WriteString("`json:\"")
