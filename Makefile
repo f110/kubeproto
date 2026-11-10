@@ -74,7 +74,8 @@ gen-object: go/apis/metav1/metav1_kubeproto.generated.object.go \
 	go/apis/schedulingv1/schedulingv1_kubeproto.generated.object.go \
 	go/apis/storagev1/storagev1_kubeproto.generated.object.go \
 	go/apis/apidiscoveryv2beta1/apidiscoveryv2beta1_kubeproto.generated.object.go \
-	go/apis/resourcev1/resourcev1_kubeproto.generated.object.go
+	go/apis/resourcev1/resourcev1_kubeproto.generated.object.go \
+	go/apis/gatewayv1/gatewayv1_kubeproto.generated.object.go
 
 .PHONY: gen-go
 gen-go: gen-object \
@@ -241,5 +242,12 @@ go/apis/apidiscoveryv2beta1/apidiscoveryv2beta1_kubeproto.generated.object.go: k
 go/apis/resourcev1/resourcev1_kubeproto.generated.object.go: k8s.io/api/resource/v1/generated.proto
 	@mkdir -p $(@D)
 	$(BAZEL) build //$(<D):resourcev1_kubeproto
+	cp ./bazel-bin/$(<D)/$(@F) $(@D)
+	@chmod 0644 $@
+
+.PHONY: go/apis/gatewayv1/gatewayv1_kubeproto.generated.object.go
+go/apis/gatewayv1/gatewayv1_kubeproto.generated.object.go: sigs.k8s.io/gateway-api/apis/v1/generated.proto
+	@mkdir -p $(@D)
+	$(BAZEL) build //$(<D):gatewayv1_kubeproto
 	cp ./bazel-bin/$(<D)/$(@F) $(@D)
 	@chmod 0644 $@

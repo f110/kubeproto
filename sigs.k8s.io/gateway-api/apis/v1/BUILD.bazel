@@ -6,8 +6,7 @@ gen_protobuf(
     name = "gen",
     srcs = ["@io_k8s_sigs_gateway_api//apis/v1:apis"],
     all = True,
-    api_domain = "gateway",
-    api_sub_group = "networking.k8s.io",
+    api_domain = "gateway.networking.k8s.io",
     api_version = "v1",
     importpath = "sigs.k8s.io/gateway-api/apis/v1",
     kubeproto_importpath = "go.f110.dev/kubeproto/go/apis/gatewayv1",
@@ -25,7 +24,7 @@ proto_library(
 )
 
 kubeproto_go_api(
-    name = "v1_kubeproto",
+    name = "gatewayv1_kubeproto",
     srcs = [":v1_proto"],
     importpath = "go.f110.dev/kubeproto/go/apis/gatewayv1",
 )

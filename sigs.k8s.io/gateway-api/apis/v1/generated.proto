@@ -3,8 +3,7 @@ syntax = "proto3";
 package sigs.k8s.io.gateway_api.apis.v1;
 option  go_package              = "sigs.k8s.io/gateway-api/apis/v1";
 option (dev.f110.kubeproto.k8s) = {
-  domain: "gateway",
-  sub_group: "networking.k8s.io",
+  domain: "gateway.networking.k8s.io",
   version: "v1",
 };
 option (dev.f110.kubeproto.kubeproto_go_package) = "go.f110.dev/kubeproto/go/apis/gatewayv1";
