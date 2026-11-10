@@ -21,11 +21,11 @@ enum HorizontalPodAutoscalerConditionType {
 }
 
 enum MetricSourceType {
-  METRIC_SOURCE_TYPE_OBJECT             = 0 [(dev.f110.kubeproto.value) = { value: "Object" }];
-  METRIC_SOURCE_TYPE_PODS               = 1 [(dev.f110.kubeproto.value) = { value: "Pods" }];
-  METRIC_SOURCE_TYPE_RESOURCE           = 2 [(dev.f110.kubeproto.value) = { value: "Resource" }];
+  METRIC_SOURCE_TYPE_OBJECT             = 0;
+  METRIC_SOURCE_TYPE_PODS               = 1;
+  METRIC_SOURCE_TYPE_RESOURCE           = 2;
   METRIC_SOURCE_TYPE_CONTAINER_RESOURCE = 3;
-  METRIC_SOURCE_TYPE_EXTERNAL           = 4 [(dev.f110.kubeproto.value) = { value: "External" }];
+  METRIC_SOURCE_TYPE_EXTERNAL           = 4;
 }
 
 message ContainerResourceMetricSource {

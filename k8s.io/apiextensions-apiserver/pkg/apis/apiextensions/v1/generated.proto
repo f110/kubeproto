@@ -12,22 +12,22 @@ import "k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto";
 import "k8s.io/apimachinery/pkg/runtime/generated.proto";
 
 enum ConditionStatus {
-  CONDITION_STATUS_TRUE    = 0 [(dev.f110.kubeproto.value) = { value: "True" }];
-  CONDITION_STATUS_FALSE   = 1 [(dev.f110.kubeproto.value) = { value: "False" }];
-  CONDITION_STATUS_UNKNOWN = 2 [(dev.f110.kubeproto.value) = { value: "Unknown" }];
+  CONDITION_STATUS_TRUE    = 0;
+  CONDITION_STATUS_FALSE   = 1;
+  CONDITION_STATUS_UNKNOWN = 2;
 }
 
 enum ConversionStrategyType {
-  CONVERSION_STRATEGY_TYPE_NONE    = 0 [(dev.f110.kubeproto.value) = { value: "None" }];
-  CONVERSION_STRATEGY_TYPE_WEBHOOK = 1 [(dev.f110.kubeproto.value) = { value: "Webhook" }];
+  CONVERSION_STRATEGY_TYPE_NONE    = 0;
+  CONVERSION_STRATEGY_TYPE_WEBHOOK = 1;
 }
 
 enum CustomResourceDefinitionConditionType {
-  CUSTOM_RESOURCE_DEFINITION_CONDITION_TYPE_ESTABLISHED                               = 0 [(dev.f110.kubeproto.value) = { value: "Established" }];
+  CUSTOM_RESOURCE_DEFINITION_CONDITION_TYPE_ESTABLISHED                               = 0;
   CUSTOM_RESOURCE_DEFINITION_CONDITION_TYPE_NAMES_ACCEPTED                            = 1;
   CUSTOM_RESOURCE_DEFINITION_CONDITION_TYPE_NON_STRUCTURAL_SCHEMA                     = 2;
-  CUSTOM_RESOURCE_DEFINITION_CONDITION_TYPE_TERMINATING                               = 3 [(dev.f110.kubeproto.value) = { value: "Terminating" }];
-  CUSTOM_RESOURCE_DEFINITION_CONDITION_TYPE_KUBERNETES_API_APPROVAL_POLICY_CONFORMANT = 4 [(dev.f110.kubeproto.value) = { value: "KubernetesAPIApprovalPolicyConformant" }];
+  CUSTOM_RESOURCE_DEFINITION_CONDITION_TYPE_TERMINATING                               = 3;
+  CUSTOM_RESOURCE_DEFINITION_CONDITION_TYPE_KUBERNETES_API_APPROVAL_POLICY_CONFORMANT = 4;
   CUSTOM_RESOURCE_DEFINITION_CONDITION_TYPE_STORAGE_MIGRATING                         = 5;
 }
 
@@ -39,8 +39,8 @@ enum FieldValueErrorReason {
 }
 
 enum ResourceScope {
-  RESOURCE_SCOPE_CLUSTER    = 0 [(dev.f110.kubeproto.value) = { value: "Cluster" }];
-  RESOURCE_SCOPE_NAMESPACED = 1 [(dev.f110.kubeproto.value) = { value: "Namespaced" }];
+  RESOURCE_SCOPE_CLUSTER    = 0;
+  RESOURCE_SCOPE_NAMESPACED = 1;
 }
 
 message ConversionRequest {

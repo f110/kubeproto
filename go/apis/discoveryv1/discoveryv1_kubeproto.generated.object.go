@@ -29,8 +29,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 type AddressType string
 
 const (
-	AddressTypeIpv4 AddressType = "IpV4"
-	AddressTypeIpv6 AddressType = "IpV6"
+	AddressTypeIpv4 AddressType = "IPV4"
+	AddressTypeIpv6 AddressType = "IPV6"
 	AddressTypeFQDN AddressType = "FQDN"
 )
 

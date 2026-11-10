@@ -13,21 +13,21 @@ import "k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto";
 import "k8s.io/apimachinery/pkg/util/intstr/generated.proto";
 
 enum AppArmorProfileType {
-  APP_ARMOR_PROFILE_TYPE_UNCONFINED      = 0 [(dev.f110.kubeproto.value) = { value: "Unconfined" }];
+  APP_ARMOR_PROFILE_TYPE_UNCONFINED      = 0;
   APP_ARMOR_PROFILE_TYPE_RUNTIME_DEFAULT = 1;
-  APP_ARMOR_PROFILE_TYPE_LOCALHOST       = 2 [(dev.f110.kubeproto.value) = { value: "Localhost" }];
+  APP_ARMOR_PROFILE_TYPE_LOCALHOST       = 2;
 }
 
 enum AzureDataDiskCachingMode {
-  AZURE_DATA_DISK_CACHING_MODE_NONE       = 0 [(dev.f110.kubeproto.value) = { value: "None" }];
+  AZURE_DATA_DISK_CACHING_MODE_NONE       = 0;
   AZURE_DATA_DISK_CACHING_MODE_READ_ONLY  = 1;
   AZURE_DATA_DISK_CACHING_MODE_READ_WRITE = 2;
 }
 
 enum AzureDataDiskKind {
-  AZURE_DATA_DISK_KIND_SHARED    = 0 [(dev.f110.kubeproto.value) = { value: "Shared" }];
-  AZURE_DATA_DISK_KIND_DEDICATED = 1 [(dev.f110.kubeproto.value) = { value: "Dedicated" }];
-  AZURE_DATA_DISK_KIND_MANAGED   = 2 [(dev.f110.kubeproto.value) = { value: "Managed" }];
+  AZURE_DATA_DISK_KIND_SHARED    = 0;
+  AZURE_DATA_DISK_KIND_DEDICATED = 1;
+  AZURE_DATA_DISK_KIND_MANAGED   = 2;
 }
 
 enum ClaimResourceStatus {
@@ -39,36 +39,36 @@ enum ClaimResourceStatus {
 }
 
 enum ComponentConditionType {
-  COMPONENT_CONDITION_TYPE_HEALTHY = 0 [(dev.f110.kubeproto.value) = { value: "Healthy" }];
+  COMPONENT_CONDITION_TYPE_HEALTHY = 0;
 }
 
 enum ConditionStatus {
-  CONDITION_STATUS_TRUE    = 0 [(dev.f110.kubeproto.value) = { value: "True" }];
-  CONDITION_STATUS_FALSE   = 1 [(dev.f110.kubeproto.value) = { value: "False" }];
-  CONDITION_STATUS_UNKNOWN = 2 [(dev.f110.kubeproto.value) = { value: "Unknown" }];
+  CONDITION_STATUS_TRUE    = 0;
+  CONDITION_STATUS_FALSE   = 1;
+  CONDITION_STATUS_UNKNOWN = 2;
 }
 
 enum ContainerRestartPolicy {
-  CONTAINER_RESTART_POLICY_ALWAYS     = 0 [(dev.f110.kubeproto.value) = { value: "Always" }];
-  CONTAINER_RESTART_POLICY_NEVER      = 1 [(dev.f110.kubeproto.value) = { value: "Never" }];
+  CONTAINER_RESTART_POLICY_ALWAYS     = 0;
+  CONTAINER_RESTART_POLICY_NEVER      = 1;
   CONTAINER_RESTART_POLICY_ON_FAILURE = 2;
 }
 
 enum ContainerRestartRuleAction {
-  CONTAINER_RESTART_RULE_ACTION_RESTART                = 0 [(dev.f110.kubeproto.value) = { value: "Restart" }];
+  CONTAINER_RESTART_RULE_ACTION_RESTART                = 0;
   CONTAINER_RESTART_RULE_ACTION_RESTART_ALL_CONTAINERS = 1;
 }
 
 enum ContainerRestartRuleOnExitCodesOperator {
-  CONTAINER_RESTART_RULE_ON_EXIT_CODES_OPERATOR_IN     = 0 [(dev.f110.kubeproto.value) = { value: "In" }];
+  CONTAINER_RESTART_RULE_ON_EXIT_CODES_OPERATOR_IN     = 0;
   CONTAINER_RESTART_RULE_ON_EXIT_CODES_OPERATOR_NOT_IN = 1;
 }
 
 enum DNSPolicy {
   DNS_POLICY_CLUSTER_FIRST_WITH_HOST_NET = 0;
   DNS_POLICY_CLUSTER_FIRST               = 1;
-  DNS_POLICY_DEFAULT                     = 2 [(dev.f110.kubeproto.value) = { value: "Default" }];
-  DNS_POLICY_NONE                        = 3 [(dev.f110.kubeproto.value) = { value: "None" }];
+  DNS_POLICY_DEFAULT                     = 2;
+  DNS_POLICY_NONE                        = 3;
 }
 
 enum FinalizerName {
@@ -77,11 +77,11 @@ enum FinalizerName {
 
 enum HostPathType {
   HOST_PATH_TYPE_HOST_PATH_UNSET     = 0 [(dev.f110.kubeproto.value) = { value: "" }];
-  HOST_PATH_TYPE_DIRECTORY_OR_CREATE = 1;
-  HOST_PATH_TYPE_DIRECTORY           = 2 [(dev.f110.kubeproto.value) = { value: "Directory" }];
-  HOST_PATH_TYPE_FILE_OR_CREATE      = 3;
-  HOST_PATH_TYPE_FILE                = 4 [(dev.f110.kubeproto.value) = { value: "File" }];
-  HOST_PATH_TYPE_SOCKET              = 5 [(dev.f110.kubeproto.value) = { value: "Socket" }];
+  HOST_PATH_TYPE_DIRECTORY_OR_CREATE = 1 [(dev.f110.kubeproto.value) = { value: "DirectoryOrCreate" }];
+  HOST_PATH_TYPE_DIRECTORY           = 2;
+  HOST_PATH_TYPE_FILE_OR_CREATE      = 3 [(dev.f110.kubeproto.value) = { value: "FileOrCreate" }];
+  HOST_PATH_TYPE_FILE                = 4;
+  HOST_PATH_TYPE_SOCKET              = 5;
   HOST_PATH_TYPE_CHAR_DEVICE         = 6;
   HOST_PATH_TYPE_BLOCK_DEVICE        = 7;
 }
@@ -99,20 +99,20 @@ enum IPFamilyPolicy {
 }
 
 enum LimitType {
-  LIMIT_TYPE_POD                     = 0 [(dev.f110.kubeproto.value) = { value: "Pod" }];
-  LIMIT_TYPE_CONTAINER               = 1 [(dev.f110.kubeproto.value) = { value: "Container" }];
+  LIMIT_TYPE_POD                     = 0;
+  LIMIT_TYPE_CONTAINER               = 1;
   LIMIT_TYPE_PERSISTENT_VOLUME_CLAIM = 2;
 }
 
 enum LoadBalancerIPMode {
-  LOAD_BALANCER_IP_MODE_V_IP  = 0 [(dev.f110.kubeproto.value) = { value: "VIP" }];
-  LOAD_BALANCER_IP_MODE_PROXY = 1 [(dev.f110.kubeproto.value) = { value: "Proxy" }];
+  LOAD_BALANCER_IP_MODE_V_IP  = 0;
+  LOAD_BALANCER_IP_MODE_PROXY = 1;
 }
 
 enum MountPropagationMode {
-  MOUNT_PROPAGATION_MODE_NONE              = 0 [(dev.f110.kubeproto.value) = { value: "None" }];
+  MOUNT_PROPAGATION_MODE_NONE              = 0;
   MOUNT_PROPAGATION_MODE_HOST_TO_CONTAINER = 1;
-  MOUNT_PROPAGATION_MODE_BIDIRECTIONAL     = 2 [(dev.f110.kubeproto.value) = { value: "Bidirectional" }];
+  MOUNT_PROPAGATION_MODE_BIDIRECTIONAL     = 2;
 }
 
 enum NamespaceConditionType {
@@ -124,44 +124,44 @@ enum NamespaceConditionType {
 }
 
 enum NamespacePhase {
-  NAMESPACE_PHASE_ACTIVE      = 0 [(dev.f110.kubeproto.value) = { value: "Active" }];
-  NAMESPACE_PHASE_TERMINATING = 1 [(dev.f110.kubeproto.value) = { value: "Terminating" }];
+  NAMESPACE_PHASE_ACTIVE      = 0;
+  NAMESPACE_PHASE_TERMINATING = 1;
 }
 
 enum NodeAddressType {
-  NODE_ADDRESS_TYPE_HOSTNAME     = 0 [(dev.f110.kubeproto.value) = { value: "Hostname" }];
-  NODE_ADDRESS_TYPE_INTERNAL_IP  = 1 [(dev.f110.kubeproto.value) = { value: "InternalIP" }];
-  NODE_ADDRESS_TYPE_EXTERNAL_IP  = 2 [(dev.f110.kubeproto.value) = { value: "ExternalIP" }];
-  NODE_ADDRESS_TYPE_INTERNAL_DNS = 3 [(dev.f110.kubeproto.value) = { value: "InternalDNS" }];
-  NODE_ADDRESS_TYPE_EXTERNAL_DNS = 4 [(dev.f110.kubeproto.value) = { value: "ExternalDNS" }];
+  NODE_ADDRESS_TYPE_HOSTNAME     = 0;
+  NODE_ADDRESS_TYPE_INTERNAL_IP  = 1;
+  NODE_ADDRESS_TYPE_EXTERNAL_IP  = 2;
+  NODE_ADDRESS_TYPE_INTERNAL_DNS = 3;
+  NODE_ADDRESS_TYPE_EXTERNAL_DNS = 4;
 }
 
 enum NodeConditionType {
-  NODE_CONDITION_TYPE_READY               = 0 [(dev.f110.kubeproto.value) = { value: "Ready" }];
+  NODE_CONDITION_TYPE_READY               = 0;
   NODE_CONDITION_TYPE_MEMORY_PRESSURE     = 1;
   NODE_CONDITION_TYPE_DISK_PRESSURE       = 2;
-  NODE_CONDITION_TYPE_PID_PRESSURE        = 3 [(dev.f110.kubeproto.value) = { value: "PIDPressure" }];
+  NODE_CONDITION_TYPE_PID_PRESSURE        = 3;
   NODE_CONDITION_TYPE_NETWORK_UNAVAILABLE = 4;
 }
 
 enum NodeInclusionPolicy {
-  NODE_INCLUSION_POLICY_IGNORE = 0 [(dev.f110.kubeproto.value) = { value: "Ignore" }];
-  NODE_INCLUSION_POLICY_HONOR  = 1 [(dev.f110.kubeproto.value) = { value: "Honor" }];
+  NODE_INCLUSION_POLICY_IGNORE = 0;
+  NODE_INCLUSION_POLICY_HONOR  = 1;
 }
 
 enum NodePhase {
-  NODE_PHASE_PENDING    = 0 [(dev.f110.kubeproto.value) = { value: "Pending" }];
-  NODE_PHASE_RUNNING    = 1 [(dev.f110.kubeproto.value) = { value: "Running" }];
-  NODE_PHASE_TERMINATED = 2 [(dev.f110.kubeproto.value) = { value: "Terminated" }];
+  NODE_PHASE_PENDING    = 0;
+  NODE_PHASE_RUNNING    = 1;
+  NODE_PHASE_TERMINATED = 2;
 }
 
 enum NodeSelectorOperator {
-  NODE_SELECTOR_OPERATOR_IN             = 0 [(dev.f110.kubeproto.value) = { value: "In" }];
+  NODE_SELECTOR_OPERATOR_IN             = 0;
   NODE_SELECTOR_OPERATOR_NOT_IN         = 1;
-  NODE_SELECTOR_OPERATOR_EXISTS         = 2 [(dev.f110.kubeproto.value) = { value: "Exists" }];
+  NODE_SELECTOR_OPERATOR_EXISTS         = 2;
   NODE_SELECTOR_OPERATOR_DOES_NOT_EXIST = 3;
-  NODE_SELECTOR_OPERATOR_GT             = 4 [(dev.f110.kubeproto.value) = { value: "Gt" }];
-  NODE_SELECTOR_OPERATOR_LT             = 5 [(dev.f110.kubeproto.value) = { value: "Lt" }];
+  NODE_SELECTOR_OPERATOR_GT             = 4;
+  NODE_SELECTOR_OPERATOR_LT             = 5;
 }
 
 enum OSName {
@@ -177,50 +177,50 @@ enum PersistentVolumeAccessMode {
 }
 
 enum PersistentVolumeClaimConditionType {
-  PERSISTENT_VOLUME_CLAIM_CONDITION_TYPE_RESIZING                   = 0 [(dev.f110.kubeproto.value) = { value: "Resizing" }];
+  PERSISTENT_VOLUME_CLAIM_CONDITION_TYPE_RESIZING                   = 0;
   PERSISTENT_VOLUME_CLAIM_CONDITION_TYPE_FILE_SYSTEM_RESIZE_PENDING = 1;
   PERSISTENT_VOLUME_CLAIM_CONDITION_TYPE_CONTROLLER_RESIZE_ERROR    = 2;
   PERSISTENT_VOLUME_CLAIM_CONDITION_TYPE_NODE_RESIZE_ERROR          = 3;
   PERSISTENT_VOLUME_CLAIM_CONDITION_TYPE_MODIFY_VOLUME_ERROR        = 4;
   PERSISTENT_VOLUME_CLAIM_CONDITION_TYPE_MODIFYING_VOLUME           = 5;
-  PERSISTENT_VOLUME_CLAIM_CONDITION_TYPE_UNUSED                     = 6 [(dev.f110.kubeproto.value) = { value: "Unused" }];
+  PERSISTENT_VOLUME_CLAIM_CONDITION_TYPE_UNUSED                     = 6;
 }
 
 enum PersistentVolumeClaimModifyVolumeStatus {
-  PERSISTENT_VOLUME_CLAIM_MODIFY_VOLUME_STATUS_PENDING     = 0 [(dev.f110.kubeproto.value) = { value: "Pending" }];
+  PERSISTENT_VOLUME_CLAIM_MODIFY_VOLUME_STATUS_PENDING     = 0;
   PERSISTENT_VOLUME_CLAIM_MODIFY_VOLUME_STATUS_IN_PROGRESS = 1;
-  PERSISTENT_VOLUME_CLAIM_MODIFY_VOLUME_STATUS_INFEASIBLE  = 2 [(dev.f110.kubeproto.value) = { value: "Infeasible" }];
+  PERSISTENT_VOLUME_CLAIM_MODIFY_VOLUME_STATUS_INFEASIBLE  = 2;
 }
 
 enum PersistentVolumeClaimPhase {
-  PERSISTENT_VOLUME_CLAIM_PHASE_PENDING = 0 [(dev.f110.kubeproto.value) = { value: "Pending" }];
-  PERSISTENT_VOLUME_CLAIM_PHASE_BOUND   = 1 [(dev.f110.kubeproto.value) = { value: "Bound" }];
-  PERSISTENT_VOLUME_CLAIM_PHASE_LOST    = 2 [(dev.f110.kubeproto.value) = { value: "Lost" }];
+  PERSISTENT_VOLUME_CLAIM_PHASE_PENDING = 0;
+  PERSISTENT_VOLUME_CLAIM_PHASE_BOUND   = 1;
+  PERSISTENT_VOLUME_CLAIM_PHASE_LOST    = 2;
 }
 
 enum PersistentVolumeMode {
-  PERSISTENT_VOLUME_MODE_BLOCK      = 0 [(dev.f110.kubeproto.value) = { value: "Block" }];
-  PERSISTENT_VOLUME_MODE_FILESYSTEM = 1 [(dev.f110.kubeproto.value) = { value: "Filesystem" }];
+  PERSISTENT_VOLUME_MODE_BLOCK      = 0;
+  PERSISTENT_VOLUME_MODE_FILESYSTEM = 1;
 }
 
 enum PersistentVolumePhase {
-  PERSISTENT_VOLUME_PHASE_PENDING   = 0 [(dev.f110.kubeproto.value) = { value: "Pending" }];
-  PERSISTENT_VOLUME_PHASE_AVAILABLE = 1 [(dev.f110.kubeproto.value) = { value: "Available" }];
-  PERSISTENT_VOLUME_PHASE_BOUND     = 2 [(dev.f110.kubeproto.value) = { value: "Bound" }];
-  PERSISTENT_VOLUME_PHASE_RELEASED  = 3 [(dev.f110.kubeproto.value) = { value: "Released" }];
-  PERSISTENT_VOLUME_PHASE_FAILED    = 4 [(dev.f110.kubeproto.value) = { value: "Failed" }];
+  PERSISTENT_VOLUME_PHASE_PENDING   = 0;
+  PERSISTENT_VOLUME_PHASE_AVAILABLE = 1;
+  PERSISTENT_VOLUME_PHASE_BOUND     = 2;
+  PERSISTENT_VOLUME_PHASE_RELEASED  = 3;
+  PERSISTENT_VOLUME_PHASE_FAILED    = 4;
 }
 
 enum PersistentVolumeReclaimPolicy {
-  PERSISTENT_VOLUME_RECLAIM_POLICY_RECYCLE = 0 [(dev.f110.kubeproto.value) = { value: "Recycle" }];
+  PERSISTENT_VOLUME_RECLAIM_POLICY_RECYCLE = 0;
   PERSISTENT_VOLUME_RECLAIM_POLICY_DELETE  = 1 [(dev.f110.kubeproto.value) = { value: "Delete" }];
-  PERSISTENT_VOLUME_RECLAIM_POLICY_RETAIN  = 2 [(dev.f110.kubeproto.value) = { value: "Retain" }];
+  PERSISTENT_VOLUME_RECLAIM_POLICY_RETAIN  = 2;
 }
 
 enum PodConditionType {
   POD_CONDITION_TYPE_CONTAINERS_READY              = 0;
-  POD_CONDITION_TYPE_INITIALIZED                   = 1 [(dev.f110.kubeproto.value) = { value: "Initialized" }];
-  POD_CONDITION_TYPE_READY                         = 2 [(dev.f110.kubeproto.value) = { value: "Ready" }];
+  POD_CONDITION_TYPE_INITIALIZED                   = 1;
+  POD_CONDITION_TYPE_READY                         = 2;
   POD_CONDITION_TYPE_POD_SCHEDULED                 = 3;
   POD_CONDITION_TYPE_DISRUPTION_TARGET             = 4;
   POD_CONDITION_TYPE_POD_READY_TO_START_CONTAINERS = 5;
@@ -231,42 +231,42 @@ enum PodConditionType {
 
 enum PodFSGroupChangePolicy {
   POD_FS_GROUP_CHANGE_POLICY_ON_ROOT_MISMATCH = 0;
-  POD_FS_GROUP_CHANGE_POLICY_ALWAYS           = 1 [(dev.f110.kubeproto.value) = { value: "Always" }];
+  POD_FS_GROUP_CHANGE_POLICY_ALWAYS           = 1;
 }
 
 enum PodPhase {
-  POD_PHASE_PENDING   = 0 [(dev.f110.kubeproto.value) = { value: "Pending" }];
-  POD_PHASE_RUNNING   = 1 [(dev.f110.kubeproto.value) = { value: "Running" }];
-  POD_PHASE_SUCCEEDED = 2 [(dev.f110.kubeproto.value) = { value: "Succeeded" }];
-  POD_PHASE_FAILED    = 3 [(dev.f110.kubeproto.value) = { value: "Failed" }];
-  POD_PHASE_UNKNOWN   = 4 [(dev.f110.kubeproto.value) = { value: "Unknown" }];
+  POD_PHASE_PENDING   = 0;
+  POD_PHASE_RUNNING   = 1;
+  POD_PHASE_SUCCEEDED = 2;
+  POD_PHASE_FAILED    = 3;
+  POD_PHASE_UNKNOWN   = 4;
 }
 
 enum PodQOSClass {
-  POD_QOS_CLASS_GUARANTEED  = 0 [(dev.f110.kubeproto.value) = { value: "Guaranteed" }];
-  POD_QOS_CLASS_BURSTABLE   = 1 [(dev.f110.kubeproto.value) = { value: "Burstable" }];
+  POD_QOS_CLASS_GUARANTEED  = 0;
+  POD_QOS_CLASS_BURSTABLE   = 1;
   POD_QOS_CLASS_BEST_EFFORT = 2;
 }
 
 enum PodResizeStatus {
   POD_RESIZE_STATUS_IN_PROGRESS = 0;
-  POD_RESIZE_STATUS_DEFERRED    = 1 [(dev.f110.kubeproto.value) = { value: "Deferred" }];
-  POD_RESIZE_STATUS_INFEASIBLE  = 2 [(dev.f110.kubeproto.value) = { value: "Infeasible" }];
+  POD_RESIZE_STATUS_DEFERRED    = 1;
+  POD_RESIZE_STATUS_INFEASIBLE  = 2;
 }
 
 enum PodSELinuxChangePolicy {
-  POD_SELINUX_CHANGE_POLICY_RECURSIVE    = 0 [(dev.f110.kubeproto.value) = { value: "Recursive" }];
+  POD_SELINUX_CHANGE_POLICY_RECURSIVE    = 0;
   POD_SELINUX_CHANGE_POLICY_MOUNT_OPTION = 1;
 }
 
 enum PreemptionPolicy {
   PREEMPTION_POLICY_PREEMPT_LOWER_PRIORITY = 0;
-  PREEMPTION_POLICY_NEVER                  = 1 [(dev.f110.kubeproto.value) = { value: "Never" }];
+  PREEMPTION_POLICY_NEVER                  = 1;
 }
 
 enum ProcMountType {
-  PROC_MOUNT_TYPE_DEFAULT  = 0 [(dev.f110.kubeproto.value) = { value: "Default" }];
-  PROC_MOUNT_TYPE_UNMASKED = 1 [(dev.f110.kubeproto.value) = { value: "Unmasked" }];
+  PROC_MOUNT_TYPE_DEFAULT  = 0;
+  PROC_MOUNT_TYPE_UNMASKED = 1;
 }
 
 enum Protocol {
@@ -276,15 +276,15 @@ enum Protocol {
 }
 
 enum PullPolicy {
-  PULL_POLICY_ALWAYS         = 0 [(dev.f110.kubeproto.value) = { value: "Always" }];
-  PULL_POLICY_NEVER          = 1 [(dev.f110.kubeproto.value) = { value: "Never" }];
+  PULL_POLICY_ALWAYS         = 0;
+  PULL_POLICY_NEVER          = 1;
   PULL_POLICY_IF_NOT_PRESENT = 2;
 }
 
 enum RecursiveReadOnlyMode {
-  RECURSIVE_READ_ONLY_MODE_DISABLED    = 0 [(dev.f110.kubeproto.value) = { value: "Disabled" }];
+  RECURSIVE_READ_ONLY_MODE_DISABLED    = 0;
   RECURSIVE_READ_ONLY_MODE_IF_POSSIBLE = 1;
-  RECURSIVE_READ_ONLY_MODE_ENABLED     = 2 [(dev.f110.kubeproto.value) = { value: "Enabled" }];
+  RECURSIVE_READ_ONLY_MODE_ENABLED     = 2;
 }
 
 enum ReplicationControllerConditionType {
@@ -292,9 +292,9 @@ enum ReplicationControllerConditionType {
 }
 
 enum ResourceHealthStatus {
-  RESOURCE_HEALTH_STATUS_HEALTHY   = 0 [(dev.f110.kubeproto.value) = { value: "Healthy" }];
-  RESOURCE_HEALTH_STATUS_UNHEALTHY = 1 [(dev.f110.kubeproto.value) = { value: "Unhealthy" }];
-  RESOURCE_HEALTH_STATUS_UNKNOWN   = 2 [(dev.f110.kubeproto.value) = { value: "Unknown" }];
+  RESOURCE_HEALTH_STATUS_HEALTHY   = 0;
+  RESOURCE_HEALTH_STATUS_UNHEALTHY = 1;
+  RESOURCE_HEALTH_STATUS_UNKNOWN   = 2;
 }
 
 enum ResourceName {
@@ -321,7 +321,7 @@ enum ResourceName {
 }
 
 enum ResourceQuotaScope {
-  RESOURCE_QUOTA_SCOPE_TERMINATING                  = 0 [(dev.f110.kubeproto.value) = { value: "Terminating" }];
+  RESOURCE_QUOTA_SCOPE_TERMINATING                  = 0;
   RESOURCE_QUOTA_SCOPE_NOT_TERMINATING              = 1;
   RESOURCE_QUOTA_SCOPE_BEST_EFFORT                  = 2;
   RESOURCE_QUOTA_SCOPE_NOT_BEST_EFFORT              = 3;
@@ -336,26 +336,26 @@ enum ResourceResizeRestartPolicy {
 }
 
 enum RestartPolicy {
-  RESTART_POLICY_ALWAYS     = 0 [(dev.f110.kubeproto.value) = { value: "Always" }];
+  RESTART_POLICY_ALWAYS     = 0;
   RESTART_POLICY_ON_FAILURE = 1;
-  RESTART_POLICY_NEVER      = 2 [(dev.f110.kubeproto.value) = { value: "Never" }];
+  RESTART_POLICY_NEVER      = 2;
 }
 
 enum ScopeSelectorOperator {
-  SCOPE_SELECTOR_OPERATOR_IN             = 0 [(dev.f110.kubeproto.value) = { value: "In" }];
+  SCOPE_SELECTOR_OPERATOR_IN             = 0;
   SCOPE_SELECTOR_OPERATOR_NOT_IN         = 1;
-  SCOPE_SELECTOR_OPERATOR_EXISTS         = 2 [(dev.f110.kubeproto.value) = { value: "Exists" }];
+  SCOPE_SELECTOR_OPERATOR_EXISTS         = 2;
   SCOPE_SELECTOR_OPERATOR_DOES_NOT_EXIST = 3;
 }
 
 enum SeccompProfileType {
-  SECCOMP_PROFILE_TYPE_UNCONFINED      = 0 [(dev.f110.kubeproto.value) = { value: "Unconfined" }];
+  SECCOMP_PROFILE_TYPE_UNCONFINED      = 0;
   SECCOMP_PROFILE_TYPE_RUNTIME_DEFAULT = 1;
-  SECCOMP_PROFILE_TYPE_LOCALHOST       = 2 [(dev.f110.kubeproto.value) = { value: "Localhost" }];
+  SECCOMP_PROFILE_TYPE_LOCALHOST       = 2;
 }
 
 enum SecretType {
-  SECRET_TYPE_OPAQUE                              = 0 [(dev.f110.kubeproto.value) = { value: "Opaque" }];
+  SECRET_TYPE_OPAQUE                              = 0;
   SECRET_TYPE_KUBERNETES_IO_SERVICE_ACCOUNT_TOKEN = 1 [(dev.f110.kubeproto.value) = { value: "kubernetes.io/service-account-token" }];
   SECRET_TYPE_KUBERNETES_IO_DOCKERCFG             = 2 [(dev.f110.kubeproto.value) = { value: "kubernetes.io/dockercfg" }];
   SECRET_TYPE_KUBERNETES_IO_DOCKERCONFIGJSON      = 3 [(dev.f110.kubeproto.value) = { value: "kubernetes.io/dockerconfigjson" }];
@@ -366,104 +366,104 @@ enum SecretType {
 }
 
 enum ServiceAffinity {
-  SERVICE_AFFINITY_CLIENT_IP = 0 [(dev.f110.kubeproto.value) = { value: "ClientIP" }];
-  SERVICE_AFFINITY_NONE      = 1 [(dev.f110.kubeproto.value) = { value: "None" }];
+  SERVICE_AFFINITY_CLIENT_IP = 0;
+  SERVICE_AFFINITY_NONE      = 1;
 }
 
 enum ServiceExternalTrafficPolicy {
-  SERVICE_EXTERNAL_TRAFFIC_POLICY_CLUSTER = 0 [(dev.f110.kubeproto.value) = { value: "Cluster" }];
-  SERVICE_EXTERNAL_TRAFFIC_POLICY_LOCAL   = 1 [(dev.f110.kubeproto.value) = { value: "Local" }];
+  SERVICE_EXTERNAL_TRAFFIC_POLICY_CLUSTER = 0;
+  SERVICE_EXTERNAL_TRAFFIC_POLICY_LOCAL   = 1;
 }
 
 enum ServiceInternalTrafficPolicy {
-  SERVICE_INTERNAL_TRAFFIC_POLICY_CLUSTER = 0 [(dev.f110.kubeproto.value) = { value: "Cluster" }];
-  SERVICE_INTERNAL_TRAFFIC_POLICY_LOCAL   = 1 [(dev.f110.kubeproto.value) = { value: "Local" }];
+  SERVICE_INTERNAL_TRAFFIC_POLICY_CLUSTER = 0;
+  SERVICE_INTERNAL_TRAFFIC_POLICY_LOCAL   = 1;
 }
 
 enum ServiceType {
-  SERVICE_TYPE_CLUSTER_IP    = 0 [(dev.f110.kubeproto.value) = { value: "ClusterIP" }];
+  SERVICE_TYPE_CLUSTER_IP    = 0;
   SERVICE_TYPE_NODE_PORT     = 1;
   SERVICE_TYPE_LOAD_BALANCER = 2;
   SERVICE_TYPE_EXTERNAL_NAME = 3;
 }
 
 enum Signal {
-  SIGNAL_S_I_G_A_B_R_T      = 0;
-  SIGNAL_S_I_G_A_L_R_M      = 1;
-  SIGNAL_S_I_G_B_U_S        = 2;
-  SIGNAL_S_I_G_C_H_L_D      = 3;
-  SIGNAL_S_I_G_C_L_D        = 4;
-  SIGNAL_S_I_G_C_O_N_T      = 5;
-  SIGNAL_S_I_G_F_P_E        = 6;
-  SIGNAL_S_I_G_H_U_P        = 7;
-  SIGNAL_S_I_G_I_L_L        = 8;
-  SIGNAL_S_I_G_I_N_T        = 9;
-  SIGNAL_S_I_G_IO           = 10 [(dev.f110.kubeproto.value) = { value: "SIGIO" }];
-  SIGNAL_S_I_G_IO_T         = 11 [(dev.f110.kubeproto.value) = { value: "SIGIOT" }];
-  SIGNAL_S_I_G_K_I_L_L      = 12;
-  SIGNAL_S_I_G_P_IP_E       = 13 [(dev.f110.kubeproto.value) = { value: "SIGPIPE" }];
-  SIGNAL_S_I_G_P_O_L_L      = 14;
-  SIGNAL_S_I_G_P_R_O_F      = 15;
-  SIGNAL_S_I_G_P_W_R        = 16;
-  SIGNAL_S_I_G_Q_U_I_T      = 17;
-  SIGNAL_S_I_G_S_E_G_V      = 18;
-  SIGNAL_S_I_G_S_T_K_F_L_T  = 19;
-  SIGNAL_S_I_G_S_T_O_P      = 20;
-  SIGNAL_S_I_G_S_Y_S        = 21;
-  SIGNAL_S_I_G_T_E_R_M      = 22;
-  SIGNAL_S_I_G_T_R_A_P      = 23;
-  SIGNAL_S_I_G_T_S_T_P      = 24;
-  SIGNAL_S_I_G_T_T_I_N      = 25;
-  SIGNAL_S_I_G_T_T_O_U      = 26;
-  SIGNAL_S_I_G_U_R_G        = 27;
-  SIGNAL_S_I_G_U_S_R1       = 28;
-  SIGNAL_S_I_G_U_S_R2       = 29;
-  SIGNAL_S_I_G_V_T_A_L_R_M  = 30;
-  SIGNAL_S_I_G_W_I_N_C_H    = 31;
-  SIGNAL_S_I_G_X_C_P_U      = 32;
-  SIGNAL_S_I_G_X_FS_Z       = 33 [(dev.f110.kubeproto.value) = { value: "SIGXFSZ" }];
-  SIGNAL_S_I_G_R_T_M_I_N    = 34;
-  SIGNAL_S_I_G_R_T_M_I_N_1  = 35 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+1" }];
-  SIGNAL_S_I_G_R_T_M_I_N_2  = 36 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+2" }];
-  SIGNAL_S_I_G_R_T_M_I_N_3  = 37 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+3" }];
-  SIGNAL_S_I_G_R_T_M_I_N_4  = 38 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+4" }];
-  SIGNAL_S_I_G_R_T_M_I_N_5  = 39 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+5" }];
-  SIGNAL_S_I_G_R_T_M_I_N_6  = 40 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+6" }];
-  SIGNAL_S_I_G_R_T_M_I_N_7  = 41 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+7" }];
-  SIGNAL_S_I_G_R_T_M_I_N_8  = 42 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+8" }];
-  SIGNAL_S_I_G_R_T_M_I_N_9  = 43 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+9" }];
-  SIGNAL_S_I_G_R_T_M_I_N_10 = 44 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+10" }];
-  SIGNAL_S_I_G_R_T_M_I_N_11 = 45 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+11" }];
-  SIGNAL_S_I_G_R_T_M_I_N_12 = 46 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+12" }];
-  SIGNAL_S_I_G_R_T_M_I_N_13 = 47 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+13" }];
-  SIGNAL_S_I_G_R_T_M_I_N_14 = 48 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+14" }];
-  SIGNAL_S_I_G_R_T_M_I_N_15 = 49 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+15" }];
-  SIGNAL_S_I_G_R_T_M_A_X_14 = 50 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-14" }];
-  SIGNAL_S_I_G_R_T_M_A_X_13 = 51 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-13" }];
-  SIGNAL_S_I_G_R_T_M_A_X_12 = 52 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-12" }];
-  SIGNAL_S_I_G_R_T_M_A_X_11 = 53 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-11" }];
-  SIGNAL_S_I_G_R_T_M_A_X_10 = 54 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-10" }];
-  SIGNAL_S_I_G_R_T_M_A_X_9  = 55 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-9" }];
-  SIGNAL_S_I_G_R_T_M_A_X_8  = 56 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-8" }];
-  SIGNAL_S_I_G_R_T_M_A_X_7  = 57 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-7" }];
-  SIGNAL_S_I_G_R_T_M_A_X_6  = 58 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-6" }];
-  SIGNAL_S_I_G_R_T_M_A_X_5  = 59 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-5" }];
-  SIGNAL_S_I_G_R_T_M_A_X_4  = 60 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-4" }];
-  SIGNAL_S_I_G_R_T_M_A_X_3  = 61 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-3" }];
-  SIGNAL_S_I_G_R_T_M_A_X_2  = 62 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-2" }];
-  SIGNAL_S_I_G_R_T_M_A_X_1  = 63 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-1" }];
-  SIGNAL_S_I_G_R_T_M_A_X    = 64;
+  SIGNAL_SIGABRT     = 0;
+  SIGNAL_SIGALRM     = 1;
+  SIGNAL_SIGBUS      = 2;
+  SIGNAL_SIGCHLD     = 3;
+  SIGNAL_SIGCLD      = 4;
+  SIGNAL_SIGCONT     = 5;
+  SIGNAL_SIGFPE      = 6;
+  SIGNAL_SIGHUP      = 7;
+  SIGNAL_SIGILL      = 8;
+  SIGNAL_SIGINT      = 9;
+  SIGNAL_SIGIO       = 10;
+  SIGNAL_SIGIO_T     = 11;
+  SIGNAL_SIGKILL     = 12;
+  SIGNAL_SIGPIPE     = 13;
+  SIGNAL_SIGPOLL     = 14;
+  SIGNAL_SIGPROF     = 15;
+  SIGNAL_SIGPWR      = 16;
+  SIGNAL_SIGQUIT     = 17;
+  SIGNAL_SIGSEGV     = 18;
+  SIGNAL_SIGSTKFLT   = 19;
+  SIGNAL_SIGSTOP     = 20;
+  SIGNAL_SIGSYS      = 21;
+  SIGNAL_SIGTERM     = 22;
+  SIGNAL_SIGTRAP     = 23;
+  SIGNAL_SIGTSTP     = 24;
+  SIGNAL_SIGTTIN     = 25;
+  SIGNAL_SIGTTOU     = 26;
+  SIGNAL_SIGURG      = 27;
+  SIGNAL_SIGUSR1     = 28;
+  SIGNAL_SIGUSR2     = 29;
+  SIGNAL_SIGVTALRM   = 30;
+  SIGNAL_SIGWINCH    = 31;
+  SIGNAL_SIGXCPU     = 32;
+  SIGNAL_SIGXFSZ     = 33;
+  SIGNAL_SIGRTMIN    = 34;
+  SIGNAL_SIGRTMIN_1  = 35 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+1" }];
+  SIGNAL_SIGRTMIN_2  = 36 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+2" }];
+  SIGNAL_SIGRTMIN_3  = 37 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+3" }];
+  SIGNAL_SIGRTMIN_4  = 38 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+4" }];
+  SIGNAL_SIGRTMIN_5  = 39 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+5" }];
+  SIGNAL_SIGRTMIN_6  = 40 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+6" }];
+  SIGNAL_SIGRTMIN_7  = 41 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+7" }];
+  SIGNAL_SIGRTMIN_8  = 42 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+8" }];
+  SIGNAL_SIGRTMIN_9  = 43 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+9" }];
+  SIGNAL_SIGRTMIN_10 = 44 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+10" }];
+  SIGNAL_SIGRTMIN_11 = 45 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+11" }];
+  SIGNAL_SIGRTMIN_12 = 46 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+12" }];
+  SIGNAL_SIGRTMIN_13 = 47 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+13" }];
+  SIGNAL_SIGRTMIN_14 = 48 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+14" }];
+  SIGNAL_SIGRTMIN_15 = 49 [(dev.f110.kubeproto.value) = { value: "SIGRTMIN+15" }];
+  SIGNAL_SIGRTMAX_14 = 50 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-14" }];
+  SIGNAL_SIGRTMAX_13 = 51 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-13" }];
+  SIGNAL_SIGRTMAX_12 = 52 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-12" }];
+  SIGNAL_SIGRTMAX_11 = 53 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-11" }];
+  SIGNAL_SIGRTMAX_10 = 54 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-10" }];
+  SIGNAL_SIGRTMAX_9  = 55 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-9" }];
+  SIGNAL_SIGRTMAX_8  = 56 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-8" }];
+  SIGNAL_SIGRTMAX_7  = 57 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-7" }];
+  SIGNAL_SIGRTMAX_6  = 58 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-6" }];
+  SIGNAL_SIGRTMAX_5  = 59 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-5" }];
+  SIGNAL_SIGRTMAX_4  = 60 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-4" }];
+  SIGNAL_SIGRTMAX_3  = 61 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-3" }];
+  SIGNAL_SIGRTMAX_2  = 62 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-2" }];
+  SIGNAL_SIGRTMAX_1  = 63 [(dev.f110.kubeproto.value) = { value: "SIGRTMAX-1" }];
+  SIGNAL_SIGRTMAX    = 64;
 }
 
 enum StorageMedium {
   STORAGE_MEDIUM_DEFAULT    = 0 [(dev.f110.kubeproto.value) = { value: "" }];
-  STORAGE_MEDIUM_MEMORY     = 1 [(dev.f110.kubeproto.value) = { value: "Memory" }];
+  STORAGE_MEDIUM_MEMORY     = 1;
   STORAGE_MEDIUM_HUGE_PAGES = 2;
 }
 
 enum SupplementalGroupsPolicy {
-  SUPPLEMENTAL_GROUPS_POLICY_MERGE  = 0 [(dev.f110.kubeproto.value) = { value: "Merge" }];
-  SUPPLEMENTAL_GROUPS_POLICY_STRICT = 1 [(dev.f110.kubeproto.value) = { value: "Strict" }];
+  SUPPLEMENTAL_GROUPS_POLICY_MERGE  = 0;
+  SUPPLEMENTAL_GROUPS_POLICY_STRICT = 1;
 }
 
 enum TaintEffect {
@@ -473,15 +473,15 @@ enum TaintEffect {
 }
 
 enum TerminationMessagePolicy {
-  TERMINATION_MESSAGE_POLICY_FILE                      = 0 [(dev.f110.kubeproto.value) = { value: "File" }];
+  TERMINATION_MESSAGE_POLICY_FILE                      = 0;
   TERMINATION_MESSAGE_POLICY_FALLBACK_TO_LOGS_ON_ERROR = 1;
 }
 
 enum TolerationOperator {
-  TOLERATION_OPERATOR_EXISTS = 0 [(dev.f110.kubeproto.value) = { value: "Exists" }];
-  TOLERATION_OPERATOR_EQUAL  = 1 [(dev.f110.kubeproto.value) = { value: "Equal" }];
-  TOLERATION_OPERATOR_LT     = 2 [(dev.f110.kubeproto.value) = { value: "Lt" }];
-  TOLERATION_OPERATOR_GT     = 3 [(dev.f110.kubeproto.value) = { value: "Gt" }];
+  TOLERATION_OPERATOR_EXISTS = 0;
+  TOLERATION_OPERATOR_EQUAL  = 1;
+  TOLERATION_OPERATOR_LT     = 2;
+  TOLERATION_OPERATOR_GT     = 3;
 }
 
 enum URIScheme {

@@ -14,8 +14,8 @@ import "k8s.io/apimachinery/pkg/api/resource/generated.proto";
 import "k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto";
 
 enum HPAScalingPolicyType {
-  HPA_SCALING_POLICY_TYPE_PODS    = 0 [(dev.f110.kubeproto.value) = { value: "Pods" }];
-  HPA_SCALING_POLICY_TYPE_PERCENT = 1 [(dev.f110.kubeproto.value) = { value: "Percent" }];
+  HPA_SCALING_POLICY_TYPE_PODS    = 0;
+  HPA_SCALING_POLICY_TYPE_PERCENT = 1;
 }
 
 enum HorizontalPodAutoscalerConditionType {
@@ -26,23 +26,23 @@ enum HorizontalPodAutoscalerConditionType {
 }
 
 enum MetricSourceType {
-  METRIC_SOURCE_TYPE_OBJECT             = 0 [(dev.f110.kubeproto.value) = { value: "Object" }];
-  METRIC_SOURCE_TYPE_PODS               = 1 [(dev.f110.kubeproto.value) = { value: "Pods" }];
-  METRIC_SOURCE_TYPE_RESOURCE           = 2 [(dev.f110.kubeproto.value) = { value: "Resource" }];
+  METRIC_SOURCE_TYPE_OBJECT             = 0;
+  METRIC_SOURCE_TYPE_PODS               = 1;
+  METRIC_SOURCE_TYPE_RESOURCE           = 2;
   METRIC_SOURCE_TYPE_CONTAINER_RESOURCE = 3;
-  METRIC_SOURCE_TYPE_EXTERNAL           = 4 [(dev.f110.kubeproto.value) = { value: "External" }];
+  METRIC_SOURCE_TYPE_EXTERNAL           = 4;
 }
 
 enum MetricTargetType {
-  METRIC_TARGET_TYPE_UTILIZATION   = 0 [(dev.f110.kubeproto.value) = { value: "Utilization" }];
-  METRIC_TARGET_TYPE_VALUE         = 1 [(dev.f110.kubeproto.value) = { value: "Value" }];
+  METRIC_TARGET_TYPE_UTILIZATION   = 0;
+  METRIC_TARGET_TYPE_VALUE         = 1;
   METRIC_TARGET_TYPE_AVERAGE_VALUE = 2;
 }
 
 enum ScalingPolicySelect {
-  SCALING_POLICY_SELECT_MAX      = 0 [(dev.f110.kubeproto.value) = { value: "Max" }];
-  SCALING_POLICY_SELECT_MIN      = 1 [(dev.f110.kubeproto.value) = { value: "Min" }];
-  SCALING_POLICY_SELECT_DISABLED = 2 [(dev.f110.kubeproto.value) = { value: "Disabled" }];
+  SCALING_POLICY_SELECT_MAX      = 0;
+  SCALING_POLICY_SELECT_MIN      = 1;
+  SCALING_POLICY_SELECT_DISABLED = 2;
 }
 
 message ContainerResourceMetricSource {

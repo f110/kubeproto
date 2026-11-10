@@ -34,9 +34,9 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 type PostPhase string
 
 const (
-	PostPhaseCREATED      PostPhase = "CREATED"
-	PostPhasePROVISIONING PostPhase = "PROVISIONING"
-	PostPhasePROVISIONED  PostPhase = "PROVISIONED"
+	PostPhaseCreated      PostPhase = "Created"
+	PostPhaseProvisioning PostPhase = "Provisioning"
+	PostPhaseProvisioned  PostPhase = "Provisioned"
 )
 
 type Author struct {

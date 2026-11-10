@@ -4,24 +4,23 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 func TestNewEnum(t *testing.T) {
 	enum := NewEnum(
 		&descriptorpb.FileDescriptorProto{
-			Package: proto.String("testing.apis"),
+			Package: new("testing.apis"),
 			Options: &descriptorpb.FileOptions{
-				GoPackage: proto.String("go.f110.dev/kubeproto/internal/definition"),
+				GoPackage: new("go.f110.dev/kubeproto/internal/definition"),
 			},
 		},
 		&descriptorpb.EnumDescriptorProto{
-			Name: proto.String("Phase"),
+			Name: new("Phase"),
 			Value: []*descriptorpb.EnumValueDescriptorProto{
-				{Name: proto.String("PHASE_CREATED"), Number: proto.Int32(0)},
-				{Name: proto.String("PHASE_CREATING"), Number: proto.Int32(1)},
-				{Name: proto.String("PHASE_CREATE_PENDING"), Number: proto.Int32(2)},
+				{Name: new("PHASE_CREATED"), Number: new(int32(0))},
+				{Name: new("PHASE_CREATING"), Number: new(int32(1))},
+				{Name: new("PHASE_PROVISION_PENDING"), Number: new(int32(2))},
 			},
 		},
 	)
@@ -31,6 +30,6 @@ func TestNewEnum(t *testing.T) {
 	if assert.Len(t, enum.Values, 3) {
 		assert.Equal(t, "Created", enum.Values[0])
 		assert.Equal(t, "Creating", enum.Values[1])
-		assert.Equal(t, "CreatePending", enum.Values[2])
+		assert.Equal(t, "ProvisionPending", enum.Values[2])
 	}
 }

@@ -14,14 +14,14 @@ import "k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto";
 import "k8s.io/apimachinery/pkg/util/intstr/generated.proto";
 
 enum PathType {
-  PATH_TYPE_EXACT                   = 0 [(dev.f110.kubeproto.value) = { value: "Exact" }];
-  PATH_TYPE_PREFIX                  = 1 [(dev.f110.kubeproto.value) = { value: "Prefix" }];
+  PATH_TYPE_EXACT                   = 0;
+  PATH_TYPE_PREFIX                  = 1;
   PATH_TYPE_IMPLEMENTATION_SPECIFIC = 2;
 }
 
 enum PolicyType {
-  POLICY_TYPE_INGRESS = 0 [(dev.f110.kubeproto.value) = { value: "Ingress" }];
-  POLICY_TYPE_EGRESS  = 1 [(dev.f110.kubeproto.value) = { value: "Egress" }];
+  POLICY_TYPE_INGRESS = 0;
+  POLICY_TYPE_EGRESS  = 1;
 }
 
 message HTTPIngressPath {

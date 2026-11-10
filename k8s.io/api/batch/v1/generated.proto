@@ -14,19 +14,19 @@ import "k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto";
 
 enum CompletionMode {
   COMPLETION_MODE_NON_INDEXED = 0;
-  COMPLETION_MODE_INDEXED     = 1 [(dev.f110.kubeproto.value) = { value: "Indexed" }];
+  COMPLETION_MODE_INDEXED     = 1;
 }
 
 enum ConcurrencyPolicy {
-  CONCURRENCY_POLICY_ALLOW   = 0 [(dev.f110.kubeproto.value) = { value: "Allow" }];
-  CONCURRENCY_POLICY_FORBID  = 1 [(dev.f110.kubeproto.value) = { value: "Forbid" }];
-  CONCURRENCY_POLICY_REPLACE = 2 [(dev.f110.kubeproto.value) = { value: "Replace" }];
+  CONCURRENCY_POLICY_ALLOW   = 0;
+  CONCURRENCY_POLICY_FORBID  = 1;
+  CONCURRENCY_POLICY_REPLACE = 2;
 }
 
 enum JobConditionType {
-  JOB_CONDITION_TYPE_SUSPENDED            = 0 [(dev.f110.kubeproto.value) = { value: "Suspended" }];
-  JOB_CONDITION_TYPE_COMPLETE             = 1 [(dev.f110.kubeproto.value) = { value: "Complete" }];
-  JOB_CONDITION_TYPE_FAILED               = 2 [(dev.f110.kubeproto.value) = { value: "Failed" }];
+  JOB_CONDITION_TYPE_SUSPENDED            = 0;
+  JOB_CONDITION_TYPE_COMPLETE             = 1;
+  JOB_CONDITION_TYPE_FAILED               = 2;
   JOB_CONDITION_TYPE_FAILURE_TARGET       = 3;
   JOB_CONDITION_TYPE_SUCCESS_CRITERIA_MET = 4;
 }
@@ -34,18 +34,18 @@ enum JobConditionType {
 enum PodFailurePolicyAction {
   POD_FAILURE_POLICY_ACTION_FAIL_JOB   = 0;
   POD_FAILURE_POLICY_ACTION_FAIL_INDEX = 1;
-  POD_FAILURE_POLICY_ACTION_IGNORE     = 2 [(dev.f110.kubeproto.value) = { value: "Ignore" }];
-  POD_FAILURE_POLICY_ACTION_COUNT      = 3 [(dev.f110.kubeproto.value) = { value: "Count" }];
+  POD_FAILURE_POLICY_ACTION_IGNORE     = 2;
+  POD_FAILURE_POLICY_ACTION_COUNT      = 3;
 }
 
 enum PodFailurePolicyOnExitCodesOperator {
-  POD_FAILURE_POLICY_ON_EXIT_CODES_OPERATOR_IN     = 0 [(dev.f110.kubeproto.value) = { value: "In" }];
+  POD_FAILURE_POLICY_ON_EXIT_CODES_OPERATOR_IN     = 0;
   POD_FAILURE_POLICY_ON_EXIT_CODES_OPERATOR_NOT_IN = 1;
 }
 
 enum PodReplacementPolicy {
   POD_REPLACEMENT_POLICY_TERMINATING_OR_FAILED = 0;
-  POD_REPLACEMENT_POLICY_FAILED                = 1 [(dev.f110.kubeproto.value) = { value: "Failed" }];
+  POD_REPLACEMENT_POLICY_FAILED                = 1;
 }
 
 message CronJob {

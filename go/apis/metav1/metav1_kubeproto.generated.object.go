@@ -89,7 +89,7 @@ const (
 type StatusReason string
 
 const (
-	StatusReasonUNKNOWN               StatusReason = "UNKNOWN"
+	StatusReasonUnknown               StatusReason = "Unknown"
 	StatusReasonUnauthorized          StatusReason = "Unauthorized"
 	StatusReasonForbidden             StatusReason = "Forbidden"
 	StatusReasonNotFound              StatusReason = "NotFound"

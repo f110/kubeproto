@@ -12,13 +12,13 @@ import "kube.proto";
 import "k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto";
 
 enum DiscoveryFreshness {
-  DISCOVERY_FRESHNESS_CURRENT = 0 [(dev.f110.kubeproto.value) = { value: "Current" }];
-  DISCOVERY_FRESHNESS_STALE   = 1 [(dev.f110.kubeproto.value) = { value: "Stale" }];
+  DISCOVERY_FRESHNESS_CURRENT = 0;
+  DISCOVERY_FRESHNESS_STALE   = 1;
 }
 
 enum ResourceScope {
-  RESOURCE_SCOPE_CLUSTER    = 0 [(dev.f110.kubeproto.value) = { value: "Cluster" }];
-  RESOURCE_SCOPE_NAMESPACED = 1 [(dev.f110.kubeproto.value) = { value: "Namespaced" }];
+  RESOURCE_SCOPE_CLUSTER    = 0;
+  RESOURCE_SCOPE_NAMESPACED = 1;
 }
 
 message APIGroupDiscovery {
