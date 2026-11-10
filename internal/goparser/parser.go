@@ -150,6 +150,9 @@ type Generator struct {
 	kubeprotoGoPackage string
 
 	typeDeclaration []*typeDeclaration
+
+	// unresolvedTypes is a list of the types which could not be converted to protobuf types.
+	unresolvedTypes []error
 }
 
 func New() *Generator {
@@ -229,6 +232,10 @@ func (g *Generator) AddDir(dir string, allStructs bool) error {
 				}
 			}
 		}
+	}
+
+	if len(g.unresolvedTypes) > 0 {
+		return errors.Join(g.unresolvedTypes...)
 	}
 
 	for k := range g.enumValueCandidates {
@@ -897,6 +904,11 @@ func (g *Generator) goTypeToProtobufKind(in ast.Expr) string {
 		if protobufPackage != "" {
 			return "." + protobufPackage + "." + v.Sel.Name
 		}
+		importPath, ok := g.packageMap[nameIdent.Name]
+		if !ok {
+			importPath = nameIdent.Name
+		}
+		g.unresolvedTypes = append(g.unresolvedTypes, fmt.Errorf("protobuf package corresponding to %s.%s is not found", importPath, v.Sel.Name))
 		return ""
 	case *ast.ArrayType:
 		ident, ok := v.Elt.(*ast.Ident)

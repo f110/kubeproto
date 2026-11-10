@@ -177,3 +177,63 @@ type Volume struct {
 		t.Errorf("message option is expected only for Port\n%s", generated)
 	}
 }
+
+func TestUnresolvedPackage(t *testing.T) {
+	cases := map[string]string{
+		"Field":   "Ref unknown.Reference",
+		"Pointer": "Ref *unknown.Reference",
+		"Slice":   "Refs []unknown.Reference",
+		"Map":     "Refs map[string]unknown.Reference",
+	}
+	for name, field := range cases {
+		t.Run(name, func(t *testing.T) {
+			code := `package api
+
+import (
+	"time"
+
+	"example.com/unknown"
+)
+
+type Spec struct {
+	Timeout time.Duration ` + "`json:\"timeout\"`" + `
+	` + field + " `json:\"ref\"`" + `
+}
+`
+			tmpDir := t.TempDir()
+			if err := os.WriteFile(filepath.Join(tmpDir, "types.go"), []byte(code), 0644); err != nil {
+				t.Fatal(err)
+			}
+			err := New().AddDir(tmpDir, true)
+			if err == nil {
+				t.Fatal("expect an error but got nil")
+			}
+			if !strings.Contains(err.Error(), "example.com/unknown") {
+				t.Errorf("error does not contain the import path: %v", err)
+			}
+		})
+	}
+
+	t.Run("Resolved", func(t *testing.T) {
+		code := `package api
+
+import (
+	"time"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+)
+
+type Spec struct {
+	Timeout time.Duration ` + "`json:\"timeout\"`" + `
+	Time metav1.Time ` + "`json:\"time\"`" + `
+}
+`
+		tmpDir := t.TempDir()
+		if err := os.WriteFile(filepath.Join(tmpDir, "types.go"), []byte(code), 0644); err != nil {
+			t.Fatal(err)
+		}
+		if err := New().AddDir(tmpDir, true); err != nil {
+			t.Fatal(err)
+		}
+	})
+}
