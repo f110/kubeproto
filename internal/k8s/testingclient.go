@@ -284,7 +284,8 @@ type fakerBackend struct {
 	gvk := gvks[0]
 	m := obj.(metav1.Object)
 	objMeta := m.GetObjectMeta()
-	obj, err = f.fake.Invokes(k8stesting.NewCreateAction(gvk.GroupVersion().WithResource(resourceName), objMeta.Namespace, obj), result)
+	createOpts := k8smetav1.CreateOptions{DryRun: opts.DryRun, FieldManager: opts.FieldManager, FieldValidation: opts.FieldValidation}
+	obj, err = f.fake.Invokes(k8stesting.NewCreateActionWithOptions(gvk.GroupVersion().WithResource(resourceName), objMeta.Namespace, obj, createOpts), result)
 
 	if obj == nil {
 		return nil, err
@@ -301,7 +302,8 @@ type fakerBackend struct {
 	gvk := gvks[0]
 	m := obj.(metav1.Object)
 	objMeta := m.GetObjectMeta()
-	obj, err = f.fake.Invokes(k8stesting.NewUpdateAction(gvk.GroupVersion().WithResource(resourceName), objMeta.Namespace, obj), result)
+	updateOpts := k8smetav1.UpdateOptions{DryRun: opts.DryRun, FieldManager: opts.FieldManager, FieldValidation: opts.FieldValidation}
+	obj, err = f.fake.Invokes(k8stesting.NewUpdateActionWithOptions(gvk.GroupVersion().WithResource(resourceName), objMeta.Namespace, obj, updateOpts), result)
 
 	if obj == nil {
 		return nil, err
@@ -317,7 +319,8 @@ type fakerBackend struct {
 	gvk := gvks[0]
 	m := obj.(metav1.Object)
 	objMeta := m.GetObjectMeta()
-	obj, err = f.fake.Invokes(k8stesting.NewUpdateSubresourceAction(gvk.GroupVersion().WithResource(resourceName), "status", objMeta.Namespace, obj), result)
+	updateOpts := k8smetav1.UpdateOptions{DryRun: opts.DryRun, FieldManager: opts.FieldManager, FieldValidation: opts.FieldValidation}
+	obj, err = f.fake.Invokes(k8stesting.NewUpdateSubresourceActionWithOptions(gvk.GroupVersion().WithResource(resourceName), "status", objMeta.Namespace, obj, updateOpts), result)
 
 	if obj == nil {
 		return nil, err
