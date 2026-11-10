@@ -32,6 +32,11 @@ func TestFieldTag(t *testing.T) {
 			Field: &Field{Inline: true},
 			Tag:   "`json:\",inline\"`",
 		},
+		{
+			Name:  "Ignored",
+			Field: &Field{FieldName: "-", Optional: true},
+			Tag:   "`json:\"-\"`",
+		},
 	}
 
 	for _, tc := range cases {
