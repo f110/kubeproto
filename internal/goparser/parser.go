@@ -8,9 +8,11 @@ import (
 	"go/parser"
 	"go/token"
 	"log"
+	"maps"
 	"os"
 	"path"
 	"reflect"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -169,7 +171,8 @@ func (g *Generator) AddDir(dir string, allStructs bool) error {
 
 	p := &ProtobufFile{}
 	for _, v := range pkgs {
-		for _, f := range v.Files {
+		for _, filename := range slices.Sorted(maps.Keys(v.Files)) {
+			f := v.Files[filename]
 			for _, v := range f.Imports {
 				g.addPackageMap(v)
 			}

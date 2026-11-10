@@ -223,19 +223,19 @@ enum PathMatchType {
 }
 
 enum PolicyConditionReason {
-  POLICY_CONDITION_REASON_ACCEPTED                    = 0 [(dev.f110.kubeproto.value) = { value: "Accepted" }];
-  POLICY_CONDITION_REASON_CONFLICTED                  = 1 [(dev.f110.kubeproto.value) = { value: "Conflicted" }];
-  POLICY_CONDITION_REASON_INVALID                     = 2 [(dev.f110.kubeproto.value) = { value: "Invalid" }];
-  POLICY_CONDITION_REASON_TARGET_NOT_FOUND            = 3;
-  POLICY_CONDITION_REASON_NO_VALID_C_A_CERTIFICATE    = 4;
-  POLICY_CONDITION_REASON_RESOLVED_REFS               = 5;
-  POLICY_CONDITION_REASON_INVALID_C_A_CERTIFICATE_REF = 6;
-  POLICY_CONDITION_REASON_INVALID_KIND                = 7;
+  POLICY_CONDITION_REASON_NO_VALID_C_A_CERTIFICATE    = 0;
+  POLICY_CONDITION_REASON_RESOLVED_REFS               = 1;
+  POLICY_CONDITION_REASON_INVALID_C_A_CERTIFICATE_REF = 2;
+  POLICY_CONDITION_REASON_INVALID_KIND                = 3;
+  POLICY_CONDITION_REASON_ACCEPTED                    = 4 [(dev.f110.kubeproto.value) = { value: "Accepted" }];
+  POLICY_CONDITION_REASON_CONFLICTED                  = 5 [(dev.f110.kubeproto.value) = { value: "Conflicted" }];
+  POLICY_CONDITION_REASON_INVALID                     = 6 [(dev.f110.kubeproto.value) = { value: "Invalid" }];
+  POLICY_CONDITION_REASON_TARGET_NOT_FOUND            = 7;
 }
 
 enum PolicyConditionType {
-  POLICY_CONDITION_TYPE_ACCEPTED      = 0 [(dev.f110.kubeproto.value) = { value: "Accepted" }];
-  POLICY_CONDITION_TYPE_RESOLVED_REFS = 1;
+  POLICY_CONDITION_TYPE_RESOLVED_REFS = 0;
+  POLICY_CONDITION_TYPE_ACCEPTED      = 1 [(dev.f110.kubeproto.value) = { value: "Accepted" }];
 }
 
 enum ProtocolType {
