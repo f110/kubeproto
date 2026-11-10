@@ -65,6 +65,40 @@ const (
 			t.Errorf("found enum and expect three elements but %d elements.", len(g.enumValueCandidates["PathType"]))
 		}
 	})
+
+	t.Run("Multiple files", func(t *testing.T) {
+		files := map[string]string{
+			"a.go": `package api
+type ConditionType string
+
+const ConditionTypeAccepted ConditionType = "Accepted"`,
+			"b.go": `package api
+const ConditionTypeResolvedRefs ConditionType = "ResolvedRefs"`,
+			"c.go": `package api
+const ConditionTypeProgrammed ConditionType = "Programmed"`,
+		}
+		tmpDir := t.TempDir()
+		for name, code := range files {
+			if err := os.WriteFile(filepath.Join(tmpDir, name), []byte(code), 0644); err != nil {
+				t.Fatal(err)
+			}
+		}
+
+		for range 20 {
+			g := New()
+			if err := g.AddDir(tmpDir, true); err != nil {
+				t.Fatal(err)
+			}
+			var names []string
+			for _, v := range g.enumValueCandidates["ConditionType"] {
+				names = append(names, v.Name)
+			}
+			expect := []string{"ConditionTypeAccepted", "ConditionTypeResolvedRefs", "ConditionTypeProgrammed"}
+			if strings.Join(names, ",") != strings.Join(expect, ",") {
+				t.Fatalf("expect %v but %v", expect, names)
+			}
+		}
+	})
 }
 
 func TestMergeStrategy(t *testing.T) {
