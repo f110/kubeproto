@@ -14,19 +14,19 @@ import "k8s.io/apimachinery/pkg/api/resource/generated.proto";
 import "k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto";
 
 enum FSGroupPolicy {
-  FS_GROUP_POLICY_READ_WRITE_ONCE_WITH_FS_TYPE = 0 [(dev.f110.kubeproto.value) = { value: "ReadWriteOnceWithFSType" }];
-  FS_GROUP_POLICY_FILE                         = 1 [(dev.f110.kubeproto.value) = { value: "File" }];
-  FS_GROUP_POLICY_NONE                         = 2 [(dev.f110.kubeproto.value) = { value: "None" }];
+  FS_GROUP_POLICY_READ_WRITE_ONCE_WITH_FS_TYPE = 0;
+  FS_GROUP_POLICY_FILE                         = 1;
+  FS_GROUP_POLICY_NONE                         = 2;
 }
 
 enum VolumeBindingMode {
-  VOLUME_BINDING_MODE_IMMEDIATE               = 0 [(dev.f110.kubeproto.value) = { value: "Immediate" }];
+  VOLUME_BINDING_MODE_IMMEDIATE               = 0;
   VOLUME_BINDING_MODE_WAIT_FOR_FIRST_CONSUMER = 1;
 }
 
 enum VolumeLifecycleMode {
-  VOLUME_LIFECYCLE_MODE_PERSISTENT = 0 [(dev.f110.kubeproto.value) = { value: "Persistent" }];
-  VOLUME_LIFECYCLE_MODE_EPHEMERAL  = 1 [(dev.f110.kubeproto.value) = { value: "Ephemeral" }];
+  VOLUME_LIFECYCLE_MODE_PERSISTENT = 0;
+  VOLUME_LIFECYCLE_MODE_EPHEMERAL  = 1;
 }
 
 message CSIDriver {

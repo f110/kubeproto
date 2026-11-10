@@ -11,6 +11,10 @@ func TestToUpperCamelCase(t *testing.T) {
 	assert.Equal(t, "CertManagerIo", ToUpperCamelCase("cert-manager.io"))
 	assert.Equal(t, "FooBar", ToUpperCamelCase("FooBar"))
 	assert.Equal(t, "Kubernetes", ToUpperCamelCase("kubernetes"))
+	assert.Equal(t, "Created", ToUpperCamelCase("CREATED"))
+	assert.Equal(t, "PIDPressure", ToUpperCamelCase("PIDPressure"))
+	assert.Equal(t, "TCP", ToUpperCamelCase("TCP"))
+	assert.Equal(t, "FooUID", ToUpperCamelCase("foo_UID"))
 }
 
 func TestToLowerCamelCase(t *testing.T) {
@@ -21,6 +25,7 @@ func TestToUpperSnakeCase(t *testing.T) {
 	assert.Equal(t, "FOO", ToUpperSnakeCase("Foo"))
 	assert.Equal(t, "FOO_BAR", ToUpperSnakeCase("FooBar"))
 	assert.Equal(t, "HTTP_01", ToUpperSnakeCase("HTTP-01"))
+	assert.Equal(t, "FOO_1", ToUpperSnakeCase("foo+1"))
 }
 
 func TestToLowerSnakeCase(t *testing.T) {
@@ -70,4 +75,6 @@ func TestIsCamelCase(t *testing.T) {
 	assert.False(t, IsCamelCase("foo_bar"))
 	assert.False(t, IsCamelCase("cert-manager.io"))
 	assert.False(t, IsCamelCase("kubernetes"))
+	assert.False(t, IsCamelCase("CREATED"))
+	assert.True(t, IsCamelCase("PIDPressure"))
 }

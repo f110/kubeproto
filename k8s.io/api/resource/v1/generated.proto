@@ -21,18 +21,18 @@ enum AllocationConfigSource {
 
 enum DeviceAllocationMode {
   DEVICE_ALLOCATION_MODE_EXACT_COUNT = 0;
-  DEVICE_ALLOCATION_MODE_ALL         = 1 [(dev.f110.kubeproto.value) = { value: "All" }];
+  DEVICE_ALLOCATION_MODE_ALL         = 1;
 }
 
 enum DeviceTaintEffect {
-  DEVICE_TAINT_EFFECT_NONE        = 0 [(dev.f110.kubeproto.value) = { value: "None" }];
+  DEVICE_TAINT_EFFECT_NONE        = 0;
   DEVICE_TAINT_EFFECT_NO_SCHEDULE = 1;
   DEVICE_TAINT_EFFECT_NO_EXECUTE  = 2;
 }
 
 enum DeviceTolerationOperator {
-  DEVICE_TOLERATION_OPERATOR_EXISTS = 0 [(dev.f110.kubeproto.value) = { value: "Exists" }];
-  DEVICE_TOLERATION_OPERATOR_EQUAL  = 1 [(dev.f110.kubeproto.value) = { value: "Equal" }];
+  DEVICE_TOLERATION_OPERATOR_EXISTS = 0;
+  DEVICE_TOLERATION_OPERATOR_EQUAL  = 1;
 }
 
 message AllocatedDeviceStatus {
@@ -567,7 +567,7 @@ message DeviceRequestAllocationResult {
 
 message DeviceSelector {
   // CEL contains a CEL expression for selecting a device.
-  optional CELDeviceSelector c_e_l = 1 [(dev.f110.kubeproto.field) = { go_name: "CEL", api_field_name: "cel", inline: false }];
+  optional CELDeviceSelector cel = 1 [(dev.f110.kubeproto.field) = { go_name: "CEL", api_field_name: "cel", inline: false }];
 }
 
 message DeviceSubRequest {

@@ -379,9 +379,9 @@ spec:
             properties:
               phase:
                 enum:
-                - CREATED
-                - PROVISIONING
-                - PROVISIONED
+                - Created
+                - Provisioning
+                - Provisioned
                 type: string
               ready:
                 type: boolean

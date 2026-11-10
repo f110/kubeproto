@@ -12,13 +12,13 @@ import "kube.proto";
 import "k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto";
 
 enum FailurePolicyType {
-  FAILURE_POLICY_TYPE_IGNORE = 0 [(dev.f110.kubeproto.value) = { value: "Ignore" }];
-  FAILURE_POLICY_TYPE_FAIL   = 1 [(dev.f110.kubeproto.value) = { value: "Fail" }];
+  FAILURE_POLICY_TYPE_IGNORE = 0;
+  FAILURE_POLICY_TYPE_FAIL   = 1;
 }
 
 enum MatchPolicyType {
-  MATCH_POLICY_TYPE_EXACT      = 0 [(dev.f110.kubeproto.value) = { value: "Exact" }];
-  MATCH_POLICY_TYPE_EQUIVALENT = 1 [(dev.f110.kubeproto.value) = { value: "Equivalent" }];
+  MATCH_POLICY_TYPE_EXACT      = 0;
+  MATCH_POLICY_TYPE_EQUIVALENT = 1;
 }
 
 enum OperationType {
@@ -30,8 +30,8 @@ enum OperationType {
 }
 
 enum ParameterNotFoundActionType {
-  PARAMETER_NOT_FOUND_ACTION_TYPE_ALLOW = 0 [(dev.f110.kubeproto.value) = { value: "Allow" }];
-  PARAMETER_NOT_FOUND_ACTION_TYPE_DENY  = 1 [(dev.f110.kubeproto.value) = { value: "Deny" }];
+  PARAMETER_NOT_FOUND_ACTION_TYPE_ALLOW = 0;
+  PARAMETER_NOT_FOUND_ACTION_TYPE_DENY  = 1;
 }
 
 enum PatchType {
@@ -40,27 +40,27 @@ enum PatchType {
 }
 
 enum ReinvocationPolicyType {
-  REINVOCATION_POLICY_TYPE_NEVER     = 0 [(dev.f110.kubeproto.value) = { value: "Never" }];
+  REINVOCATION_POLICY_TYPE_NEVER     = 0;
   REINVOCATION_POLICY_TYPE_IF_NEEDED = 1;
 }
 
 enum ScopeType {
-  SCOPE_TYPE_CLUSTER    = 0 [(dev.f110.kubeproto.value) = { value: "Cluster" }];
-  SCOPE_TYPE_NAMESPACED = 1 [(dev.f110.kubeproto.value) = { value: "Namespaced" }];
+  SCOPE_TYPE_CLUSTER    = 0;
+  SCOPE_TYPE_NAMESPACED = 1;
   SCOPE_TYPE_ASTERISK   = 2 [(dev.f110.kubeproto.value) = { value: "*" }];
 }
 
 enum SideEffectClass {
-  SIDE_EFFECT_CLASS_UNKNOWN         = 0 [(dev.f110.kubeproto.value) = { value: "Unknown" }];
-  SIDE_EFFECT_CLASS_NONE            = 1 [(dev.f110.kubeproto.value) = { value: "None" }];
-  SIDE_EFFECT_CLASS_SOME            = 2 [(dev.f110.kubeproto.value) = { value: "Some" }];
+  SIDE_EFFECT_CLASS_UNKNOWN         = 0;
+  SIDE_EFFECT_CLASS_NONE            = 1;
+  SIDE_EFFECT_CLASS_SOME            = 2;
   SIDE_EFFECT_CLASS_NONE_ON_DRY_RUN = 3;
 }
 
 enum ValidationAction {
-  VALIDATION_ACTION_DENY  = 0 [(dev.f110.kubeproto.value) = { value: "Deny" }];
-  VALIDATION_ACTION_WARN  = 1 [(dev.f110.kubeproto.value) = { value: "Warn" }];
-  VALIDATION_ACTION_AUDIT = 2 [(dev.f110.kubeproto.value) = { value: "Audit" }];
+  VALIDATION_ACTION_DENY  = 0;
+  VALIDATION_ACTION_WARN  = 1;
+  VALIDATION_ACTION_AUDIT = 2;
 }
 
 message ApplyConfiguration {

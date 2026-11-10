@@ -39,9 +39,9 @@ enum KeyUsage {
 }
 
 enum RequestConditionType {
-  REQUEST_CONDITION_TYPE_APPROVED = 0 [(dev.f110.kubeproto.value) = { value: "Approved" }];
-  REQUEST_CONDITION_TYPE_DENIED   = 1 [(dev.f110.kubeproto.value) = { value: "Denied" }];
-  REQUEST_CONDITION_TYPE_FAILED   = 2 [(dev.f110.kubeproto.value) = { value: "Failed" }];
+  REQUEST_CONDITION_TYPE_APPROVED = 0;
+  REQUEST_CONDITION_TYPE_DENIED   = 1;
+  REQUEST_CONDITION_TYPE_FAILED   = 2;
 }
 
 message CertificateSigningRequest {

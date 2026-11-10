@@ -10,10 +10,14 @@ import (
 // word is a list of proper noun used to divide words.
 // The word at the top of the list is given priority.
 // Therefore, words with fewer letters should be placed at the end of the list.
-var word = []string{"UUID", "UID", "WWIDs", "IQN", "ISCSI", "API", "ACME", "CHAP", "CIDRs", "CIDR", "PID", "ID", "DNS",
+var word = []string{"SIGABRT", "SIGALRM", "SIGBUS", "SIGCHLD", "SIGCLD", "SIGCONT", "SIGFPE", "SIGHUP", "SIGILL", "SIGINT", "SIGIO", "SIGIOT", "SIGKILL",
+	"SIGPIPE", "SIGPOLL", "SIGPROF", "SIGPWR", "SIGQUIT", "SIGSEGV", "SIGSTKFLT", "SIGSTOP", "SIGSYS", "SIGTERM", "SIGTRAP", "SIGTSTP",
+	"SIGTTIN", "SIGTTOU", "SIGURG", "SIGUSR1", "SIGUSR2", "SIGVTALRM", "SIGWINCH", "SIGXCPU", "SIGXFSZ", "SIGRTMIN", "SIGRTMAX",
+	"UUID", "UID", "WWIDs", "IQN", "ISCSI", "API", "ACME", "CHAP", "CIDRs", "CIDR", "PID", "ID", "DNS",
 	"IPC", "IPs", "IP", "PUT", "POST", "QOS", "OS", "NFS", "FS", "FC", "RBD", "HPA", "TCP", "UDP", "SCTP", "GET", "URI", "URL",
 	"TLS", "CREATE", "UPDATE", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH", "HTTPS", "HTTP", "SELinux", "FQDN", "TTY",
-	"WWNs", "GCE", "AWS", "IO", "CSI", "GRPC", "SSL", "GMSA", "HMAC", "HEAD", "JSON"}
+	"WWNs", "GCE", "AWS", "IO", "CSI", "GRPC", "SSL", "GMSA", "HMAC", "HEAD", "JSON", "VIP", "GID", "CEL",
+}
 
 var wordDic map[string]struct{}
 
@@ -29,20 +33,19 @@ func IsSnakeCase(in string) bool {
 }
 
 func IsCamelCase(in string) bool {
-	upper := false
+	var upper, lower bool
 	for i := 0; i < len(in); i++ {
 		if !unicode.IsLetter(rune(in[i])) {
 			return false
 		}
-		if !upper && unicode.IsUpper(rune(in[i])) {
+		if unicode.IsUpper(rune(in[i])) {
 			upper = true
+		} else {
+			lower = true
 		}
 	}
-	if !upper {
-		return false
-	}
 
-	return true
+	return upper && lower
 }
 
 func ToUpperCamelCase(in string) string {
@@ -68,6 +71,10 @@ func ToUpperCamelCase(in string) string {
 
 	var buf strings.Builder
 	for _, v := range s {
+		if _, ok := wordDic[v]; ok {
+			buf.WriteString(v)
+			continue
+		}
 		buf.WriteRune(unicode.ToUpper(rune(v[0])))
 		buf.WriteString(strings.ToLower(v[1:]))
 	}
@@ -133,7 +140,7 @@ Loop:
 			}
 
 			switch s[i][k] {
-			case '.', '-', '_', '/':
+			case '.', '-', '_', '/', '+':
 				if k == 0 {
 					if len(s[i]) == 1 {
 						s = remove(s, i)
