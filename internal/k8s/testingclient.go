@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"path"
+	"strings"
 
 	"google.golang.org/protobuf/reflect/protoregistry"
 	"google.golang.org/protobuf/types/descriptorpb"
@@ -163,6 +164,19 @@ func (g *restFakeClientGenerator) WriteTo(writer *codegeneration.Writer, fqdn bo
 	writer.F("}")
 	writer.F("return parser")
 	writer.F("})")
+	writer.F("")
+	writer.F("// statusSubresourceKinds is the set of the kinds which have the status subresource.")
+	writer.F("// The apiserver ignores the status when the object of these kinds is applied to the main resource.")
+	writer.F("var statusSubresourceKinds = map[schema.GroupVersionKind]struct{}{")
+	for _, k := range keys(g.groupVersions) {
+		for _, m := range g.groupVersions[k] {
+			if !m.IsDefinedSubResource() {
+				continue
+			}
+			writer.F("{Group: %q, Version: %q, Kind: %q}: {},", strings.TrimPrefix(m.Group, "."), m.Version, m.ShortName)
+		}
+	}
+	writer.F("}")
 	writer.F("")
 
 	writer.F("func NewSet() *Set {")
@@ -324,6 +338,17 @@ type fakerBackend struct {
 	patch, err := json.Marshal(obj)
 	if err != nil {
 		return nil, err
+	}
+	if _, ok := statusSubresourceKinds[gvk]; ok {
+		var fields map[string]json.RawMessage
+		if err := json.Unmarshal(patch, &fields); err != nil {
+			return nil, err
+		}
+		delete(fields, "status")
+		patch, err = json.Marshal(fields)
+		if err != nil {
+			return nil, err
+		}
 	}
 	patchOpts := k8smetav1.PatchOptions{DryRun: opts.DryRun, Force: &opts.Force, FieldManager: opts.FieldManager}
 	action := k8stesting.NewPatchActionWithOptions(gvk.GroupVersion().WithResource(resourceName), objMeta.Namespace, objMeta.Name, types.ApplyPatchType, patch, patchOpts)

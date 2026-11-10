@@ -125,3 +125,28 @@ func TestApplyWithFieldManager(t *testing.T) {
 	_, err = s.AppsV1.ApplyDeployment(t.Context(), deployment(corev1.Container{Name: "app", Image: "app:v3"}), metav1.ApplyOptions{FieldManager: "injector"})
 	assertion.Equal(t, true, apierrors.IsConflict(err))
 }
+
+func TestApplyIgnoresStatusSubresource(t *testing.T) {
+	s := NewSet()
+	err := s.Tracker().Add(&appsv1.Deployment{
+		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: metav1.NamespaceDefault},
+		Status:     &appsv1.DeploymentStatus{Replicas: 3},
+	})
+	assertion.MustNoError(t, err)
+
+	d, err := s.AppsV1.ApplyDeployment(
+		t.Context(),
+		&appsv1.Deployment{
+			ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: metav1.NamespaceDefault, Labels: map[string]string{"app": "test"}},
+			Status:     &appsv1.DeploymentStatus{Replicas: 1},
+		},
+		metav1.ApplyOptions{FieldManager: "test"},
+	)
+	assertion.MustNoError(t, err)
+	assertion.Equal(t, "test", d.Labels["app"])
+	assertion.Equal(t, 3, d.Status.Replicas)
+
+	d, err = s.AppsV1.GetDeployment(t.Context(), metav1.NamespaceDefault, "test", metav1.GetOptions{})
+	assertion.MustNoError(t, err)
+	assertion.Equal(t, 3, d.Status.Replicas)
+}
