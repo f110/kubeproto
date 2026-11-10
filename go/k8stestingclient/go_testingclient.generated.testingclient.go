@@ -49,6 +49,43 @@ var typeSchemaParser = sync.OnceValue(func() *typed.Parser {
 	return parser
 })
 
+// statusSubresourceKinds is the set of the kinds which have the status subresource.
+// The apiserver ignores the status when the object of these kinds is applied to the main resource.
+var statusSubresourceKinds = map[schema.GroupVersionKind]struct{}{
+	{Group: "", Version: "v1", Kind: "Namespace"}:                                             {},
+	{Group: "", Version: "v1", Kind: "Node"}:                                                  {},
+	{Group: "", Version: "v1", Kind: "PersistentVolume"}:                                      {},
+	{Group: "", Version: "v1", Kind: "PersistentVolumeClaim"}:                                 {},
+	{Group: "", Version: "v1", Kind: "Pod"}:                                                   {},
+	{Group: "", Version: "v1", Kind: "PodStatusResult"}:                                       {},
+	{Group: "", Version: "v1", Kind: "ReplicationController"}:                                 {},
+	{Group: "", Version: "v1", Kind: "ResourceQuota"}:                                         {},
+	{Group: "", Version: "v1", Kind: "Service"}:                                               {},
+	{Group: "admissionregistration.k8s.io", Version: "v1", Kind: "ValidatingAdmissionPolicy"}: {},
+	{Group: "apps", Version: "v1", Kind: "DaemonSet"}:                                         {},
+	{Group: "apps", Version: "v1", Kind: "Deployment"}:                                        {},
+	{Group: "apps", Version: "v1", Kind: "ReplicaSet"}:                                        {},
+	{Group: "apps", Version: "v1", Kind: "StatefulSet"}:                                       {},
+	{Group: "authentication.k8s.io", Version: "v1", Kind: "SelfSubjectReview"}:                {},
+	{Group: "authentication.k8s.io", Version: "v1", Kind: "TokenRequest"}:                     {},
+	{Group: "authentication.k8s.io", Version: "v1", Kind: "TokenReview"}:                      {},
+	{Group: "authorization.k8s.io", Version: "v1", Kind: "LocalSubjectAccessReview"}:          {},
+	{Group: "authorization.k8s.io", Version: "v1", Kind: "SelfSubjectAccessReview"}:           {},
+	{Group: "authorization.k8s.io", Version: "v1", Kind: "SelfSubjectRulesReview"}:            {},
+	{Group: "authorization.k8s.io", Version: "v1", Kind: "SubjectAccessReview"}:               {},
+	{Group: "autoscaling", Version: "v1", Kind: "HorizontalPodAutoscaler"}:                    {},
+	{Group: "autoscaling", Version: "v1", Kind: "Scale"}:                                      {},
+	{Group: "autoscaling", Version: "v2", Kind: "HorizontalPodAutoscaler"}:                    {},
+	{Group: "batch", Version: "v1", Kind: "CronJob"}:                                          {},
+	{Group: "batch", Version: "v1", Kind: "Job"}:                                              {},
+	{Group: "certificates.k8s.io", Version: "v1", Kind: "CertificateSigningRequest"}:          {},
+	{Group: "networking.k8s.io", Version: "v1", Kind: "Ingress"}:                              {},
+	{Group: "networking.k8s.io", Version: "v1", Kind: "ServiceCIDR"}:                          {},
+	{Group: "policy", Version: "v1", Kind: "PodDisruptionBudget"}:                             {},
+	{Group: "resource", Version: "v1", Kind: "ResourceClaim"}:                                 {},
+	{Group: "storage.k8s.io", Version: "v1", Kind: "VolumeAttachment"}:                        {},
+}
+
 func NewSet() *Set {
 	s := &Set{}
 	typeConverter := managedfields.NewSchemeTypeConverter(k8sclient.Scheme, typeSchemaParser())
@@ -213,6 +250,17 @@ func (f *fakerBackend) Apply(ctx context.Context, resourceName string, obj runti
 	patch, err := json.Marshal(obj)
 	if err != nil {
 		return nil, err
+	}
+	if _, ok := statusSubresourceKinds[gvk]; ok {
+		var fields map[string]json.RawMessage
+		if err := json.Unmarshal(patch, &fields); err != nil {
+			return nil, err
+		}
+		delete(fields, "status")
+		patch, err = json.Marshal(fields)
+		if err != nil {
+			return nil, err
+		}
 	}
 	patchOpts := k8smetav1.PatchOptions{DryRun: opts.DryRun, Force: &opts.Force, FieldManager: opts.FieldManager}
 	action := k8stesting.NewPatchActionWithOptions(gvk.GroupVersion().WithResource(resourceName), objMeta.Namespace, objMeta.Name, types.ApplyPatchType, patch, patchOpts)

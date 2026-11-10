@@ -49,6 +49,10 @@ var typeSchemaParser = sync.OnceValue(func() *typed.Parser {
 	return parser
 })
 
+// statusSubresourceKinds is the set of the kinds which have the status subresource.
+// The apiserver ignores the status when the object of these kinds is applied to the main resource.
+var statusSubresourceKinds = map[schema.GroupVersionKind]struct{}{}
+
 func NewSet() *Set {
 	s := &Set{}
 	typeConverter := managedfields.NewSchemeTypeConverter(client.Scheme, typeSchemaParser())
@@ -197,6 +201,17 @@ func (f *fakerBackend) Apply(ctx context.Context, resourceName string, obj runti
 	patch, err := json.Marshal(obj)
 	if err != nil {
 		return nil, err
+	}
+	if _, ok := statusSubresourceKinds[gvk]; ok {
+		var fields map[string]json.RawMessage
+		if err := json.Unmarshal(patch, &fields); err != nil {
+			return nil, err
+		}
+		delete(fields, "status")
+		patch, err = json.Marshal(fields)
+		if err != nil {
+			return nil, err
+		}
 	}
 	patchOpts := k8smetav1.PatchOptions{DryRun: opts.DryRun, Force: &opts.Force, FieldManager: opts.FieldManager}
 	action := k8stesting.NewPatchActionWithOptions(gvk.GroupVersion().WithResource(resourceName), objMeta.Namespace, objMeta.Name, types.ApplyPatchType, patch, patchOpts)
