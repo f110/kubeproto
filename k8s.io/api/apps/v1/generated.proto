@@ -163,7 +163,9 @@ message DaemonSetStatus {
   // create the name for the newest ControllerRevision.
   optional int32 collision_count = 9 [(dev.f110.kubeproto.field) = { go_name: "CollisionCount", api_field_name: "collisionCount", inline: false }];
   // Represents the latest available observations of a DaemonSet's current state.
-  repeated DaemonSetCondition conditions = 10 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated DaemonSetCondition conditions = 10 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                              list_map_keys: [ "type" ],
+                                                                              inline: false }];
 }
 
 message DaemonSetUpdateStrategy {
@@ -260,7 +262,9 @@ message DeploymentStatus {
   // This is a beta field and requires enabling DeploymentReplicaSetTerminatingReplicas feature (enabled by default).
   optional int32 terminating_replicas = 7 [(dev.f110.kubeproto.field) = { go_name: "TerminatingReplicas", api_field_name: "terminatingReplicas", inline: false }];
   // Represents the latest available observations of a deployment's current state.
-  repeated DeploymentCondition conditions = 8 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated DeploymentCondition conditions = 8 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                              list_map_keys: [ "type" ],
+                                                                              inline: false }];
   // Count of hash collisions for the Deployment. The Deployment controller uses this
   // field as a collision avoidance mechanism when it needs to create the name for the
   // newest ReplicaSet.
@@ -353,7 +357,9 @@ message ReplicaSetStatus {
   // ObservedGeneration reflects the generation of the most recently observed ReplicaSet.
   optional int64 observed_generation = 6 [(dev.f110.kubeproto.field) = { go_name: "ObservedGeneration", api_field_name: "observedGeneration", inline: false }];
   // Represents the latest available observations of a replica set's current state.
-  repeated ReplicaSetCondition conditions = 7 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated ReplicaSetCondition conditions = 7 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                              list_map_keys: [ "type" ],
+                                                                              inline: false }];
 }
 
 message RollingUpdateDaemonSet {
@@ -518,7 +524,7 @@ message StatefulSetSpec {
   // this list must have at least one matching (by name) volumeMount in one
   // container in the template. A claim in this list takes precedence over
   // any volumes in the template, with the same name.
-  repeated .k8s.io.api.core.v1.PersistentVolumeClaim volume_claim_templates = 4 [(dev.f110.kubeproto.field) = { go_name: "VolumeClaimTemplates", api_field_name: "volumeClaimTemplates", inline: false }];
+  repeated .k8s.io.api.core.v1.PersistentVolumeClaim volume_claim_templates = 4 [(dev.f110.kubeproto.field) = { go_name: "VolumeClaimTemplates", api_field_name: "volumeClaimTemplates", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // serviceName is the name of the service that governs this StatefulSet.
   // This service must exist before the StatefulSet, and is responsible for
   // the network identity of the set. Pods get DNS/hostnames that follow the
@@ -585,7 +591,9 @@ message StatefulSetStatus {
   // newest ControllerRevision.
   optional int32 collision_count = 8 [(dev.f110.kubeproto.field) = { go_name: "CollisionCount", api_field_name: "collisionCount", inline: false }];
   // Represents the latest available observations of a statefulset's current state.
-  repeated StatefulSetCondition conditions = 9 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated StatefulSetCondition conditions = 9 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                               list_map_keys: [ "type" ],
+                                                                               inline: false }];
   // Total number of available pods (ready for at least minReadySeconds) targeted by this statefulset.
   int32 available_replicas = 10 [(dev.f110.kubeproto.field) = { go_name: "AvailableReplicas", api_field_name: "availableReplicas", inline: false }];
 }

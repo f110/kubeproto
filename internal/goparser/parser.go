@@ -12,9 +12,11 @@ import (
 	"path"
 	"reflect"
 	"sort"
+	"strconv"
 	"strings"
 	"unicode"
 
+	"go.f110.dev/kubeproto"
 	"go.f110.dev/kubeproto/internal/codegeneration"
 	"go.f110.dev/kubeproto/internal/stringsutil"
 )
@@ -491,6 +493,19 @@ func (g *Generator) WriteFile(outputFilePath string) error {
 			if f.SubResource {
 				w.Fn("sub_resource: true, ")
 			}
+			if v, ok := enumValueName(kubeproto.ListType_value, "LIST_TYPE_", f.ListType); ok {
+				w.Fn("list_type: %s, ", v)
+				if len(f.ListMapKeys) > 0 {
+					keys := make([]string, len(f.ListMapKeys))
+					for i, k := range f.ListMapKeys {
+						keys[i] = strconv.Quote(k)
+					}
+					w.Fn("list_map_keys: [%s], ", strings.Join(keys, ", "))
+				}
+			}
+			if v, ok := enumValueName(kubeproto.MapType_value, "MAP_TYPE_", f.MapType); ok {
+				w.Fn("map_type: %s, ", v)
+			}
 			w.Fn("inline: %v}];", f.Inline)
 			w.F("")
 		}
@@ -502,6 +517,9 @@ func (g *Generator) WriteFile(outputFilePath string) error {
 				w.F("scope: SCOPE_CLUSTER")
 			}
 			w.F("};")
+		}
+		if v, ok := enumValueName(kubeproto.StructType_value, "STRUCT_TYPE_", m.StructType); ok {
+			w.F("option (dev.f110.kubeproto.message) = {struct_type: %s};", v)
 		}
 		w.F("}")
 		w.F("")
@@ -656,7 +674,7 @@ func (g *Generator) structToProtobufMessage(v *ast.GenDecl, comment *ast.Comment
 		}
 
 		var inline, optional bool
-		var apiFieldName string
+		var apiFieldName, patchStrategy, patchMergeKey string
 		if f.Tag != nil && f.Tag.Value != "" {
 			tag := reflect.StructTag(f.Tag.Value[1 : len(f.Tag.Value)-1])
 
@@ -678,6 +696,7 @@ func (g *Generator) structToProtobufMessage(v *ast.GenDecl, comment *ast.Comment
 				}
 			}
 			apiFieldName = s[0]
+			patchStrategy, patchMergeKey = tag.Get("patchStrategy"), tag.Get("patchMergeKey")
 		}
 
 		var kind, mapKeyKind, mapValueKind, externalPackage string
@@ -727,6 +746,12 @@ func (g *Generator) structToProtobufMessage(v *ast.GenDecl, comment *ast.Comment
 			optional = false
 		}
 
+		fieldMarkers := parseMarkers(f.Doc)
+		var listType string
+		var listMapKeys []string
+		if repeated {
+			listType, listMapKeys = listMergeStrategy(fieldMarkers, patchStrategy, patchMergeKey)
+		}
 		m.Fields = append(m.Fields, &ProtobufField{
 			Name:            stringsutil.ToLowerSnakeCase(name),
 			GoName:          name,
@@ -742,9 +767,13 @@ func (g *Generator) structToProtobufMessage(v *ast.GenDecl, comment *ast.Comment
 			Repeated:        repeated,
 			Inline:          inline,
 			Doc:             f.Doc.Text(),
+			ListType:        listType,
+			ListMapKeys:     listMapKeys,
+			MapType:         fieldMarkers.Get("mapType"),
 		})
 		i++
 	}
+	m.StructType = parseMarkers(v.Doc).Get("structType")
 
 	if m.IsRuntimeObject() {
 		m.Option = &ProtobufMessageOption{}
@@ -771,6 +800,66 @@ func (g *Generator) structToProtobufMessage(v *ast.GenDecl, comment *ast.Comment
 	}
 
 	return m
+}
+
+// enumValueName returns the name of the enum value in kube.proto that corresponds to the value of the marker.
+// e.g. "atomic" of +listType is LIST_TYPE_ATOMIC.
+func enumValueName(values map[string]int32, prefix, markerValue string) (string, bool) {
+	if markerValue == "" {
+		return "", false
+	}
+	name := prefix + strings.ToUpper(markerValue)
+	_, ok := values[name]
+	return name, ok
+}
+
+type markers map[string][]string
+
+// parseMarkers returns the values of the markers (e.g. "// +listType=map") in the comment.
+func parseMarkers(doc *ast.CommentGroup) markers {
+	m := make(markers)
+	if doc == nil {
+		return m
+	}
+	for line := range strings.SplitSeq(doc.Text(), "\n") {
+		if !strings.HasPrefix(line, "+") {
+			continue
+		}
+		k, v, ok := strings.Cut(line[1:], "=")
+		if !ok {
+			continue
+		}
+		m[k] = append(m[k], strings.TrimSpace(v))
+	}
+	return m
+}
+
+func (m markers) Get(key string) string {
+	if v := m[key]; len(v) > 0 {
+		return v[0]
+	}
+	return ""
+}
+
+// listMergeStrategy returns the list type and the keys of the list.
+// The struct tags of the strategic merge patch are used when the field doesn't have +listType marker.
+// This is the same as getListElementRelationship of k8s.io/kube-openapi/pkg/schemaconv.
+func listMergeStrategy(m markers, patchStrategy, patchMergeKey string) (string, []string) {
+	if v := m.Get("listType"); v != "" {
+		if v == "map" {
+			return v, m["listMapKey"]
+		}
+		return v, nil
+	}
+
+	switch patchStrategy {
+	case "merge", "merge,retainKeys":
+		if patchMergeKey != "" {
+			return "map", []string{patchMergeKey}
+		}
+		return "set", nil
+	}
+	return "", nil
 }
 
 func (g *Generator) goTypeToProtobufKind(in ast.Expr) string {

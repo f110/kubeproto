@@ -94,6 +94,8 @@ go/k8stestingclient/go_testingclient.generated.testingclient.go: gen-proto gen-o
 	$(BAZEL) build //$(@D):go_testingclient
 	cp ./bazel-bin/$(@D)/$(@F) $(@D)
 	@chmod 0644 $@
+	cp ./bazel-bin/$(@D)/$(@F:.go=.typeschema.yaml) $(@D)
+	@chmod 0644 $(@:.go=.typeschema.yaml)
 
 .PHONY: go/apis/metav1/metav1_kubeproto.generated.object.go
 go/apis/metav1/metav1_kubeproto.generated.object.go: k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto

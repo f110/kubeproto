@@ -15,6 +15,8 @@ type ProtobufMessage struct {
 	Fields      []*ProtobufField
 	UseFieldsOf string
 	Option      *ProtobufMessageOption
+	// StructType is the value of +structType marker (e.g. atomic)
+	StructType string
 }
 
 type ProtobufMessageOption struct {
@@ -53,4 +55,9 @@ type ProtobufField struct {
 	Inline          bool
 	ExternalPackage string
 	Doc             string
+	// ListType is the value of +listType marker (e.g. atomic, map, set)
+	ListType    string
+	ListMapKeys []string
+	// MapType is the value of +mapType marker (e.g. atomic, granular)
+	MapType string
 }

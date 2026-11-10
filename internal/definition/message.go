@@ -149,6 +149,8 @@ type Message struct {
 	Scope ScopeType
 	// HasTypeMeta indicates this message contains TypeMeta
 	HasTypeMeta bool
+	// StructType is how Server-Side Apply merges the fields of this message.
+	StructType kubeproto.StructType
 
 	fileDescriptor    protoreflect.FileDescriptor
 	messageDescriptor protoreflect.MessageDescriptor
@@ -161,6 +163,9 @@ func NewMessageFromMessageDescriptor(m protoreflect.MessageDescriptor, f protore
 
 		var name, fieldName string
 		var subResource, inline bool
+		var listType kubeproto.ListType
+		var listMapKeys []string
+		var mapType kubeproto.MapType
 		e := proto.GetExtension(v.Options(), kubeproto.E_Field)
 		ext := e.(*kubeproto.Field)
 		if ext != nil {
@@ -170,6 +175,9 @@ func NewMessageFromMessageDescriptor(m protoreflect.MessageDescriptor, f protore
 				fieldName = ext.ApiFieldName
 			}
 			inline = ext.Inline
+			listType = ext.ListType
+			listMapKeys = ext.ListMapKeys
+			mapType = ext.MapType
 		}
 		if name == "" {
 			name = stringsutil.ToUpperCamelCase(string(v.Name()))
@@ -202,6 +210,9 @@ func NewMessageFromMessageDescriptor(m protoreflect.MessageDescriptor, f protore
 			Embed:       inline,
 			Optional:    v.HasOptionalKeyword() || v.IsMap(),
 			SubResource: subResource,
+			ListType:    listType,
+			ListMapKeys: listMapKeys,
+			MapType:     mapType,
 			descriptor:  v,
 		})
 	}
@@ -215,6 +226,11 @@ func NewMessageFromMessageDescriptor(m protoreflect.MessageDescriptor, f protore
 		if ext.Scope == kubeproto.Scope_SCOPE_CLUSTER {
 			messageScope = ScopeTypeCluster
 		}
+	}
+
+	var structType kubeproto.StructType
+	if ext := proto.GetExtension(m.Options(), kubeproto.E_Message).(*kubeproto.Message); ext != nil {
+		structType = ext.StructType
 	}
 
 	var group, subGroup, version string
@@ -250,6 +266,7 @@ func NewMessageFromMessageDescriptor(m protoreflect.MessageDescriptor, f protore
 		ShortName:                string(m.Name()),
 		Fields:                   fields,
 		AdditionalPrinterColumns: printerColumns,
+		StructType:               structType,
 		Group:                    group,
 		SubGroup:                 subGroup,
 		Version:                  version,
@@ -363,6 +380,12 @@ type Field struct {
 	Embed bool
 	// SubResource indicates that this field is the sub resource of Kind
 	SubResource bool
+	// ListType is how Server-Side Apply merges the elements of this field. This is used when Repeated is true.
+	ListType kubeproto.ListType
+	// ListMapKeys is the names of the fields that identify an element. This is used when ListType is LIST_TYPE_MAP.
+	ListMapKeys []string
+	// MapType is how Server-Side Apply merges the entries of this field. This is used when the field is a map.
+	MapType kubeproto.MapType
 
 	importPath   string
 	packageAlias string

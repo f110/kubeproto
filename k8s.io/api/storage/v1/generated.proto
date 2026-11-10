@@ -92,7 +92,7 @@ message CSIDriverSpec {
   // A driver can support one or more of these modes and more modes may be added in the future.
   // This field is beta.
   // This field is immutable.
-  repeated VolumeLifecycleMode volume_lifecycle_modes = 3 [(dev.f110.kubeproto.field) = { go_name: "VolumeLifecycleModes", api_field_name: "volumeLifecycleModes", inline: false }];
+  repeated VolumeLifecycleMode volume_lifecycle_modes = 3 [(dev.f110.kubeproto.field) = { go_name: "VolumeLifecycleModes", api_field_name: "volumeLifecycleModes", list_type: LIST_TYPE_SET, inline: false }];
   // storageCapacity indicates that the CSI volume driver wants pod scheduling to consider the storage
   // capacity that the driver deployment will report by creating
   // CSIStorageCapacity objects with capacity information, if set to true.
@@ -128,7 +128,7 @@ message CSIDriverSpec {
   // Note: Audience in each TokenRequest should be different and at
   // most one token is empty string. To receive a new token after expiry,
   // RequiresRepublish can be used to trigger NodePublishVolume periodically.
-  repeated TokenRequest token_requests = 6 [(dev.f110.kubeproto.field) = { go_name: "TokenRequests", api_field_name: "tokenRequests", inline: false }];
+  repeated TokenRequest token_requests = 6 [(dev.f110.kubeproto.field) = { go_name: "TokenRequests", api_field_name: "tokenRequests", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // requiresRepublish indicates the CSI driver wants `NodePublishVolume`
   // being periodically called to reflect any possible change in the mounted
   // volume. This field defaults to false.
@@ -226,7 +226,7 @@ message CSINodeDriver {
   // back to the driver.
   // It is possible for different nodes to use different topology keys.
   // This can be empty if driver does not support topology.
-  repeated string topology_keys = 3 [(dev.f110.kubeproto.field) = { go_name: "TopologyKeys", api_field_name: "topologyKeys", inline: false }];
+  repeated string topology_keys = 3 [(dev.f110.kubeproto.field) = { go_name: "TopologyKeys", api_field_name: "topologyKeys", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // allocatable represents the volume resources of a node that are available for scheduling.
   // This field is beta.
   optional VolumeNodeResources allocatable = 4 [(dev.f110.kubeproto.field) = { go_name: "Allocatable", api_field_name: "allocatable", inline: false }];
@@ -244,7 +244,9 @@ message CSINodeList {
 message CSINodeSpec {
   // drivers is a list of information of all CSI Drivers existing on a node.
   // If all drivers in the list are uninstalled, this can become empty.
-  repeated CSINodeDriver drivers = 1 [(dev.f110.kubeproto.field) = { go_name: "Drivers", api_field_name: "drivers", inline: false }];
+  repeated CSINodeDriver drivers = 1 [(dev.f110.kubeproto.field) = { go_name: "Drivers", api_field_name: "drivers", list_type: LIST_TYPE_MAP,
+                                                                     list_map_keys: [ "name" ],
+                                                                     inline: false }];
 }
 
 message CSIStorageCapacity {
@@ -305,7 +307,7 @@ message StorageClass {
   // mountOptions controls the mountOptions for dynamically provisioned PersistentVolumes of this storage class.
   // e.g. ["ro", "soft"]. Not validated -
   // mount of the PVs will simply fail if one is invalid.
-  repeated string mount_options = 6 [(dev.f110.kubeproto.field) = { go_name: "MountOptions", api_field_name: "mountOptions", inline: false }];
+  repeated string mount_options = 6 [(dev.f110.kubeproto.field) = { go_name: "MountOptions", api_field_name: "mountOptions", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // allowVolumeExpansion shows whether the storage class allow volume expand.
   optional bool allow_volume_expansion = 7 [(dev.f110.kubeproto.field) = { go_name: "AllowVolumeExpansion", api_field_name: "allowVolumeExpansion", inline: false }];
   // volumeBindingMode indicates how PersistentVolumeClaims should be
@@ -316,7 +318,7 @@ message StorageClass {
   // Each volume plugin defines its own supported topology specifications.
   // An empty TopologySelectorTerm list means there is no topology restriction.
   // This field is only honored by servers that enable the VolumeScheduling feature.
-  repeated .k8s.io.api.core.v1.TopologySelectorTerm allowed_topologies = 9 [(dev.f110.kubeproto.field) = { go_name: "AllowedTopologies", api_field_name: "allowedTopologies", inline: false }];
+  repeated .k8s.io.api.core.v1.TopologySelectorTerm allowed_topologies = 9 [(dev.f110.kubeproto.field) = { go_name: "AllowedTopologies", api_field_name: "allowedTopologies", list_type: LIST_TYPE_ATOMIC, inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
     scope: SCOPE_CLUSTER

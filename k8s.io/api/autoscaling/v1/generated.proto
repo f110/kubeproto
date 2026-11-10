@@ -67,7 +67,10 @@ message CrossVersionObjectReference {
   // name is the name of the referent; More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
   string name = 2 [(dev.f110.kubeproto.field) = { go_name: "Name", api_field_name: "name", inline: false }];
   // apiVersion is the API version of the referent
-  optional string api_version = 3 [(dev.f110.kubeproto.field) = { go_name: "APIVersion", api_field_name: "apiVersion", inline: false }];
+  optional string api_version         = 3 [(dev.f110.kubeproto.field) = { go_name: "APIVersion", api_field_name: "apiVersion", inline: false }];
+  option (dev.f110.kubeproto.message) = {
+    struct_type: STRUCT_TYPE_ATOMIC
+  };
 }
 
 message ExternalMetricSource {

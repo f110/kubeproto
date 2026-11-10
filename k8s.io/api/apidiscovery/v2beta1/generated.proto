@@ -24,7 +24,9 @@ enum ResourceScope {
 message APIGroupDiscovery {
   // versions are the versions supported in this group. They are sorted in descending order of preference,
   // with the preferred version being the first entry.
-  repeated APIVersionDiscovery versions = 3 [(dev.f110.kubeproto.field) = { go_name: "Versions", api_field_name: "versions", inline: false }];
+  repeated APIVersionDiscovery versions = 3 [(dev.f110.kubeproto.field) = { go_name: "Versions", api_field_name: "versions", list_type: LIST_TYPE_MAP,
+                                                                            list_map_keys: [ "version" ],
+                                                                            inline: false }];
 
   option (dev.f110.kubeproto.kind) = {
   };
@@ -59,14 +61,16 @@ message APIResourceDiscovery {
   // verbs is a list of supported API operation types (this includes
   // but is not limited to get, list, watch, create, update, patch,
   // delete, deletecollection, and proxy).
-  repeated string verbs = 5 [(dev.f110.kubeproto.field) = { go_name: "Verbs", api_field_name: "verbs", inline: false }];
+  repeated string verbs = 5 [(dev.f110.kubeproto.field) = { go_name: "Verbs", api_field_name: "verbs", list_type: LIST_TYPE_SET, inline: false }];
   // shortNames is a list of suggested short names of the resource.
-  repeated string short_names = 6 [(dev.f110.kubeproto.field) = { go_name: "ShortNames", api_field_name: "shortNames", inline: false }];
+  repeated string short_names = 6 [(dev.f110.kubeproto.field) = { go_name: "ShortNames", api_field_name: "shortNames", list_type: LIST_TYPE_SET, inline: false }];
   // categories is a list of the grouped resources this resource belongs to (e.g. 'all').
   // Clients may use this to simplify acting on multiple resource types at once.
-  repeated string categories = 7 [(dev.f110.kubeproto.field) = { go_name: "Categories", api_field_name: "categories", inline: false }];
+  repeated string categories = 7 [(dev.f110.kubeproto.field) = { go_name: "Categories", api_field_name: "categories", list_type: LIST_TYPE_SET, inline: false }];
   // subresources is a list of subresources provided by this resource. Subresources are located at /apis/<APIGroupDiscovery.objectMeta.name>/<APIVersionDiscovery.version>/<APIResourceDiscovery.Resource>/name-of-instance/<APIResourceDiscovery.subresources[i].subresource>
-  repeated APISubresourceDiscovery subresources = 8 [(dev.f110.kubeproto.field) = { go_name: "Subresources", api_field_name: "subresources", inline: false }];
+  repeated APISubresourceDiscovery subresources = 8 [(dev.f110.kubeproto.field) = { go_name: "Subresources", api_field_name: "subresources", list_type: LIST_TYPE_MAP,
+                                                                                    list_map_keys: [ "subresource" ],
+                                                                                    inline: false }];
 }
 
 message APISubresourceDiscovery {
@@ -80,21 +84,25 @@ message APISubresourceDiscovery {
   // Subresources may accept the standard content types or define
   // custom negotiation schemes. The list may not be exhaustive for
   // all operations.
-  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.GroupVersionKind accepted_types = 3 [(dev.f110.kubeproto.field) = { go_name: "AcceptedTypes", api_field_name: "acceptedTypes", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.GroupVersionKind accepted_types = 3 [(dev.f110.kubeproto.field) = { go_name: "AcceptedTypes", api_field_name: "acceptedTypes", list_type: LIST_TYPE_MAP,
+                                                                                                                     list_map_keys: [ "group", "version", "kind" ],
+                                                                                                                     inline: false }];
   // verbs is a list of supported API operation types (this includes
   // but is not limited to get, list, watch, create, update, patch,
   // delete, deletecollection, and proxy). Subresources may define
   // custom verbs outside the standard Kubernetes verb set. Clients
   // should expect the behavior of standard verbs to align with
   // Kubernetes interaction conventions.
-  repeated string verbs = 4 [(dev.f110.kubeproto.field) = { go_name: "Verbs", api_field_name: "verbs", inline: false }];
+  repeated string verbs = 4 [(dev.f110.kubeproto.field) = { go_name: "Verbs", api_field_name: "verbs", list_type: LIST_TYPE_SET, inline: false }];
 }
 
 message APIVersionDiscovery {
   // version is the name of the version within a group version.
   string version = 1 [(dev.f110.kubeproto.field) = { go_name: "Version", api_field_name: "version", inline: false }];
   // resources is a list of APIResourceDiscovery objects for the corresponding group version.
-  repeated APIResourceDiscovery resources = 2 [(dev.f110.kubeproto.field) = { go_name: "Resources", api_field_name: "resources", inline: false }];
+  repeated APIResourceDiscovery resources = 2 [(dev.f110.kubeproto.field) = { go_name: "Resources", api_field_name: "resources", list_type: LIST_TYPE_MAP,
+                                                                              list_map_keys: [ "resource" ],
+                                                                              inline: false }];
   // freshness marks whether a group version's discovery document is up to date.
   // "Current" indicates the discovery document was recently
   // refreshed. "Stale" indicates the discovery document could not

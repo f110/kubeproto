@@ -3,6 +3,7 @@ package goparser
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -64,4 +65,81 @@ const (
 			t.Errorf("found enum and expect three elements but %d elements.", len(g.enumValueCandidates["PathType"]))
 		}
 	})
+}
+
+func TestMergeStrategy(t *testing.T) {
+	code := `package api
+
+type PodSpec struct {
+	// +listType=map
+	// +listMapKey=containerPort
+	// +listMapKey=protocol
+	Ports []Port ` + "`json:\"ports,omitempty\"`" + `
+	// +listType=atomic
+	Args []string ` + "`json:\"args,omitempty\"`" + `
+	// +listType=set
+	Finalizers []string ` + "`json:\"finalizers,omitempty\"`" + `
+	Containers []Container ` + "`json:\"containers\" patchStrategy:\"merge\" patchMergeKey:\"name\"`" + `
+	Names []string ` + "`json:\"names,omitempty\" patchStrategy:\"merge\"`" + `
+	// +listType=atomic
+	Volumes []Volume ` + "`json:\"volumes,omitempty\" patchStrategy:\"merge,retainKeys\" patchMergeKey:\"name\"`" + `
+	// +mapType=atomic
+	NodeSelector map[string]string ` + "`json:\"nodeSelector,omitempty\"`" + `
+	Labels map[string]string ` + "`json:\"labels,omitempty\"`" + `
+	Hosts []string ` + "`json:\"hosts,omitempty\"`" + `
+}
+
+// +structType=atomic
+type Port struct {
+	ContainerPort int32 ` + "`json:\"containerPort\"`" + `
+	Protocol string ` + "`json:\"protocol,omitempty\"`" + `
+}
+
+type Container struct {
+	Name string ` + "`json:\"name\"`" + `
+}
+
+type Volume struct {
+	Name string ` + "`json:\"name\"`" + `
+}
+`
+	tmpDir := t.TempDir()
+	g := New()
+	g.SetProtoPackage("api")
+	if err := os.WriteFile(filepath.Join(tmpDir, "types.go"), []byte(code), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddDir(tmpDir, true); err != nil {
+		t.Fatal(err)
+	}
+	out := filepath.Join(t.TempDir(), "generated.proto")
+	if err := g.WriteFile(out); err != nil {
+		t.Fatal(err)
+	}
+	b, err := os.ReadFile(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	generated := string(b)
+
+	expects := []string{
+		`repeated Port ports = 1 [(dev.f110.kubeproto.field) = {go_name: "Ports", api_field_name: "ports", list_type: LIST_TYPE_MAP, list_map_keys: ["containerPort", "protocol"], inline: false}];`,
+		`repeated string args = 2 [(dev.f110.kubeproto.field) = {go_name: "Args", api_field_name: "args", list_type: LIST_TYPE_ATOMIC, inline: false}];`,
+		`repeated string finalizers = 3 [(dev.f110.kubeproto.field) = {go_name: "Finalizers", api_field_name: "finalizers", list_type: LIST_TYPE_SET, inline: false}];`,
+		`repeated Container containers = 4 [(dev.f110.kubeproto.field) = {go_name: "Containers", api_field_name: "containers", list_type: LIST_TYPE_MAP, list_map_keys: ["name"], inline: false}];`,
+		`repeated string names = 5 [(dev.f110.kubeproto.field) = {go_name: "Names", api_field_name: "names", list_type: LIST_TYPE_SET, inline: false}];`,
+		`repeated Volume volumes = 6 [(dev.f110.kubeproto.field) = {go_name: "Volumes", api_field_name: "volumes", list_type: LIST_TYPE_ATOMIC, inline: false}];`,
+		`map<string, string> node_selector = 7 [(dev.f110.kubeproto.field) = {go_name: "NodeSelector", api_field_name: "nodeSelector", map_type: MAP_TYPE_ATOMIC, inline: false}];`,
+		`map<string, string> labels = 8 [(dev.f110.kubeproto.field) = {go_name: "Labels", api_field_name: "labels", inline: false}];`,
+		`repeated string hosts = 9 [(dev.f110.kubeproto.field) = {go_name: "Hosts", api_field_name: "hosts", inline: false}];`,
+		"option (dev.f110.kubeproto.message) = {struct_type: STRUCT_TYPE_ATOMIC};",
+	}
+	for _, v := range expects {
+		if !strings.Contains(generated, v) {
+			t.Errorf("generated proto does not contain %q\n%s", v, generated)
+		}
+	}
+	if strings.Count(generated, "dev.f110.kubeproto.message") != 1 {
+		t.Errorf("message option is expected only for Port\n%s", generated)
+	}
 }

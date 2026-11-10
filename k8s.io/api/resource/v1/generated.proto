@@ -56,7 +56,9 @@ message AllocatedDeviceStatus {
   // If the device has been configured according to the class and claim
   // config references, the `Ready` condition should be True.
   // Must not contain more than 8 entries.
-  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 5 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 5 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                                                          list_map_keys: [ "type" ],
+                                                                                                          inline: false }];
   // Data contains arbitrary driver-specific data.
   // The length of the raw data must be smaller or equal to 10 Ki.
   optional .k8s.io.apimachinery.pkg.runtime.RawExtension data = 6 [(dev.f110.kubeproto.field) = { go_name: "Data", api_field_name: "data", inline: false }];
@@ -143,7 +145,7 @@ message CapacityRequestPolicy {
   // That is: min(ceil(requestedValue) ∈ validValues), where requestedValue ≤ max(validValues).
   // If the requested amount exceeds all valid values, the request violates the policy,
   // and this device cannot be allocated.
-  repeated .k8s.io.apimachinery.pkg.api.resource.Quantity valid_values = 2 [(dev.f110.kubeproto.field) = { go_name: "ValidValues", api_field_name: "validValues", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.api.resource.Quantity valid_values = 2 [(dev.f110.kubeproto.field) = { go_name: "ValidValues", api_field_name: "validValues", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // ValidRange defines an acceptable quantity value range in consuming requests.
   // If this field is set,
   // Default must be defined and it must fall within the defined ValidRange.
@@ -224,7 +226,7 @@ message Device {
   // There can only be a single entry per counterSet.
   // The maximum number of device counter consumptions per
   // device is 2.
-  repeated DeviceCounterConsumption consumes_counters = 4 [(dev.f110.kubeproto.field) = { go_name: "ConsumesCounters", api_field_name: "consumesCounters", inline: false }];
+  repeated DeviceCounterConsumption consumes_counters = 4 [(dev.f110.kubeproto.field) = { go_name: "ConsumesCounters", api_field_name: "consumesCounters", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // NodeName identifies the node where the device is available.
   // Must only be set if Spec.PerDeviceNodeSelection is set to true.
   // At most one of NodeName, NodeSelector and AllNodes can be set.
@@ -244,7 +246,7 @@ message Device {
   // allowed devices per ResourceSlice is 64 instead of 128.
   // This is a beta field and requires enabling the DRADeviceTaints
   // feature gate.
-  repeated DeviceTaint taints = 8 [(dev.f110.kubeproto.field) = { go_name: "Taints", api_field_name: "taints", inline: false }];
+  repeated DeviceTaint taints = 8 [(dev.f110.kubeproto.field) = { go_name: "Taints", api_field_name: "taints", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // BindsToNode indicates if the usage of an allocation involving this device
   // has to be limited to exactly the node that was chosen when allocating the claim.
   // If set to true, the scheduler will set the ResourceClaim.Status.Allocation.NodeSelector
@@ -260,7 +262,7 @@ message Device {
   // The conditions must be a valid condition type string.
   // This is a beta field and requires enabling the DRADeviceBindingConditions and DRAResourceClaimDeviceStatus
   // feature gates.
-  repeated string binding_conditions = 10 [(dev.f110.kubeproto.field) = { go_name: "BindingConditions", api_field_name: "bindingConditions", inline: false }];
+  repeated string binding_conditions = 10 [(dev.f110.kubeproto.field) = { go_name: "BindingConditions", api_field_name: "bindingConditions", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // BindingFailureConditions defines the conditions for binding failure.
   // They may be set in the per-device status conditions.
   // If any is set to "True", a binding failure occurred.
@@ -268,7 +270,7 @@ message Device {
   // The conditions must be a valid condition type string.
   // This is a beta field and requires enabling the DRADeviceBindingConditions and DRAResourceClaimDeviceStatus
   // feature gates.
-  repeated string binding_failure_conditions = 11 [(dev.f110.kubeproto.field) = { go_name: "BindingFailureConditions", api_field_name: "bindingFailureConditions", inline: false }];
+  repeated string binding_failure_conditions = 11 [(dev.f110.kubeproto.field) = { go_name: "BindingFailureConditions", api_field_name: "bindingFailureConditions", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // AllowMultipleAllocations marks whether the device is allowed to be allocated to multiple DeviceRequests.
   // If AllowMultipleAllocations is set to true, the device can be allocated more than once,
   // and all of its capacity is consumable, regardless of whether the requestPolicy is defined or not.
@@ -297,20 +299,20 @@ message DeviceAllocationConfiguration {
   // References to subrequests must include the name of the main request
   // and may include the subrequest using the format <main request>[/<subrequest>]. If just
   // the main request is given, the configuration applies to all subrequests.
-  repeated string     requests             = 2 [(dev.f110.kubeproto.field) = { go_name: "Requests", api_field_name: "requests", inline: false }];
+  repeated string     requests             = 2 [(dev.f110.kubeproto.field) = { go_name: "Requests", api_field_name: "requests", list_type: LIST_TYPE_ATOMIC, inline: false }];
   DeviceConfiguration device_configuration = 3 [(dev.f110.kubeproto.field) = { go_name: "DeviceConfiguration", inline: true }];
 }
 
 message DeviceAllocationResult {
   // Results lists all allocated devices.
-  repeated DeviceRequestAllocationResult results = 1 [(dev.f110.kubeproto.field) = { go_name: "Results", api_field_name: "results", inline: false }];
+  repeated DeviceRequestAllocationResult results = 1 [(dev.f110.kubeproto.field) = { go_name: "Results", api_field_name: "results", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // This field is a combination of all the claim and class configuration parameters.
   // Drivers can distinguish between those based on a flag.
   // This includes configuration parameters for drivers which have no allocated
   // devices in the result because it is up to the drivers which configuration
   // parameters they support. They can silently ignore unknown configuration
   // parameters.
-  repeated DeviceAllocationConfiguration config = 2 [(dev.f110.kubeproto.field) = { go_name: "Config", api_field_name: "config", inline: false }];
+  repeated DeviceAllocationConfiguration config = 2 [(dev.f110.kubeproto.field) = { go_name: "Config", api_field_name: "config", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message DeviceAttribute {
@@ -325,17 +327,17 @@ message DeviceAttribute {
   optional string version_value = 4 [(dev.f110.kubeproto.field) = { go_name: "VersionValue", api_field_name: "version", inline: false }];
   // IntValues is a non-empty list of numbers.
   // This is an alpha field and requires enabling the DRAListTypeAttributes feature gate.
-  repeated int64 int_values = 5 [(dev.f110.kubeproto.field) = { go_name: "IntValues", api_field_name: "ints", inline: false }];
+  repeated int64 int_values = 5 [(dev.f110.kubeproto.field) = { go_name: "IntValues", api_field_name: "ints", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // BoolValues is a non-empty list of true/false values.
-  repeated bool bool_values = 6 [(dev.f110.kubeproto.field) = { go_name: "BoolValues", api_field_name: "bools", inline: false }];
+  repeated bool bool_values = 6 [(dev.f110.kubeproto.field) = { go_name: "BoolValues", api_field_name: "bools", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // StringValues is a non-empty list of strings.
   // Each string must not be longer than 64 characters.
   // This is an alpha field and requires enabling the DRAListTypeAttributes feature gate.
-  repeated string string_values = 7 [(dev.f110.kubeproto.field) = { go_name: "StringValues", api_field_name: "strings", inline: false }];
+  repeated string string_values = 7 [(dev.f110.kubeproto.field) = { go_name: "StringValues", api_field_name: "strings", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // VersionValues is a non-empty list of semantic versions according to semver.org spec 2.0.0.
   // Each version string must not be longer than 64 characters.
   // This is an alpha field and requires enabling the DRAListTypeAttributes feature gate.
-  repeated string version_values = 8 [(dev.f110.kubeproto.field) = { go_name: "VersionValues", api_field_name: "versions", inline: false }];
+  repeated string version_values = 8 [(dev.f110.kubeproto.field) = { go_name: "VersionValues", api_field_name: "versions", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message DeviceCapacity {
@@ -357,14 +359,14 @@ message DeviceCapacity {
 message DeviceClaim {
   // Requests represent individual requests for distinct devices which
   // must all be satisfied. If empty, nothing needs to be allocated.
-  repeated DeviceRequest requests = 1 [(dev.f110.kubeproto.field) = { go_name: "Requests", api_field_name: "requests", inline: false }];
+  repeated DeviceRequest requests = 1 [(dev.f110.kubeproto.field) = { go_name: "Requests", api_field_name: "requests", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // These constraints must be satisfied by the set of devices that get
   // allocated for the claim.
-  repeated DeviceConstraint constraints = 2 [(dev.f110.kubeproto.field) = { go_name: "Constraints", api_field_name: "constraints", inline: false }];
+  repeated DeviceConstraint constraints = 2 [(dev.f110.kubeproto.field) = { go_name: "Constraints", api_field_name: "constraints", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // This field holds configuration for multiple potential drivers which
   // could satisfy requests in this claim. It is ignored while allocating
   // the claim.
-  repeated DeviceClaimConfiguration config = 3 [(dev.f110.kubeproto.field) = { go_name: "Config", api_field_name: "config", inline: false }];
+  repeated DeviceClaimConfiguration config = 3 [(dev.f110.kubeproto.field) = { go_name: "Config", api_field_name: "config", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message DeviceClaimConfiguration {
@@ -373,7 +375,7 @@ message DeviceClaimConfiguration {
   // References to subrequests must include the name of the main request
   // and may include the subrequest using the format <main request>[/<subrequest>]. If just
   // the main request is given, the configuration applies to all subrequests.
-  repeated string     requests             = 1 [(dev.f110.kubeproto.field) = { go_name: "Requests", api_field_name: "requests", inline: false }];
+  repeated string     requests             = 1 [(dev.f110.kubeproto.field) = { go_name: "Requests", api_field_name: "requests", list_type: LIST_TYPE_ATOMIC, inline: false }];
   DeviceConfiguration device_configuration = 2 [(dev.f110.kubeproto.field) = { go_name: "DeviceConfiguration", inline: true }];
 }
 
@@ -405,12 +407,12 @@ message DeviceClassList {
 
 message DeviceClassSpec {
   // Each selector must be satisfied by a device which is claimed via this class.
-  repeated DeviceSelector selectors = 1 [(dev.f110.kubeproto.field) = { go_name: "Selectors", api_field_name: "selectors", inline: false }];
+  repeated DeviceSelector selectors = 1 [(dev.f110.kubeproto.field) = { go_name: "Selectors", api_field_name: "selectors", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Config defines configuration parameters that apply to each device that is claimed via this class.
   // Some classses may potentially be satisfied by multiple drivers, so each instance of a vendor
   // configuration applies to exactly one driver.
   // They are passed to the driver, but are not considered while allocating the claim.
-  repeated DeviceClassConfiguration config = 2 [(dev.f110.kubeproto.field) = { go_name: "Config", api_field_name: "config", inline: false }];
+  repeated DeviceClassConfiguration config = 2 [(dev.f110.kubeproto.field) = { go_name: "Config", api_field_name: "config", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // ExtendedResourceName is the extended resource name for the devices of this class.
   // The devices of this class can be used to satisfy a pod's extended resource requests.
   // It has the same format as the name of a pod's extended resource.
@@ -437,7 +439,7 @@ message DeviceConstraint {
   // References to subrequests must include the name of the main request
   // and may include the subrequest using the format <main request>[/<subrequest>]. If just
   // the main request is given, the constraint applies to all subrequests.
-  repeated string requests = 1 [(dev.f110.kubeproto.field) = { go_name: "Requests", api_field_name: "requests", inline: false }];
+  repeated string requests = 1 [(dev.f110.kubeproto.field) = { go_name: "Requests", api_field_name: "requests", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // MatchAttribute requires that all devices in question have this
   // attribute and that its type and value are the same across those
   // devices.
@@ -502,7 +504,7 @@ message DeviceRequest {
   // will determine which node is chosen. This means that the set of
   // devices allocated to a claim might not be the optimal set
   // available to the cluster. Scoring will be implemented later.
-  repeated DeviceSubRequest first_available = 3 [(dev.f110.kubeproto.field) = { go_name: "FirstAvailable", api_field_name: "firstAvailable", inline: false }];
+  repeated DeviceSubRequest first_available = 3 [(dev.f110.kubeproto.field) = { go_name: "FirstAvailable", api_field_name: "firstAvailable", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message DeviceRequestAllocationResult {
@@ -538,17 +540,17 @@ message DeviceRequestAllocationResult {
   // The maximum number of tolerations is 16.
   // This is a beta field and requires enabling the DRADeviceTaints
   // feature gate.
-  repeated DeviceToleration tolerations = 6 [(dev.f110.kubeproto.field) = { go_name: "Tolerations", api_field_name: "tolerations", inline: false }];
+  repeated DeviceToleration tolerations = 6 [(dev.f110.kubeproto.field) = { go_name: "Tolerations", api_field_name: "tolerations", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // BindingConditions contains a copy of the BindingConditions
   // from the corresponding ResourceSlice at the time of allocation.
   // This is a beta field and requires enabling the DRADeviceBindingConditions and DRAResourceClaimDeviceStatus
   // feature gates.
-  repeated string binding_conditions = 7 [(dev.f110.kubeproto.field) = { go_name: "BindingConditions", api_field_name: "bindingConditions", inline: false }];
+  repeated string binding_conditions = 7 [(dev.f110.kubeproto.field) = { go_name: "BindingConditions", api_field_name: "bindingConditions", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // BindingFailureConditions contains a copy of the BindingFailureConditions
   // from the corresponding ResourceSlice at the time of allocation.
   // This is a beta field and requires enabling the DRADeviceBindingConditions and DRAResourceClaimDeviceStatus
   // feature gates.
-  repeated string binding_failure_conditions = 8 [(dev.f110.kubeproto.field) = { go_name: "BindingFailureConditions", api_field_name: "bindingFailureConditions", inline: false }];
+  repeated string binding_failure_conditions = 8 [(dev.f110.kubeproto.field) = { go_name: "BindingFailureConditions", api_field_name: "bindingFailureConditions", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // ShareID uniquely identifies an individual allocation share of the device,
   // used when the device supports multiple simultaneous allocations.
   // It serves as an additional map key to differentiate concurrent shares
@@ -588,7 +590,7 @@ message DeviceSubRequest {
   // device in order for that device to be considered for this
   // subrequest. All selectors must be satisfied for a device to be
   // considered.
-  repeated DeviceSelector selectors = 3 [(dev.f110.kubeproto.field) = { go_name: "Selectors", api_field_name: "selectors", inline: false }];
+  repeated DeviceSelector selectors = 3 [(dev.f110.kubeproto.field) = { go_name: "Selectors", api_field_name: "selectors", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // AllocationMode and its related fields define how devices are allocated
   // to satisfy this subrequest. Supported values are:
   // - ExactCount: This request is for a specific number of devices.
@@ -619,7 +621,7 @@ message DeviceSubRequest {
   // The maximum number of tolerations is 16.
   // This is a beta field and requires enabling the DRADeviceTaints
   // feature gate.
-  repeated DeviceToleration tolerations = 6 [(dev.f110.kubeproto.field) = { go_name: "Tolerations", api_field_name: "tolerations", inline: false }];
+  repeated DeviceToleration tolerations = 6 [(dev.f110.kubeproto.field) = { go_name: "Tolerations", api_field_name: "tolerations", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Capacity define resource requirements against each capacity.
   // If this field is unset and the device supports multiple allocations,
   // the default value will be applied to each capacity according to requestPolicy.
@@ -700,7 +702,7 @@ message ExactDeviceRequest {
   // device in order for that device to be considered for this
   // request. All selectors must be satisfied for a device to be
   // considered.
-  repeated DeviceSelector selectors = 2 [(dev.f110.kubeproto.field) = { go_name: "Selectors", api_field_name: "selectors", inline: false }];
+  repeated DeviceSelector selectors = 2 [(dev.f110.kubeproto.field) = { go_name: "Selectors", api_field_name: "selectors", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // AllocationMode and its related fields define how devices are allocated
   // to satisfy this request. Supported values are:
   // - ExactCount: This request is for a specific number of devices.
@@ -740,7 +742,7 @@ message ExactDeviceRequest {
   // The maximum number of tolerations is 16.
   // This is a beta field and requires enabling the DRADeviceTaints
   // feature gate.
-  repeated DeviceToleration tolerations = 6 [(dev.f110.kubeproto.field) = { go_name: "Tolerations", api_field_name: "tolerations", inline: false }];
+  repeated DeviceToleration tolerations = 6 [(dev.f110.kubeproto.field) = { go_name: "Tolerations", api_field_name: "tolerations", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // Capacity define resource requirements against each capacity.
   // If this field is unset and the device supports multiple allocations,
   // the default value will be applied to each capacity according to requestPolicy.
@@ -765,7 +767,7 @@ message NetworkDeviceData {
   // The IPs are in the CIDR notation, which includes both the address and the
   // associated subnet mask.
   // e.g.: "192.0.2.5/24" for IPv4 and "2001:db8::5/64" for IPv6.
-  repeated string ips = 2 [(dev.f110.kubeproto.field) = { go_name: "IPs", api_field_name: "ips", inline: false }];
+  repeated string ips = 2 [(dev.f110.kubeproto.field) = { go_name: "IPs", api_field_name: "ips", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // HardwareAddress represents the hardware address (e.g. MAC Address) of the device's network interface.
   // Must not be longer than 128 bytes.
   optional string hardware_address = 3 [(dev.f110.kubeproto.field) = { go_name: "HardwareAddress", api_field_name: "hardwareAddress", inline: false }];
@@ -875,11 +877,15 @@ message ResourceClaimStatus {
   // waiting for the ResourceClaim to become usable again.
   // There can be at most 256 such reservations. This may get increased in
   // the future, but not reduced.
-  repeated ResourceClaimConsumerReference reserved_for = 2 [(dev.f110.kubeproto.field) = { go_name: "ReservedFor", api_field_name: "reservedFor", inline: false }];
+  repeated ResourceClaimConsumerReference reserved_for = 2 [(dev.f110.kubeproto.field) = { go_name: "ReservedFor", api_field_name: "reservedFor", list_type: LIST_TYPE_MAP,
+                                                                                           list_map_keys: [ "uid" ],
+                                                                                           inline: false }];
   // Devices contains the status of each device allocated for this
   // claim, as reported by the driver. This can include driver-specific
   // information. Entries are owned by their respective drivers.
-  repeated AllocatedDeviceStatus devices = 3 [(dev.f110.kubeproto.field) = { go_name: "Devices", api_field_name: "devices", inline: false }];
+  repeated AllocatedDeviceStatus devices = 3 [(dev.f110.kubeproto.field) = { go_name: "Devices", api_field_name: "devices", list_type: LIST_TYPE_MAP,
+                                                                             list_map_keys: [ "driver", "device", "pool", "shareID" ],
+                                                                             inline: false }];
 }
 
 message ResourceClaimTemplate {
@@ -986,7 +992,7 @@ message ResourceSliceSpec {
   // Devices lists some or all of the devices in this pool.
   // Must not have more than 128 entries. If any device uses taints or consumes counters the limit is 64.
   // Only one of Devices and SharedCounters can be set in a ResourceSlice.
-  repeated Device devices = 6 [(dev.f110.kubeproto.field) = { go_name: "Devices", api_field_name: "devices", inline: false }];
+  repeated Device devices = 6 [(dev.f110.kubeproto.field) = { go_name: "Devices", api_field_name: "devices", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // PerDeviceNodeSelection defines whether the access from nodes to
   // resources in the pool is set on the ResourceSlice level or on each
   // device. If it is set to true, every device defined the ResourceSlice
@@ -998,5 +1004,5 @@ message ResourceSliceSpec {
   // The names of the counter sets must be unique in the ResourcePool.
   // Only one of Devices and SharedCounters can be set in a ResourceSlice.
   // The maximum number of counter sets is 8.
-  repeated CounterSet shared_counters = 8 [(dev.f110.kubeproto.field) = { go_name: "SharedCounters", api_field_name: "sharedCounters", inline: false }];
+  repeated CounterSet shared_counters = 8 [(dev.f110.kubeproto.field) = { go_name: "SharedCounters", api_field_name: "sharedCounters", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }

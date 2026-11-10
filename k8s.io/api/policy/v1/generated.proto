@@ -117,5 +117,7 @@ message PodDisruptionBudgetStatus {
   // - SufficientPods: There are more pods than required by the PodDisruptionBudget.
   //                   The condition will be True, and the number of allowed
   //                   disruptions are provided by the disruptionsAllowed property.
-  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 7 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.Condition conditions = 7 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                                                          list_map_keys: [ "type" ],
+                                                                                                          inline: false }];
 }

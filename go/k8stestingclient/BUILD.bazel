@@ -35,6 +35,7 @@ go_library(
         "discovery.go",
         "go_testingclient.generated.testingclient.go",
     ],
+    embedsrcs = ["go_testingclient.generated.testingclient.typeschema.yaml"],
     importpath = "go.f110.dev/kubeproto/go/k8stestingclient",
     visibility = ["//visibility:public"],
     deps = [
@@ -46,9 +47,12 @@ go_library(
         "@io_k8s_apimachinery//pkg/runtime",
         "@io_k8s_apimachinery//pkg/runtime/schema",
         "@io_k8s_apimachinery//pkg/runtime/serializer",
+        "@io_k8s_apimachinery//pkg/types",
+        "@io_k8s_apimachinery//pkg/util/managedfields",
         "@io_k8s_apimachinery//pkg/watch",
         "@io_k8s_client_go//rest",
         "@io_k8s_client_go//testing",
+        "@io_k8s_sigs_structured_merge_diff_v6//typed",
     ],
 )
 
@@ -57,10 +61,14 @@ go_test(
     srcs = ["test_test.go"],
     embed = [":k8stestingclient"],
     deps = [
+        "//go/apis/appsv1",
         "//go/apis/corev1",
         "//go/apis/metav1",
         "//go/internal/assertion",
         "//go/k8sclient",
+        "@io_k8s_apimachinery//pkg/api/errors",
         "@io_k8s_apimachinery//pkg/labels",
+        "@io_k8s_apimachinery//pkg/types",
+        "@io_k8s_client_go//testing",
     ],
 )

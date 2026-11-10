@@ -49,6 +49,9 @@ pkg/client/testingclient/k8s.generated.testingclient.go: pkg/apis/blogv1alpha1/b
 	@rm -f $@
 	cp ../bazel-bin/example/$@ $(@D)
 	@chmod 644 $@
+	@rm -f $(@:.go=.typeschema.yaml)
+	cp ../bazel-bin/example/$(@:.go=.typeschema.yaml) $(@D)
+	@chmod 644 $(@:.go=.typeschema.yaml)
 
 .PHONY: crd/blog.crd.yaml
 crd/blog.crd.yaml: pkg/apis/blogv1alpha1/blog.proto pkg/apis/blogv1alpha2/blog.proto
@@ -70,6 +73,9 @@ pkg/thirdpartyclient/testingthirdpartyclient/testingthirdpartyclient.generated.t
 	@rm -f $@
 	cp ../bazel-bin/example/$@ $(@D)
 	@chmod 644 $@
+	@rm -f $(@:.go=.typeschema.yaml)
+	cp ../bazel-bin/example/$(@:.go=.typeschema.yaml) $(@D)
+	@chmod 644 $(@:.go=.typeschema.yaml)
 
 .PHONY: $(PROTO_FILES)
 $(PROTO_FILES):

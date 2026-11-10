@@ -25,7 +25,7 @@ message FieldSelectorAttributes {
   // Webhook implementations should handle requirements, but how to handle them is up to the webhook.
   // Since requirements can only limit the request, it is safe to authorize as unlimited request if the requirements
   // are not understood.
-  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.FieldSelectorRequirement requirements = 2 [(dev.f110.kubeproto.field) = { go_name: "Requirements", api_field_name: "requirements", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.FieldSelectorRequirement requirements = 2 [(dev.f110.kubeproto.field) = { go_name: "Requirements", api_field_name: "requirements", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message LabelSelectorAttributes {
@@ -38,7 +38,7 @@ message LabelSelectorAttributes {
   // Webhook implementations should handle requirements, but how to handle them is up to the webhook.
   // Since requirements can only limit the request, it is safe to authorize as unlimited request if the requirements
   // are not understood.
-  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement requirements = 2 [(dev.f110.kubeproto.field) = { go_name: "Requirements", api_field_name: "requirements", inline: false }];
+  repeated .k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement requirements = 2 [(dev.f110.kubeproto.field) = { go_name: "Requirements", api_field_name: "requirements", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message LocalSubjectAccessReview {
@@ -61,10 +61,10 @@ message NonResourceAttributes {
 
 message NonResourceRule {
   // verbs is a list of kubernetes non-resource API verbs, like: get, post, put, delete, patch, head, options.  "*" means all.
-  repeated string verbs = 1 [(dev.f110.kubeproto.field) = { go_name: "Verbs", api_field_name: "verbs", inline: false }];
+  repeated string verbs = 1 [(dev.f110.kubeproto.field) = { go_name: "Verbs", api_field_name: "verbs", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // nonResourceURLs is a set of partial urls that a user should have access to.  *s are allowed, but only as the full,
   // final step in the path.  "*" means all.
-  repeated string non_resource_url_s = 2 [(dev.f110.kubeproto.field) = { go_name: "NonResourceURLs", api_field_name: "nonResourceURLs", inline: false }];
+  repeated string non_resource_url_s = 2 [(dev.f110.kubeproto.field) = { go_name: "NonResourceURLs", api_field_name: "nonResourceURLs", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message ResourceAttributes {
@@ -93,15 +93,15 @@ message ResourceAttributes {
 
 message ResourceRule {
   // verbs is a list of kubernetes resource API verbs, like: get, list, watch, create, update, delete, proxy.  "*" means all.
-  repeated string verbs = 1 [(dev.f110.kubeproto.field) = { go_name: "Verbs", api_field_name: "verbs", inline: false }];
+  repeated string verbs = 1 [(dev.f110.kubeproto.field) = { go_name: "Verbs", api_field_name: "verbs", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // apiGroups is the name of the APIGroup that contains the resources.  If multiple API groups are specified, any action requested against one of
   // the enumerated resources in any API group will be allowed.  "*" means all.
-  repeated string api_groups = 2 [(dev.f110.kubeproto.field) = { go_name: "APIGroups", api_field_name: "apiGroups", inline: false }];
+  repeated string api_groups = 2 [(dev.f110.kubeproto.field) = { go_name: "APIGroups", api_field_name: "apiGroups", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // resources is a list of resources this rule applies to.  "*" means all in the specified apiGroups.
   //  "*/foo" represents the subresource 'foo' for all resources in the specified apiGroups.
-  repeated string resources = 3 [(dev.f110.kubeproto.field) = { go_name: "Resources", api_field_name: "resources", inline: false }];
+  repeated string resources = 3 [(dev.f110.kubeproto.field) = { go_name: "Resources", api_field_name: "resources", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // resourceNames is an optional white list of names that the rule applies to.  An empty set means that everything is allowed.  "*" means all.
-  repeated string resource_names = 4 [(dev.f110.kubeproto.field) = { go_name: "ResourceNames", api_field_name: "resourceNames", inline: false }];
+  repeated string resource_names = 4 [(dev.f110.kubeproto.field) = { go_name: "ResourceNames", api_field_name: "resourceNames", list_type: LIST_TYPE_ATOMIC, inline: false }];
 }
 
 message SelfSubjectAccessReview {
@@ -158,7 +158,7 @@ message SubjectAccessReviewSpec {
   // If you specify "User" but not "Groups", then is it interpreted as "What if User were not a member of any groups
   optional string user = 3 [(dev.f110.kubeproto.field) = { go_name: "User", api_field_name: "user", inline: false }];
   // groups is the groups you're testing for.
-  repeated string groups = 4 [(dev.f110.kubeproto.field) = { go_name: "Groups", api_field_name: "groups", inline: false }];
+  repeated string groups = 4 [(dev.f110.kubeproto.field) = { go_name: "Groups", api_field_name: "groups", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // extra corresponds to the user.Info.GetExtra() method from the authenticator.  Since that is input to the authorizer
   // it needs a reflection here.
   map<string, ExtraValue> extra = 5 [(dev.f110.kubeproto.field) = { go_name: "Extra", api_field_name: "extra", inline: false }];
@@ -185,10 +185,10 @@ message SubjectAccessReviewStatus {
 message SubjectRulesReviewStatus {
   // resourceRules is the list of actions the subject is allowed to perform on resources.
   // The list ordering isn't significant, may contain duplicates, and possibly be incomplete.
-  repeated ResourceRule resource_rules = 1 [(dev.f110.kubeproto.field) = { go_name: "ResourceRules", api_field_name: "resourceRules", inline: false }];
+  repeated ResourceRule resource_rules = 1 [(dev.f110.kubeproto.field) = { go_name: "ResourceRules", api_field_name: "resourceRules", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // nonResourceRules is the list of actions the subject is allowed to perform on non-resources.
   // The list ordering isn't significant, may contain duplicates, and possibly be incomplete.
-  repeated NonResourceRule non_resource_rules = 2 [(dev.f110.kubeproto.field) = { go_name: "NonResourceRules", api_field_name: "nonResourceRules", inline: false }];
+  repeated NonResourceRule non_resource_rules = 2 [(dev.f110.kubeproto.field) = { go_name: "NonResourceRules", api_field_name: "nonResourceRules", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // incomplete is true when the rules returned by this call are incomplete. This is most commonly
   // encountered when an authorizer, such as an external authorizer, doesn't support rules evaluation.
   bool incomplete = 3 [(dev.f110.kubeproto.field) = { go_name: "Incomplete", api_field_name: "incomplete", inline: false }];

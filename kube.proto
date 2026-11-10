@@ -13,11 +13,45 @@ message Kind {
   Scope                  scope                      = 2;
 }
 
+// ListType is how the elements of a list are merged by Server-Side Apply.
+enum ListType {
+  LIST_TYPE_UNSPECIFIED = 0;
+  // The list is owned as a whole.
+  LIST_TYPE_ATOMIC = 1;
+  // Each element is identified by the fields in list_map_keys.
+  LIST_TYPE_MAP = 2;
+  // Each element is identified by its value.
+  LIST_TYPE_SET = 3;
+}
+
+// MapType is how the entries of a map are merged by Server-Side Apply.
+enum MapType {
+  MAP_TYPE_UNSPECIFIED = 0;
+  MAP_TYPE_GRANULAR    = 1;
+  MAP_TYPE_ATOMIC      = 2;
+}
+
+// StructType is how the fields of a message are merged by Server-Side Apply.
+enum StructType {
+  STRUCT_TYPE_UNSPECIFIED = 0;
+  STRUCT_TYPE_GRANULAR    = 1;
+  STRUCT_TYPE_ATOMIC      = 2;
+}
+
 message Field {
-  string go_name        = 1;
-  bool inline           = 2;
-  bool   sub_resource   = 3;
-  string api_field_name = 4;
+  string go_name          = 1;
+  bool inline             = 2;
+  bool     sub_resource   = 3;
+  string   api_field_name = 4;
+  ListType list_type      = 5;
+  // list_map_keys is the names of the fields that identify an element.
+  // This is used when list_type is LIST_TYPE_MAP.
+  repeated string list_map_keys = 6;
+  MapType         map_type      = 7;
+}
+
+message Message {
+  StructType struct_type = 1;
 }
 
 message Kubernetes {
@@ -46,7 +80,8 @@ message EnumValue {
 }
 
 extend google.protobuf.MessageOptions {
-  Kind kind = 60010;
+  Kind    kind    = 60010;
+  Message message = 60011;
 }
 
 extend google.protobuf.FieldOptions {

@@ -140,7 +140,7 @@ message CertificateSigningRequestSpec {
   //  "code signing", "email protection", "s/mime",
   //  "ipsec end system", "ipsec tunnel", "ipsec user",
   //  "timestamping", "ocsp signing", "microsoft sgc", "netscape sgc"
-  repeated KeyUsage usages = 4 [(dev.f110.kubeproto.field) = { go_name: "Usages", api_field_name: "usages", inline: false }];
+  repeated KeyUsage usages = 4 [(dev.f110.kubeproto.field) = { go_name: "Usages", api_field_name: "usages", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // username contains the name of the user that created the CertificateSigningRequest.
   // Populated by the API server on creation and immutable.
   optional string username = 5 [(dev.f110.kubeproto.field) = { go_name: "Username", api_field_name: "username", inline: false }];
@@ -149,7 +149,7 @@ message CertificateSigningRequestSpec {
   optional string uid = 6 [(dev.f110.kubeproto.field) = { go_name: "UID", api_field_name: "uid", inline: false }];
   // groups contains group membership of the user that created the CertificateSigningRequest.
   // Populated by the API server on creation and immutable.
-  repeated string groups = 7 [(dev.f110.kubeproto.field) = { go_name: "Groups", api_field_name: "groups", inline: false }];
+  repeated string groups = 7 [(dev.f110.kubeproto.field) = { go_name: "Groups", api_field_name: "groups", list_type: LIST_TYPE_ATOMIC, inline: false }];
   // extra contains extra attributes of the user that created the CertificateSigningRequest.
   // Populated by the API server on creation and immutable.
   map<string, ExtraValue> extra = 8 [(dev.f110.kubeproto.field) = { go_name: "Extra", api_field_name: "extra", inline: false }];
@@ -157,7 +157,9 @@ message CertificateSigningRequestSpec {
 
 message CertificateSigningRequestStatus {
   // conditions applied to the request. Known conditions are "Approved", "Denied", and "Failed".
-  repeated CertificateSigningRequestCondition conditions = 1 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", inline: false }];
+  repeated CertificateSigningRequestCondition conditions = 1 [(dev.f110.kubeproto.field) = { go_name: "Conditions", api_field_name: "conditions", list_type: LIST_TYPE_MAP,
+                                                                                             list_map_keys: [ "type" ],
+                                                                                             inline: false }];
   // certificate is populated with an issued certificate by the signer after an Approved condition is present.
   // This field is set via the /status subresource. Once populated, this field is immutable.
   // If the certificate signing request is denied, a condition of type "Denied" is added and this field remains empty.

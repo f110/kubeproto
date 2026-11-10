@@ -2,7 +2,10 @@ package testingclient
 
 import (
 	"context"
+	_ "embed"
+	"encoding/json"
 	"strings"
+	"sync"
 
 	"k8s.io/apimachinery/pkg/api/meta"
 	k8smetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -10,9 +13,12 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
+	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/managedfields"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/rest"
 	k8stesting "k8s.io/client-go/testing"
+	"sigs.k8s.io/structured-merge-diff/v6/typed"
 
 	"go.f110.dev/kubeproto/example/pkg/client"
 	"go.f110.dev/kubeproto/go/apis/metav1"
@@ -29,9 +35,24 @@ type Set struct {
 	tracker k8stesting.ObjectTracker
 }
 
+// typeSchema is the schema of structured-merge-diff for the kinds.
+// The field manager of the tracker uses it to merge the objects in the same way as Server-Side Apply.
+//
+//go:embed k8s.generated.testingclient.typeschema.yaml
+var typeSchema string
+
+var typeSchemaParser = sync.OnceValue(func() *typed.Parser {
+	parser, err := typed.NewParser(typed.YAMLObject(typeSchema))
+	if err != nil {
+		panic(err)
+	}
+	return parser
+})
+
 func NewSet() *Set {
 	s := &Set{}
-	s.tracker = k8stesting.NewObjectTracker(client.Scheme, codecs.UniversalDecoder())
+	typeConverter := managedfields.NewSchemeTypeConverter(client.Scheme, typeSchemaParser())
+	s.tracker = k8stesting.NewFieldManagedObjectTracker(client.Scheme, codecs.UniversalDecoder(), typeConverter)
 	s.fake.AddReactor("*", "*", k8stesting.ObjectReaction(s.tracker))
 	s.fake.AddWatchReactor("*", func(action k8stesting.Action) (handled bool, ret watch.Interface, err error) {
 		w, err := s.tracker.Watch(action.GetResource(), action.GetNamespace())
@@ -163,6 +184,29 @@ func (f *fakerBackend) UpdateStatus(ctx context.Context, resourceName string, ob
 	}
 	return obj.DeepCopyObject(), err
 }
+func (f *fakerBackend) Apply(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error) {
+	gvks, _, err := client.Scheme.ObjectKinds(result)
+	if err != nil {
+		return nil, err
+	}
+	gvk := gvks[0]
+	m := obj.(metav1.Object)
+	objMeta := m.GetObjectMeta()
+	obj = obj.DeepCopyObject()
+	obj.GetObjectKind().SetGroupVersionKind(gvk)
+	patch, err := json.Marshal(obj)
+	if err != nil {
+		return nil, err
+	}
+	patchOpts := k8smetav1.PatchOptions{DryRun: opts.DryRun, Force: &opts.Force, FieldManager: opts.FieldManager}
+	action := k8stesting.NewPatchActionWithOptions(gvk.GroupVersion().WithResource(resourceName), objMeta.Namespace, objMeta.Name, types.ApplyPatchType, patch, patchOpts)
+	obj, err = f.fake.Invokes(action, result)
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.DeepCopyObject(), err
+}
 func (f *fakerBackend) Delete(ctx context.Context, gvr schema.GroupVersionResource, namespace, name string, opts metav1.DeleteOptions) error {
 	_, err := f.fake.Invokes(k8stesting.NewDeleteAction(gvr, namespace, name), nil)
 
@@ -189,6 +233,10 @@ func (f *fakerBackend) UpdateClusterScoped(ctx context.Context, resourceName str
 
 func (f *fakerBackend) UpdateStatusClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error) {
 	return f.UpdateStatus(ctx, resourceName, obj, opts, result)
+}
+
+func (f *fakerBackend) ApplyClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error) {
+	return f.Apply(ctx, resourceName, obj, opts, result)
 }
 
 func (f *fakerBackend) DeleteClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, name string, opts metav1.DeleteOptions) error {
