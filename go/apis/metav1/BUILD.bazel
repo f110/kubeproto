@@ -1,4 +1,4 @@
-load("@rules_go//go:def.bzl", "go_library")
+load("@rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "metav1",
@@ -16,5 +16,15 @@ go_library(
         "@io_k8s_apimachinery//pkg/selection",
         "@io_k8s_apimachinery//pkg/types",
         "@io_k8s_apimachinery//pkg/watch",
+    ],
+)
+
+go_test(
+    name = "metav1_test",
+    srcs = ["util_test.go"],
+    embed = [":metav1"],
+    deps = [
+        "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//require",
     ],
 )
