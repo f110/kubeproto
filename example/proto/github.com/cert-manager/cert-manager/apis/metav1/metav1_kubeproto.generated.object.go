@@ -6,7 +6,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
-const GroupName = "cert-manager.io."
+const GroupName = "cert-manager.io"
 
 var (
 	GroupVersion       = metav1.GroupVersion{Group: GroupName, Version: "v1"}

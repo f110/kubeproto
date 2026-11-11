@@ -9,7 +9,7 @@ import (
 	"maps"
 )
 
-const GroupName = "resource"
+const GroupName = "resource.k8s.io"
 
 var (
 	GroupVersion       = metav1.GroupVersion{Group: GroupName, Version: "v1"}

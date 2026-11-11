@@ -52,13 +52,13 @@ var typeSchemaParser = sync.OnceValue(func() *typed.Parser {
 // statusSubresourceKinds is the set of the kinds which have the status subresource.
 // The apiserver ignores the status when the object of these kinds is applied to the main resource.
 var statusSubresourceKinds = map[schema.GroupVersionKind]struct{}{
-	{Group: "cert-manager.io.", Version: "v1", Kind: "Certificate"}:        {},
-	{Group: "cert-manager.io.", Version: "v1", Kind: "CertificateRequest"}: {},
-	{Group: "cert-manager.io.", Version: "v1", Kind: "ClusterIssuer"}:      {},
-	{Group: "cert-manager.io.", Version: "v1", Kind: "Issuer"}:             {},
-	{Group: "coreos.com.monitor", Version: "v1", Kind: "Alertmanager"}:     {},
-	{Group: "coreos.com.monitor", Version: "v1", Kind: "Prometheus"}:       {},
-	{Group: "coreos.com.monitor", Version: "v1", Kind: "ThanosRuler"}:      {},
+	{Group: "cert-manager.io", Version: "v1", Kind: "Certificate"}:        {},
+	{Group: "cert-manager.io", Version: "v1", Kind: "CertificateRequest"}: {},
+	{Group: "cert-manager.io", Version: "v1", Kind: "ClusterIssuer"}:      {},
+	{Group: "cert-manager.io", Version: "v1", Kind: "Issuer"}:             {},
+	{Group: "monitoring.coreos.com", Version: "v1", Kind: "Alertmanager"}: {},
+	{Group: "monitoring.coreos.com", Version: "v1", Kind: "Prometheus"}:   {},
+	{Group: "monitoring.coreos.com", Version: "v1", Kind: "ThanosRuler"}:  {},
 }
 
 func NewSet() *Set {
@@ -75,7 +75,7 @@ func NewSet() *Set {
 	})
 
 	s.CertManagerIoV1 = thirdpartyclient.NewCertManagerIoV1Client(&fakerBackend{fake: &s.fake}, nil)
-	s.CoreosComV1 = thirdpartyclient.NewCoreosComV1Client(&fakerBackend{fake: &s.fake}, nil)
+	s.MonitoringCoreosComV1 = thirdpartyclient.NewMonitoringCoreosComV1Client(&fakerBackend{fake: &s.fake}, nil)
 	return s
 }
 

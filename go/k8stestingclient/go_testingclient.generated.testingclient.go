@@ -82,7 +82,7 @@ var statusSubresourceKinds = map[schema.GroupVersionKind]struct{}{
 	{Group: "networking.k8s.io", Version: "v1", Kind: "Ingress"}:                              {},
 	{Group: "networking.k8s.io", Version: "v1", Kind: "ServiceCIDR"}:                          {},
 	{Group: "policy", Version: "v1", Kind: "PodDisruptionBudget"}:                             {},
-	{Group: "resource", Version: "v1", Kind: "ResourceClaim"}:                                 {},
+	{Group: "resource.k8s.io", Version: "v1", Kind: "ResourceClaim"}:                          {},
 	{Group: "storage.k8s.io", Version: "v1", Kind: "VolumeAttachment"}:                        {},
 }
 
@@ -114,7 +114,7 @@ func NewSet() *Set {
 	s.NetworkingK8sIoV1 = k8sclient.NewNetworkingK8sIoV1Client(&fakerBackend{fake: &s.fake}, nil)
 	s.PolicyV1 = k8sclient.NewPolicyV1Client(&fakerBackend{fake: &s.fake}, nil)
 	s.RbacAuthorizationK8sIoV1 = k8sclient.NewRbacAuthorizationK8sIoV1Client(&fakerBackend{fake: &s.fake}, nil)
-	s.ResourceV1 = k8sclient.NewResourceV1Client(&fakerBackend{fake: &s.fake}, nil)
+	s.ResourceK8sIoV1 = k8sclient.NewResourceK8sIoV1Client(&fakerBackend{fake: &s.fake}, nil)
 	s.SchedulingK8sIoV1 = k8sclient.NewSchedulingK8sIoV1Client(&fakerBackend{fake: &s.fake}, nil)
 	s.StorageK8sIoV1 = k8sclient.NewStorageK8sIoV1Client(&fakerBackend{fake: &s.fake}, nil)
 	return s
