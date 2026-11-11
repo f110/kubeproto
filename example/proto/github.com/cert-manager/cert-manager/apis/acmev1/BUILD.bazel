@@ -7,7 +7,7 @@ gen_protobuf(
     name = "gen",
     srcs = ["@com_github_cert_manager_cert_manager//pkg/apis/acme/v1:acme"],
     all = True,
-    api_sub_group = "cert-manager.io",
+    api_domain = "acme.cert-manager.io",
     api_version = "v1",
     importpath = "go.f110.dev/kubeproto/example/proto/github.com/cert-manager/cert-manager/apis/acmev1",
     proto_package_name = "github.com.cert_manager.cert_manager.pkg.apis.acmev1",

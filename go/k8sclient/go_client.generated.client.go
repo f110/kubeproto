@@ -132,7 +132,7 @@ type Set struct {
 	NetworkingK8sIoV1            *NetworkingK8sIoV1
 	PolicyV1                     *PolicyV1
 	RbacAuthorizationK8sIoV1     *RbacAuthorizationK8sIoV1
-	ResourceV1                   *ResourceV1
+	ResourceK8sIoV1              *ResourceK8sIoV1
 	SchedulingK8sIoV1            *SchedulingK8sIoV1
 	StorageK8sIoV1               *StorageK8sIoV1
 }
@@ -313,7 +313,7 @@ func NewSet(cfg *rest.Config) (*Set, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.ResourceV1 = NewResourceV1Client(&restBackend{client: c}, &conf)
+		s.ResourceK8sIoV1 = NewResourceK8sIoV1Client(&restBackend{client: c}, &conf)
 	}
 	{
 		conf := *cfg
@@ -3694,16 +3694,16 @@ func (c *RbacAuthorizationK8sIoV1) WatchRoleBinding(ctx context.Context, namespa
 	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".rbac.authorization.k8s.io", Version: "v1", Resource: "rolebindings"}, namespace, opts)
 }
 
-type ResourceV1 struct {
+type ResourceK8sIoV1 struct {
 	backend Backend
 	config  *rest.Config
 }
 
-func NewResourceV1Client(b Backend, config *rest.Config) *ResourceV1 {
-	return &ResourceV1{backend: b, config: config}
+func NewResourceK8sIoV1Client(b Backend, config *rest.Config) *ResourceK8sIoV1 {
+	return &ResourceK8sIoV1{backend: b, config: config}
 }
 
-func (c *ResourceV1) GetDeviceClass(ctx context.Context, name string, opts metav1.GetOptions) (*resourcev1.DeviceClass, error) {
+func (c *ResourceK8sIoV1) GetDeviceClass(ctx context.Context, name string, opts metav1.GetOptions) (*resourcev1.DeviceClass, error) {
 	result, err := c.backend.GetClusterScoped(ctx, "deviceclasses", name, opts, &resourcev1.DeviceClass{})
 	if err != nil {
 		return nil, err
@@ -3711,7 +3711,7 @@ func (c *ResourceV1) GetDeviceClass(ctx context.Context, name string, opts metav
 	return result.(*resourcev1.DeviceClass), nil
 }
 
-func (c *ResourceV1) CreateDeviceClass(ctx context.Context, v *resourcev1.DeviceClass, opts metav1.CreateOptions) (*resourcev1.DeviceClass, error) {
+func (c *ResourceK8sIoV1) CreateDeviceClass(ctx context.Context, v *resourcev1.DeviceClass, opts metav1.CreateOptions) (*resourcev1.DeviceClass, error) {
 	result, err := c.backend.CreateClusterScoped(ctx, "deviceclasses", v, opts, &resourcev1.DeviceClass{})
 	if err != nil {
 		return nil, err
@@ -3719,7 +3719,7 @@ func (c *ResourceV1) CreateDeviceClass(ctx context.Context, v *resourcev1.Device
 	return result.(*resourcev1.DeviceClass), nil
 }
 
-func (c *ResourceV1) UpdateDeviceClass(ctx context.Context, v *resourcev1.DeviceClass, opts metav1.UpdateOptions) (*resourcev1.DeviceClass, error) {
+func (c *ResourceK8sIoV1) UpdateDeviceClass(ctx context.Context, v *resourcev1.DeviceClass, opts metav1.UpdateOptions) (*resourcev1.DeviceClass, error) {
 	result, err := c.backend.UpdateClusterScoped(ctx, "deviceclasses", v, opts, &resourcev1.DeviceClass{})
 	if err != nil {
 		return nil, err
@@ -3727,7 +3727,7 @@ func (c *ResourceV1) UpdateDeviceClass(ctx context.Context, v *resourcev1.Device
 	return result.(*resourcev1.DeviceClass), nil
 }
 
-func (c *ResourceV1) ApplyDeviceClass(ctx context.Context, v *resourcev1.DeviceClass, opts metav1.ApplyOptions) (*resourcev1.DeviceClass, error) {
+func (c *ResourceK8sIoV1) ApplyDeviceClass(ctx context.Context, v *resourcev1.DeviceClass, opts metav1.ApplyOptions) (*resourcev1.DeviceClass, error) {
 	result, err := c.backend.ApplyClusterScoped(ctx, "deviceclasses", v, opts, &resourcev1.DeviceClass{})
 	if err != nil {
 		return nil, err
@@ -3735,11 +3735,11 @@ func (c *ResourceV1) ApplyDeviceClass(ctx context.Context, v *resourcev1.DeviceC
 	return result.(*resourcev1.DeviceClass), nil
 }
 
-func (c *ResourceV1) DeleteDeviceClass(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".resource", Version: "v1", Resource: "deviceclasses"}, name, opts)
+func (c *ResourceK8sIoV1) DeleteDeviceClass(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".resource.k8s.io", Version: "v1", Resource: "deviceclasses"}, name, opts)
 }
 
-func (c *ResourceV1) ListDeviceClass(ctx context.Context, opts metav1.ListOptions) (*resourcev1.DeviceClassList, error) {
+func (c *ResourceK8sIoV1) ListDeviceClass(ctx context.Context, opts metav1.ListOptions) (*resourcev1.DeviceClassList, error) {
 	result, err := c.backend.ListClusterScoped(ctx, "deviceclasses", opts, &resourcev1.DeviceClassList{})
 	if err != nil {
 		return nil, err
@@ -3747,11 +3747,11 @@ func (c *ResourceV1) ListDeviceClass(ctx context.Context, opts metav1.ListOption
 	return result.(*resourcev1.DeviceClassList), nil
 }
 
-func (c *ResourceV1) WatchDeviceClass(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".resource", Version: "v1", Resource: "deviceclasses"}, opts)
+func (c *ResourceK8sIoV1) WatchDeviceClass(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".resource.k8s.io", Version: "v1", Resource: "deviceclasses"}, opts)
 }
 
-func (c *ResourceV1) GetResourceClaim(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*resourcev1.ResourceClaim, error) {
+func (c *ResourceK8sIoV1) GetResourceClaim(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*resourcev1.ResourceClaim, error) {
 	result, err := c.backend.Get(ctx, "resourceclaims", namespace, name, opts, &resourcev1.ResourceClaim{})
 	if err != nil {
 		return nil, err
@@ -3759,7 +3759,7 @@ func (c *ResourceV1) GetResourceClaim(ctx context.Context, namespace, name strin
 	return result.(*resourcev1.ResourceClaim), nil
 }
 
-func (c *ResourceV1) CreateResourceClaim(ctx context.Context, v *resourcev1.ResourceClaim, opts metav1.CreateOptions) (*resourcev1.ResourceClaim, error) {
+func (c *ResourceK8sIoV1) CreateResourceClaim(ctx context.Context, v *resourcev1.ResourceClaim, opts metav1.CreateOptions) (*resourcev1.ResourceClaim, error) {
 	result, err := c.backend.Create(ctx, "resourceclaims", v, opts, &resourcev1.ResourceClaim{})
 	if err != nil {
 		return nil, err
@@ -3767,7 +3767,7 @@ func (c *ResourceV1) CreateResourceClaim(ctx context.Context, v *resourcev1.Reso
 	return result.(*resourcev1.ResourceClaim), nil
 }
 
-func (c *ResourceV1) UpdateResourceClaim(ctx context.Context, v *resourcev1.ResourceClaim, opts metav1.UpdateOptions) (*resourcev1.ResourceClaim, error) {
+func (c *ResourceK8sIoV1) UpdateResourceClaim(ctx context.Context, v *resourcev1.ResourceClaim, opts metav1.UpdateOptions) (*resourcev1.ResourceClaim, error) {
 	result, err := c.backend.Update(ctx, "resourceclaims", v, opts, &resourcev1.ResourceClaim{})
 	if err != nil {
 		return nil, err
@@ -3775,7 +3775,7 @@ func (c *ResourceV1) UpdateResourceClaim(ctx context.Context, v *resourcev1.Reso
 	return result.(*resourcev1.ResourceClaim), nil
 }
 
-func (c *ResourceV1) UpdateStatusResourceClaim(ctx context.Context, v *resourcev1.ResourceClaim, opts metav1.UpdateOptions) (*resourcev1.ResourceClaim, error) {
+func (c *ResourceK8sIoV1) UpdateStatusResourceClaim(ctx context.Context, v *resourcev1.ResourceClaim, opts metav1.UpdateOptions) (*resourcev1.ResourceClaim, error) {
 	result, err := c.backend.UpdateStatus(ctx, "resourceclaims", v, opts, &resourcev1.ResourceClaim{})
 	if err != nil {
 		return nil, err
@@ -3783,7 +3783,7 @@ func (c *ResourceV1) UpdateStatusResourceClaim(ctx context.Context, v *resourcev
 	return result.(*resourcev1.ResourceClaim), nil
 }
 
-func (c *ResourceV1) ApplyResourceClaim(ctx context.Context, v *resourcev1.ResourceClaim, opts metav1.ApplyOptions) (*resourcev1.ResourceClaim, error) {
+func (c *ResourceK8sIoV1) ApplyResourceClaim(ctx context.Context, v *resourcev1.ResourceClaim, opts metav1.ApplyOptions) (*resourcev1.ResourceClaim, error) {
 	result, err := c.backend.Apply(ctx, "resourceclaims", v, opts, &resourcev1.ResourceClaim{})
 	if err != nil {
 		return nil, err
@@ -3791,11 +3791,11 @@ func (c *ResourceV1) ApplyResourceClaim(ctx context.Context, v *resourcev1.Resou
 	return result.(*resourcev1.ResourceClaim), nil
 }
 
-func (c *ResourceV1) DeleteResourceClaim(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".resource", Version: "v1", Resource: "resourceclaims"}, namespace, name, opts)
+func (c *ResourceK8sIoV1) DeleteResourceClaim(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".resource.k8s.io", Version: "v1", Resource: "resourceclaims"}, namespace, name, opts)
 }
 
-func (c *ResourceV1) ListResourceClaim(ctx context.Context, namespace string, opts metav1.ListOptions) (*resourcev1.ResourceClaimList, error) {
+func (c *ResourceK8sIoV1) ListResourceClaim(ctx context.Context, namespace string, opts metav1.ListOptions) (*resourcev1.ResourceClaimList, error) {
 	result, err := c.backend.List(ctx, "resourceclaims", namespace, opts, &resourcev1.ResourceClaimList{})
 	if err != nil {
 		return nil, err
@@ -3803,11 +3803,11 @@ func (c *ResourceV1) ListResourceClaim(ctx context.Context, namespace string, op
 	return result.(*resourcev1.ResourceClaimList), nil
 }
 
-func (c *ResourceV1) WatchResourceClaim(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".resource", Version: "v1", Resource: "resourceclaims"}, namespace, opts)
+func (c *ResourceK8sIoV1) WatchResourceClaim(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".resource.k8s.io", Version: "v1", Resource: "resourceclaims"}, namespace, opts)
 }
 
-func (c *ResourceV1) GetResourceClaimTemplate(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*resourcev1.ResourceClaimTemplate, error) {
+func (c *ResourceK8sIoV1) GetResourceClaimTemplate(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*resourcev1.ResourceClaimTemplate, error) {
 	result, err := c.backend.Get(ctx, "resourceclaimtemplates", namespace, name, opts, &resourcev1.ResourceClaimTemplate{})
 	if err != nil {
 		return nil, err
@@ -3815,7 +3815,7 @@ func (c *ResourceV1) GetResourceClaimTemplate(ctx context.Context, namespace, na
 	return result.(*resourcev1.ResourceClaimTemplate), nil
 }
 
-func (c *ResourceV1) CreateResourceClaimTemplate(ctx context.Context, v *resourcev1.ResourceClaimTemplate, opts metav1.CreateOptions) (*resourcev1.ResourceClaimTemplate, error) {
+func (c *ResourceK8sIoV1) CreateResourceClaimTemplate(ctx context.Context, v *resourcev1.ResourceClaimTemplate, opts metav1.CreateOptions) (*resourcev1.ResourceClaimTemplate, error) {
 	result, err := c.backend.Create(ctx, "resourceclaimtemplates", v, opts, &resourcev1.ResourceClaimTemplate{})
 	if err != nil {
 		return nil, err
@@ -3823,7 +3823,7 @@ func (c *ResourceV1) CreateResourceClaimTemplate(ctx context.Context, v *resourc
 	return result.(*resourcev1.ResourceClaimTemplate), nil
 }
 
-func (c *ResourceV1) UpdateResourceClaimTemplate(ctx context.Context, v *resourcev1.ResourceClaimTemplate, opts metav1.UpdateOptions) (*resourcev1.ResourceClaimTemplate, error) {
+func (c *ResourceK8sIoV1) UpdateResourceClaimTemplate(ctx context.Context, v *resourcev1.ResourceClaimTemplate, opts metav1.UpdateOptions) (*resourcev1.ResourceClaimTemplate, error) {
 	result, err := c.backend.Update(ctx, "resourceclaimtemplates", v, opts, &resourcev1.ResourceClaimTemplate{})
 	if err != nil {
 		return nil, err
@@ -3831,7 +3831,7 @@ func (c *ResourceV1) UpdateResourceClaimTemplate(ctx context.Context, v *resourc
 	return result.(*resourcev1.ResourceClaimTemplate), nil
 }
 
-func (c *ResourceV1) ApplyResourceClaimTemplate(ctx context.Context, v *resourcev1.ResourceClaimTemplate, opts metav1.ApplyOptions) (*resourcev1.ResourceClaimTemplate, error) {
+func (c *ResourceK8sIoV1) ApplyResourceClaimTemplate(ctx context.Context, v *resourcev1.ResourceClaimTemplate, opts metav1.ApplyOptions) (*resourcev1.ResourceClaimTemplate, error) {
 	result, err := c.backend.Apply(ctx, "resourceclaimtemplates", v, opts, &resourcev1.ResourceClaimTemplate{})
 	if err != nil {
 		return nil, err
@@ -3839,11 +3839,11 @@ func (c *ResourceV1) ApplyResourceClaimTemplate(ctx context.Context, v *resource
 	return result.(*resourcev1.ResourceClaimTemplate), nil
 }
 
-func (c *ResourceV1) DeleteResourceClaimTemplate(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".resource", Version: "v1", Resource: "resourceclaimtemplates"}, namespace, name, opts)
+func (c *ResourceK8sIoV1) DeleteResourceClaimTemplate(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".resource.k8s.io", Version: "v1", Resource: "resourceclaimtemplates"}, namespace, name, opts)
 }
 
-func (c *ResourceV1) ListResourceClaimTemplate(ctx context.Context, namespace string, opts metav1.ListOptions) (*resourcev1.ResourceClaimTemplateList, error) {
+func (c *ResourceK8sIoV1) ListResourceClaimTemplate(ctx context.Context, namespace string, opts metav1.ListOptions) (*resourcev1.ResourceClaimTemplateList, error) {
 	result, err := c.backend.List(ctx, "resourceclaimtemplates", namespace, opts, &resourcev1.ResourceClaimTemplateList{})
 	if err != nil {
 		return nil, err
@@ -3851,11 +3851,11 @@ func (c *ResourceV1) ListResourceClaimTemplate(ctx context.Context, namespace st
 	return result.(*resourcev1.ResourceClaimTemplateList), nil
 }
 
-func (c *ResourceV1) WatchResourceClaimTemplate(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".resource", Version: "v1", Resource: "resourceclaimtemplates"}, namespace, opts)
+func (c *ResourceK8sIoV1) WatchResourceClaimTemplate(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".resource.k8s.io", Version: "v1", Resource: "resourceclaimtemplates"}, namespace, opts)
 }
 
-func (c *ResourceV1) GetResourceSlice(ctx context.Context, name string, opts metav1.GetOptions) (*resourcev1.ResourceSlice, error) {
+func (c *ResourceK8sIoV1) GetResourceSlice(ctx context.Context, name string, opts metav1.GetOptions) (*resourcev1.ResourceSlice, error) {
 	result, err := c.backend.GetClusterScoped(ctx, "resourceslices", name, opts, &resourcev1.ResourceSlice{})
 	if err != nil {
 		return nil, err
@@ -3863,7 +3863,7 @@ func (c *ResourceV1) GetResourceSlice(ctx context.Context, name string, opts met
 	return result.(*resourcev1.ResourceSlice), nil
 }
 
-func (c *ResourceV1) CreateResourceSlice(ctx context.Context, v *resourcev1.ResourceSlice, opts metav1.CreateOptions) (*resourcev1.ResourceSlice, error) {
+func (c *ResourceK8sIoV1) CreateResourceSlice(ctx context.Context, v *resourcev1.ResourceSlice, opts metav1.CreateOptions) (*resourcev1.ResourceSlice, error) {
 	result, err := c.backend.CreateClusterScoped(ctx, "resourceslices", v, opts, &resourcev1.ResourceSlice{})
 	if err != nil {
 		return nil, err
@@ -3871,7 +3871,7 @@ func (c *ResourceV1) CreateResourceSlice(ctx context.Context, v *resourcev1.Reso
 	return result.(*resourcev1.ResourceSlice), nil
 }
 
-func (c *ResourceV1) UpdateResourceSlice(ctx context.Context, v *resourcev1.ResourceSlice, opts metav1.UpdateOptions) (*resourcev1.ResourceSlice, error) {
+func (c *ResourceK8sIoV1) UpdateResourceSlice(ctx context.Context, v *resourcev1.ResourceSlice, opts metav1.UpdateOptions) (*resourcev1.ResourceSlice, error) {
 	result, err := c.backend.UpdateClusterScoped(ctx, "resourceslices", v, opts, &resourcev1.ResourceSlice{})
 	if err != nil {
 		return nil, err
@@ -3879,7 +3879,7 @@ func (c *ResourceV1) UpdateResourceSlice(ctx context.Context, v *resourcev1.Reso
 	return result.(*resourcev1.ResourceSlice), nil
 }
 
-func (c *ResourceV1) ApplyResourceSlice(ctx context.Context, v *resourcev1.ResourceSlice, opts metav1.ApplyOptions) (*resourcev1.ResourceSlice, error) {
+func (c *ResourceK8sIoV1) ApplyResourceSlice(ctx context.Context, v *resourcev1.ResourceSlice, opts metav1.ApplyOptions) (*resourcev1.ResourceSlice, error) {
 	result, err := c.backend.ApplyClusterScoped(ctx, "resourceslices", v, opts, &resourcev1.ResourceSlice{})
 	if err != nil {
 		return nil, err
@@ -3887,11 +3887,11 @@ func (c *ResourceV1) ApplyResourceSlice(ctx context.Context, v *resourcev1.Resou
 	return result.(*resourcev1.ResourceSlice), nil
 }
 
-func (c *ResourceV1) DeleteResourceSlice(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".resource", Version: "v1", Resource: "resourceslices"}, name, opts)
+func (c *ResourceK8sIoV1) DeleteResourceSlice(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".resource.k8s.io", Version: "v1", Resource: "resourceslices"}, name, opts)
 }
 
-func (c *ResourceV1) ListResourceSlice(ctx context.Context, opts metav1.ListOptions) (*resourcev1.ResourceSliceList, error) {
+func (c *ResourceK8sIoV1) ListResourceSlice(ctx context.Context, opts metav1.ListOptions) (*resourcev1.ResourceSliceList, error) {
 	result, err := c.backend.ListClusterScoped(ctx, "resourceslices", opts, &resourcev1.ResourceSliceList{})
 	if err != nil {
 		return nil, err
@@ -3899,8 +3899,8 @@ func (c *ResourceV1) ListResourceSlice(ctx context.Context, opts metav1.ListOpti
 	return result.(*resourcev1.ResourceSliceList), nil
 }
 
-func (c *ResourceV1) WatchResourceSlice(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".resource", Version: "v1", Resource: "resourceslices"}, opts)
+func (c *ResourceK8sIoV1) WatchResourceSlice(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".resource.k8s.io", Version: "v1", Resource: "resourceslices"}, opts)
 }
 
 type SchedulingK8sIoV1 struct {
@@ -4433,13 +4433,13 @@ func (f *InformerFactory) InformerFor(obj runtime.Object) cache.SharedIndexInfor
 	case *rbacv1.RoleBinding:
 		return NewRbacAuthorizationK8sIoV1Informer(f.cache, f.set.RbacAuthorizationK8sIoV1, f.namespace, f.resyncPeriod).RoleBindingInformer()
 	case *resourcev1.DeviceClass:
-		return NewResourceV1Informer(f.cache, f.set.ResourceV1, f.namespace, f.resyncPeriod).DeviceClassInformer()
+		return NewResourceK8sIoV1Informer(f.cache, f.set.ResourceK8sIoV1, f.namespace, f.resyncPeriod).DeviceClassInformer()
 	case *resourcev1.ResourceClaim:
-		return NewResourceV1Informer(f.cache, f.set.ResourceV1, f.namespace, f.resyncPeriod).ResourceClaimInformer()
+		return NewResourceK8sIoV1Informer(f.cache, f.set.ResourceK8sIoV1, f.namespace, f.resyncPeriod).ResourceClaimInformer()
 	case *resourcev1.ResourceClaimTemplate:
-		return NewResourceV1Informer(f.cache, f.set.ResourceV1, f.namespace, f.resyncPeriod).ResourceClaimTemplateInformer()
+		return NewResourceK8sIoV1Informer(f.cache, f.set.ResourceK8sIoV1, f.namespace, f.resyncPeriod).ResourceClaimTemplateInformer()
 	case *resourcev1.ResourceSlice:
-		return NewResourceV1Informer(f.cache, f.set.ResourceV1, f.namespace, f.resyncPeriod).ResourceSliceInformer()
+		return NewResourceK8sIoV1Informer(f.cache, f.set.ResourceK8sIoV1, f.namespace, f.resyncPeriod).ResourceSliceInformer()
 	case *schedulingv1.PriorityClass:
 		return NewSchedulingK8sIoV1Informer(f.cache, f.set.SchedulingK8sIoV1, f.namespace, f.resyncPeriod).PriorityClassInformer()
 	case *storagev1.CSIDriver:
@@ -4576,13 +4576,13 @@ func (f *InformerFactory) InformerForResource(gvr schema.GroupVersionResource) c
 	case rbacv1.SchemaGroupVersion.WithResource("rolebindings"):
 		return NewRbacAuthorizationK8sIoV1Informer(f.cache, f.set.RbacAuthorizationK8sIoV1, f.namespace, f.resyncPeriod).RoleBindingInformer()
 	case resourcev1.SchemaGroupVersion.WithResource("deviceclasses"):
-		return NewResourceV1Informer(f.cache, f.set.ResourceV1, f.namespace, f.resyncPeriod).DeviceClassInformer()
+		return NewResourceK8sIoV1Informer(f.cache, f.set.ResourceK8sIoV1, f.namespace, f.resyncPeriod).DeviceClassInformer()
 	case resourcev1.SchemaGroupVersion.WithResource("resourceclaims"):
-		return NewResourceV1Informer(f.cache, f.set.ResourceV1, f.namespace, f.resyncPeriod).ResourceClaimInformer()
+		return NewResourceK8sIoV1Informer(f.cache, f.set.ResourceK8sIoV1, f.namespace, f.resyncPeriod).ResourceClaimInformer()
 	case resourcev1.SchemaGroupVersion.WithResource("resourceclaimtemplates"):
-		return NewResourceV1Informer(f.cache, f.set.ResourceV1, f.namespace, f.resyncPeriod).ResourceClaimTemplateInformer()
+		return NewResourceK8sIoV1Informer(f.cache, f.set.ResourceK8sIoV1, f.namespace, f.resyncPeriod).ResourceClaimTemplateInformer()
 	case resourcev1.SchemaGroupVersion.WithResource("resourceslices"):
-		return NewResourceV1Informer(f.cache, f.set.ResourceV1, f.namespace, f.resyncPeriod).ResourceSliceInformer()
+		return NewResourceK8sIoV1Informer(f.cache, f.set.ResourceK8sIoV1, f.namespace, f.resyncPeriod).ResourceSliceInformer()
 	case schedulingv1.SchemaGroupVersion.WithResource("priorityclasses"):
 		return NewSchedulingK8sIoV1Informer(f.cache, f.set.SchedulingK8sIoV1, f.namespace, f.resyncPeriod).PriorityClassInformer()
 	case storagev1.SchemaGroupVersion.WithResource("csidrivers"):
@@ -6132,16 +6132,16 @@ func (f *RbacAuthorizationK8sIoV1Informer) RoleBindingLister() *RbacAuthorizatio
 	return NewRbacAuthorizationK8sIoV1RoleBindingLister(f.RoleBindingInformer().GetIndexer())
 }
 
-type ResourceV1Informer struct {
+type ResourceK8sIoV1Informer struct {
 	cache        *InformerCache
-	client       *ResourceV1
+	client       *ResourceK8sIoV1
 	namespace    string
 	resyncPeriod time.Duration
 	indexers     cache.Indexers
 }
 
-func NewResourceV1Informer(c *InformerCache, client *ResourceV1, namespace string, resyncPeriod time.Duration) *ResourceV1Informer {
-	return &ResourceV1Informer{
+func NewResourceK8sIoV1Informer(c *InformerCache, client *ResourceK8sIoV1, namespace string, resyncPeriod time.Duration) *ResourceK8sIoV1Informer {
+	return &ResourceK8sIoV1Informer{
 		cache:        c,
 		client:       client,
 		namespace:    namespace,
@@ -6150,7 +6150,7 @@ func NewResourceV1Informer(c *InformerCache, client *ResourceV1, namespace strin
 	}
 }
 
-func (f *ResourceV1Informer) DeviceClassInformer() cache.SharedIndexInformer {
+func (f *ResourceK8sIoV1Informer) DeviceClassInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&resourcev1.DeviceClass{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
@@ -6168,11 +6168,11 @@ func (f *ResourceV1Informer) DeviceClassInformer() cache.SharedIndexInformer {
 	})
 }
 
-func (f *ResourceV1Informer) DeviceClassLister() *ResourceV1DeviceClassLister {
-	return NewResourceV1DeviceClassLister(f.DeviceClassInformer().GetIndexer())
+func (f *ResourceK8sIoV1Informer) DeviceClassLister() *ResourceK8sIoV1DeviceClassLister {
+	return NewResourceK8sIoV1DeviceClassLister(f.DeviceClassInformer().GetIndexer())
 }
 
-func (f *ResourceV1Informer) ResourceClaimInformer() cache.SharedIndexInformer {
+func (f *ResourceK8sIoV1Informer) ResourceClaimInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&resourcev1.ResourceClaim{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
@@ -6190,11 +6190,11 @@ func (f *ResourceV1Informer) ResourceClaimInformer() cache.SharedIndexInformer {
 	})
 }
 
-func (f *ResourceV1Informer) ResourceClaimLister() *ResourceV1ResourceClaimLister {
-	return NewResourceV1ResourceClaimLister(f.ResourceClaimInformer().GetIndexer())
+func (f *ResourceK8sIoV1Informer) ResourceClaimLister() *ResourceK8sIoV1ResourceClaimLister {
+	return NewResourceK8sIoV1ResourceClaimLister(f.ResourceClaimInformer().GetIndexer())
 }
 
-func (f *ResourceV1Informer) ResourceClaimTemplateInformer() cache.SharedIndexInformer {
+func (f *ResourceK8sIoV1Informer) ResourceClaimTemplateInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&resourcev1.ResourceClaimTemplate{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
@@ -6212,11 +6212,11 @@ func (f *ResourceV1Informer) ResourceClaimTemplateInformer() cache.SharedIndexIn
 	})
 }
 
-func (f *ResourceV1Informer) ResourceClaimTemplateLister() *ResourceV1ResourceClaimTemplateLister {
-	return NewResourceV1ResourceClaimTemplateLister(f.ResourceClaimTemplateInformer().GetIndexer())
+func (f *ResourceK8sIoV1Informer) ResourceClaimTemplateLister() *ResourceK8sIoV1ResourceClaimTemplateLister {
+	return NewResourceK8sIoV1ResourceClaimTemplateLister(f.ResourceClaimTemplateInformer().GetIndexer())
 }
 
-func (f *ResourceV1Informer) ResourceSliceInformer() cache.SharedIndexInformer {
+func (f *ResourceK8sIoV1Informer) ResourceSliceInformer() cache.SharedIndexInformer {
 	return f.cache.Write(&resourcev1.ResourceSlice{}, func() cache.SharedIndexInformer {
 		return cache.NewSharedIndexInformer(
 			&cache.ListWatch{
@@ -6234,8 +6234,8 @@ func (f *ResourceV1Informer) ResourceSliceInformer() cache.SharedIndexInformer {
 	})
 }
 
-func (f *ResourceV1Informer) ResourceSliceLister() *ResourceV1ResourceSliceLister {
-	return NewResourceV1ResourceSliceLister(f.ResourceSliceInformer().GetIndexer())
+func (f *ResourceK8sIoV1Informer) ResourceSliceLister() *ResourceK8sIoV1ResourceSliceLister {
+	return NewResourceK8sIoV1ResourceSliceLister(f.ResourceSliceInformer().GetIndexer())
 }
 
 type SchedulingK8sIoV1Informer struct {
@@ -7967,15 +7967,15 @@ func (x *RbacAuthorizationK8sIoV1RoleBindingLister) Get(namespace, name string) 
 	return obj.(*rbacv1.RoleBinding).DeepCopy(), nil
 }
 
-type ResourceV1DeviceClassLister struct {
+type ResourceK8sIoV1DeviceClassLister struct {
 	indexer cache.Indexer
 }
 
-func NewResourceV1DeviceClassLister(indexer cache.Indexer) *ResourceV1DeviceClassLister {
-	return &ResourceV1DeviceClassLister{indexer: indexer}
+func NewResourceK8sIoV1DeviceClassLister(indexer cache.Indexer) *ResourceK8sIoV1DeviceClassLister {
+	return &ResourceK8sIoV1DeviceClassLister{indexer: indexer}
 }
 
-func (x *ResourceV1DeviceClassLister) List(selector labels.Selector) ([]*resourcev1.DeviceClass, error) {
+func (x *ResourceK8sIoV1DeviceClassLister) List(selector labels.Selector) ([]*resourcev1.DeviceClass, error) {
 	var ret []*resourcev1.DeviceClass
 	err := cache.ListAll(x.indexer, selector, func(m interface{}) {
 		ret = append(ret, m.(*resourcev1.DeviceClass).DeepCopy())
@@ -7983,7 +7983,7 @@ func (x *ResourceV1DeviceClassLister) List(selector labels.Selector) ([]*resourc
 	return ret, err
 }
 
-func (x *ResourceV1DeviceClassLister) Get(name string) (*resourcev1.DeviceClass, error) {
+func (x *ResourceK8sIoV1DeviceClassLister) Get(name string) (*resourcev1.DeviceClass, error) {
 	obj, exists, err := x.indexer.GetByKey("/" + name)
 	if err != nil {
 		return nil, err
@@ -7994,15 +7994,15 @@ func (x *ResourceV1DeviceClassLister) Get(name string) (*resourcev1.DeviceClass,
 	return obj.(*resourcev1.DeviceClass).DeepCopy(), nil
 }
 
-type ResourceV1ResourceClaimLister struct {
+type ResourceK8sIoV1ResourceClaimLister struct {
 	indexer cache.Indexer
 }
 
-func NewResourceV1ResourceClaimLister(indexer cache.Indexer) *ResourceV1ResourceClaimLister {
-	return &ResourceV1ResourceClaimLister{indexer: indexer}
+func NewResourceK8sIoV1ResourceClaimLister(indexer cache.Indexer) *ResourceK8sIoV1ResourceClaimLister {
+	return &ResourceK8sIoV1ResourceClaimLister{indexer: indexer}
 }
 
-func (x *ResourceV1ResourceClaimLister) List(namespace string, selector labels.Selector) ([]*resourcev1.ResourceClaim, error) {
+func (x *ResourceK8sIoV1ResourceClaimLister) List(namespace string, selector labels.Selector) ([]*resourcev1.ResourceClaim, error) {
 	var ret []*resourcev1.ResourceClaim
 	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
 		ret = append(ret, m.(*resourcev1.ResourceClaim).DeepCopy())
@@ -8010,7 +8010,7 @@ func (x *ResourceV1ResourceClaimLister) List(namespace string, selector labels.S
 	return ret, err
 }
 
-func (x *ResourceV1ResourceClaimLister) Get(namespace, name string) (*resourcev1.ResourceClaim, error) {
+func (x *ResourceK8sIoV1ResourceClaimLister) Get(namespace, name string) (*resourcev1.ResourceClaim, error) {
 	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
 	if err != nil {
 		return nil, err
@@ -8021,15 +8021,15 @@ func (x *ResourceV1ResourceClaimLister) Get(namespace, name string) (*resourcev1
 	return obj.(*resourcev1.ResourceClaim).DeepCopy(), nil
 }
 
-type ResourceV1ResourceClaimTemplateLister struct {
+type ResourceK8sIoV1ResourceClaimTemplateLister struct {
 	indexer cache.Indexer
 }
 
-func NewResourceV1ResourceClaimTemplateLister(indexer cache.Indexer) *ResourceV1ResourceClaimTemplateLister {
-	return &ResourceV1ResourceClaimTemplateLister{indexer: indexer}
+func NewResourceK8sIoV1ResourceClaimTemplateLister(indexer cache.Indexer) *ResourceK8sIoV1ResourceClaimTemplateLister {
+	return &ResourceK8sIoV1ResourceClaimTemplateLister{indexer: indexer}
 }
 
-func (x *ResourceV1ResourceClaimTemplateLister) List(namespace string, selector labels.Selector) ([]*resourcev1.ResourceClaimTemplate, error) {
+func (x *ResourceK8sIoV1ResourceClaimTemplateLister) List(namespace string, selector labels.Selector) ([]*resourcev1.ResourceClaimTemplate, error) {
 	var ret []*resourcev1.ResourceClaimTemplate
 	err := cache.ListAllByNamespace(x.indexer, namespace, selector, func(m interface{}) {
 		ret = append(ret, m.(*resourcev1.ResourceClaimTemplate).DeepCopy())
@@ -8037,7 +8037,7 @@ func (x *ResourceV1ResourceClaimTemplateLister) List(namespace string, selector 
 	return ret, err
 }
 
-func (x *ResourceV1ResourceClaimTemplateLister) Get(namespace, name string) (*resourcev1.ResourceClaimTemplate, error) {
+func (x *ResourceK8sIoV1ResourceClaimTemplateLister) Get(namespace, name string) (*resourcev1.ResourceClaimTemplate, error) {
 	obj, exists, err := x.indexer.GetByKey(namespace + "/" + name)
 	if err != nil {
 		return nil, err
@@ -8048,15 +8048,15 @@ func (x *ResourceV1ResourceClaimTemplateLister) Get(namespace, name string) (*re
 	return obj.(*resourcev1.ResourceClaimTemplate).DeepCopy(), nil
 }
 
-type ResourceV1ResourceSliceLister struct {
+type ResourceK8sIoV1ResourceSliceLister struct {
 	indexer cache.Indexer
 }
 
-func NewResourceV1ResourceSliceLister(indexer cache.Indexer) *ResourceV1ResourceSliceLister {
-	return &ResourceV1ResourceSliceLister{indexer: indexer}
+func NewResourceK8sIoV1ResourceSliceLister(indexer cache.Indexer) *ResourceK8sIoV1ResourceSliceLister {
+	return &ResourceK8sIoV1ResourceSliceLister{indexer: indexer}
 }
 
-func (x *ResourceV1ResourceSliceLister) List(selector labels.Selector) ([]*resourcev1.ResourceSlice, error) {
+func (x *ResourceK8sIoV1ResourceSliceLister) List(selector labels.Selector) ([]*resourcev1.ResourceSlice, error) {
 	var ret []*resourcev1.ResourceSlice
 	err := cache.ListAll(x.indexer, selector, func(m interface{}) {
 		ret = append(ret, m.(*resourcev1.ResourceSlice).DeepCopy())
@@ -8064,7 +8064,7 @@ func (x *ResourceV1ResourceSliceLister) List(selector labels.Selector) ([]*resou
 	return ret, err
 }
 
-func (x *ResourceV1ResourceSliceLister) Get(name string) (*resourcev1.ResourceSlice, error) {
+func (x *ResourceK8sIoV1ResourceSliceLister) Get(name string) (*resourcev1.ResourceSlice, error) {
 	obj, exists, err := x.indexer.GetByKey("/" + name)
 	if err != nil {
 		return nil, err

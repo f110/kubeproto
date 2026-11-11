@@ -9,7 +9,7 @@ import (
 	"maps"
 )
 
-const GroupName = "coreos.com.monitor"
+const GroupName = "monitoring.coreos.com"
 
 var (
 	GroupVersion       = metav1.GroupVersion{Group: GroupName, Version: "v1"}

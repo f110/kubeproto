@@ -6,7 +6,7 @@ gen_protobuf(
     name = "gen",
     srcs = ["@io_k8s_api//resource/v1:resource"],
     all = True,
-    api_domain = "resource",
+    api_domain = "resource.k8s.io",
     api_version = "v1",
     importpath = "k8s.io/api/resource/v1",
     kubeproto_importpath = "go.f110.dev/kubeproto/go/apis/resourcev1",

@@ -9,7 +9,7 @@ import (
 	"maps"
 )
 
-const GroupName = "cert-manager.io."
+const GroupName = "cert-manager.io"
 
 var (
 	GroupVersion       = metav1.GroupVersion{Group: GroupName, Version: "v1"}
