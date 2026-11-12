@@ -519,10 +519,7 @@ func (r *restBackend) RESTClient() *rest.RESTClient {
 		writer.F("")
 
 		for _, m := range v {
-			group := m.Group
-			if group == "." {
-				group = ""
-			}
+			group := strings.TrimPrefix(m.Group, ".")
 			structNameWithPkg := fmt.Sprintf("%s.%s", m.Package.Alias, m.ShortName)
 			// GetXXX
 			if m.Scope == definition.ScopeTypeCluster {

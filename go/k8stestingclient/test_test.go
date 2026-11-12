@@ -198,3 +198,24 @@ func TestApplyIgnoresStatusSubresource(t *testing.T) {
 	assertion.MustNoError(t, err)
 	assertion.Equal(t, 3, d.Status.Replicas)
 }
+
+func TestDeleteAndWatchNonCoreGroup(t *testing.T) {
+	s := NewSet()
+	err := s.Tracker().Add(&appsv1.Deployment{ObjectMeta: metav1.ObjectMeta{Name: "test-1", Namespace: metav1.NamespaceDefault}})
+	assertion.MustNoError(t, err)
+
+	err = s.AppsV1.DeleteDeployment(t.Context(), metav1.NamespaceDefault, "test-1", metav1.DeleteOptions{})
+	assertion.MustNoError(t, err)
+
+	w, err := s.AppsV1.WatchDeployment(t.Context(), metav1.NamespaceDefault, metav1.ListOptions{})
+	assertion.MustNoError(t, err)
+	defer w.Stop()
+	err = s.Tracker().Add(&appsv1.Deployment{ObjectMeta: metav1.ObjectMeta{Name: "test-2", Namespace: metav1.NamespaceDefault}})
+	assertion.MustNoError(t, err)
+	select {
+	case e := <-w.ResultChan():
+		assertion.Equal(t, "test-2", e.Object.(*appsv1.Deployment).Name)
+	case <-time.After(3 * time.Second):
+		t.Fatal("timed out waiting for the watch event")
+	}
+}
