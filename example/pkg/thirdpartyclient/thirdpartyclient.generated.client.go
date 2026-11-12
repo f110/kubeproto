@@ -393,7 +393,7 @@ func (c *CertManagerIoV1) ApplyCertificate(ctx context.Context, v *certmanagerv1
 }
 
 func (c *CertManagerIoV1) DeleteCertificate(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".cert-manager.io", Version: "v1", Resource: "certificates"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "cert-manager.io", Version: "v1", Resource: "certificates"}, namespace, name, opts)
 }
 
 func (c *CertManagerIoV1) ListCertificate(ctx context.Context, namespace string, opts metav1.ListOptions) (*certmanagerv1.CertificateList, error) {
@@ -405,7 +405,7 @@ func (c *CertManagerIoV1) ListCertificate(ctx context.Context, namespace string,
 }
 
 func (c *CertManagerIoV1) WatchCertificate(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".cert-manager.io", Version: "v1", Resource: "certificates"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "cert-manager.io", Version: "v1", Resource: "certificates"}, namespace, opts)
 }
 
 func (c *CertManagerIoV1) GetCertificateRequest(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*certmanagerv1.CertificateRequest, error) {
@@ -449,7 +449,7 @@ func (c *CertManagerIoV1) ApplyCertificateRequest(ctx context.Context, v *certma
 }
 
 func (c *CertManagerIoV1) DeleteCertificateRequest(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".cert-manager.io", Version: "v1", Resource: "certificaterequests"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "cert-manager.io", Version: "v1", Resource: "certificaterequests"}, namespace, name, opts)
 }
 
 func (c *CertManagerIoV1) ListCertificateRequest(ctx context.Context, namespace string, opts metav1.ListOptions) (*certmanagerv1.CertificateRequestList, error) {
@@ -461,7 +461,7 @@ func (c *CertManagerIoV1) ListCertificateRequest(ctx context.Context, namespace 
 }
 
 func (c *CertManagerIoV1) WatchCertificateRequest(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".cert-manager.io", Version: "v1", Resource: "certificaterequests"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "cert-manager.io", Version: "v1", Resource: "certificaterequests"}, namespace, opts)
 }
 
 func (c *CertManagerIoV1) GetClusterIssuer(ctx context.Context, name string, opts metav1.GetOptions) (*certmanagerv1.ClusterIssuer, error) {
@@ -505,7 +505,7 @@ func (c *CertManagerIoV1) ApplyClusterIssuer(ctx context.Context, v *certmanager
 }
 
 func (c *CertManagerIoV1) DeleteClusterIssuer(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".cert-manager.io", Version: "v1", Resource: "clusterissuers"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "cert-manager.io", Version: "v1", Resource: "clusterissuers"}, name, opts)
 }
 
 func (c *CertManagerIoV1) ListClusterIssuer(ctx context.Context, opts metav1.ListOptions) (*certmanagerv1.ClusterIssuerList, error) {
@@ -517,7 +517,7 @@ func (c *CertManagerIoV1) ListClusterIssuer(ctx context.Context, opts metav1.Lis
 }
 
 func (c *CertManagerIoV1) WatchClusterIssuer(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".cert-manager.io", Version: "v1", Resource: "clusterissuers"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "cert-manager.io", Version: "v1", Resource: "clusterissuers"}, opts)
 }
 
 func (c *CertManagerIoV1) GetIssuer(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*certmanagerv1.Issuer, error) {
@@ -561,7 +561,7 @@ func (c *CertManagerIoV1) ApplyIssuer(ctx context.Context, v *certmanagerv1.Issu
 }
 
 func (c *CertManagerIoV1) DeleteIssuer(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".cert-manager.io", Version: "v1", Resource: "issuers"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "cert-manager.io", Version: "v1", Resource: "issuers"}, namespace, name, opts)
 }
 
 func (c *CertManagerIoV1) ListIssuer(ctx context.Context, namespace string, opts metav1.ListOptions) (*certmanagerv1.IssuerList, error) {
@@ -573,7 +573,7 @@ func (c *CertManagerIoV1) ListIssuer(ctx context.Context, namespace string, opts
 }
 
 func (c *CertManagerIoV1) WatchIssuer(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".cert-manager.io", Version: "v1", Resource: "issuers"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "cert-manager.io", Version: "v1", Resource: "issuers"}, namespace, opts)
 }
 
 type MonitoringCoreosComV1 struct {
@@ -626,7 +626,7 @@ func (c *MonitoringCoreosComV1) ApplyAlertmanager(ctx context.Context, v *monito
 }
 
 func (c *MonitoringCoreosComV1) DeleteAlertmanager(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".monitoring.coreos.com", Version: "v1", Resource: "alertmanagers"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "monitoring.coreos.com", Version: "v1", Resource: "alertmanagers"}, namespace, name, opts)
 }
 
 func (c *MonitoringCoreosComV1) ListAlertmanager(ctx context.Context, namespace string, opts metav1.ListOptions) (*monitoringv1.AlertmanagerList, error) {
@@ -638,7 +638,7 @@ func (c *MonitoringCoreosComV1) ListAlertmanager(ctx context.Context, namespace 
 }
 
 func (c *MonitoringCoreosComV1) WatchAlertmanager(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".monitoring.coreos.com", Version: "v1", Resource: "alertmanagers"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "monitoring.coreos.com", Version: "v1", Resource: "alertmanagers"}, namespace, opts)
 }
 
 func (c *MonitoringCoreosComV1) GetPodMonitor(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*monitoringv1.PodMonitor, error) {
@@ -674,7 +674,7 @@ func (c *MonitoringCoreosComV1) ApplyPodMonitor(ctx context.Context, v *monitori
 }
 
 func (c *MonitoringCoreosComV1) DeletePodMonitor(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".monitoring.coreos.com", Version: "v1", Resource: "podmonitors"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "monitoring.coreos.com", Version: "v1", Resource: "podmonitors"}, namespace, name, opts)
 }
 
 func (c *MonitoringCoreosComV1) ListPodMonitor(ctx context.Context, namespace string, opts metav1.ListOptions) (*monitoringv1.PodMonitorList, error) {
@@ -686,7 +686,7 @@ func (c *MonitoringCoreosComV1) ListPodMonitor(ctx context.Context, namespace st
 }
 
 func (c *MonitoringCoreosComV1) WatchPodMonitor(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".monitoring.coreos.com", Version: "v1", Resource: "podmonitors"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "monitoring.coreos.com", Version: "v1", Resource: "podmonitors"}, namespace, opts)
 }
 
 func (c *MonitoringCoreosComV1) GetProbe(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*monitoringv1.Probe, error) {
@@ -722,7 +722,7 @@ func (c *MonitoringCoreosComV1) ApplyProbe(ctx context.Context, v *monitoringv1.
 }
 
 func (c *MonitoringCoreosComV1) DeleteProbe(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".monitoring.coreos.com", Version: "v1", Resource: "probes"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "monitoring.coreos.com", Version: "v1", Resource: "probes"}, namespace, name, opts)
 }
 
 func (c *MonitoringCoreosComV1) ListProbe(ctx context.Context, namespace string, opts metav1.ListOptions) (*monitoringv1.ProbeList, error) {
@@ -734,7 +734,7 @@ func (c *MonitoringCoreosComV1) ListProbe(ctx context.Context, namespace string,
 }
 
 func (c *MonitoringCoreosComV1) WatchProbe(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".monitoring.coreos.com", Version: "v1", Resource: "probes"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "monitoring.coreos.com", Version: "v1", Resource: "probes"}, namespace, opts)
 }
 
 func (c *MonitoringCoreosComV1) GetPrometheus(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*monitoringv1.Prometheus, error) {
@@ -778,7 +778,7 @@ func (c *MonitoringCoreosComV1) ApplyPrometheus(ctx context.Context, v *monitori
 }
 
 func (c *MonitoringCoreosComV1) DeletePrometheus(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".monitoring.coreos.com", Version: "v1", Resource: "prometheuses"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "monitoring.coreos.com", Version: "v1", Resource: "prometheuses"}, namespace, name, opts)
 }
 
 func (c *MonitoringCoreosComV1) ListPrometheus(ctx context.Context, namespace string, opts metav1.ListOptions) (*monitoringv1.PrometheusList, error) {
@@ -790,7 +790,7 @@ func (c *MonitoringCoreosComV1) ListPrometheus(ctx context.Context, namespace st
 }
 
 func (c *MonitoringCoreosComV1) WatchPrometheus(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".monitoring.coreos.com", Version: "v1", Resource: "prometheuses"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "monitoring.coreos.com", Version: "v1", Resource: "prometheuses"}, namespace, opts)
 }
 
 func (c *MonitoringCoreosComV1) GetPrometheusRule(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*monitoringv1.PrometheusRule, error) {
@@ -826,7 +826,7 @@ func (c *MonitoringCoreosComV1) ApplyPrometheusRule(ctx context.Context, v *moni
 }
 
 func (c *MonitoringCoreosComV1) DeletePrometheusRule(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".monitoring.coreos.com", Version: "v1", Resource: "prometheusrules"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "monitoring.coreos.com", Version: "v1", Resource: "prometheusrules"}, namespace, name, opts)
 }
 
 func (c *MonitoringCoreosComV1) ListPrometheusRule(ctx context.Context, namespace string, opts metav1.ListOptions) (*monitoringv1.PrometheusRuleList, error) {
@@ -838,7 +838,7 @@ func (c *MonitoringCoreosComV1) ListPrometheusRule(ctx context.Context, namespac
 }
 
 func (c *MonitoringCoreosComV1) WatchPrometheusRule(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".monitoring.coreos.com", Version: "v1", Resource: "prometheusrules"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "monitoring.coreos.com", Version: "v1", Resource: "prometheusrules"}, namespace, opts)
 }
 
 func (c *MonitoringCoreosComV1) GetServiceMonitor(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*monitoringv1.ServiceMonitor, error) {
@@ -874,7 +874,7 @@ func (c *MonitoringCoreosComV1) ApplyServiceMonitor(ctx context.Context, v *moni
 }
 
 func (c *MonitoringCoreosComV1) DeleteServiceMonitor(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".monitoring.coreos.com", Version: "v1", Resource: "servicemonitors"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "monitoring.coreos.com", Version: "v1", Resource: "servicemonitors"}, namespace, name, opts)
 }
 
 func (c *MonitoringCoreosComV1) ListServiceMonitor(ctx context.Context, namespace string, opts metav1.ListOptions) (*monitoringv1.ServiceMonitorList, error) {
@@ -886,7 +886,7 @@ func (c *MonitoringCoreosComV1) ListServiceMonitor(ctx context.Context, namespac
 }
 
 func (c *MonitoringCoreosComV1) WatchServiceMonitor(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".monitoring.coreos.com", Version: "v1", Resource: "servicemonitors"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "monitoring.coreos.com", Version: "v1", Resource: "servicemonitors"}, namespace, opts)
 }
 
 func (c *MonitoringCoreosComV1) GetThanosRuler(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*monitoringv1.ThanosRuler, error) {
@@ -930,7 +930,7 @@ func (c *MonitoringCoreosComV1) ApplyThanosRuler(ctx context.Context, v *monitor
 }
 
 func (c *MonitoringCoreosComV1) DeleteThanosRuler(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".monitoring.coreos.com", Version: "v1", Resource: "thanosrulers"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "monitoring.coreos.com", Version: "v1", Resource: "thanosrulers"}, namespace, name, opts)
 }
 
 func (c *MonitoringCoreosComV1) ListThanosRuler(ctx context.Context, namespace string, opts metav1.ListOptions) (*monitoringv1.ThanosRulerList, error) {
@@ -942,7 +942,7 @@ func (c *MonitoringCoreosComV1) ListThanosRuler(ctx context.Context, namespace s
 }
 
 func (c *MonitoringCoreosComV1) WatchThanosRuler(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".monitoring.coreos.com", Version: "v1", Resource: "thanosrulers"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "monitoring.coreos.com", Version: "v1", Resource: "thanosrulers"}, namespace, opts)
 }
 
 type InformerCache struct {

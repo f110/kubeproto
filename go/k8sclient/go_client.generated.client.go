@@ -1618,7 +1618,7 @@ func (c *AdmissionregistrationK8sIoV1) ApplyMutatingAdmissionPolicy(ctx context.
 }
 
 func (c *AdmissionregistrationK8sIoV1) DeleteMutatingAdmissionPolicy(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".admissionregistration.k8s.io", Version: "v1", Resource: "mutatingadmissionpolicies"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "admissionregistration.k8s.io", Version: "v1", Resource: "mutatingadmissionpolicies"}, name, opts)
 }
 
 func (c *AdmissionregistrationK8sIoV1) ListMutatingAdmissionPolicy(ctx context.Context, opts metav1.ListOptions) (*admissionregistrationv1.MutatingAdmissionPolicyList, error) {
@@ -1630,7 +1630,7 @@ func (c *AdmissionregistrationK8sIoV1) ListMutatingAdmissionPolicy(ctx context.C
 }
 
 func (c *AdmissionregistrationK8sIoV1) WatchMutatingAdmissionPolicy(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".admissionregistration.k8s.io", Version: "v1", Resource: "mutatingadmissionpolicies"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "admissionregistration.k8s.io", Version: "v1", Resource: "mutatingadmissionpolicies"}, opts)
 }
 
 func (c *AdmissionregistrationK8sIoV1) GetMutatingAdmissionPolicyBinding(ctx context.Context, name string, opts metav1.GetOptions) (*admissionregistrationv1.MutatingAdmissionPolicyBinding, error) {
@@ -1666,7 +1666,7 @@ func (c *AdmissionregistrationK8sIoV1) ApplyMutatingAdmissionPolicyBinding(ctx c
 }
 
 func (c *AdmissionregistrationK8sIoV1) DeleteMutatingAdmissionPolicyBinding(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".admissionregistration.k8s.io", Version: "v1", Resource: "mutatingadmissionpolicybindings"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "admissionregistration.k8s.io", Version: "v1", Resource: "mutatingadmissionpolicybindings"}, name, opts)
 }
 
 func (c *AdmissionregistrationK8sIoV1) ListMutatingAdmissionPolicyBinding(ctx context.Context, opts metav1.ListOptions) (*admissionregistrationv1.MutatingAdmissionPolicyBindingList, error) {
@@ -1678,7 +1678,7 @@ func (c *AdmissionregistrationK8sIoV1) ListMutatingAdmissionPolicyBinding(ctx co
 }
 
 func (c *AdmissionregistrationK8sIoV1) WatchMutatingAdmissionPolicyBinding(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".admissionregistration.k8s.io", Version: "v1", Resource: "mutatingadmissionpolicybindings"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "admissionregistration.k8s.io", Version: "v1", Resource: "mutatingadmissionpolicybindings"}, opts)
 }
 
 func (c *AdmissionregistrationK8sIoV1) GetMutatingWebhookConfiguration(ctx context.Context, name string, opts metav1.GetOptions) (*admissionregistrationv1.MutatingWebhookConfiguration, error) {
@@ -1714,7 +1714,7 @@ func (c *AdmissionregistrationK8sIoV1) ApplyMutatingWebhookConfiguration(ctx con
 }
 
 func (c *AdmissionregistrationK8sIoV1) DeleteMutatingWebhookConfiguration(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".admissionregistration.k8s.io", Version: "v1", Resource: "mutatingwebhookconfigurations"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "admissionregistration.k8s.io", Version: "v1", Resource: "mutatingwebhookconfigurations"}, name, opts)
 }
 
 func (c *AdmissionregistrationK8sIoV1) ListMutatingWebhookConfiguration(ctx context.Context, opts metav1.ListOptions) (*admissionregistrationv1.MutatingWebhookConfigurationList, error) {
@@ -1726,7 +1726,7 @@ func (c *AdmissionregistrationK8sIoV1) ListMutatingWebhookConfiguration(ctx cont
 }
 
 func (c *AdmissionregistrationK8sIoV1) WatchMutatingWebhookConfiguration(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".admissionregistration.k8s.io", Version: "v1", Resource: "mutatingwebhookconfigurations"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "admissionregistration.k8s.io", Version: "v1", Resource: "mutatingwebhookconfigurations"}, opts)
 }
 
 func (c *AdmissionregistrationK8sIoV1) GetValidatingAdmissionPolicy(ctx context.Context, name string, opts metav1.GetOptions) (*admissionregistrationv1.ValidatingAdmissionPolicy, error) {
@@ -1770,7 +1770,7 @@ func (c *AdmissionregistrationK8sIoV1) ApplyValidatingAdmissionPolicy(ctx contex
 }
 
 func (c *AdmissionregistrationK8sIoV1) DeleteValidatingAdmissionPolicy(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".admissionregistration.k8s.io", Version: "v1", Resource: "validatingadmissionpolicies"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "admissionregistration.k8s.io", Version: "v1", Resource: "validatingadmissionpolicies"}, name, opts)
 }
 
 func (c *AdmissionregistrationK8sIoV1) ListValidatingAdmissionPolicy(ctx context.Context, opts metav1.ListOptions) (*admissionregistrationv1.ValidatingAdmissionPolicyList, error) {
@@ -1782,7 +1782,7 @@ func (c *AdmissionregistrationK8sIoV1) ListValidatingAdmissionPolicy(ctx context
 }
 
 func (c *AdmissionregistrationK8sIoV1) WatchValidatingAdmissionPolicy(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".admissionregistration.k8s.io", Version: "v1", Resource: "validatingadmissionpolicies"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "admissionregistration.k8s.io", Version: "v1", Resource: "validatingadmissionpolicies"}, opts)
 }
 
 func (c *AdmissionregistrationK8sIoV1) GetValidatingAdmissionPolicyBinding(ctx context.Context, name string, opts metav1.GetOptions) (*admissionregistrationv1.ValidatingAdmissionPolicyBinding, error) {
@@ -1818,7 +1818,7 @@ func (c *AdmissionregistrationK8sIoV1) ApplyValidatingAdmissionPolicyBinding(ctx
 }
 
 func (c *AdmissionregistrationK8sIoV1) DeleteValidatingAdmissionPolicyBinding(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".admissionregistration.k8s.io", Version: "v1", Resource: "validatingadmissionpolicybindings"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "admissionregistration.k8s.io", Version: "v1", Resource: "validatingadmissionpolicybindings"}, name, opts)
 }
 
 func (c *AdmissionregistrationK8sIoV1) ListValidatingAdmissionPolicyBinding(ctx context.Context, opts metav1.ListOptions) (*admissionregistrationv1.ValidatingAdmissionPolicyBindingList, error) {
@@ -1830,7 +1830,7 @@ func (c *AdmissionregistrationK8sIoV1) ListValidatingAdmissionPolicyBinding(ctx 
 }
 
 func (c *AdmissionregistrationK8sIoV1) WatchValidatingAdmissionPolicyBinding(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".admissionregistration.k8s.io", Version: "v1", Resource: "validatingadmissionpolicybindings"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "admissionregistration.k8s.io", Version: "v1", Resource: "validatingadmissionpolicybindings"}, opts)
 }
 
 func (c *AdmissionregistrationK8sIoV1) GetValidatingWebhookConfiguration(ctx context.Context, name string, opts metav1.GetOptions) (*admissionregistrationv1.ValidatingWebhookConfiguration, error) {
@@ -1866,7 +1866,7 @@ func (c *AdmissionregistrationK8sIoV1) ApplyValidatingWebhookConfiguration(ctx c
 }
 
 func (c *AdmissionregistrationK8sIoV1) DeleteValidatingWebhookConfiguration(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".admissionregistration.k8s.io", Version: "v1", Resource: "validatingwebhookconfigurations"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "admissionregistration.k8s.io", Version: "v1", Resource: "validatingwebhookconfigurations"}, name, opts)
 }
 
 func (c *AdmissionregistrationK8sIoV1) ListValidatingWebhookConfiguration(ctx context.Context, opts metav1.ListOptions) (*admissionregistrationv1.ValidatingWebhookConfigurationList, error) {
@@ -1878,7 +1878,7 @@ func (c *AdmissionregistrationK8sIoV1) ListValidatingWebhookConfiguration(ctx co
 }
 
 func (c *AdmissionregistrationK8sIoV1) WatchValidatingWebhookConfiguration(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".admissionregistration.k8s.io", Version: "v1", Resource: "validatingwebhookconfigurations"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "admissionregistration.k8s.io", Version: "v1", Resource: "validatingwebhookconfigurations"}, opts)
 }
 
 type AppsV1 struct {
@@ -1923,7 +1923,7 @@ func (c *AppsV1) ApplyControllerRevision(ctx context.Context, v *appsv1.Controll
 }
 
 func (c *AppsV1) DeleteControllerRevision(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".apps", Version: "v1", Resource: "controllerrevisions"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "controllerrevisions"}, namespace, name, opts)
 }
 
 func (c *AppsV1) ListControllerRevision(ctx context.Context, namespace string, opts metav1.ListOptions) (*appsv1.ControllerRevisionList, error) {
@@ -1935,7 +1935,7 @@ func (c *AppsV1) ListControllerRevision(ctx context.Context, namespace string, o
 }
 
 func (c *AppsV1) WatchControllerRevision(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".apps", Version: "v1", Resource: "controllerrevisions"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "controllerrevisions"}, namespace, opts)
 }
 
 func (c *AppsV1) GetDaemonSet(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*appsv1.DaemonSet, error) {
@@ -1979,7 +1979,7 @@ func (c *AppsV1) ApplyDaemonSet(ctx context.Context, v *appsv1.DaemonSet, opts m
 }
 
 func (c *AppsV1) DeleteDaemonSet(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".apps", Version: "v1", Resource: "daemonsets"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "daemonsets"}, namespace, name, opts)
 }
 
 func (c *AppsV1) ListDaemonSet(ctx context.Context, namespace string, opts metav1.ListOptions) (*appsv1.DaemonSetList, error) {
@@ -1991,7 +1991,7 @@ func (c *AppsV1) ListDaemonSet(ctx context.Context, namespace string, opts metav
 }
 
 func (c *AppsV1) WatchDaemonSet(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".apps", Version: "v1", Resource: "daemonsets"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "daemonsets"}, namespace, opts)
 }
 
 func (c *AppsV1) GetDeployment(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*appsv1.Deployment, error) {
@@ -2035,7 +2035,7 @@ func (c *AppsV1) ApplyDeployment(ctx context.Context, v *appsv1.Deployment, opts
 }
 
 func (c *AppsV1) DeleteDeployment(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".apps", Version: "v1", Resource: "deployments"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}, namespace, name, opts)
 }
 
 func (c *AppsV1) ListDeployment(ctx context.Context, namespace string, opts metav1.ListOptions) (*appsv1.DeploymentList, error) {
@@ -2047,7 +2047,7 @@ func (c *AppsV1) ListDeployment(ctx context.Context, namespace string, opts meta
 }
 
 func (c *AppsV1) WatchDeployment(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".apps", Version: "v1", Resource: "deployments"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}, namespace, opts)
 }
 
 func (c *AppsV1) GetReplicaSet(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*appsv1.ReplicaSet, error) {
@@ -2091,7 +2091,7 @@ func (c *AppsV1) ApplyReplicaSet(ctx context.Context, v *appsv1.ReplicaSet, opts
 }
 
 func (c *AppsV1) DeleteReplicaSet(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".apps", Version: "v1", Resource: "replicasets"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "replicasets"}, namespace, name, opts)
 }
 
 func (c *AppsV1) ListReplicaSet(ctx context.Context, namespace string, opts metav1.ListOptions) (*appsv1.ReplicaSetList, error) {
@@ -2103,7 +2103,7 @@ func (c *AppsV1) ListReplicaSet(ctx context.Context, namespace string, opts meta
 }
 
 func (c *AppsV1) WatchReplicaSet(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".apps", Version: "v1", Resource: "replicasets"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "replicasets"}, namespace, opts)
 }
 
 func (c *AppsV1) GetStatefulSet(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*appsv1.StatefulSet, error) {
@@ -2147,7 +2147,7 @@ func (c *AppsV1) ApplyStatefulSet(ctx context.Context, v *appsv1.StatefulSet, op
 }
 
 func (c *AppsV1) DeleteStatefulSet(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".apps", Version: "v1", Resource: "statefulsets"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "statefulsets"}, namespace, name, opts)
 }
 
 func (c *AppsV1) ListStatefulSet(ctx context.Context, namespace string, opts metav1.ListOptions) (*appsv1.StatefulSetList, error) {
@@ -2159,7 +2159,7 @@ func (c *AppsV1) ListStatefulSet(ctx context.Context, namespace string, opts met
 }
 
 func (c *AppsV1) WatchStatefulSet(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".apps", Version: "v1", Resource: "statefulsets"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "statefulsets"}, namespace, opts)
 }
 
 type AuthenticationK8sIoV1 struct {
@@ -2212,7 +2212,7 @@ func (c *AuthenticationK8sIoV1) ApplySelfSubjectReview(ctx context.Context, v *a
 }
 
 func (c *AuthenticationK8sIoV1) DeleteSelfSubjectReview(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".authentication.k8s.io", Version: "v1", Resource: "selfsubjectreviews"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "authentication.k8s.io", Version: "v1", Resource: "selfsubjectreviews"}, name, opts)
 }
 
 func (c *AuthenticationK8sIoV1) ListSelfSubjectReview(ctx context.Context, opts metav1.ListOptions) (*authenticationv1.SelfSubjectReviewList, error) {
@@ -2224,7 +2224,7 @@ func (c *AuthenticationK8sIoV1) ListSelfSubjectReview(ctx context.Context, opts 
 }
 
 func (c *AuthenticationK8sIoV1) WatchSelfSubjectReview(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".authentication.k8s.io", Version: "v1", Resource: "selfsubjectreviews"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "authentication.k8s.io", Version: "v1", Resource: "selfsubjectreviews"}, opts)
 }
 
 func (c *AuthenticationK8sIoV1) GetTokenRequest(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*authenticationv1.TokenRequest, error) {
@@ -2268,7 +2268,7 @@ func (c *AuthenticationK8sIoV1) ApplyTokenRequest(ctx context.Context, v *authen
 }
 
 func (c *AuthenticationK8sIoV1) DeleteTokenRequest(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".authentication.k8s.io", Version: "v1", Resource: "tokenrequests"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "authentication.k8s.io", Version: "v1", Resource: "tokenrequests"}, namespace, name, opts)
 }
 
 func (c *AuthenticationK8sIoV1) ListTokenRequest(ctx context.Context, namespace string, opts metav1.ListOptions) (*authenticationv1.TokenRequestList, error) {
@@ -2280,7 +2280,7 @@ func (c *AuthenticationK8sIoV1) ListTokenRequest(ctx context.Context, namespace 
 }
 
 func (c *AuthenticationK8sIoV1) WatchTokenRequest(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".authentication.k8s.io", Version: "v1", Resource: "tokenrequests"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "authentication.k8s.io", Version: "v1", Resource: "tokenrequests"}, namespace, opts)
 }
 
 func (c *AuthenticationK8sIoV1) GetTokenReview(ctx context.Context, name string, opts metav1.GetOptions) (*authenticationv1.TokenReview, error) {
@@ -2324,7 +2324,7 @@ func (c *AuthenticationK8sIoV1) ApplyTokenReview(ctx context.Context, v *authent
 }
 
 func (c *AuthenticationK8sIoV1) DeleteTokenReview(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".authentication.k8s.io", Version: "v1", Resource: "tokenreviews"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "authentication.k8s.io", Version: "v1", Resource: "tokenreviews"}, name, opts)
 }
 
 func (c *AuthenticationK8sIoV1) ListTokenReview(ctx context.Context, opts metav1.ListOptions) (*authenticationv1.TokenReviewList, error) {
@@ -2336,7 +2336,7 @@ func (c *AuthenticationK8sIoV1) ListTokenReview(ctx context.Context, opts metav1
 }
 
 func (c *AuthenticationK8sIoV1) WatchTokenReview(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".authentication.k8s.io", Version: "v1", Resource: "tokenreviews"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "authentication.k8s.io", Version: "v1", Resource: "tokenreviews"}, opts)
 }
 
 type AuthorizationK8sIoV1 struct {
@@ -2389,7 +2389,7 @@ func (c *AuthorizationK8sIoV1) ApplyLocalSubjectAccessReview(ctx context.Context
 }
 
 func (c *AuthorizationK8sIoV1) DeleteLocalSubjectAccessReview(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".authorization.k8s.io", Version: "v1", Resource: "localsubjectaccessreviews"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "authorization.k8s.io", Version: "v1", Resource: "localsubjectaccessreviews"}, namespace, name, opts)
 }
 
 func (c *AuthorizationK8sIoV1) ListLocalSubjectAccessReview(ctx context.Context, namespace string, opts metav1.ListOptions) (*authorizationv1.LocalSubjectAccessReviewList, error) {
@@ -2401,7 +2401,7 @@ func (c *AuthorizationK8sIoV1) ListLocalSubjectAccessReview(ctx context.Context,
 }
 
 func (c *AuthorizationK8sIoV1) WatchLocalSubjectAccessReview(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".authorization.k8s.io", Version: "v1", Resource: "localsubjectaccessreviews"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "authorization.k8s.io", Version: "v1", Resource: "localsubjectaccessreviews"}, namespace, opts)
 }
 
 func (c *AuthorizationK8sIoV1) GetSelfSubjectAccessReview(ctx context.Context, name string, opts metav1.GetOptions) (*authorizationv1.SelfSubjectAccessReview, error) {
@@ -2445,7 +2445,7 @@ func (c *AuthorizationK8sIoV1) ApplySelfSubjectAccessReview(ctx context.Context,
 }
 
 func (c *AuthorizationK8sIoV1) DeleteSelfSubjectAccessReview(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".authorization.k8s.io", Version: "v1", Resource: "selfsubjectaccessreviews"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "authorization.k8s.io", Version: "v1", Resource: "selfsubjectaccessreviews"}, name, opts)
 }
 
 func (c *AuthorizationK8sIoV1) ListSelfSubjectAccessReview(ctx context.Context, opts metav1.ListOptions) (*authorizationv1.SelfSubjectAccessReviewList, error) {
@@ -2457,7 +2457,7 @@ func (c *AuthorizationK8sIoV1) ListSelfSubjectAccessReview(ctx context.Context, 
 }
 
 func (c *AuthorizationK8sIoV1) WatchSelfSubjectAccessReview(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".authorization.k8s.io", Version: "v1", Resource: "selfsubjectaccessreviews"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "authorization.k8s.io", Version: "v1", Resource: "selfsubjectaccessreviews"}, opts)
 }
 
 func (c *AuthorizationK8sIoV1) GetSelfSubjectRulesReview(ctx context.Context, name string, opts metav1.GetOptions) (*authorizationv1.SelfSubjectRulesReview, error) {
@@ -2501,7 +2501,7 @@ func (c *AuthorizationK8sIoV1) ApplySelfSubjectRulesReview(ctx context.Context, 
 }
 
 func (c *AuthorizationK8sIoV1) DeleteSelfSubjectRulesReview(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".authorization.k8s.io", Version: "v1", Resource: "selfsubjectrulesreviews"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "authorization.k8s.io", Version: "v1", Resource: "selfsubjectrulesreviews"}, name, opts)
 }
 
 func (c *AuthorizationK8sIoV1) ListSelfSubjectRulesReview(ctx context.Context, opts metav1.ListOptions) (*authorizationv1.SelfSubjectRulesReviewList, error) {
@@ -2513,7 +2513,7 @@ func (c *AuthorizationK8sIoV1) ListSelfSubjectRulesReview(ctx context.Context, o
 }
 
 func (c *AuthorizationK8sIoV1) WatchSelfSubjectRulesReview(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".authorization.k8s.io", Version: "v1", Resource: "selfsubjectrulesreviews"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "authorization.k8s.io", Version: "v1", Resource: "selfsubjectrulesreviews"}, opts)
 }
 
 func (c *AuthorizationK8sIoV1) GetSubjectAccessReview(ctx context.Context, name string, opts metav1.GetOptions) (*authorizationv1.SubjectAccessReview, error) {
@@ -2557,7 +2557,7 @@ func (c *AuthorizationK8sIoV1) ApplySubjectAccessReview(ctx context.Context, v *
 }
 
 func (c *AuthorizationK8sIoV1) DeleteSubjectAccessReview(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".authorization.k8s.io", Version: "v1", Resource: "subjectaccessreviews"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "authorization.k8s.io", Version: "v1", Resource: "subjectaccessreviews"}, name, opts)
 }
 
 func (c *AuthorizationK8sIoV1) ListSubjectAccessReview(ctx context.Context, opts metav1.ListOptions) (*authorizationv1.SubjectAccessReviewList, error) {
@@ -2569,7 +2569,7 @@ func (c *AuthorizationK8sIoV1) ListSubjectAccessReview(ctx context.Context, opts
 }
 
 func (c *AuthorizationK8sIoV1) WatchSubjectAccessReview(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".authorization.k8s.io", Version: "v1", Resource: "subjectaccessreviews"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "authorization.k8s.io", Version: "v1", Resource: "subjectaccessreviews"}, opts)
 }
 
 type AutoscalingV1 struct {
@@ -2622,7 +2622,7 @@ func (c *AutoscalingV1) ApplyHorizontalPodAutoscaler(ctx context.Context, v *aut
 }
 
 func (c *AutoscalingV1) DeleteHorizontalPodAutoscaler(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".autoscaling", Version: "v1", Resource: "horizontalpodautoscalers"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "autoscaling", Version: "v1", Resource: "horizontalpodautoscalers"}, namespace, name, opts)
 }
 
 func (c *AutoscalingV1) ListHorizontalPodAutoscaler(ctx context.Context, namespace string, opts metav1.ListOptions) (*autoscalingv1.HorizontalPodAutoscalerList, error) {
@@ -2634,7 +2634,7 @@ func (c *AutoscalingV1) ListHorizontalPodAutoscaler(ctx context.Context, namespa
 }
 
 func (c *AutoscalingV1) WatchHorizontalPodAutoscaler(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".autoscaling", Version: "v1", Resource: "horizontalpodautoscalers"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "autoscaling", Version: "v1", Resource: "horizontalpodautoscalers"}, namespace, opts)
 }
 
 func (c *AutoscalingV1) GetScale(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*autoscalingv1.Scale, error) {
@@ -2678,7 +2678,7 @@ func (c *AutoscalingV1) ApplyScale(ctx context.Context, v *autoscalingv1.Scale, 
 }
 
 func (c *AutoscalingV1) DeleteScale(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".autoscaling", Version: "v1", Resource: "scales"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "autoscaling", Version: "v1", Resource: "scales"}, namespace, name, opts)
 }
 
 func (c *AutoscalingV1) ListScale(ctx context.Context, namespace string, opts metav1.ListOptions) (*autoscalingv1.ScaleList, error) {
@@ -2690,7 +2690,7 @@ func (c *AutoscalingV1) ListScale(ctx context.Context, namespace string, opts me
 }
 
 func (c *AutoscalingV1) WatchScale(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".autoscaling", Version: "v1", Resource: "scales"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "autoscaling", Version: "v1", Resource: "scales"}, namespace, opts)
 }
 
 type AutoscalingV2 struct {
@@ -2743,7 +2743,7 @@ func (c *AutoscalingV2) ApplyHorizontalPodAutoscaler(ctx context.Context, v *aut
 }
 
 func (c *AutoscalingV2) DeleteHorizontalPodAutoscaler(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".autoscaling", Version: "v2", Resource: "horizontalpodautoscalers"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "autoscaling", Version: "v2", Resource: "horizontalpodautoscalers"}, namespace, name, opts)
 }
 
 func (c *AutoscalingV2) ListHorizontalPodAutoscaler(ctx context.Context, namespace string, opts metav1.ListOptions) (*autoscalingv2.HorizontalPodAutoscalerList, error) {
@@ -2755,7 +2755,7 @@ func (c *AutoscalingV2) ListHorizontalPodAutoscaler(ctx context.Context, namespa
 }
 
 func (c *AutoscalingV2) WatchHorizontalPodAutoscaler(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".autoscaling", Version: "v2", Resource: "horizontalpodautoscalers"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "autoscaling", Version: "v2", Resource: "horizontalpodautoscalers"}, namespace, opts)
 }
 
 type BatchV1 struct {
@@ -2808,7 +2808,7 @@ func (c *BatchV1) ApplyCronJob(ctx context.Context, v *batchv1.CronJob, opts met
 }
 
 func (c *BatchV1) DeleteCronJob(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".batch", Version: "v1", Resource: "cronjobs"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "batch", Version: "v1", Resource: "cronjobs"}, namespace, name, opts)
 }
 
 func (c *BatchV1) ListCronJob(ctx context.Context, namespace string, opts metav1.ListOptions) (*batchv1.CronJobList, error) {
@@ -2820,7 +2820,7 @@ func (c *BatchV1) ListCronJob(ctx context.Context, namespace string, opts metav1
 }
 
 func (c *BatchV1) WatchCronJob(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".batch", Version: "v1", Resource: "cronjobs"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "batch", Version: "v1", Resource: "cronjobs"}, namespace, opts)
 }
 
 func (c *BatchV1) GetJob(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*batchv1.Job, error) {
@@ -2864,7 +2864,7 @@ func (c *BatchV1) ApplyJob(ctx context.Context, v *batchv1.Job, opts metav1.Appl
 }
 
 func (c *BatchV1) DeleteJob(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".batch", Version: "v1", Resource: "jobs"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "batch", Version: "v1", Resource: "jobs"}, namespace, name, opts)
 }
 
 func (c *BatchV1) ListJob(ctx context.Context, namespace string, opts metav1.ListOptions) (*batchv1.JobList, error) {
@@ -2876,7 +2876,7 @@ func (c *BatchV1) ListJob(ctx context.Context, namespace string, opts metav1.Lis
 }
 
 func (c *BatchV1) WatchJob(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".batch", Version: "v1", Resource: "jobs"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "batch", Version: "v1", Resource: "jobs"}, namespace, opts)
 }
 
 type CertificatesK8sIoV1 struct {
@@ -2929,7 +2929,7 @@ func (c *CertificatesK8sIoV1) ApplyCertificateSigningRequest(ctx context.Context
 }
 
 func (c *CertificatesK8sIoV1) DeleteCertificateSigningRequest(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".certificates.k8s.io", Version: "v1", Resource: "certificatesigningrequests"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "certificates.k8s.io", Version: "v1", Resource: "certificatesigningrequests"}, name, opts)
 }
 
 func (c *CertificatesK8sIoV1) ListCertificateSigningRequest(ctx context.Context, opts metav1.ListOptions) (*certificatesv1.CertificateSigningRequestList, error) {
@@ -2941,7 +2941,7 @@ func (c *CertificatesK8sIoV1) ListCertificateSigningRequest(ctx context.Context,
 }
 
 func (c *CertificatesK8sIoV1) WatchCertificateSigningRequest(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".certificates.k8s.io", Version: "v1", Resource: "certificatesigningrequests"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "certificates.k8s.io", Version: "v1", Resource: "certificatesigningrequests"}, opts)
 }
 
 type CoordinationK8sIoV1 struct {
@@ -2986,7 +2986,7 @@ func (c *CoordinationK8sIoV1) ApplyLease(ctx context.Context, v *coordinationv1.
 }
 
 func (c *CoordinationK8sIoV1) DeleteLease(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".coordination.k8s.io", Version: "v1", Resource: "leases"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "coordination.k8s.io", Version: "v1", Resource: "leases"}, namespace, name, opts)
 }
 
 func (c *CoordinationK8sIoV1) ListLease(ctx context.Context, namespace string, opts metav1.ListOptions) (*coordinationv1.LeaseList, error) {
@@ -2998,7 +2998,7 @@ func (c *CoordinationK8sIoV1) ListLease(ctx context.Context, namespace string, o
 }
 
 func (c *CoordinationK8sIoV1) WatchLease(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".coordination.k8s.io", Version: "v1", Resource: "leases"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "coordination.k8s.io", Version: "v1", Resource: "leases"}, namespace, opts)
 }
 
 type DiscoveryK8sIoV1 struct {
@@ -3043,7 +3043,7 @@ func (c *DiscoveryK8sIoV1) ApplyEndpointSlice(ctx context.Context, v *discoveryv
 }
 
 func (c *DiscoveryK8sIoV1) DeleteEndpointSlice(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".discovery.k8s.io", Version: "v1", Resource: "endpointslices"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "discovery.k8s.io", Version: "v1", Resource: "endpointslices"}, namespace, name, opts)
 }
 
 func (c *DiscoveryK8sIoV1) ListEndpointSlice(ctx context.Context, namespace string, opts metav1.ListOptions) (*discoveryv1.EndpointSliceList, error) {
@@ -3055,7 +3055,7 @@ func (c *DiscoveryK8sIoV1) ListEndpointSlice(ctx context.Context, namespace stri
 }
 
 func (c *DiscoveryK8sIoV1) WatchEndpointSlice(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".discovery.k8s.io", Version: "v1", Resource: "endpointslices"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "discovery.k8s.io", Version: "v1", Resource: "endpointslices"}, namespace, opts)
 }
 
 type EventsK8sIoV1 struct {
@@ -3100,7 +3100,7 @@ func (c *EventsK8sIoV1) ApplyEvent(ctx context.Context, v *eventsv1.Event, opts 
 }
 
 func (c *EventsK8sIoV1) DeleteEvent(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".events.k8s.io", Version: "v1", Resource: "events"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "events.k8s.io", Version: "v1", Resource: "events"}, namespace, name, opts)
 }
 
 func (c *EventsK8sIoV1) ListEvent(ctx context.Context, namespace string, opts metav1.ListOptions) (*eventsv1.EventList, error) {
@@ -3112,7 +3112,7 @@ func (c *EventsK8sIoV1) ListEvent(ctx context.Context, namespace string, opts me
 }
 
 func (c *EventsK8sIoV1) WatchEvent(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".events.k8s.io", Version: "v1", Resource: "events"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "events.k8s.io", Version: "v1", Resource: "events"}, namespace, opts)
 }
 
 type NetworkingK8sIoV1 struct {
@@ -3157,7 +3157,7 @@ func (c *NetworkingK8sIoV1) ApplyIPAddress(ctx context.Context, v *networkingv1.
 }
 
 func (c *NetworkingK8sIoV1) DeleteIPAddress(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".networking.k8s.io", Version: "v1", Resource: "ipaddresses"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "networking.k8s.io", Version: "v1", Resource: "ipaddresses"}, name, opts)
 }
 
 func (c *NetworkingK8sIoV1) ListIPAddress(ctx context.Context, opts metav1.ListOptions) (*networkingv1.IPAddressList, error) {
@@ -3169,7 +3169,7 @@ func (c *NetworkingK8sIoV1) ListIPAddress(ctx context.Context, opts metav1.ListO
 }
 
 func (c *NetworkingK8sIoV1) WatchIPAddress(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".networking.k8s.io", Version: "v1", Resource: "ipaddresses"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "networking.k8s.io", Version: "v1", Resource: "ipaddresses"}, opts)
 }
 
 func (c *NetworkingK8sIoV1) GetIngress(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*networkingv1.Ingress, error) {
@@ -3213,7 +3213,7 @@ func (c *NetworkingK8sIoV1) ApplyIngress(ctx context.Context, v *networkingv1.In
 }
 
 func (c *NetworkingK8sIoV1) DeleteIngress(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".networking.k8s.io", Version: "v1", Resource: "ingresses"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "networking.k8s.io", Version: "v1", Resource: "ingresses"}, namespace, name, opts)
 }
 
 func (c *NetworkingK8sIoV1) ListIngress(ctx context.Context, namespace string, opts metav1.ListOptions) (*networkingv1.IngressList, error) {
@@ -3225,7 +3225,7 @@ func (c *NetworkingK8sIoV1) ListIngress(ctx context.Context, namespace string, o
 }
 
 func (c *NetworkingK8sIoV1) WatchIngress(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".networking.k8s.io", Version: "v1", Resource: "ingresses"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "networking.k8s.io", Version: "v1", Resource: "ingresses"}, namespace, opts)
 }
 
 func (c *NetworkingK8sIoV1) GetIngressClass(ctx context.Context, name string, opts metav1.GetOptions) (*networkingv1.IngressClass, error) {
@@ -3261,7 +3261,7 @@ func (c *NetworkingK8sIoV1) ApplyIngressClass(ctx context.Context, v *networking
 }
 
 func (c *NetworkingK8sIoV1) DeleteIngressClass(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".networking.k8s.io", Version: "v1", Resource: "ingressclasses"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "networking.k8s.io", Version: "v1", Resource: "ingressclasses"}, name, opts)
 }
 
 func (c *NetworkingK8sIoV1) ListIngressClass(ctx context.Context, opts metav1.ListOptions) (*networkingv1.IngressClassList, error) {
@@ -3273,7 +3273,7 @@ func (c *NetworkingK8sIoV1) ListIngressClass(ctx context.Context, opts metav1.Li
 }
 
 func (c *NetworkingK8sIoV1) WatchIngressClass(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".networking.k8s.io", Version: "v1", Resource: "ingressclasses"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "networking.k8s.io", Version: "v1", Resource: "ingressclasses"}, opts)
 }
 
 func (c *NetworkingK8sIoV1) GetNetworkPolicy(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*networkingv1.NetworkPolicy, error) {
@@ -3309,7 +3309,7 @@ func (c *NetworkingK8sIoV1) ApplyNetworkPolicy(ctx context.Context, v *networkin
 }
 
 func (c *NetworkingK8sIoV1) DeleteNetworkPolicy(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".networking.k8s.io", Version: "v1", Resource: "networkpolicies"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "networking.k8s.io", Version: "v1", Resource: "networkpolicies"}, namespace, name, opts)
 }
 
 func (c *NetworkingK8sIoV1) ListNetworkPolicy(ctx context.Context, namespace string, opts metav1.ListOptions) (*networkingv1.NetworkPolicyList, error) {
@@ -3321,7 +3321,7 @@ func (c *NetworkingK8sIoV1) ListNetworkPolicy(ctx context.Context, namespace str
 }
 
 func (c *NetworkingK8sIoV1) WatchNetworkPolicy(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".networking.k8s.io", Version: "v1", Resource: "networkpolicies"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "networking.k8s.io", Version: "v1", Resource: "networkpolicies"}, namespace, opts)
 }
 
 func (c *NetworkingK8sIoV1) GetServiceCIDR(ctx context.Context, name string, opts metav1.GetOptions) (*networkingv1.ServiceCIDR, error) {
@@ -3365,7 +3365,7 @@ func (c *NetworkingK8sIoV1) ApplyServiceCIDR(ctx context.Context, v *networkingv
 }
 
 func (c *NetworkingK8sIoV1) DeleteServiceCIDR(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".networking.k8s.io", Version: "v1", Resource: "servicecidrs"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "networking.k8s.io", Version: "v1", Resource: "servicecidrs"}, name, opts)
 }
 
 func (c *NetworkingK8sIoV1) ListServiceCIDR(ctx context.Context, opts metav1.ListOptions) (*networkingv1.ServiceCIDRList, error) {
@@ -3377,7 +3377,7 @@ func (c *NetworkingK8sIoV1) ListServiceCIDR(ctx context.Context, opts metav1.Lis
 }
 
 func (c *NetworkingK8sIoV1) WatchServiceCIDR(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".networking.k8s.io", Version: "v1", Resource: "servicecidrs"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "networking.k8s.io", Version: "v1", Resource: "servicecidrs"}, opts)
 }
 
 type PolicyV1 struct {
@@ -3422,7 +3422,7 @@ func (c *PolicyV1) ApplyEviction(ctx context.Context, v *policyv1.Eviction, opts
 }
 
 func (c *PolicyV1) DeleteEviction(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".policy", Version: "v1", Resource: "evictions"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "policy", Version: "v1", Resource: "evictions"}, namespace, name, opts)
 }
 
 func (c *PolicyV1) ListEviction(ctx context.Context, namespace string, opts metav1.ListOptions) (*policyv1.EvictionList, error) {
@@ -3434,7 +3434,7 @@ func (c *PolicyV1) ListEviction(ctx context.Context, namespace string, opts meta
 }
 
 func (c *PolicyV1) WatchEviction(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".policy", Version: "v1", Resource: "evictions"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "policy", Version: "v1", Resource: "evictions"}, namespace, opts)
 }
 
 func (c *PolicyV1) GetPodDisruptionBudget(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*policyv1.PodDisruptionBudget, error) {
@@ -3478,7 +3478,7 @@ func (c *PolicyV1) ApplyPodDisruptionBudget(ctx context.Context, v *policyv1.Pod
 }
 
 func (c *PolicyV1) DeletePodDisruptionBudget(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".policy", Version: "v1", Resource: "poddisruptionbudgets"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "policy", Version: "v1", Resource: "poddisruptionbudgets"}, namespace, name, opts)
 }
 
 func (c *PolicyV1) ListPodDisruptionBudget(ctx context.Context, namespace string, opts metav1.ListOptions) (*policyv1.PodDisruptionBudgetList, error) {
@@ -3490,7 +3490,7 @@ func (c *PolicyV1) ListPodDisruptionBudget(ctx context.Context, namespace string
 }
 
 func (c *PolicyV1) WatchPodDisruptionBudget(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".policy", Version: "v1", Resource: "poddisruptionbudgets"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "policy", Version: "v1", Resource: "poddisruptionbudgets"}, namespace, opts)
 }
 
 type RbacAuthorizationK8sIoV1 struct {
@@ -3535,7 +3535,7 @@ func (c *RbacAuthorizationK8sIoV1) ApplyClusterRole(ctx context.Context, v *rbac
 }
 
 func (c *RbacAuthorizationK8sIoV1) DeleteClusterRole(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".rbac.authorization.k8s.io", Version: "v1", Resource: "clusterroles"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "rbac.authorization.k8s.io", Version: "v1", Resource: "clusterroles"}, name, opts)
 }
 
 func (c *RbacAuthorizationK8sIoV1) ListClusterRole(ctx context.Context, opts metav1.ListOptions) (*rbacv1.ClusterRoleList, error) {
@@ -3547,7 +3547,7 @@ func (c *RbacAuthorizationK8sIoV1) ListClusterRole(ctx context.Context, opts met
 }
 
 func (c *RbacAuthorizationK8sIoV1) WatchClusterRole(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".rbac.authorization.k8s.io", Version: "v1", Resource: "clusterroles"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "rbac.authorization.k8s.io", Version: "v1", Resource: "clusterroles"}, opts)
 }
 
 func (c *RbacAuthorizationK8sIoV1) GetClusterRoleBinding(ctx context.Context, name string, opts metav1.GetOptions) (*rbacv1.ClusterRoleBinding, error) {
@@ -3583,7 +3583,7 @@ func (c *RbacAuthorizationK8sIoV1) ApplyClusterRoleBinding(ctx context.Context, 
 }
 
 func (c *RbacAuthorizationK8sIoV1) DeleteClusterRoleBinding(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".rbac.authorization.k8s.io", Version: "v1", Resource: "clusterrolebindings"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "rbac.authorization.k8s.io", Version: "v1", Resource: "clusterrolebindings"}, name, opts)
 }
 
 func (c *RbacAuthorizationK8sIoV1) ListClusterRoleBinding(ctx context.Context, opts metav1.ListOptions) (*rbacv1.ClusterRoleBindingList, error) {
@@ -3595,7 +3595,7 @@ func (c *RbacAuthorizationK8sIoV1) ListClusterRoleBinding(ctx context.Context, o
 }
 
 func (c *RbacAuthorizationK8sIoV1) WatchClusterRoleBinding(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".rbac.authorization.k8s.io", Version: "v1", Resource: "clusterrolebindings"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "rbac.authorization.k8s.io", Version: "v1", Resource: "clusterrolebindings"}, opts)
 }
 
 func (c *RbacAuthorizationK8sIoV1) GetRole(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*rbacv1.Role, error) {
@@ -3631,7 +3631,7 @@ func (c *RbacAuthorizationK8sIoV1) ApplyRole(ctx context.Context, v *rbacv1.Role
 }
 
 func (c *RbacAuthorizationK8sIoV1) DeleteRole(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".rbac.authorization.k8s.io", Version: "v1", Resource: "roles"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "rbac.authorization.k8s.io", Version: "v1", Resource: "roles"}, namespace, name, opts)
 }
 
 func (c *RbacAuthorizationK8sIoV1) ListRole(ctx context.Context, namespace string, opts metav1.ListOptions) (*rbacv1.RoleList, error) {
@@ -3643,7 +3643,7 @@ func (c *RbacAuthorizationK8sIoV1) ListRole(ctx context.Context, namespace strin
 }
 
 func (c *RbacAuthorizationK8sIoV1) WatchRole(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".rbac.authorization.k8s.io", Version: "v1", Resource: "roles"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "rbac.authorization.k8s.io", Version: "v1", Resource: "roles"}, namespace, opts)
 }
 
 func (c *RbacAuthorizationK8sIoV1) GetRoleBinding(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*rbacv1.RoleBinding, error) {
@@ -3679,7 +3679,7 @@ func (c *RbacAuthorizationK8sIoV1) ApplyRoleBinding(ctx context.Context, v *rbac
 }
 
 func (c *RbacAuthorizationK8sIoV1) DeleteRoleBinding(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".rbac.authorization.k8s.io", Version: "v1", Resource: "rolebindings"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "rbac.authorization.k8s.io", Version: "v1", Resource: "rolebindings"}, namespace, name, opts)
 }
 
 func (c *RbacAuthorizationK8sIoV1) ListRoleBinding(ctx context.Context, namespace string, opts metav1.ListOptions) (*rbacv1.RoleBindingList, error) {
@@ -3691,7 +3691,7 @@ func (c *RbacAuthorizationK8sIoV1) ListRoleBinding(ctx context.Context, namespac
 }
 
 func (c *RbacAuthorizationK8sIoV1) WatchRoleBinding(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".rbac.authorization.k8s.io", Version: "v1", Resource: "rolebindings"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "rbac.authorization.k8s.io", Version: "v1", Resource: "rolebindings"}, namespace, opts)
 }
 
 type ResourceK8sIoV1 struct {
@@ -3736,7 +3736,7 @@ func (c *ResourceK8sIoV1) ApplyDeviceClass(ctx context.Context, v *resourcev1.De
 }
 
 func (c *ResourceK8sIoV1) DeleteDeviceClass(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".resource.k8s.io", Version: "v1", Resource: "deviceclasses"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "resource.k8s.io", Version: "v1", Resource: "deviceclasses"}, name, opts)
 }
 
 func (c *ResourceK8sIoV1) ListDeviceClass(ctx context.Context, opts metav1.ListOptions) (*resourcev1.DeviceClassList, error) {
@@ -3748,7 +3748,7 @@ func (c *ResourceK8sIoV1) ListDeviceClass(ctx context.Context, opts metav1.ListO
 }
 
 func (c *ResourceK8sIoV1) WatchDeviceClass(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".resource.k8s.io", Version: "v1", Resource: "deviceclasses"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "resource.k8s.io", Version: "v1", Resource: "deviceclasses"}, opts)
 }
 
 func (c *ResourceK8sIoV1) GetResourceClaim(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*resourcev1.ResourceClaim, error) {
@@ -3792,7 +3792,7 @@ func (c *ResourceK8sIoV1) ApplyResourceClaim(ctx context.Context, v *resourcev1.
 }
 
 func (c *ResourceK8sIoV1) DeleteResourceClaim(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".resource.k8s.io", Version: "v1", Resource: "resourceclaims"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "resource.k8s.io", Version: "v1", Resource: "resourceclaims"}, namespace, name, opts)
 }
 
 func (c *ResourceK8sIoV1) ListResourceClaim(ctx context.Context, namespace string, opts metav1.ListOptions) (*resourcev1.ResourceClaimList, error) {
@@ -3804,7 +3804,7 @@ func (c *ResourceK8sIoV1) ListResourceClaim(ctx context.Context, namespace strin
 }
 
 func (c *ResourceK8sIoV1) WatchResourceClaim(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".resource.k8s.io", Version: "v1", Resource: "resourceclaims"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "resource.k8s.io", Version: "v1", Resource: "resourceclaims"}, namespace, opts)
 }
 
 func (c *ResourceK8sIoV1) GetResourceClaimTemplate(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*resourcev1.ResourceClaimTemplate, error) {
@@ -3840,7 +3840,7 @@ func (c *ResourceK8sIoV1) ApplyResourceClaimTemplate(ctx context.Context, v *res
 }
 
 func (c *ResourceK8sIoV1) DeleteResourceClaimTemplate(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".resource.k8s.io", Version: "v1", Resource: "resourceclaimtemplates"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "resource.k8s.io", Version: "v1", Resource: "resourceclaimtemplates"}, namespace, name, opts)
 }
 
 func (c *ResourceK8sIoV1) ListResourceClaimTemplate(ctx context.Context, namespace string, opts metav1.ListOptions) (*resourcev1.ResourceClaimTemplateList, error) {
@@ -3852,7 +3852,7 @@ func (c *ResourceK8sIoV1) ListResourceClaimTemplate(ctx context.Context, namespa
 }
 
 func (c *ResourceK8sIoV1) WatchResourceClaimTemplate(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".resource.k8s.io", Version: "v1", Resource: "resourceclaimtemplates"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "resource.k8s.io", Version: "v1", Resource: "resourceclaimtemplates"}, namespace, opts)
 }
 
 func (c *ResourceK8sIoV1) GetResourceSlice(ctx context.Context, name string, opts metav1.GetOptions) (*resourcev1.ResourceSlice, error) {
@@ -3888,7 +3888,7 @@ func (c *ResourceK8sIoV1) ApplyResourceSlice(ctx context.Context, v *resourcev1.
 }
 
 func (c *ResourceK8sIoV1) DeleteResourceSlice(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".resource.k8s.io", Version: "v1", Resource: "resourceslices"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "resource.k8s.io", Version: "v1", Resource: "resourceslices"}, name, opts)
 }
 
 func (c *ResourceK8sIoV1) ListResourceSlice(ctx context.Context, opts metav1.ListOptions) (*resourcev1.ResourceSliceList, error) {
@@ -3900,7 +3900,7 @@ func (c *ResourceK8sIoV1) ListResourceSlice(ctx context.Context, opts metav1.Lis
 }
 
 func (c *ResourceK8sIoV1) WatchResourceSlice(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".resource.k8s.io", Version: "v1", Resource: "resourceslices"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "resource.k8s.io", Version: "v1", Resource: "resourceslices"}, opts)
 }
 
 type SchedulingK8sIoV1 struct {
@@ -3945,7 +3945,7 @@ func (c *SchedulingK8sIoV1) ApplyPriorityClass(ctx context.Context, v *schedulin
 }
 
 func (c *SchedulingK8sIoV1) DeletePriorityClass(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".scheduling.k8s.io", Version: "v1", Resource: "priorityclasses"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "scheduling.k8s.io", Version: "v1", Resource: "priorityclasses"}, name, opts)
 }
 
 func (c *SchedulingK8sIoV1) ListPriorityClass(ctx context.Context, opts metav1.ListOptions) (*schedulingv1.PriorityClassList, error) {
@@ -3957,7 +3957,7 @@ func (c *SchedulingK8sIoV1) ListPriorityClass(ctx context.Context, opts metav1.L
 }
 
 func (c *SchedulingK8sIoV1) WatchPriorityClass(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".scheduling.k8s.io", Version: "v1", Resource: "priorityclasses"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "scheduling.k8s.io", Version: "v1", Resource: "priorityclasses"}, opts)
 }
 
 type StorageK8sIoV1 struct {
@@ -4002,7 +4002,7 @@ func (c *StorageK8sIoV1) ApplyCSIDriver(ctx context.Context, v *storagev1.CSIDri
 }
 
 func (c *StorageK8sIoV1) DeleteCSIDriver(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "csidrivers"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "storage.k8s.io", Version: "v1", Resource: "csidrivers"}, name, opts)
 }
 
 func (c *StorageK8sIoV1) ListCSIDriver(ctx context.Context, opts metav1.ListOptions) (*storagev1.CSIDriverList, error) {
@@ -4014,7 +4014,7 @@ func (c *StorageK8sIoV1) ListCSIDriver(ctx context.Context, opts metav1.ListOpti
 }
 
 func (c *StorageK8sIoV1) WatchCSIDriver(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "csidrivers"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "storage.k8s.io", Version: "v1", Resource: "csidrivers"}, opts)
 }
 
 func (c *StorageK8sIoV1) GetCSINode(ctx context.Context, name string, opts metav1.GetOptions) (*storagev1.CSINode, error) {
@@ -4050,7 +4050,7 @@ func (c *StorageK8sIoV1) ApplyCSINode(ctx context.Context, v *storagev1.CSINode,
 }
 
 func (c *StorageK8sIoV1) DeleteCSINode(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "csinodes"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "storage.k8s.io", Version: "v1", Resource: "csinodes"}, name, opts)
 }
 
 func (c *StorageK8sIoV1) ListCSINode(ctx context.Context, opts metav1.ListOptions) (*storagev1.CSINodeList, error) {
@@ -4062,7 +4062,7 @@ func (c *StorageK8sIoV1) ListCSINode(ctx context.Context, opts metav1.ListOption
 }
 
 func (c *StorageK8sIoV1) WatchCSINode(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "csinodes"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "storage.k8s.io", Version: "v1", Resource: "csinodes"}, opts)
 }
 
 func (c *StorageK8sIoV1) GetCSIStorageCapacity(ctx context.Context, namespace, name string, opts metav1.GetOptions) (*storagev1.CSIStorageCapacity, error) {
@@ -4098,7 +4098,7 @@ func (c *StorageK8sIoV1) ApplyCSIStorageCapacity(ctx context.Context, v *storage
 }
 
 func (c *StorageK8sIoV1) DeleteCSIStorageCapacity(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
-	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "csistoragecapacities"}, namespace, name, opts)
+	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "storage.k8s.io", Version: "v1", Resource: "csistoragecapacities"}, namespace, name, opts)
 }
 
 func (c *StorageK8sIoV1) ListCSIStorageCapacity(ctx context.Context, namespace string, opts metav1.ListOptions) (*storagev1.CSIStorageCapacityList, error) {
@@ -4110,7 +4110,7 @@ func (c *StorageK8sIoV1) ListCSIStorageCapacity(ctx context.Context, namespace s
 }
 
 func (c *StorageK8sIoV1) WatchCSIStorageCapacity(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "csistoragecapacities"}, namespace, opts)
+	return c.backend.Watch(ctx, schema.GroupVersionResource{Group: "storage.k8s.io", Version: "v1", Resource: "csistoragecapacities"}, namespace, opts)
 }
 
 func (c *StorageK8sIoV1) GetStorageClass(ctx context.Context, name string, opts metav1.GetOptions) (*storagev1.StorageClass, error) {
@@ -4146,7 +4146,7 @@ func (c *StorageK8sIoV1) ApplyStorageClass(ctx context.Context, v *storagev1.Sto
 }
 
 func (c *StorageK8sIoV1) DeleteStorageClass(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "storageclasses"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "storage.k8s.io", Version: "v1", Resource: "storageclasses"}, name, opts)
 }
 
 func (c *StorageK8sIoV1) ListStorageClass(ctx context.Context, opts metav1.ListOptions) (*storagev1.StorageClassList, error) {
@@ -4158,7 +4158,7 @@ func (c *StorageK8sIoV1) ListStorageClass(ctx context.Context, opts metav1.ListO
 }
 
 func (c *StorageK8sIoV1) WatchStorageClass(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "storageclasses"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "storage.k8s.io", Version: "v1", Resource: "storageclasses"}, opts)
 }
 
 func (c *StorageK8sIoV1) GetVolumeAttachment(ctx context.Context, name string, opts metav1.GetOptions) (*storagev1.VolumeAttachment, error) {
@@ -4202,7 +4202,7 @@ func (c *StorageK8sIoV1) ApplyVolumeAttachment(ctx context.Context, v *storagev1
 }
 
 func (c *StorageK8sIoV1) DeleteVolumeAttachment(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "volumeattachments"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "storage.k8s.io", Version: "v1", Resource: "volumeattachments"}, name, opts)
 }
 
 func (c *StorageK8sIoV1) ListVolumeAttachment(ctx context.Context, opts metav1.ListOptions) (*storagev1.VolumeAttachmentList, error) {
@@ -4214,7 +4214,7 @@ func (c *StorageK8sIoV1) ListVolumeAttachment(ctx context.Context, opts metav1.L
 }
 
 func (c *StorageK8sIoV1) WatchVolumeAttachment(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "volumeattachments"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "storage.k8s.io", Version: "v1", Resource: "volumeattachments"}, opts)
 }
 
 func (c *StorageK8sIoV1) GetVolumeAttributesClass(ctx context.Context, name string, opts metav1.GetOptions) (*storagev1.VolumeAttributesClass, error) {
@@ -4250,7 +4250,7 @@ func (c *StorageK8sIoV1) ApplyVolumeAttributesClass(ctx context.Context, v *stor
 }
 
 func (c *StorageK8sIoV1) DeleteVolumeAttributesClass(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "volumeattributesclasses"}, name, opts)
+	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "storage.k8s.io", Version: "v1", Resource: "volumeattributesclasses"}, name, opts)
 }
 
 func (c *StorageK8sIoV1) ListVolumeAttributesClass(ctx context.Context, opts metav1.ListOptions) (*storagev1.VolumeAttributesClassList, error) {
@@ -4262,7 +4262,7 @@ func (c *StorageK8sIoV1) ListVolumeAttributesClass(ctx context.Context, opts met
 }
 
 func (c *StorageK8sIoV1) WatchVolumeAttributesClass(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: ".storage.k8s.io", Version: "v1", Resource: "volumeattributesclasses"}, opts)
+	return c.backend.WatchClusterScoped(ctx, schema.GroupVersionResource{Group: "storage.k8s.io", Version: "v1", Resource: "volumeattributesclasses"}, opts)
 }
 
 type InformerCache struct {
