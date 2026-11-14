@@ -29,8 +29,10 @@ go_test(
     ],
     embed = [":definition"],
     deps = [
+        "//:kubeproto_lib",
         "@com_github_stretchr_testify//assert",
         "@com_github_stretchr_testify//require",
+        "@org_golang_google_protobuf//proto",
         "@org_golang_google_protobuf//reflect/protodesc",
         "@org_golang_google_protobuf//reflect/protoregistry",
         "@org_golang_google_protobuf//types/descriptorpb",

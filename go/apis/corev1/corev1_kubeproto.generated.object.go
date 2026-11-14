@@ -151,7 +151,7 @@ const (
 type HostPathType string
 
 const (
-	HostPathTypeHostPathUnset     HostPathType = "HostPathUnset"
+	HostPathTypeHostPathUnset     HostPathType = ""
 	HostPathTypeDirectoryOrCreate HostPathType = "DirectoryOrCreate"
 	HostPathTypeDirectory         HostPathType = "Directory"
 	HostPathTypeFileOrCreate      HostPathType = "FileOrCreate"
@@ -166,7 +166,7 @@ type IPFamily string
 const (
 	IPFamilyIpv4    IPFamily = "IPv4"
 	IPFamilyIpv6    IPFamily = "IPv6"
-	IPFamilyUnknown IPFamily = "Unknown"
+	IPFamilyUnknown IPFamily = ""
 )
 
 type IPFamilyPolicy string
@@ -623,7 +623,7 @@ const (
 type StorageMedium string
 
 const (
-	StorageMediumDefault   StorageMedium = "Default"
+	StorageMediumDefault   StorageMedium = ""
 	StorageMediumMemory    StorageMedium = "Memory"
 	StorageMediumHugePages StorageMedium = "HugePages"
 )

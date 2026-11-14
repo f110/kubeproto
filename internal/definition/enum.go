@@ -19,22 +19,35 @@ type Enum struct {
 	Name string
 	// ShortName is a name of enum
 	ShortName string
-	Values    []string
+	Values    []*EnumValue
 	Package   ImportPackage
 	// External indicates that this enum is defined by imported proto.
 	External bool
 }
 
+type EnumValue struct {
+	// Name is a name of the value in UpperCamelCase. It doesn't include the name of enum.
+	Name  string
+	Value string
+}
+
+func newEnumValue(name, prefix string, opt proto.Message) *EnumValue {
+	nameFromProto := stringsutil.ToUpperCamelCase(strings.TrimPrefix(name, prefix))
+	value := nameFromProto
+	if ext := proto.GetExtension(opt, kubeproto.E_Value).(*kubeproto.EnumValue); ext != nil {
+		value = ext.Value
+	}
+	if value == "" {
+		return &EnumValue{Name: stringsutil.ToUpperCamelCase(nameFromProto), Value: value}
+	}
+	return &EnumValue{Name: stringsutil.ToUpperCamelCase(value), Value: value}
+}
+
 func NewEnum(f *descriptorpb.FileDescriptorProto, enum *descriptorpb.EnumDescriptorProto) *Enum {
-	var values []string
+	var values []*EnumValue
 	prefix := stringsutil.ToUpperSnakeCase(enum.GetName()) + "_"
 	for _, v := range enum.Value {
-		e := proto.GetExtension(v.GetOptions(), kubeproto.E_Value)
-		if ext := e.(*kubeproto.EnumValue); ext != nil {
-			values = append(values, ext.Value)
-		} else {
-			values = append(values, stringsutil.ToUpperCamelCase(strings.TrimPrefix(v.GetName(), prefix)))
-		}
+		values = append(values, newEnumValue(v.GetName(), prefix, v.GetOptions()))
 	}
 
 	return &Enum{
@@ -49,16 +62,11 @@ func NewEnum(f *descriptorpb.FileDescriptorProto, enum *descriptorpb.EnumDescrip
 }
 
 func NewEnumFromEnumDescriptor(e protoreflect.EnumDescriptor, f protoreflect.FileDescriptor, external bool) *Enum {
-	var values []string
+	var values []*EnumValue
 	prefix := stringsutil.ToUpperSnakeCase(string(e.Name())) + "_"
 	for i := 0; i < e.Values().Len(); i++ {
 		v := e.Values().Get(i)
-		e := proto.GetExtension(v.Options(), kubeproto.E_Value)
-		if ext := e.(*kubeproto.EnumValue); ext != nil && ext.Value != "" {
-			values = append(values, ext.Value)
-		} else {
-			values = append(values, stringsutil.ToUpperCamelCase(strings.TrimPrefix(string(v.Name()), prefix)))
-		}
+		values = append(values, newEnumValue(string(v.Name()), prefix, v.Options()))
 	}
 
 	fileOpt := f.Options()
