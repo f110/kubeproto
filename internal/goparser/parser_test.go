@@ -283,3 +283,46 @@ type PodResources struct {
 		t.Errorf("generated proto should not import k8s.io/api/core/v1\n%s", generated)
 	}
 }
+
+func TestEnumReferringExternalConstant(t *testing.T) {
+	depDir := t.TempDir()
+	depCode := `package v1
+type IPFamily string
+
+const (
+	IPv4Protocol IPFamily = "IPv4"
+	IPv6Protocol IPFamily = "IPv6"
+)`
+	if err := os.WriteFile(filepath.Join(depDir, "types.go"), []byte(depCode), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	code := `package api
+import v1 "example.com/core/v1"
+
+type AddressType string
+
+const (
+	AddressTypeIPv4 = AddressType(v1.IPv4Protocol)
+	AddressTypeIPv6 AddressType = v1.IPv6Protocol
+	AddressTypeFQDN = AddressType("FQDN")
+)`
+	tmpDir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(tmpDir, "enum.go"), []byte(code), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	g := New()
+	g.AddDependencyDir("example.com/core/v1", depDir)
+	if err := g.AddDir(tmpDir, true); err != nil {
+		t.Fatal(err)
+	}
+	var values []string
+	for _, v := range g.enumValueCandidates["AddressType"] {
+		values = append(values, v.Name+"="+v.Value)
+	}
+	expect := []string{"AddressTypeIPv4=IPv4", "AddressTypeIPv6=IPv6", "AddressTypeFQDN=FQDN"}
+	if strings.Join(values, ",") != strings.Join(expect, ",") {
+		t.Errorf("expect %v but %v", expect, values)
+	}
+}

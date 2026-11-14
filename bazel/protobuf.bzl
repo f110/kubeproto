@@ -1,4 +1,4 @@
-load("@rules_go//go:def.bzl", "GoInfo")
+load("@rules_go//go:def.bzl", "GoArchive", "GoInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
 KubeProtoLibrary = provider()
@@ -16,6 +16,15 @@ def _gen_protobuf_impl(ctx):
             fail("Can not generate once with multiple packages")
         srcs.extend(info.srcs)
 
+    dep_srcs = []
+    dep_dirs = {}
+    for src in ctx.attr.srcs:
+        for d in src[GoArchive].direct:
+            if not d.data.srcs or d.data.importpath in dep_dirs:
+                continue
+            dep_dirs[d.data.importpath] = paths.dirname(d.data.srcs[0].path)
+            dep_srcs.extend(d.data.srcs)
+
     args = ctx.actions.args()
     args.add("--proto-package=%s" % ctx.attr.proto_package_name)
     args.add("--go-package=%s" % ctx.attr.importpath)
@@ -29,6 +38,8 @@ def _gen_protobuf_impl(ctx):
         for d in ctx.attr.deps:
             dep = d[KubeProtoLibrary]
             args.add("--imports=%s:%s:%s" % (dep.origin_go_package, dep.proto_package, dep.file_import_path))
+    for importpath, dep_dir in dep_dirs.items():
+        args.add("--dependency-dir=%s=%s" % (importpath, dep_dir))
     if ctx.attr.kubeproto_importpath:
         args.add("--kubeproto-package=%s" % ctx.attr.kubeproto_importpath)
     if ctx.attr.all:
@@ -39,7 +50,7 @@ def _gen_protobuf_impl(ctx):
     ctx.actions.run(
         executable = ctx.executable._cmd,
         inputs = depset(
-            direct = srcs,
+            direct = srcs + dep_srcs,
         ),
         outputs = [out],
         arguments = [args]

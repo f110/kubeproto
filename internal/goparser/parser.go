@@ -158,7 +158,12 @@ type Generator struct {
 
 	// importedPackages is a list of imported packages
 	importedPackages []*packageInformation
-	importPrefix     string
+	// dependencyDirs is a map for resolving the constants of the other packages.
+	// The key of map is an import path. The value of map is a directory of the source files.
+	dependencyDirs map[string]string
+	// externalConsts is a cache of the string constants of the other packages. The key of map is an import path.
+	externalConsts map[string]map[string]string
+	importPrefix   string
 
 	// kubeprotoGoPackage is a package name that used to used instead of go_package.
 	kubeprotoGoPackage string
@@ -174,7 +179,14 @@ func New() *Generator {
 		packageMap:          make(map[string]string),
 		enumCandidates:      make(map[string]struct{}),
 		enumValueCandidates: make(map[string][]*enumValue),
+		dependencyDirs:      make(map[string]string),
+		externalConsts:      make(map[string]map[string]string),
 	}
+}
+
+// AddDependencyDir adds the directory of the package which is imported by the target package.
+func (g *Generator) AddDependencyDir(importPath, dir string) {
+	g.dependencyDirs[importPath] = dir
 }
 
 func (g *Generator) AddDir(dir string, allStructs bool) error {
@@ -602,26 +614,8 @@ func (g *Generator) constToEnumValue(v *ast.GenDecl) map[string][]*enumValue {
 				continue
 			}
 
-			var strValue string
-			switch v := valueSpec.Values[0].(type) {
-			case *ast.BasicLit:
-				if v.Kind != token.STRING {
-					continue
-				}
-				// Remove quotations
-				strValue = v.Value[1 : len(v.Value)-1]
-			case *ast.CallExpr:
-				if len(v.Args) == 0 {
-					continue
-				}
-				if lit, ok := v.Args[0].(*ast.BasicLit); ok {
-					if lit.Kind != token.STRING {
-						continue
-					}
-					// Remove quotations
-					strValue = lit.Value[1 : len(lit.Value)-1]
-				}
-			default:
+			strValue, ok := g.constantValue(valueSpec.Values[0])
+			if !ok {
 				continue
 			}
 			if len(strValue) > 0 && strValue[len(strValue)-1] == '-' {
@@ -633,6 +627,93 @@ func (g *Generator) constToEnumValue(v *ast.GenDecl) map[string][]*enumValue {
 	}
 
 	return constDefinitions
+}
+
+// constantValue returns the string value of the constant expression.
+// The constant of the other package is resolved by the directory which is given by AddDependencyDir.
+func (g *Generator) constantValue(in ast.Expr) (string, bool) {
+	switch v := in.(type) {
+	case *ast.SelectorExpr:
+		return g.externalConstantValue(v)
+	case *ast.CallExpr:
+		if len(v.Args) == 0 {
+			return "", false
+		}
+		return g.constantValue(v.Args[0])
+	}
+	return literalValue(in)
+}
+
+func (g *Generator) externalConstantValue(in *ast.SelectorExpr) (string, bool) {
+	if x, ok := in.X.(*ast.Ident); ok {
+		if importPath, ok := g.packageMap[x.Name]; ok {
+			consts, err := g.externalConstants(importPath)
+			if err != nil {
+				log.Print(err)
+			} else if v, ok := consts[in.Sel.Name]; ok {
+				return v, true
+			}
+		}
+	}
+	log.Printf("Could not resolve the value of %s.%s", in.X, in.Sel.Name)
+	return "", false
+}
+
+func (g *Generator) externalConstants(importPath string) (map[string]string, error) {
+	if v, ok := g.externalConsts[importPath]; ok {
+		return v, nil
+	}
+	dir, ok := g.dependencyDirs[importPath]
+	if !ok {
+		return nil, fmt.Errorf("the directory of %s is not given", importPath)
+	}
+
+	pkgs, err := parser.ParseDir(token.NewFileSet(), dir, nil, parser.SkipObjectResolution)
+	if err != nil {
+		return nil, err
+	}
+	consts := make(map[string]string)
+	for _, pkg := range pkgs {
+		for _, f := range pkg.Files {
+			for _, d := range f.Decls {
+				gen, ok := d.(*ast.GenDecl)
+				if !ok || gen.Tok != token.CONST {
+					continue
+				}
+				for _, s := range gen.Specs {
+					valueSpec := s.(*ast.ValueSpec)
+					for i, name := range valueSpec.Names {
+						if i >= len(valueSpec.Values) {
+							break
+						}
+						if v, ok := literalValue(valueSpec.Values[i]); ok {
+							consts[name.Name] = v
+						}
+					}
+				}
+			}
+		}
+	}
+	g.externalConsts[importPath] = consts
+	return consts, nil
+}
+
+// literalValue returns the value of the string literal. The literal can be wrapped by the type conversion (e.g. PathType("Exact")).
+func literalValue(in ast.Expr) (string, bool) {
+	switch v := in.(type) {
+	case *ast.BasicLit:
+		if v.Kind != token.STRING {
+			return "", false
+		}
+		// Remove quotations
+		return v.Value[1 : len(v.Value)-1], true
+	case *ast.CallExpr:
+		if len(v.Args) == 0 {
+			return "", false
+		}
+		return literalValue(v.Args[0])
+	}
+	return "", false
 }
 
 func (g *Generator) structToProtobufMessage(v *ast.GenDecl, comment *ast.CommentGroup, allStruct bool) *ProtobufMessage {
