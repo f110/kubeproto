@@ -275,7 +275,7 @@ func (g *CRDGenerator) fieldToJSONSchemaProps(f *definition.Field) apiextensions
 func (g *CRDGenerator) enumToJSONSchemaProps(f *definition.Field, enum *definition.Enum) apiextensionsv1.JSONSchemaProps {
 	var values []apiextensionsv1.JSON
 	for _, v := range enum.Values {
-		values = append(values, apiextensionsv1.JSON{Raw: []byte(fmt.Sprintf("%q", v))})
+		values = append(values, apiextensionsv1.JSON{Raw: []byte(fmt.Sprintf("%q", v.Value))})
 	}
 	props := apiextensionsv1.JSONSchemaProps{
 		Description: f.Description,
