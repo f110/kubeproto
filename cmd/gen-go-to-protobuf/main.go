@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/pflag"
 
@@ -12,7 +13,7 @@ import (
 
 func genGoToProtobuf(args []string) error {
 	var out, protoPackage, goPackage, apiDomain, apiSubGroup, apiVersion, importPrefix, kubeprotoPackage string
-	var imports []string
+	var imports, dependencyDirs []string
 	var allStructs bool
 	fs := pflag.NewFlagSet("gen-to-to-protobuf", pflag.PanicOnError)
 	fs.StringVar(&out, "out", "", "Output file")
@@ -26,6 +27,7 @@ func genGoToProtobuf(args []string) error {
 		"The first element is the name of go package. "+
 		"The second element is the package name in protobuf. "+
 		"The third element is the import path.")
+	fs.StringSliceVar(&dependencyDirs, "dependency-dir", nil, "Directories of the dependent packages. The value is the import path and the directory joined by =.")
 	fs.StringVar(&importPrefix, "import-prefix", "", "Import path prefix")
 	fs.StringVar(&kubeprotoPackage, "kubeproto-package", "", "")
 	fs.MarkHidden("kubeproto-package")
@@ -43,6 +45,13 @@ func genGoToProtobuf(args []string) error {
 		g.SetAPIDomain(apiDomain, apiSubGroup)
 		g.SetAPIVersion(apiVersion)
 		g.AddImport(imports...)
+		for _, d := range dependencyDirs {
+			importPath, dir, ok := strings.Cut(d, "=")
+			if !ok {
+				return fmt.Errorf("invalid --dependency-dir: %s", d)
+			}
+			g.AddDependencyDir(importPath, dir)
+		}
 		g.SetImportPrefix(importPrefix)
 		g.SetKubeprotoPackage(kubeprotoPackage)
 		if err := g.AddDir(v, allStructs); err != nil {

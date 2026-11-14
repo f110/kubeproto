@@ -13,8 +13,8 @@ import "k8s.io/api/core/v1/generated.proto";
 import "k8s.io/apimachinery/pkg/apis/meta/v1/generated.proto";
 
 enum AddressType {
-  ADDRESS_TYPE_IP_V4 = 0 [(dev.f110.kubeproto.value) = { value: "" }];
-  ADDRESS_TYPE_IP_V6 = 1 [(dev.f110.kubeproto.value) = { value: "" }];
+  ADDRESS_TYPE_IP_V4 = 0 [(dev.f110.kubeproto.value) = { value: "IPv4" }];
+  ADDRESS_TYPE_IP_V6 = 1 [(dev.f110.kubeproto.value) = { value: "IPv6" }];
   ADDRESS_TYPE_FQDN  = 2;
 }
 
