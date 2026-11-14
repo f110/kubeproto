@@ -274,6 +274,46 @@ func (f *fakerBackend) Apply(ctx context.Context, resourceName string, obj runti
 	}
 	return obj.DeepCopyObject(), err
 }
+func (f *fakerBackend) ApplyStatus(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error) {
+	gvks, _, err := k8sclient.Scheme.ObjectKinds(result)
+	if err != nil {
+		return nil, err
+	}
+	gvk := gvks[0]
+	m := obj.(metav1.Object)
+	objMeta := m.GetObjectMeta()
+	obj = obj.DeepCopyObject()
+	obj.GetObjectKind().SetGroupVersionKind(gvk)
+	patch, err := json.Marshal(obj)
+	if err != nil {
+		return nil, err
+	}
+	// The apiserver ignores the fields other than the status when the object is applied to the status subresource.
+	var fields map[string]json.RawMessage
+	if err := json.Unmarshal(patch, &fields); err != nil {
+		return nil, err
+	}
+	metadata, err := json.Marshal(&metav1.ObjectMeta{Name: objMeta.Name, Namespace: objMeta.Namespace})
+	if err != nil {
+		return nil, err
+	}
+	statusPatch := map[string]json.RawMessage{"apiVersion": fields["apiVersion"], "kind": fields["kind"], "metadata": metadata}
+	if v, ok := fields["status"]; ok {
+		statusPatch["status"] = v
+	}
+	patch, err = json.Marshal(statusPatch)
+	if err != nil {
+		return nil, err
+	}
+	patchOpts := k8smetav1.PatchOptions{DryRun: opts.DryRun, Force: &opts.Force, FieldManager: opts.FieldManager}
+	action := k8stesting.NewPatchSubresourceActionWithOptions(gvk.GroupVersion().WithResource(resourceName), objMeta.Namespace, objMeta.Name, types.ApplyPatchType, patch, patchOpts, "status")
+	obj, err = f.fake.Invokes(action, result)
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.DeepCopyObject(), err
+}
 func (f *fakerBackend) Delete(ctx context.Context, gvr schema.GroupVersionResource, namespace, name string, opts metav1.DeleteOptions) error {
 	_, err := f.fake.Invokes(k8stesting.NewDeleteAction(gvr, namespace, name), nil)
 
@@ -304,6 +344,10 @@ func (f *fakerBackend) UpdateStatusClusterScoped(ctx context.Context, resourceNa
 
 func (f *fakerBackend) ApplyClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error) {
 	return f.Apply(ctx, resourceName, obj, opts, result)
+}
+
+func (f *fakerBackend) ApplyStatusClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error) {
+	return f.ApplyStatus(ctx, resourceName, obj, opts, result)
 }
 
 func (f *fakerBackend) DeleteClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, name string, opts metav1.DeleteOptions) error {
