@@ -54,6 +54,7 @@ type Backend interface {
 	Update(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	UpdateStatus(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	Apply(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error)
+	ApplyStatus(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error)
 	Delete(ctx context.Context, gvr schema.GroupVersionResource, namespace, name string, opts metav1.DeleteOptions) error
 	Watch(ctx context.Context, gvr schema.GroupVersionResource, namespace string, opts metav1.ListOptions) (watch.Interface, error)
 	GetClusterScoped(ctx context.Context, resourceName, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error)
@@ -62,6 +63,7 @@ type Backend interface {
 	UpdateClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	UpdateStatusClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	ApplyClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error)
+	ApplyStatusClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error)
 	DeleteClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, name string, opts metav1.DeleteOptions) error
 	WatchClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, opts metav1.ListOptions) (watch.Interface, error)
 
@@ -198,6 +200,28 @@ func (r *restBackend) Apply(ctx context.Context, resourceName string, obj runtim
 		Into(result)
 }
 
+func (r *restBackend) ApplyStatus(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error) {
+	m := obj.(metav1.Object)
+	if m == nil {
+		return nil, errors.New("obj is not implement metav1.Object")
+	}
+	meta := m.GetObjectMeta()
+	patch, err := encodeApplyStatusPatch(obj)
+	if err != nil {
+		return nil, err
+	}
+	patchOpts := opts.ToPatchOptions()
+	return result, r.client.Patch(types.ApplyPatchType).
+		Namespace(meta.Namespace).
+		Resource(resourceName).
+		Name(meta.Name).
+		SubResource("status").
+		VersionedParams(&patchOpts, ParameterCodec).
+		Body(patch).
+		Do(ctx).
+		Into(result)
+}
+
 func (r *restBackend) Delete(ctx context.Context, gvr schema.GroupVersionResource, namespace, name string, opts metav1.DeleteOptions) error {
 	return r.client.Delete().
 		Namespace(namespace).
@@ -304,6 +328,27 @@ func (r *restBackend) ApplyClusterScoped(ctx context.Context, resourceName strin
 		Into(result)
 }
 
+func (r *restBackend) ApplyStatusClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error) {
+	m := obj.(metav1.Object)
+	if m == nil {
+		return nil, errors.New("obj is not implement metav1.Object")
+	}
+	meta := m.GetObjectMeta()
+	patch, err := encodeApplyStatusPatch(obj)
+	if err != nil {
+		return nil, err
+	}
+	patchOpts := opts.ToPatchOptions()
+	return result, r.client.Patch(types.ApplyPatchType).
+		Resource(resourceName).
+		Name(meta.Name).
+		SubResource("status").
+		VersionedParams(&patchOpts, ParameterCodec).
+		Body(patch).
+		Do(ctx).
+		Into(result)
+}
+
 // encodeApplyPatch encodes obj into the body of the apply request.
 // The body is passed as []byte because rest.Request overwrites Content-Type when the body is runtime.Object.
 // The apply request requires apiVersion and kind, so they are set from Scheme.
@@ -315,6 +360,29 @@ func encodeApplyPatch(obj runtime.Object) ([]byte, error) {
 	obj = obj.DeepCopyObject()
 	obj.GetObjectKind().SetGroupVersionKind(gvks[0])
 	return json.Marshal(obj)
+}
+
+// encodeApplyStatusPatch encodes obj into the body of the apply request to the status subresource.
+// The apiserver ignores the fields other than the status, so the body contains only apiVersion, kind, the name, the namespace and the status.
+func encodeApplyStatusPatch(obj runtime.Object) ([]byte, error) {
+	patch, err := encodeApplyPatch(obj)
+	if err != nil {
+		return nil, err
+	}
+	var fields map[string]json.RawMessage
+	if err := json.Unmarshal(patch, &fields); err != nil {
+		return nil, err
+	}
+	objMeta := obj.(metav1.Object).GetObjectMeta()
+	metadata, err := json.Marshal(&metav1.ObjectMeta{Name: objMeta.Name, Namespace: objMeta.Namespace})
+	if err != nil {
+		return nil, err
+	}
+	statusPatch := map[string]json.RawMessage{"apiVersion": fields["apiVersion"], "kind": fields["kind"], "metadata": metadata}
+	if v, ok := fields["status"]; ok {
+		statusPatch["status"] = v
+	}
+	return json.Marshal(statusPatch)
 }
 
 func (r *restBackend) DeleteClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, name string, opts metav1.DeleteOptions) error {

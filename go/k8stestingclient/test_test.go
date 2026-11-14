@@ -199,6 +199,68 @@ func TestApplyIgnoresStatusSubresource(t *testing.T) {
 	assertion.Equal(t, 3, d.Status.Replicas)
 }
 
+func TestApplyStatus(t *testing.T) {
+	s := NewSet()
+	err := s.Tracker().Add(&appsv1.Deployment{
+		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: metav1.NamespaceDefault},
+		Spec:       &appsv1.DeploymentSpec{Replicas: 1},
+	})
+	assertion.MustNoError(t, err)
+
+	_, err = s.AppsV1.ApplyStatusDeployment(
+		t.Context(),
+		&appsv1.Deployment{
+			ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: metav1.NamespaceDefault},
+			Status: &appsv1.DeploymentStatus{
+				Conditions: []appsv1.DeploymentCondition{{Type: appsv1.DeploymentConditionTypeAvailable, Status: corev1.ConditionStatusTrue}},
+			},
+		},
+		metav1.ApplyOptions{FieldManager: "other"},
+	)
+	assertion.MustNoError(t, err)
+
+	d, err := s.AppsV1.ApplyStatusDeployment(
+		t.Context(),
+		&appsv1.Deployment{
+			ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: metav1.NamespaceDefault, Labels: map[string]string{"app": "test"}},
+			Spec:       &appsv1.DeploymentSpec{Replicas: 3},
+			Status: &appsv1.DeploymentStatus{
+				Replicas:   1,
+				Conditions: []appsv1.DeploymentCondition{{Type: appsv1.DeploymentConditionTypeProgressing, Status: corev1.ConditionStatusTrue}},
+			},
+		},
+		metav1.ApplyOptions{FieldManager: "test", Force: true},
+	)
+	assertion.MustNoError(t, err)
+	assertion.Equal(t, 1, d.Status.Replicas)
+	assertion.Len(t, d.Status.Conditions, 2)
+	assertion.Equal(t, 1, d.Spec.Replicas)
+	assertion.Len(t, d.Labels, 0)
+	var found bool
+	for _, v := range d.ManagedFields {
+		if v.Manager == "test" {
+			found = true
+		}
+	}
+	assertion.Equal(t, true, found)
+
+	actions := s.Actions()
+	assertion.Len(t, actions, 2)
+	action, ok := actions[1].(k8stesting.PatchActionImpl)
+	assertion.Equal(t, true, ok)
+	assertion.Equal(t, types.ApplyPatchType, action.GetPatchType())
+	assertion.Equal(t, "status", action.GetSubresource())
+	assertion.Equal(t, "test", action.GetName())
+	assertion.Equal(t, "deployments", action.GetResource().Resource)
+	assertion.Equal(t, "test", action.PatchOptions.FieldManager)
+	assertion.Equal(t, true, *action.PatchOptions.Force)
+
+	var applied map[string]any
+	assertion.MustNoError(t, json.Unmarshal(action.GetPatch(), &applied))
+	_, ok = applied["spec"]
+	assertion.Equal(t, false, ok)
+}
+
 func TestDeleteAndWatchNonCoreGroup(t *testing.T) {
 	s := NewSet()
 	err := s.Tracker().Add(&appsv1.Deployment{ObjectMeta: metav1.ObjectMeta{Name: "test-1", Namespace: metav1.NamespaceDefault}})
