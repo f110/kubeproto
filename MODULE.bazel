@@ -1,6 +1,5 @@
 module(
     name = "dev_f110_kubeproto",
-    version = "1.0",
 )
 
 bazel_dep(name = "apple_support", version = "1.23.1")
