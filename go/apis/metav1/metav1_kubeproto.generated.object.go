@@ -594,7 +594,7 @@ func (in *DeleteOptions) OpenAPIModelName() string {
 }
 
 type Duration struct {
-	Duration int64 `json:"duration"`
+	time.Duration
 }
 
 func (in *Duration) DeepCopyInto(out *Duration) {

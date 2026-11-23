@@ -140,11 +140,14 @@ func (g *ObjectGenerator) Generate(out io.Writer) error {
 			// Struct definition
 			defW.F("type %s struct {", obj.ShortName)
 
-			// Special case for metav1.Time
+			// Special case for metav1.Time and metav1.Duration
 			switch obj.Name {
 			case "k8s.io.apimachinery.pkg.apis.meta.v1.Time":
 				importPackages["time"] = ""
 				defW.F("time.Time")
+			case "k8s.io.apimachinery.pkg.apis.meta.v1.Duration":
+				importPackages["time"] = ""
+				defW.F("time.Duration")
 			default:
 				for _, f := range obj.Fields {
 					switch f.Kind {
