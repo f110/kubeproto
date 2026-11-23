@@ -2,6 +2,7 @@ package metav1
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -171,7 +172,26 @@ func (f *FieldsV1) UnmarshalJSON(b []byte) error {
 }
 
 func (in *Duration) TimeDuration() time.Duration {
-	return time.Duration(in.Duration)
+	return in.Duration
+}
+
+// MarshalJSON encodes the duration as a string in the format of time.Duration.String (e.g. "1h0m0s").
+func (in Duration) MarshalJSON() ([]byte, error) {
+	return json.Marshal(in.Duration.String())
+}
+
+// UnmarshalJSON decodes the string in the format accepted by time.ParseDuration (e.g. "1h").
+func (in *Duration) UnmarshalJSON(b []byte) error {
+	var str string
+	if err := json.Unmarshal(b, &str); err != nil {
+		return err
+	}
+	d, err := time.ParseDuration(str)
+	if err != nil {
+		return err
+	}
+	in.Duration = d
+	return nil
 }
 
 type Object interface {
