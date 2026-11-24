@@ -55,6 +55,7 @@ type Backend interface {
 	UpdateStatus(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	Apply(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error)
 	ApplyStatus(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error)
+	Patch(ctx context.Context, resourceName, namespace, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, result runtime.Object, subresources ...string) (runtime.Object, error)
 	Delete(ctx context.Context, gvr schema.GroupVersionResource, namespace, name string, opts metav1.DeleteOptions) error
 	Watch(ctx context.Context, gvr schema.GroupVersionResource, namespace string, opts metav1.ListOptions) (watch.Interface, error)
 	GetClusterScoped(ctx context.Context, resourceName, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error)
@@ -64,6 +65,7 @@ type Backend interface {
 	UpdateStatusClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	ApplyClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error)
 	ApplyStatusClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error)
+	PatchClusterScoped(ctx context.Context, resourceName, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, result runtime.Object, subresources ...string) (runtime.Object, error)
 	DeleteClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, name string, opts metav1.DeleteOptions) error
 	WatchClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, opts metav1.ListOptions) (watch.Interface, error)
 
@@ -222,6 +224,18 @@ func (r *restBackend) ApplyStatus(ctx context.Context, resourceName string, obj 
 		Into(result)
 }
 
+func (r *restBackend) Patch(ctx context.Context, resourceName, namespace, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, result runtime.Object, subresources ...string) (runtime.Object, error) {
+	return result, r.client.Patch(pt).
+		Namespace(namespace).
+		Resource(resourceName).
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&opts, ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+}
+
 func (r *restBackend) Delete(ctx context.Context, gvr schema.GroupVersionResource, namespace, name string, opts metav1.DeleteOptions) error {
 	return r.client.Delete().
 		Namespace(namespace).
@@ -349,6 +363,17 @@ func (r *restBackend) ApplyStatusClusterScoped(ctx context.Context, resourceName
 		Into(result)
 }
 
+func (r *restBackend) PatchClusterScoped(ctx context.Context, resourceName, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, result runtime.Object, subresources ...string) (runtime.Object, error) {
+	return result, r.client.Patch(pt).
+		Resource(resourceName).
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&opts, ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+}
+
 // encodeApplyPatch encodes obj into the body of the apply request.
 // The body is passed as []byte because rest.Request overwrites Content-Type when the body is runtime.Object.
 // The apply request requires apiVersion and kind, so they are set from Scheme.
@@ -468,6 +493,14 @@ func (c *CertManagerIoV1) ApplyStatusCertificate(ctx context.Context, v *certman
 	return result.(*certmanagerv1.Certificate), nil
 }
 
+func (c *CertManagerIoV1) PatchCertificate(ctx context.Context, namespace, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (*certmanagerv1.Certificate, error) {
+	result, err := c.backend.Patch(ctx, "certificates", namespace, name, pt, data, opts, &certmanagerv1.Certificate{}, subresources...)
+	if err != nil {
+		return nil, err
+	}
+	return result.(*certmanagerv1.Certificate), nil
+}
+
 func (c *CertManagerIoV1) DeleteCertificate(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "cert-manager.io", Version: "v1", Resource: "certificates"}, namespace, name, opts)
 }
@@ -526,6 +559,14 @@ func (c *CertManagerIoV1) ApplyCertificateRequest(ctx context.Context, v *certma
 
 func (c *CertManagerIoV1) ApplyStatusCertificateRequest(ctx context.Context, v *certmanagerv1.CertificateRequest, opts metav1.ApplyOptions) (*certmanagerv1.CertificateRequest, error) {
 	result, err := c.backend.ApplyStatus(ctx, "certificaterequests", v, opts, &certmanagerv1.CertificateRequest{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*certmanagerv1.CertificateRequest), nil
+}
+
+func (c *CertManagerIoV1) PatchCertificateRequest(ctx context.Context, namespace, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (*certmanagerv1.CertificateRequest, error) {
+	result, err := c.backend.Patch(ctx, "certificaterequests", namespace, name, pt, data, opts, &certmanagerv1.CertificateRequest{}, subresources...)
 	if err != nil {
 		return nil, err
 	}
@@ -596,6 +637,14 @@ func (c *CertManagerIoV1) ApplyStatusClusterIssuer(ctx context.Context, v *certm
 	return result.(*certmanagerv1.ClusterIssuer), nil
 }
 
+func (c *CertManagerIoV1) PatchClusterIssuer(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (*certmanagerv1.ClusterIssuer, error) {
+	result, err := c.backend.PatchClusterScoped(ctx, "clusterissuers", name, pt, data, opts, &certmanagerv1.ClusterIssuer{}, subresources...)
+	if err != nil {
+		return nil, err
+	}
+	return result.(*certmanagerv1.ClusterIssuer), nil
+}
+
 func (c *CertManagerIoV1) DeleteClusterIssuer(ctx context.Context, name string, opts metav1.DeleteOptions) error {
 	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "cert-manager.io", Version: "v1", Resource: "clusterissuers"}, name, opts)
 }
@@ -654,6 +703,14 @@ func (c *CertManagerIoV1) ApplyIssuer(ctx context.Context, v *certmanagerv1.Issu
 
 func (c *CertManagerIoV1) ApplyStatusIssuer(ctx context.Context, v *certmanagerv1.Issuer, opts metav1.ApplyOptions) (*certmanagerv1.Issuer, error) {
 	result, err := c.backend.ApplyStatus(ctx, "issuers", v, opts, &certmanagerv1.Issuer{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*certmanagerv1.Issuer), nil
+}
+
+func (c *CertManagerIoV1) PatchIssuer(ctx context.Context, namespace, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (*certmanagerv1.Issuer, error) {
+	result, err := c.backend.Patch(ctx, "issuers", namespace, name, pt, data, opts, &certmanagerv1.Issuer{}, subresources...)
 	if err != nil {
 		return nil, err
 	}
@@ -733,6 +790,14 @@ func (c *MonitoringCoreosComV1) ApplyStatusAlertmanager(ctx context.Context, v *
 	return result.(*monitoringv1.Alertmanager), nil
 }
 
+func (c *MonitoringCoreosComV1) PatchAlertmanager(ctx context.Context, namespace, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (*monitoringv1.Alertmanager, error) {
+	result, err := c.backend.Patch(ctx, "alertmanagers", namespace, name, pt, data, opts, &monitoringv1.Alertmanager{}, subresources...)
+	if err != nil {
+		return nil, err
+	}
+	return result.(*monitoringv1.Alertmanager), nil
+}
+
 func (c *MonitoringCoreosComV1) DeleteAlertmanager(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "monitoring.coreos.com", Version: "v1", Resource: "alertmanagers"}, namespace, name, opts)
 }
@@ -781,6 +846,14 @@ func (c *MonitoringCoreosComV1) ApplyPodMonitor(ctx context.Context, v *monitori
 	return result.(*monitoringv1.PodMonitor), nil
 }
 
+func (c *MonitoringCoreosComV1) PatchPodMonitor(ctx context.Context, namespace, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (*monitoringv1.PodMonitor, error) {
+	result, err := c.backend.Patch(ctx, "podmonitors", namespace, name, pt, data, opts, &monitoringv1.PodMonitor{}, subresources...)
+	if err != nil {
+		return nil, err
+	}
+	return result.(*monitoringv1.PodMonitor), nil
+}
+
 func (c *MonitoringCoreosComV1) DeletePodMonitor(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "monitoring.coreos.com", Version: "v1", Resource: "podmonitors"}, namespace, name, opts)
 }
@@ -823,6 +896,14 @@ func (c *MonitoringCoreosComV1) UpdateProbe(ctx context.Context, v *monitoringv1
 
 func (c *MonitoringCoreosComV1) ApplyProbe(ctx context.Context, v *monitoringv1.Probe, opts metav1.ApplyOptions) (*monitoringv1.Probe, error) {
 	result, err := c.backend.Apply(ctx, "probes", v, opts, &monitoringv1.Probe{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*monitoringv1.Probe), nil
+}
+
+func (c *MonitoringCoreosComV1) PatchProbe(ctx context.Context, namespace, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (*monitoringv1.Probe, error) {
+	result, err := c.backend.Patch(ctx, "probes", namespace, name, pt, data, opts, &monitoringv1.Probe{}, subresources...)
 	if err != nil {
 		return nil, err
 	}
@@ -893,6 +974,14 @@ func (c *MonitoringCoreosComV1) ApplyStatusPrometheus(ctx context.Context, v *mo
 	return result.(*monitoringv1.Prometheus), nil
 }
 
+func (c *MonitoringCoreosComV1) PatchPrometheus(ctx context.Context, namespace, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (*monitoringv1.Prometheus, error) {
+	result, err := c.backend.Patch(ctx, "prometheuses", namespace, name, pt, data, opts, &monitoringv1.Prometheus{}, subresources...)
+	if err != nil {
+		return nil, err
+	}
+	return result.(*monitoringv1.Prometheus), nil
+}
+
 func (c *MonitoringCoreosComV1) DeletePrometheus(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "monitoring.coreos.com", Version: "v1", Resource: "prometheuses"}, namespace, name, opts)
 }
@@ -941,6 +1030,14 @@ func (c *MonitoringCoreosComV1) ApplyPrometheusRule(ctx context.Context, v *moni
 	return result.(*monitoringv1.PrometheusRule), nil
 }
 
+func (c *MonitoringCoreosComV1) PatchPrometheusRule(ctx context.Context, namespace, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (*monitoringv1.PrometheusRule, error) {
+	result, err := c.backend.Patch(ctx, "prometheusrules", namespace, name, pt, data, opts, &monitoringv1.PrometheusRule{}, subresources...)
+	if err != nil {
+		return nil, err
+	}
+	return result.(*monitoringv1.PrometheusRule), nil
+}
+
 func (c *MonitoringCoreosComV1) DeletePrometheusRule(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "monitoring.coreos.com", Version: "v1", Resource: "prometheusrules"}, namespace, name, opts)
 }
@@ -983,6 +1080,14 @@ func (c *MonitoringCoreosComV1) UpdateServiceMonitor(ctx context.Context, v *mon
 
 func (c *MonitoringCoreosComV1) ApplyServiceMonitor(ctx context.Context, v *monitoringv1.ServiceMonitor, opts metav1.ApplyOptions) (*monitoringv1.ServiceMonitor, error) {
 	result, err := c.backend.Apply(ctx, "servicemonitors", v, opts, &monitoringv1.ServiceMonitor{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*monitoringv1.ServiceMonitor), nil
+}
+
+func (c *MonitoringCoreosComV1) PatchServiceMonitor(ctx context.Context, namespace, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (*monitoringv1.ServiceMonitor, error) {
+	result, err := c.backend.Patch(ctx, "servicemonitors", namespace, name, pt, data, opts, &monitoringv1.ServiceMonitor{}, subresources...)
 	if err != nil {
 		return nil, err
 	}
@@ -1047,6 +1152,14 @@ func (c *MonitoringCoreosComV1) ApplyThanosRuler(ctx context.Context, v *monitor
 
 func (c *MonitoringCoreosComV1) ApplyStatusThanosRuler(ctx context.Context, v *monitoringv1.ThanosRuler, opts metav1.ApplyOptions) (*monitoringv1.ThanosRuler, error) {
 	result, err := c.backend.ApplyStatus(ctx, "thanosrulers", v, opts, &monitoringv1.ThanosRuler{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*monitoringv1.ThanosRuler), nil
+}
+
+func (c *MonitoringCoreosComV1) PatchThanosRuler(ctx context.Context, namespace, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (*monitoringv1.ThanosRuler, error) {
+	result, err := c.backend.Patch(ctx, "thanosrulers", namespace, name, pt, data, opts, &monitoringv1.ThanosRuler{}, subresources...)
 	if err != nil {
 		return nil, err
 	}

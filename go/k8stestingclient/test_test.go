@@ -281,3 +281,58 @@ func TestDeleteAndWatchNonCoreGroup(t *testing.T) {
 		t.Fatal("timed out waiting for the watch event")
 	}
 }
+
+func TestPatch(t *testing.T) {
+	s := NewSet()
+	err := s.Tracker().Add(&appsv1.Deployment{
+		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: metav1.NamespaceDefault},
+		Spec:       &appsv1.DeploymentSpec{Replicas: 3},
+	})
+	assertion.MustNoError(t, err)
+
+	patch := []byte(`{"metadata":{"finalizers":["test"]}}`)
+	d, err := s.AppsV1.PatchDeployment(t.Context(), metav1.NamespaceDefault, "test", types.MergePatchType, patch, metav1.PatchOptions{FieldManager: "test"})
+	assertion.MustNoError(t, err)
+	assertion.Len(t, d.Finalizers, 1)
+	assertion.Equal(t, "test", d.Finalizers[0])
+	assertion.Equal(t, 3, d.Spec.Replicas)
+
+	d, err = s.AppsV1.GetDeployment(t.Context(), metav1.NamespaceDefault, "test", metav1.GetOptions{})
+	assertion.MustNoError(t, err)
+	assertion.Len(t, d.Finalizers, 1)
+	assertion.Equal(t, "test", d.Finalizers[0])
+	assertion.Equal(t, 3, d.Spec.Replicas)
+
+	actions := s.Actions()
+	assertion.Len(t, actions, 2)
+	action, ok := actions[0].(k8stesting.PatchActionImpl)
+	assertion.Equal(t, true, ok)
+	assertion.Equal(t, types.MergePatchType, action.GetPatchType())
+	assertion.Equal(t, "test", action.GetName())
+	assertion.Equal(t, metav1.NamespaceDefault, action.GetNamespace())
+	assertion.Equal(t, "deployments", action.GetResource().Resource)
+	assertion.Equal(t, "", action.GetSubresource())
+	assertion.Equal(t, string(patch), string(action.GetPatch()))
+	assertion.Equal(t, "test", action.PatchOptions.FieldManager)
+	assertion.Equal(t, true, action.PatchOptions.Force == nil)
+}
+
+func TestPatchSubresource(t *testing.T) {
+	s := NewSet()
+	err := s.Tracker().Add(&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "test"}})
+	assertion.MustNoError(t, err)
+
+	patch := []byte(`[{"op":"add","path":"/status","value":{"phase":"Active"}}]`)
+	ns, err := s.CoreV1.PatchNamespace(t.Context(), "test", types.JSONPatchType, patch, metav1.PatchOptions{}, "status")
+	assertion.MustNoError(t, err)
+	assertion.Equal(t, corev1.NamespacePhaseActive, ns.Status.Phase)
+
+	actions := s.Actions()
+	assertion.Len(t, actions, 1)
+	action, ok := actions[0].(k8stesting.PatchActionImpl)
+	assertion.Equal(t, true, ok)
+	assertion.Equal(t, types.JSONPatchType, action.GetPatchType())
+	assertion.Equal(t, "namespaces", action.GetResource().Resource)
+	assertion.Equal(t, "", action.GetNamespace())
+	assertion.Equal(t, "status", action.GetSubresource())
+}

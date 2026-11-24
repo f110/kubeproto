@@ -55,6 +55,7 @@ type Backend interface {
 	UpdateStatus(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	Apply(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error)
 	ApplyStatus(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error)
+	Patch(ctx context.Context, resourceName, namespace, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, result runtime.Object, subresources ...string) (runtime.Object, error)
 	Delete(ctx context.Context, gvr schema.GroupVersionResource, namespace, name string, opts metav1.DeleteOptions) error
 	Watch(ctx context.Context, gvr schema.GroupVersionResource, namespace string, opts metav1.ListOptions) (watch.Interface, error)
 	GetClusterScoped(ctx context.Context, resourceName, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error)
@@ -64,6 +65,7 @@ type Backend interface {
 	UpdateStatusClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	ApplyClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error)
 	ApplyStatusClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error)
+	PatchClusterScoped(ctx context.Context, resourceName, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, result runtime.Object, subresources ...string) (runtime.Object, error)
 	DeleteClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, name string, opts metav1.DeleteOptions) error
 	WatchClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, opts metav1.ListOptions) (watch.Interface, error)
 
@@ -222,6 +224,18 @@ func (r *restBackend) ApplyStatus(ctx context.Context, resourceName string, obj 
 		Into(result)
 }
 
+func (r *restBackend) Patch(ctx context.Context, resourceName, namespace, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, result runtime.Object, subresources ...string) (runtime.Object, error) {
+	return result, r.client.Patch(pt).
+		Namespace(namespace).
+		Resource(resourceName).
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&opts, ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+}
+
 func (r *restBackend) Delete(ctx context.Context, gvr schema.GroupVersionResource, namespace, name string, opts metav1.DeleteOptions) error {
 	return r.client.Delete().
 		Namespace(namespace).
@@ -349,6 +363,17 @@ func (r *restBackend) ApplyStatusClusterScoped(ctx context.Context, resourceName
 		Into(result)
 }
 
+func (r *restBackend) PatchClusterScoped(ctx context.Context, resourceName, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, result runtime.Object, subresources ...string) (runtime.Object, error) {
+	return result, r.client.Patch(pt).
+		Resource(resourceName).
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&opts, ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+}
+
 // encodeApplyPatch encodes obj into the body of the apply request.
 // The body is passed as []byte because rest.Request overwrites Content-Type when the body is runtime.Object.
 // The apply request requires apiVersion and kind, so they are set from Scheme.
@@ -452,6 +477,14 @@ func (c *BlogV1alpha1) ApplyBlog(ctx context.Context, v *blogv1alpha1.Blog, opts
 	return result.(*blogv1alpha1.Blog), nil
 }
 
+func (c *BlogV1alpha1) PatchBlog(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (*blogv1alpha1.Blog, error) {
+	result, err := c.backend.PatchClusterScoped(ctx, "blogs", name, pt, data, opts, &blogv1alpha1.Blog{}, subresources...)
+	if err != nil {
+		return nil, err
+	}
+	return result.(*blogv1alpha1.Blog), nil
+}
+
 func (c *BlogV1alpha1) DeleteBlog(ctx context.Context, name string, opts metav1.DeleteOptions) error {
 	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "blog.f110.dev", Version: "v1alpha1", Resource: "blogs"}, name, opts)
 }
@@ -494,6 +527,14 @@ func (c *BlogV1alpha1) UpdatePost(ctx context.Context, v *blogv1alpha1.Post, opt
 
 func (c *BlogV1alpha1) ApplyPost(ctx context.Context, v *blogv1alpha1.Post, opts metav1.ApplyOptions) (*blogv1alpha1.Post, error) {
 	result, err := c.backend.Apply(ctx, "posts", v, opts, &blogv1alpha1.Post{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*blogv1alpha1.Post), nil
+}
+
+func (c *BlogV1alpha1) PatchPost(ctx context.Context, namespace, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (*blogv1alpha1.Post, error) {
+	result, err := c.backend.Patch(ctx, "posts", namespace, name, pt, data, opts, &blogv1alpha1.Post{}, subresources...)
 	if err != nil {
 		return nil, err
 	}
@@ -557,6 +598,14 @@ func (c *BlogV1alpha2) ApplyAuthor(ctx context.Context, v *blogv1alpha2.Author, 
 	return result.(*blogv1alpha2.Author), nil
 }
 
+func (c *BlogV1alpha2) PatchAuthor(ctx context.Context, namespace, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (*blogv1alpha2.Author, error) {
+	result, err := c.backend.Patch(ctx, "authors", namespace, name, pt, data, opts, &blogv1alpha2.Author{}, subresources...)
+	if err != nil {
+		return nil, err
+	}
+	return result.(*blogv1alpha2.Author), nil
+}
+
 func (c *BlogV1alpha2) DeleteAuthor(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error {
 	return c.backend.Delete(ctx, schema.GroupVersionResource{Group: "blog.f110.dev", Version: "v1alpha2", Resource: "authors"}, namespace, name, opts)
 }
@@ -605,6 +654,14 @@ func (c *BlogV1alpha2) ApplyBlog(ctx context.Context, v *blogv1alpha2.Blog, opts
 	return result.(*blogv1alpha2.Blog), nil
 }
 
+func (c *BlogV1alpha2) PatchBlog(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (*blogv1alpha2.Blog, error) {
+	result, err := c.backend.PatchClusterScoped(ctx, "blogs", name, pt, data, opts, &blogv1alpha2.Blog{}, subresources...)
+	if err != nil {
+		return nil, err
+	}
+	return result.(*blogv1alpha2.Blog), nil
+}
+
 func (c *BlogV1alpha2) DeleteBlog(ctx context.Context, name string, opts metav1.DeleteOptions) error {
 	return c.backend.DeleteClusterScoped(ctx, schema.GroupVersionResource{Group: "blog.f110.dev", Version: "v1alpha2", Resource: "blogs"}, name, opts)
 }
@@ -647,6 +704,14 @@ func (c *BlogV1alpha2) UpdatePost(ctx context.Context, v *blogv1alpha2.Post, opt
 
 func (c *BlogV1alpha2) ApplyPost(ctx context.Context, v *blogv1alpha2.Post, opts metav1.ApplyOptions) (*blogv1alpha2.Post, error) {
 	result, err := c.backend.Apply(ctx, "posts", v, opts, &blogv1alpha2.Post{})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*blogv1alpha2.Post), nil
+}
+
+func (c *BlogV1alpha2) PatchPost(ctx context.Context, namespace, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (*blogv1alpha2.Post, error) {
+	result, err := c.backend.Patch(ctx, "posts", namespace, name, pt, data, opts, &blogv1alpha2.Post{}, subresources...)
 	if err != nil {
 		return nil, err
 	}

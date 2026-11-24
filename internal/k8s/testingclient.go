@@ -404,6 +404,25 @@ type fakerBackend struct {
 	return obj.DeepCopyObject(), err
 }`, clientPackageName)
 
+	writer.F(`func (f *fakerBackend) Patch(ctx context.Context, resourceName, namespace, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, result runtime.Object, subresources ...string) (runtime.Object, error) {
+	gvks, _, err := %s.Scheme.ObjectKinds(result)
+	if err != nil {
+		return nil, err
+	}
+	gvk := gvks[0]
+	patchOpts := k8smetav1.PatchOptions{DryRun: opts.DryRun, FieldManager: opts.FieldManager, FieldValidation: opts.FieldValidation}
+	if opts.Force {
+		patchOpts.Force = &opts.Force
+	}
+	action := k8stesting.NewPatchSubresourceActionWithOptions(gvk.GroupVersion().WithResource(resourceName), namespace, name, pt, data, patchOpts, subresources...)
+	obj, err := f.fake.Invokes(action, result)
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.DeepCopyObject(), err
+}`, clientPackageName)
+
 	writer.F(`func (f *fakerBackend) Delete(ctx context.Context, gvr schema.GroupVersionResource, namespace, name string, opts metav1.DeleteOptions) error {
 	_, err := f.fake.Invokes(k8stesting.NewDeleteAction(gvr, namespace, name), nil)
 
@@ -442,6 +461,10 @@ func (f *fakerBackend) ApplyClusterScoped(ctx context.Context, resourceName stri
 
 func (f *fakerBackend) ApplyStatusClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error) {
 	return f.ApplyStatus(ctx, resourceName, obj, opts, result)
+}
+
+func (f *fakerBackend) PatchClusterScoped(ctx context.Context, resourceName, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, result runtime.Object, subresources ...string) (runtime.Object, error) {
+	return f.Patch(ctx, resourceName, "", name, pt, data, opts, result, subresources...)
 }
 
 func (f *fakerBackend) DeleteClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, name string, opts metav1.DeleteOptions) error {

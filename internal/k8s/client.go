@@ -99,6 +99,7 @@ type Backend interface {
 	UpdateStatus(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	Apply(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error)
 	ApplyStatus(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error)
+	Patch(ctx context.Context, resourceName, namespace, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, result runtime.Object, subresources ...string) (runtime.Object, error)
 	Delete(ctx context.Context, gvr schema.GroupVersionResource, namespace, name string, opts metav1.DeleteOptions) error
 	Watch(ctx context.Context, gvr schema.GroupVersionResource, namespace string, opts metav1.ListOptions) (watch.Interface, error)
 	GetClusterScoped(ctx context.Context, resourceName, name string, opts metav1.GetOptions, result runtime.Object) (runtime.Object, error)
@@ -108,6 +109,7 @@ type Backend interface {
 	UpdateStatusClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.UpdateOptions, result runtime.Object) (runtime.Object, error)
 	ApplyClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error)
 	ApplyStatusClusterScoped(ctx context.Context, resourceName string, obj runtime.Object, opts metav1.ApplyOptions, result runtime.Object) (runtime.Object, error)
+	PatchClusterScoped(ctx context.Context, resourceName, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, result runtime.Object, subresources ...string) (runtime.Object, error)
 	DeleteClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, name string, opts metav1.DeleteOptions) error
 	WatchClusterScoped(ctx context.Context, gvr schema.GroupVersionResource, opts metav1.ListOptions) (watch.Interface, error)
 
@@ -381,6 +383,18 @@ func (r *restBackend) ApplyStatus(ctx context.Context, resourceName string, obj 
 		Into(result)
 }
 
+func (r *restBackend) Patch(ctx context.Context, resourceName, namespace, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, result runtime.Object, subresources ...string) (runtime.Object, error) {
+	return result, r.client.Patch(pt).
+		Namespace(namespace).
+		Resource(resourceName).
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&opts, ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+}
+
 func (r *restBackend) Delete(ctx context.Context, gvr schema.GroupVersionResource, namespace, name string, opts metav1.DeleteOptions) error {
 	return r.client.Delete().
 		Namespace(namespace).
@@ -504,6 +518,17 @@ func (r *restBackend) ApplyStatusClusterScoped(ctx context.Context, resourceName
 		SubResource("status").
 		VersionedParams(&patchOpts, ParameterCodec).
 		Body(patch).
+		Do(ctx).
+		Into(result)
+}
+
+func (r *restBackend) PatchClusterScoped(ctx context.Context, resourceName, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, result runtime.Object, subresources ...string) (runtime.Object, error) {
+	return result, r.client.Patch(pt).
+		Resource(resourceName).
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&opts, ParameterCodec).
+		Body(data).
 		Do(ctx).
 		Into(result)
 }
@@ -704,6 +729,21 @@ func (r *restBackend) RESTClient() *rest.RESTClient {
 				writer.F("}")
 				writer.F("")
 			}
+
+			// PatchXXX
+			if m.Scope == definition.ScopeTypeCluster {
+				writer.F("func (c *%s) Patch%s(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (*%s, error) {", clientName, m.ShortName, structNameWithPkg)
+				writer.F("result, err := c.backend.PatchClusterScoped(ctx, %q, name, pt, data, opts, &%s{}, subresources...)", strings.ToLower(stringsutil.Plural(m.ShortName)), structNameWithPkg)
+			} else {
+				writer.F("func (c *%s) Patch%s(ctx context.Context, namespace, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (*%s, error) {", clientName, m.ShortName, structNameWithPkg)
+				writer.F("result, err := c.backend.Patch(ctx, %q, namespace, name, pt, data, opts, &%s{}, subresources...)", strings.ToLower(stringsutil.Plural(m.ShortName)), structNameWithPkg)
+			}
+			writer.F("if err != nil {")
+			writer.F("return nil, err")
+			writer.F("}")
+			writer.F("return result.(*%s), nil", structNameWithPkg)
+			writer.F("}")
+			writer.F("")
 
 			// DeleteXXX
 			if m.Scope == definition.ScopeTypeCluster {
